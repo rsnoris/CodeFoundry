@@ -62,6 +62,72 @@
     .nav-btn.primary { background: var(--primary); color: var(--navy-2); font-weight: 700; }
     .nav-btn.secondary { background: #fff; color: var(--navy);}
     .mobile-hamburger { display: none; background: none; border: none; color: var(--text); font-size: 29px; padding: 5px 10px; margin-left: 10px; cursor: pointer; }
+    @media (max-width: 768px) {
+      .nav-menu,
+      .nav-actions {
+        display: none;
+      }
+      .mobile-hamburger {
+        display: block;
+      }
+    }
+    .mobile-nav-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 2000;
+      display: none;
+      backdrop-filter: blur(4px);
+    }
+    .mobile-nav-overlay.open {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .mobile-nav-panel {
+      width: 80%;
+      max-width: 340px;
+      background: #0e1828f9;
+      height: 100%;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      backdrop-filter: blur(20px);
+      border-left: 1px solid var(--border-color);
+    }
+    .mobile-menu-close {
+      align-self: flex-end;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 28px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+    .mobile-menu-links {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .mobile-menu-links .nav-link {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .mobile-menu-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: auto;
+    }
+    .mobile-menu-actions .nav-btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+    }
     .main-content { max-width: 800px; background: var(--navy-3); border-radius: var(--card-radius); border:1px solid var(--border-color); margin: 44px auto 40px auto; padding: 40px 26px; }
     @media (max-width: 700px) { .main-content { margin: 28px 6px 28px 6px; padding: 18px 6px;} .nav {padding: 0 6px;} }
     .section-heading { text-align: center; margin-bottom: 34px;}
@@ -103,19 +169,43 @@
       CodeFoundry
     </div>
     <nav class="nav-menu">
-      <a href="index.html#services" class="nav-link">Services</a>
-      <a href="index.html#solutions" class="nav-link">Solutions</a>
-      <a href="index.html#industries" class="nav-link">Industries</a>
-      <a href="CaseStudies.html" class="nav-link">Case Studies</a>
-      <a href="about.html" class="nav-link">About</a>
-      <a href="careers.html" class="nav-link active">Careers</a>
+      <a href="/#services" class="nav-link">Services</a>
+      <a href="/#solutions" class="nav-link">Solutions</a>
+      <a href="/#industries" class="nav-link">Industries</a>
+      <a href="/CaseStudies/" class="nav-link">Case Studies</a>
+      <a href="/AboutUs" class="nav-link">About</a>
+      <a href="/Careers/" class="nav-link active">Careers</a>
     </nav>
     <div class="nav-actions">
       <button class="nav-btn secondary" style="font-weight:800;">Media Kit</button>
       <button class="nav-btn primary">Get Started</button>
+      <button class="mobile-hamburger" id="mobileMenuBtn" aria-label="Open menu">
+        <iconify-icon icon="lucide:menu"></iconify-icon>
+      </button>
     </div>
   </div>
 </header>
+
+<div class="mobile-nav-overlay" id="mobileNav">
+  <div class="mobile-nav-panel">
+    <button class="mobile-menu-close" id="closeMobileNav" aria-label="Close menu">
+      <iconify-icon icon="lucide:x"></iconify-icon>
+    </button>
+    <div class="mobile-menu-links">
+      <a href="/#services" class="nav-link" onclick="closeMobileNav()">Services</a>
+      <a href="/#solutions" class="nav-link" onclick="closeMobileNav()">Solutions</a>
+      <a href="/#industries" class="nav-link" onclick="closeMobileNav()">Industries</a>
+      <a href="/CaseStudies/" class="nav-link" onclick="closeMobileNav()">Case Studies</a>
+      <a href="/AboutUs" class="nav-link" onclick="closeMobileNav()">About</a>
+      <a href="/Careers/" class="nav-link active" onclick="closeMobileNav()">Careers</a>
+    </div>
+    <div class="mobile-menu-actions">
+      <button class="nav-btn secondary" style="font-weight:800;">Media Kit</button>
+      <button class="nav-btn primary">Get Started</button>
+    </div>
+  </div>
+</div>
+
 <main class="main-content">
   <section class="section-heading">
     <h2 class="section-title">Build the Future at CodeFoundry</h2>
@@ -173,8 +263,8 @@
       <ul class="footer-link-list">
         <li><a href="/Services/SoftwareDevelopment/" class="footer-link">Software Development</a></li>
         <li><a href="/Services/CloudConsulting/" class="footer-link">Cloud Consulting</a></li>
-        <li><a href="Services/Fractional/" class="footer-link">Fractional CTO</a></li>
-        <li><a href="Services/ITStrategy/" class="footer-link">IT Strategy</a></li>
+        <li><a href="/Services/Fractional/" class="footer-link">Fractional CTO</a></li>
+        <li><a href="/Services/ITStrategy/" class="footer-link">IT Strategy</a></li>
       </ul>
     </div>
     <div class="footer-col">
@@ -201,5 +291,17 @@
     <div>Crafted with innovation and excellence</div>
   </div>
 </footer>
+
+<script>
+  const menuBtn = document.getElementById('mobileMenuBtn');
+  const mobileNav = document.getElementById('mobileNav');
+  const closeBtn = document.getElementById('closeMobileNav');
+  function closeMobileNav() { mobileNav.classList.remove('open'); }
+  menuBtn.onclick = () => mobileNav.classList.add('open');
+  closeBtn.onclick = closeMobileNav;
+  mobileNav.onclick = (e) => {
+    if(e.target === mobileNav) closeMobileNav();
+  };
+</script>
 </body>
 </html>
