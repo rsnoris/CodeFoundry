@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeFoundry - Enterprise Technology Solutions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0e1828;
+      --navy-2: #121c2b;
+      --navy-3: #161f2f;
+      --primary: #18b3ff;
+      --primary-hover: #009de0;
+      --text: #fff;
+      --text-muted: #92a3bb;
+      --text-subtle: #627193;
+      --border-color: #1a2942;
+      --button-outline: #ffffff22;
+      --button-radius: 8px;
+      --maxwidth: 1200px;
+      --card-radius: 12px;
+      --header-height: 68px;
+      --mobile-menu-bg: #0e1828f9;
+    }
+    html, body {
+      background: var(--navy-2);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    body { min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+
+    header {
+      background: var(--navy);
+      color: var(--text);
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid #192746;
+    }
+    .nav {
+      max-width: var(--maxwidth);
+      margin: 0 auto;
+      padding: 0 40px;
+      min-height: var(--header-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      font-weight: 800;
+      font-size: 22px;
+      gap: 12px;
+      letter-spacing: -0.5px;
+    }
+    .brand svg {
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      border-radius: 6px;
+      color: #092340;
+      padding: 4px;
+      margin-right: 4px;
+      box-sizing: border-box;
+    }
+    .nav-menu {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+    }
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 15px;
+      transition: color .2s;
+    }
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--text);
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .nav-btn {
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      border: 0;
+      border-radius: var(--button-radius);
+      padding: 10px 18px;
+      background: var(--navy-3);
+      color: var(--text);
+      outline: 0;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .nav-btn.primary {
+      background: var(--primary);
+      color: var(--navy-2);
+      font-weight: 700;
+    }
+    .nav-btn.primary:hover {
+      background: var(--primary-hover);
+    }
+    .nav-btn.secondary {
+      background: #fff;
+      color: var(--navy);
+    }
+    .mobile-hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 29px;
+      padding: 5px 10px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    /* MOBILE NAV */
+    .mobile-nav-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100vw;
+      background: var(--mobile-menu-bg);
+      z-index: 9999;
+      transition: opacity .23s, visibility .23s;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-end;
+    }
+    .mobile-nav-overlay.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition: opacity .32s;
+    }
+    .mobile-nav-panel {
+      min-width: 75vw;
+      max-width: 340px;
+      height: 100%;
+      background: var(--navy);
+      box-shadow: 0 0 22px #00112a88;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 32px 28px 18px 28px;
+    }
+    .mobile-menu-close {
+      align-self: flex-end;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 32px;
+      margin-top: 0;
+      margin-bottom: 22px;
+      cursor: pointer;
+    }
+    .mobile-menu-links {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      width: 100%;
+    }
+    .mobile-menu-links a.nav-link {
+      color: var(--text-muted);
+      font-size: 18px;
+      font-weight: 700;
+      padding: 5px 0;
+      border: none;
+      background: none;
+      text-align: left;
+    }
+    .mobile-menu-actions {
+      margin-top: 35px;
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      width: 100%;
+    }
+    .mobile-menu-actions .nav-btn.primary,
+    .mobile-menu-actions .nav-btn.secondary {
+      width: 100%;
+      font-size: 17px;
+    }
+
+    .hero-bg {
+      background: var(--navy-2);
+      width: 100vw;
+      padding: 0;
+      margin: 0;
+    }
+    .hero {
+      max-width: var(--maxwidth);
+      margin: 0 auto;
+      padding: 54px 40px 60px 40px;
+      display: flex;
+      gap: 48px;
+      align-items: stretch;
+    }
+    .hero-col {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .hero-badge {
+      background: var(--navy-3);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 13px;
+      display: inline-block;
+      padding: 6px 28px;
+      border-radius: 20px;
+      margin-bottom: 32px;
+      letter-spacing: .08em;
+      box-shadow: 0 2px 12px 0 #0e273533;
+      width: fit-content;
+    }
+    .hero-title {
+      font-size: 3.2rem;
+      line-height: 1.14;
+      font-weight: 800;
+      margin-bottom: 24px;
+      letter-spacing: -1px;
+    }
+    .hero-title .highlight {
+      color: var(--primary);
+    }
+    .hero-desc {
+      color: var(--text-subtle);
+      font-size: 1.15rem;
+      margin-bottom: 34px;
+      line-height: 1.65;
+      max-width: 540px;
+      font-weight: 500;
+    }
+    .hero-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+    .hero-row .btn {
+      min-width: 190px;
+      font-size: 16px;
+      border-radius: var(--button-radius);
+      font-weight: 600;
+      border: 0;
+      padding: 13px 0 13px 0;
+      display: inline-block;
+      text-align: center;
+      transition: background .2s, color .2s;
+    }
+    .hero-row .btn.primary {
+      background: var(--primary);
+      color: var(--navy-3);
+    }
+    .hero-row .btn.primary:hover { background: var(--primary-hover);}
+    .hero-row .btn.secondary {
+      background: var(--navy-3);
+      border: 1px solid var(--button-outline);
+      color: var(--text);
+    }
+    .hero-row .btn.secondary:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .hero-stats {
+      display: flex;
+      align-items: flex-start;
+      gap: 48px;
+      margin-bottom: 0;
+    }
+    .stat-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+    }
+    .stat-label {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: var(--text);
+    }
+    .stat-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 2px;
+    }
+    .stat-desc {
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 400;
+    }
+    .hero-image-wrap {
+      flex: 1 1 0;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      min-width: 320px;
+    }
+    .hero-img {
+      border-radius: 16px;
+      background: #07121f;
+      width: 100%;
+      max-width: 540px;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      box-shadow: 0 8px 36px #0a192a77;
+    }
+    section {
+      padding: 78px 0 0 0;
+      background: transparent;
+    }
+    .section-heading {
+      max-width: var(--maxwidth);
+      margin: 0 auto 42px auto;
+      text-align: center;
+    }
+    .section-badge {
+      background: var(--navy-3);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 12px;
+      display: inline-block;
+      padding: 7px 22px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+      letter-spacing: .08em;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .section-title {
+      margin: 0 0 10px 0;
+      font-size: 2.04rem;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      color: var(--text);
+    }
+    .section-desc {
+      margin-top: 0;
+      color: var(--text-subtle);
+      font-size: 1.09rem;
+      font-weight: 500;
+    }
+    .services-grid, .cloud-grid, .industry-grid, .sizes-grid {
+      width: 100%;
+      max-width: var(--maxwidth);
+      margin: 0 auto;
+      display: grid;
+      gap: 32px;
+      box-sizing: border-box;
+    }
+    .services-grid { grid-template-columns: repeat(3, 1fr); margin-bottom: 72px; }
+    .service-card {
+      background: var(--navy-3);
+      border-radius: var(--card-radius);
+      border: 1px solid var(--border-color);
+      padding: 38px 32px 36px 32px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      transition: box-shadow 0.18s, border-color 0.18s;
+    }
+    .service-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 8px 24px 0 #18b3ff44;
+    }
+    .service-icon {
+      width: 51px;
+      height: 51px;
+      border-radius: 10px;
+      background: var(--primary);
+      color: #00192d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 25px;
+      margin-bottom: 10px;
+    }
+    .card-title { font-weight: 800; font-size: 1.25rem; margin-bottom: 4px; }
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 15px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .feature-list {
+      padding: 0;
+      list-style: none;
+      margin: 0 0 20px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 15px;
+    }
+    .learn-more {
+      color: var(--primary);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 15px;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .cloud-grid { grid-template-columns: repeat(5, 1fr); margin-bottom: 90px; }
+    .cloud-card {
+      background: var(--navy-3);
+      border-radius: 9px;
+      border: 1px solid var(--border-color);
+      padding: 33px 17px 29px 17px;
+      text-align: center;
+      transition: box-shadow 0.18s, border-color 0.18s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .cloud-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 2px 14px #0ab7fa22;
+    }
+    .cloud-icon { color: var(--primary); font-size: 30px; margin-bottom: 11px; }
+    .cloud-title { font-weight: 700; }
+    .cloud-desc { color: var(--text-muted); font-size: 13.5px; margin-top: -2px; }
+    .industry-grid { grid-template-columns: repeat(4, 1fr); margin-bottom: 90px;}
+    .industry-card {
+      background: var(--navy-3);
+      border-radius: 9px;
+      border: 1px solid var(--border-color);
+      padding: 24px 18px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      transition: box-shadow 0.18s, border-color 0.18s;
+      gap: 7px;
+    }
+    .industry-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 2px 11px #18b3ff22;
+    }
+    .industry-icon { color: var(--primary); font-size: 22px; margin-bottom: 6px;}
+    .industry-title { font-weight: 700; margin-bottom: 4px;}
+    .industry-desc { color: var(--text-muted); font-size: 14px; margin-bottom: 0;}
+    .sizes-grid { grid-template-columns: repeat(3, 1fr); margin-bottom: 80px;}
+    .size-card {
+      background: var(--navy-3);
+      border-radius: 11px;
+      border: 1px solid var(--border-color);
+      padding: 38px 26px 28px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: box-shadow .18s, border-color .18s;
+    }
+    .size-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 2px 13px #18b3ff25;
+    }
+    .size-icon-box {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #011c2f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 9px;
+    }
+    .size-title { font-size: 18px; font-weight: 800; margin-bottom: 1px;}
+    .size-desc { color: var(--text-muted); font-size: 15px; margin-bottom: 7px;}
+    .check-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 9px; }
+    .check-item { display: flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 600; font-size: 15px;}
+    .cta-section { padding: 85px 0 60px 0; background: linear-gradient(90deg, #0e1828 80%, #18b3ff11 100%);}
+    .cta-card {
+      background: linear-gradient(120deg,#081729 10%,#0f2742 80%);
+      border-radius: 18px;
+      padding: 70px 28px 72px 28px;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+      color: #fff;
+      box-shadow: 0 2px 36px #158bca44;
+    }
+    .cta-title { font-size: 2.3rem; font-weight: 800; margin-bottom: 20px;}
+    .cta-subtitle {
+      color: #dde6f3;
+      font-size: 1.25rem;
+      margin-bottom: 29px;
+      line-height: 1.6;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-actions { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+    .cta-actions .btn {
+      font-size: 16px;
+      border-radius: var(--button-radius);
+      padding: 13px 32px;
+      font-weight: 700;
+      border: 0;
+      background: var(--primary);
+      color: #02182b;
+      cursor: pointer;
+      transition: background 0.16s, color 0.16s;
+    }
+    .cta-actions .btn.secondary {
+      background: var(--navy-3);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+    .cta-actions .btn.secondary:hover {
+      background: var(--primary);
+      color: #021839;
+    }
+    .footer-section {
+      background: var(--navy);
+      color: var(--text-muted);
+      padding: 70px 0 22px 0;
+      margin-top: 48px;
+    }
+    .footer-row {
+      max-width: var(--maxwidth);
+      margin: 0 auto;
+      display: flex;
+      gap: 44px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid #1a2942;
+      padding-bottom: 38px;
+    }
+    .footer-brand {
+      flex: 1 1 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 21px;
+      color: #fff;
+    }
+    .footer-logo svg { width: 28px; height: 28px; background: var(--primary); border-radius: 6px; color: #011c2f; padding: 4px;}
+    .footer-link-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 7px; }
+    .footer-col { flex: 1 1 140px;}
+    .footer-col-title { font-weight: 700; color: #fff; font-size: 15.5px; margin-bottom: 11px;}
+    .footer-link {color: var(--text-muted); font-size: 15px; text-decoration: none; font-weight: 500; transition: color 0.15s;}
+    .footer-link:hover { color: var(--primary);}
+    .footer-social {display: flex; gap: 14px; margin-top: 6px;}
+    .footer-social a {color: var(--primary); background: var(--navy-3); border-radius: 5px; padding: 6px 9px; display: flex; align-items: center; font-size: 19px; transition: background 0.18s;}
+    .footer-social a:hover {background: var(--primary); color: var(--navy);}
+    .footer-legal {
+      max-width: var(--maxwidth);
+      margin: 0 auto;
+      font-size: 13.2px;
+      color: #6e7b97;
+      padding-top: 23px;
+      display: flex;
+      gap: 19px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+    /* RESPONSIVE */
+    @media (max-width: 1100px) {
+      .hero, .section-heading, .services-grid, .cloud-grid, .industry-grid, .sizes-grid, .footer-row { padding-left: 12px !important; padding-right: 12px !important; }
+      .hero {flex-direction: column; gap: 42px;}
+      .hero-img { max-width: 100%; }
+    }
+    @media (max-width: 990px) {
+      .services-grid,
+      .cloud-grid {grid-template-columns: repeat(2, 1fr);}
+      .industry-grid {grid-template-columns: repeat(2, 1fr);}
+      .sizes-grid {grid-template-columns: 1fr;}
+    }
+    @media (max-width: 590px) {
+      .section-heading {padding-left: 0; padding-right: 0;}
+      .services-grid,
+      .cloud-grid,
+      .industry-grid {grid-template-columns: 1fr;}
+      .footer-row {gap: 26px; flex-direction: column; padding-left: 12px; padding-right: 12px;}
+    }
+    @media (max-width: 800px) {
+      .nav-menu, .nav-actions {display: none;}
+      .mobile-hamburger {display: inline-block;}
+    }
+    @media (max-width: 700px) {
+      .nav {padding: 0 10px;}
+      .hero {padding: 36px 6px 38px 6px;}
+      .hero-title { font-size: 2.1rem; }
+      .hero-row .btn { min-width: 120px; }
+      .hero-image-wrap { min-width: 200px; }
+      .hero-stats { gap: 28px;}
+      section {padding-top: 40px;}
+    }
+  </style>
+  <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+</head>
+<body>
+<!-- HEADER / NAV -->
+<header>
+  <div class="nav">
+    <div class="brand">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m18 16l4-4l-4-4M6 8l-4 4l4 4m8.5-12l-5 16"/></svg>
+      CodeFoundry
+    </div>
+    <nav class="nav-menu">
+  <a href="/#services" class="nav-link">Services</a>
+      <a href="/#solutions" class="nav-link">Solutions</a>
+      <a href="/#industries" class="nav-link">Industries</a>
+      <a href="/CaseStudies/" class="nav-link">Case Studies</a>
+      <a href="/AboutUs" class="nav-link">About</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="nav-btn secondary" style="font-weight:800;">Media Kit</button>
+      <button class="nav-btn primary">Get Started</button>
+    </div>
+    <button class="mobile-hamburger" id="mobileMenuBtn" aria-label="Open menu">
+      <iconify-icon icon="lucide:menu"></iconify-icon>
+    </button>
+  </div>
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-nav-overlay" id="mobileNav">
+    <div class="mobile-nav-panel">
+      <button class="mobile-menu-close" id="closeMobileNav" aria-label="Close menu">
+        <iconify-icon icon="lucide:x"></iconify-icon>
+      </button>
+      <div class="mobile-menu-links">
+        <a href="/#services" class="nav-link" onclick="closeMobileNav()">Services</a>
+        <a href="/#solutions" class="nav-link" onclick="closeMobileNav()">Solutions</a>
+        <a href="/#industries" class="nav-link" onclick="closeMobileNav()">Industries</a>
+        <a href="/CaseStudies/" class="nav-link" onclick="closeMobileNav()">Case Studies</a>
+        <a href="/#about" class="nav-link" onclick="closeMobileNav()">About</a>
+      </div>
+      <div class="mobile-menu-actions">
+        <button class="nav-btn secondary" style="font-weight:800;">Media Kit</button>
+        <button class="nav-btn primary">Get Started</button>
+      </div>
+    </div>
+  </div>
+</header>
+<!-- HERO -->
+<section class="hero-bg">
+  <div class="hero">
+    <div class="hero-col">
+      <span class="hero-badge">Tech-First Technology Solutions</span>
+      <h1 class="hero-title">
+        Transform Your Business with <span class="highlight">CodeFoundry</span>
+      </h1>
+      <div class="hero-desc">Enterprise-grade software services, fractional leadership, and comprehensive IT consulting for businesses of all sizes.</div>
+      <div class="hero-row">
+        <button class="btn primary">Schedule Consultation</button>
+        <button class="btn secondary">View Services</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-group">
+          <div class="stat-label">500+</div>
+          <div class="stat-desc">Projects Delivered</div>
+        </div>
+        <div class="stat-group">
+          <div class="stat-label">98%</div>
+          <div class="stat-desc">Client Satisfaction</div>
+        </div>
+        <div class="stat-group">
+          <div class="stat-label">24/7</div>
+          <div class="stat-desc">Support Available</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-image-wrap">
+      <img class="hero-img" src="https://storage.googleapis.com/banani-generated-images/generated-images/b511c073-d260-494d-81ea-973b0eb682c8.jpg" alt="CodeFoundry Technology Cube" />
+    </div>
+  </div>
+</section>
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-heading">
+    <span class="section-badge">OUR SERVICES</span>
+    <h2 class="section-title">Comprehensive Technology Solutions</h2>
+    <p class="section-desc">End-to-end services designed to accelerate your digital transformation journey with precision and scale.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon"><iconify-icon icon="lucide:monitor"></iconify-icon></div>
+      <div class="card-title">Software Services</div>
+      <div class="card-desc">Custom software development, application modernization, and enterprise solutions tailored to your needs.</div>
+      <ul class="feature-list">
+        <li class="feature-item"><iconify-icon icon="lucide:check"></iconify-icon>Custom Development</li>
+        <li class="feature-item"><iconify-icon icon="lucide:check"></iconify-icon>API Integration</li>
+        <li class="feature-item"><iconify-icon icon="lucide:check"></iconify-icon>Cloud Migration</li>
+      </ul>
+      <a href="https://CodeFoundry.cloud/Services/SoftwareDevelopment/" class="learn-more">Learn More <iconify-icon icon="lucide:arrow-right"></iconify-icon></a>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><iconify-icon icon="lucide:users"></iconify-icon></div>
+      <div class="card-title">Fractional Leadership</div>
+      <div class="card-desc">Access C-level expertise without full-time commitment. Strategic guidance when you need it most.</div>
+      <ul class="feature-list">
+        <li class="feature-item"><iconify-icon icon="lucide:check"></iconify-icon>CTO/CIO Services</li>
+        <li class="feature-item"><iconify-icon icon="lucide:check"></iconify-icon>Tech Strategy</li>
+        <li class="feature-item"><iconify-icon icon="lucide:check"></iconify-icon>Team Building</li>
+      </ul>
+      <a href="https://CodeFoundry.cloud/Services/Fractional/" class="learn-more">Learn More <iconify-icon icon="lucide:arrow-right"></iconify-icon></a>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><iconify-icon icon="lucide:cloud"></iconify-icon></div>
+      <div class="card-title">IT Consulting</div>
+      <div class="card-desc">Comprehensive cloud and infrastructure consulting across all major platforms and service models.</div>
+      <ul class="feature-list">
+        <li class="feature-item"><iconify-icon icon="lucide:check"></iconify-icon>IaaS, PaaS, SaaS</li>
+        <li class="feature-item"><iconify-icon icon="lucide:check"></iconify-icon>DBaaS, XaaS</li>
+        <li class="feature-item"><iconify-icon icon="lucide:check"></iconify-icon>Architecture Design</li>
+      </ul>
+      <a href="https://CodeFoundry.cloud/Services/CloudConsulting/" class="learn-more">Learn More <iconify-icon icon="lucide:arrow-right"></iconify-icon></a>
+    </div>
+  </div>
+</section>
+<!-- CLOUD SOLUTIONS -->
+<section id="solutions">
+  <div class="section-heading">
+    <span class="section-badge">CLOUD & INFRASTRUCTURE</span>
+    <h2 class="section-title">Cloud &amp; Infrastructure Solutions</h2>
+    <p class="section-desc">Complete XaaS ecosystem for modern enterprises.</p>
+  </div>
+  <div class="cloud-grid">
+    <div class="cloud-card">
+      <div class="cloud-icon"><iconify-icon icon="lucide:server"></iconify-icon></div>
+      <div class="cloud-title">IaaS</div>
+      <div class="cloud-desc">Infrastructure as a Service</div>
+    </div>
+    <div class="cloud-card">
+      <div class="cloud-icon"><iconify-icon icon="lucide:layers"></iconify-icon></div>
+      <div class="cloud-title">PaaS</div>
+      <div class="cloud-desc">Platform as a Service</div>
+    </div>
+    <div class="cloud-card">
+      <div class="cloud-icon"><iconify-icon icon="lucide:app-window"></iconify-icon></div>
+      <div class="cloud-title">SaaS</div>
+      <div class="cloud-desc">Software as a Service</div>
+    </div>
+    <div class="cloud-card">
+      <div class="cloud-icon"><iconify-icon icon="lucide:database"></iconify-icon></div>
+      <div class="cloud-title">DBaaS</div>
+      <div class="cloud-desc">Database as a Service</div>
+    </div>
+    <div class="cloud-card">
+      <div class="cloud-icon"><iconify-icon icon="lucide:infinity"></iconify-icon></div>
+      <div class="cloud-title">XaaS</div>
+      <div class="cloud-desc">Everything as a Service</div>
+    </div>
+  </div>
+</section>
+<!-- INDUSTRIES -->
+<section id="industries">
+  <div class="section-heading">
+    <span class="section-badge">INDUSTRIES WE SERVE</span>
+    <h2 class="section-title">Tailored Solutions Across Industries</h2>
+  </div>
+  <div class="industry-grid">
+    <div class="industry-card">
+      <div class="industry-icon"><iconify-icon icon="lucide:landmark"></iconify-icon></div>
+      <div class="industry-title">FinTech & Banking</div>
+      <div class="industry-desc">Secure, scalable solutions for financial services</div>
+    </div>
+    <div class="industry-card">
+      <div class="industry-icon"><iconify-icon icon="lucide:heart-pulse"></iconify-icon></div>
+      <div class="industry-title">Healthcare</div>
+      <div class="industry-desc">HIPAA-compliant healthcare technology</div>
+    </div>
+    <div class="industry-card">
+      <div class="industry-icon"><iconify-icon icon="lucide:shopping-cart"></iconify-icon></div>
+      <div class="industry-title">Retail & E-commerce</div>
+      <div class="industry-desc">Omnichannel retail experiences</div>
+    </div>
+    <div class="industry-card">
+      <div class="industry-icon"><iconify-icon icon="lucide:factory"></iconify-icon></div>
+      <div class="industry-title">Manufacturing</div>
+      <div class="industry-desc">IoT and automation solutions</div>
+    </div>
+    <div class="industry-card">
+      <div class="industry-icon"><iconify-icon icon="lucide:graduation-cap"></iconify-icon></div>
+      <div class="industry-title">Education</div>
+      <div class="industry-desc">EdTech platforms and learning systems</div>
+    </div>
+    <div class="industry-card">
+      <div class="industry-icon"><iconify-icon icon="lucide:truck"></iconify-icon></div>
+      <div class="industry-title">Logistics</div>
+      <div class="industry-desc">Supply chain optimization</div>
+    </div>
+    <div class="industry-card">
+      <div class="industry-icon"><iconify-icon icon="lucide:building"></iconify-icon></div>
+      <div class="industry-title">Real Estate</div>
+      <div class="industry-desc">PropTech solutions</div>
+    </div>
+    <div class="industry-card">
+      <div class="industry-icon"><iconify-icon icon="lucide:clapperboard"></iconify-icon></div>
+      <div class="industry-title">Media & Entertainment</div>
+      <div class="industry-desc">Content delivery platforms</div>
+    </div>
+  </div>
+</section>
+<!-- SIZES -->
+<section>
+  <div class="section-heading">
+    <span class="section-badge">FOR EVERY BUSINESS SIZE</span>
+    <h2 class="section-title">Solutions for Every Business Size</h2>
+    <p class="section-desc">From startups to enterprises, we scale with you.</p>
+  </div>
+  <div class="sizes-grid">
+    <div class="size-card">
+      <div class="size-icon-box"><iconify-icon icon="lucide:sprout"></iconify-icon></div>
+      <div class="size-title">Small Business</div>
+      <div class="size-desc">Perfect for startups and growing teams (1-50 employees).</div>
+      <ul class="check-list">
+        <li class="check-item"><iconify-icon icon="lucide:check"></iconify-icon>Affordable pricing</li>
+        <li class="check-item"><iconify-icon icon="lucide:check"></iconify-icon>Rapid deployment</li>
+        <li class="check-item"><iconify-icon icon="lucide:check"></iconify-icon>Scalable solutions</li>
+        <li class="check-item"><iconify-icon icon="lucide:check"></iconify-icon>Part-time CTO access</li>
+      </ul>
+    </div>
+    <div class="size-card">
+      <div class="size-icon-box"><iconify-icon icon="lucide:chart-column-increasing"></iconify-icon></div>
+      <div class="size-title">Medium Business</div>
+      <div class="size-desc">Ideal for established companies (50-500 employees).</div>
+      <ul class="check-list">
+        <li class="check-item"><iconify-icon icon="lucide:check"></iconify-icon>Custom integrations</li>
+        <li class="check-item"><iconify-icon icon="lucide:check"></iconify-icon>Advanced analytics</li>
+        <li class="check-item"><iconify-icon icon="lucide:check"></iconify-icon>Dedicated support</li>
+        <li class="check-item"><iconify-icon icon="lucide:check"></iconify-icon>Strategic consulting</li>
+      </ul>
+    </div>
+    <div class="size-card">
+      <div class="size-icon-box"><iconify-icon icon="lucide:building-2"></iconify-icon></div>
+      <div class="size-title">Large Enterprise</div>
+      <div class="size-desc">Enterprise-grade for organizations (500+ employees).</div>
+      <ul class="check-list">
+        <li class="check-item"><iconify-icon icon="lucide:check"></iconify-icon>Full-scale transformation</li>
+        <li class="check-item"><iconify-icon icon="lucide:check"></iconify-icon>24/7 premium support</li>
+        <li class="check-item"><iconify-icon icon="lucide:check"></iconify-icon>Multi-cloud architecture</li>
+        <li class="check-item"><iconify-icon icon="lucide:check"></iconify-icon>C-level engagement</li>
+      </ul>
+    </div>
+  </div>
+</section>
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-card">
+    <div class="cta-title">Ready to Transform Your Business?</div>
+    <div class="cta-subtitle">
+      Let's discuss how CodeFoundry can accelerate your digital journey with cutting-edge technology solutions.
+    </div>
+    <div class="cta-actions">
+      <a href="https://CodeFoundry.cloud/Contact/" class="btn">Schedule Free Consultation</a>
+      <a href="https://CodeFoundry.cloud/CaseStudies/" class="btn secondary">View Case Studies</a>
+    </div>
+  </div>
+</section>
+<!-- FOOTER -->
+<footer class="footer-section">
+  <div class="footer-row">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m18 16l4-4l-4-4M6 8l-4 4l4 4m8.5-12l-5 16"/></svg>
+        CodeFoundry
+      </div>
+      <div>Empowering businesses with next-generation technology solutions and strategic leadership.</div>
+      <div class="footer-social">
+        <a href="#"><iconify-icon icon="lucide:linkedin"></iconify-icon></a>
+        <a href="#"><iconify-icon icon="lucide:twitter"></iconify-icon></a>
+        <a href="#"><iconify-icon icon="lucide:github"></iconify-icon></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Services</div>
+      <ul class="footer-link-list">
+        <li><a href="/Services/SoftwareDevelopment/" class="footer-link">Software Development</a></li>
+        <li><a href="/Services/CloudConsulting/" class="footer-link">Cloud Consulting</a></li>
+        <li><a href="Services/Fractional/" class="footer-link">Fractional CTO</a></li>
+        <li><a href="Services/ITStrategy/" class="footer-link">IT Strategy</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-link-list">
+        <li><a href="/AboutUs" class="footer-link">About Us</a></li>
+        <li><a href="/CaseStudies/" class="footer-link">Case Studies</a></li>
+        <li><a href="/Careers/" class="footer-link">Careers</a></li>
+        <li><a href="/Contact/" class="footer-link">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Resources</div>
+      <ul class="footer-link-list">
+        <li><a href="/Blog" class="footer-link">Blog</a></li>
+        <li><a href="/Documentation/" class="footer-link">Documentation</a></li>
+        <li><a href="/Support/" class="footer-link">Support</a></li>
+        <li><a href="/PrivacyPolicy/" class="footer-link">Privacy Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-legal">
+    <div>© 2024 CodeFoundry. All rights reserved.</div>
+    <div>Crafted with innovation and excellence</div>
+  </div>
+</footer>
+<script>
+  // Simple mobile nav toggle
+  const menuBtn = document.getElementById('mobileMenuBtn');
+  const mobileNav = document.getElementById('mobileNav');
+  const closeBtn = document.getElementById('closeMobileNav');
+  function closeMobileNav() { mobileNav.classList.remove('open'); }
+  menuBtn.onclick = () => mobileNav.classList.add('open');
+  closeBtn.onclick = closeMobileNav;
+  mobileNav.onclick = (e) => {
+    if(e.target === mobileNav) closeMobileNav();
+  };
+</script>
+</body>
+</html>

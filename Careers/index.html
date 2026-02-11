@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Careers at CodeFoundry</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0e1828;
+      --navy-2: #121c2b;
+      --navy-3: #161f2f;
+      --primary: #18b3ff;
+      --primary-hover: #009de0;
+      --text: #fff;
+      --text-muted: #92a3bb;
+      --border-color: #1a2942;
+      --card-radius: 12px;
+      --maxwidth: 1200px;
+    }
+    html, body {
+      background: var(--navy-2);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: var(--navy);
+      color: var(--text);
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid #192746;
+    }
+    .nav {
+      max-width: var(--maxwidth);
+      margin: 0 auto;
+      padding: 0 40px;
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      font-weight: 800;
+      font-size: 22px;
+      gap: 12px;
+      letter-spacing: -0.5px;
+    }
+    .brand svg {
+      width: 28px; height: 28px; background: var(--primary); border-radius: 6px; color: #092340; padding: 4px; margin-right: 4px; box-sizing: border-box;
+    }
+    .nav-menu { display: flex; gap: 28px; align-items: center;}
+    .nav-link { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 15px; transition: color .2s;}
+    .nav-link:hover, .nav-link.active { color: var(--text);}
+    .nav-actions { display: flex; align-items: center; gap: 16px;}
+    .nav-btn { font-family: inherit; font-size: 15px; font-weight: 700; border: 0; border-radius: 8px; padding: 10px 18px; background: var(--navy-3); color: var(--text); outline: 0; cursor: pointer; transition: background .2s, color .2s;}
+    .nav-btn.primary { background: var(--primary); color: var(--navy-2); font-weight: 700; }
+    .nav-btn.secondary { background: #fff; color: var(--navy);}
+    .mobile-hamburger { display: none; background: none; border: none; color: var(--text); font-size: 29px; padding: 5px 10px; margin-left: 10px; cursor: pointer; }
+    .main-content { max-width: 800px; background: var(--navy-3); border-radius: var(--card-radius); border:1px solid var(--border-color); margin: 44px auto 40px auto; padding: 40px 26px; }
+    @media (max-width: 700px) { .main-content { margin: 28px 6px 28px 6px; padding: 18px 6px;} .nav {padding: 0 6px;} }
+    .section-heading { text-align: center; margin-bottom: 34px;}
+    .section-title { font-size: 2rem; font-weight: 800; margin-bottom: 7px; letter-spacing: -1.2px;}
+    .section-desc { color: var(--text-muted);}
+    .career-list { margin: 22px 0 0 0; padding: 0; list-style: none;}
+    .career-card { background: var(--navy-2); border: 1px solid var(--border-color); border-radius: 9px; margin-bottom: 18px; padding: 23px 18px 18px 18px;}
+    .career-role { font-weight: 800; color: var(--primary); font-size: 1.14rem; margin-bottom: 7px;}
+    .career-location { color: var(--text-muted); font-size: 0.97rem;}
+    .career-desc { margin-top: 6px; color: var(--text-muted);}
+    .career-apply { display: inline-block; margin-top: 13px; color: var(--primary); font-weight: 700; text-decoration: underline; font-size: 15px;}
+    .footer-section {
+      background: var(--navy);
+      color: var(--text-muted);
+      padding: 70px 0 22px 0;
+      margin-top: 48px;
+    }
+    .footer-row { max-width: var(--maxwidth); margin: 0 auto; display: flex; gap: 44px; flex-wrap: wrap; border-bottom: 1px solid #1a2942; padding-bottom: 38px;}
+    .footer-brand { flex: 1 1 260px; display: flex; flex-direction: column; gap: 10px;}
+    .footer-logo {display:flex;align-items:center;gap:10px;font-weight:800;font-size:21px;color:#fff;}
+    .footer-logo svg{width:28px;height:28px;background:var(--primary);border-radius:6px;color:#011c2f;padding:4px;}
+    .footer-link-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:7px;}
+    .footer-col{flex:1 1 140px;}
+    .footer-col-title{font-weight:700;color:#fff;font-size:15.5px;margin-bottom:11px;}
+    .footer-link{color:var(--text-muted);font-size:15px;text-decoration:none;font-weight:500;}
+    .footer-link:hover{color:var(--primary);}
+    .footer-social{display:flex;gap:14px;margin-top:6px;}
+    .footer-social a{color:var(--primary);background:var(--navy-3);border-radius:5px;padding:6px 9px;display:flex;align-items:center;}
+    .footer-social a:hover{background:var(--primary);color:var(--navy);}
+    .footer-legal{max-width:1200px;margin:0 auto;font-size:13.2px;color:#6e7b97;padding-top:23px;display:flex;gap:19px;flex-wrap:wrap;justify-content:space-between;}
+  </style>
+  <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+</head>
+<body>
+<header>
+  <div class="nav">
+    <div class="brand">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m18 16l4-4l-4-4M6 8l-4 4l4 4m8.5-12l-5 16"/></svg>
+      CodeFoundry
+    </div>
+    <nav class="nav-menu">
+      <a href="index.html#services" class="nav-link">Services</a>
+      <a href="index.html#solutions" class="nav-link">Solutions</a>
+      <a href="index.html#industries" class="nav-link">Industries</a>
+      <a href="CaseStudies.html" class="nav-link">Case Studies</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="careers.html" class="nav-link active">Careers</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="nav-btn secondary" style="font-weight:800;">Media Kit</button>
+      <button class="nav-btn primary">Get Started</button>
+    </div>
+  </div>
+</header>
+<main class="main-content">
+  <section class="section-heading">
+    <h2 class="section-title">Build the Future at CodeFoundry</h2>
+    <div class="section-desc">Join a high-impact team shaping the next generation of digital transformation.</div>
+  </section>
+  <ul class="career-list">
+    <li class="career-card">
+      <div class="career-role">Senior Software Engineer</div>
+      <div class="career-location">Remote (USA preferred)</div>
+      <div class="career-desc">Lead the design and delivery of cloud-native apps. Work with Node.js, Python, Azure/AWS, containers, and CI/CD pipelines in a collaborative agile environment.</div>
+      <a href="mailto:careers@codefoundry.cloud?subject=Application Senior Software Engineer" class="career-apply">Apply Now</a>
+    </li>
+    <li class="career-card">
+      <div class="career-role">Frontend Developer</div>
+      <div class="career-location">New York, NY / Remote</div>
+      <div class="career-desc">Build beautiful, responsive UIs using React, TypeScript, and Next.js. Drive UX best practices from design to deployment.</div>
+      <a href="mailto:careers@codefoundry.cloud?subject=Application Frontend Developer" class="career-apply">Apply Now</a>
+    </li>
+    <li class="career-card">
+      <div class="career-role">Cloud Architect</div>
+      <div class="career-location">Remote (Global)</div>
+      <div class="career-desc">Architect and implement scalable microservices and IaC solutions for global clients on AWS, Azure, or GCP. You will mentor teams and advise on best practices.</div>
+      <a href="mailto:careers@codefoundry.cloud?subject=Application Cloud Architect" class="career-apply">Apply Now</a>
+    </li>
+    <li class="career-card">
+      <div class="career-role">Project Manager (Agile)</div>
+      <div class="career-location">Hybrid (New York HQ / Remote)</div>
+      <div class="career-desc">Facilitate agile delivery, manage multiple client projects, ensure milestones, budgets, and communication excellence. Scrum/Agile exp required.</div>
+      <a href="mailto:careers@codefoundry.cloud?subject=Application Project Manager" class="career-apply">Apply Now</a>
+    </li>
+    <li class="career-card">
+      <div class="career-role">Intern: Software Engineering</div>
+      <div class="career-location">Remote or HQ - Summer 2024</div>
+      <div class="career-desc">Work on real-world digital projects and get mentored by senior engineers. CS or related majors, currently enrolled.</div>
+      <a href="mailto:careers@codefoundry.cloud?subject=Application Internship" class="career-apply">Apply Now</a>
+    </li>
+  </ul>
+</main>
+<footer class="footer-section">
+  <div class="footer-row">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m18 16l4-4l-4-4M6 8l-4 4l4 4m8.5-12l-5 16"/></svg>
+        CodeFoundry
+      </div>
+      <div>Empowering businesses with next-generation technology solutions and strategic leadership.</div>
+      <div class="footer-social">
+        <a href="#"><iconify-icon icon="lucide:linkedin"></iconify-icon></a>
+        <a href="#"><iconify-icon icon="lucide:twitter"></iconify-icon></a>
+        <a href="#"><iconify-icon icon="lucide:github"></iconify-icon></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Services</div>
+      <ul class="footer-link-list">
+        <li><a href="/Services/SoftwareDevelopment/" class="footer-link">Software Development</a></li>
+        <li><a href="/Services/CloudConsulting/" class="footer-link">Cloud Consulting</a></li>
+        <li><a href="Services/Fractional/" class="footer-link">Fractional CTO</a></li>
+        <li><a href="Services/ITStrategy/" class="footer-link">IT Strategy</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-link-list">
+        <li><a href="/AboutUs" class="footer-link">About Us</a></li>
+        <li><a href="/CaseStudies/" class="footer-link">Case Studies</a></li>
+        <li><a href="/Careers/" class="footer-link">Careers</a></li>
+        <li><a href="/Contact/" class="footer-link">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Resources</div>
+      <ul class="footer-link-list">
+        <li><a href="/Blog" class="footer-link">Blog</a></li>
+        <li><a href="/Documentation/" class="footer-link">Documentation</a></li>
+        <li><a href="/Support/" class="footer-link">Support</a></li>
+        <li><a href="/PrivacyPolicy/" class="footer-link">Privacy Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-legal">
+    <div>© 2024 CodeFoundry. All rights reserved.</div>
+    <div>Crafted with innovation and excellence</div>
+  </div>
+</footer>
+</body>
+</html>

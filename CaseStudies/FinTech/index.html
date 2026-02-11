@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeFoundry Case Study: FinTech & Banking</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0e1828;
+      --navy-2: #121c2b;
+      --navy-3: #161f2f;
+      --primary: #18b3ff;
+      --primary-hover: #009de0;
+      --text: #fff;
+      --text-muted: #92a3bb;
+      --text-subtle: #627193;
+      --border-color: #1a2942;
+      --button-outline: #ffffff22;
+      --button-radius: 8px;
+      --maxwidth: 1200px;
+      --card-radius: 12px;
+      --header-height: 68px;
+      --mobile-menu-bg: #0e1828f9;
+    }
+    html, body {
+      background: var(--navy-2);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .nav {
+      max-width: var(--maxwidth);
+      margin: 0 auto;
+      padding: 0 40px;
+      min-height: var(--header-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      font-weight: 800;
+      font-size: 22px;
+      gap: 12px;
+      letter-spacing: -0.5px;
+    }
+    .brand svg {
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      border-radius: 6px;
+      color: #092340;
+      padding: 4px;
+      margin-right: 4px;
+      box-sizing: border-box;
+    }
+    .nav-menu {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+    }
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 15px;
+      transition: color .2s;
+    }
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--text);
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .nav-btn {
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      border: 0;
+      border-radius: var(--button-radius);
+      padding: 10px 18px;
+      background: var(--navy-3);
+      color: var(--text);
+      outline: 0;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .nav-btn.primary {
+      background: var(--primary);
+      color: var(--navy-2);
+      font-weight: 700;
+    }
+    .nav-btn.primary:hover {
+      background: var(--primary-hover);
+    }
+    .mobile-hamburger { display: none; }
+    @media (max-width: 800px) {
+      .nav-menu, .nav-actions {display: none;}
+      .mobile-hamburger {display: inline-block;}
+    }
+    .section-heading, .scenarios-main {
+      max-width: var(--maxwidth);
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+    .section-heading {
+      margin-top: 50px;
+      margin-bottom: 35px;
+      text-align: center;
+    }
+    .section-badge {
+      background: var(--navy-3);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 13px;
+      display: inline-block;
+      padding: 7px 22px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+      letter-spacing: .08em;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .section-title {
+      margin: 0 0 10px 0;
+      font-size: 2.04rem;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      color: var(--text);
+    }
+    .section-desc {
+      margin-top: 0;
+      color: var(--text-subtle);
+      font-size: 1.09rem;
+      font-weight: 500;
+    }
+    .scenario-card {
+      background: var(--navy-3);
+      border-radius: var(--card-radius);
+      border: 1px solid var(--border-color);
+      color: var(--text);
+      margin-bottom: 32px;
+      padding: 33px 32px 25px 32px;
+      box-sizing: border-box;
+      transition: box-shadow 0.18s, border-color 0.18s;
+      position: relative;
+    }
+    .scenario-title {
+      font-size: 1.24rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 13px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .scenario-text {
+      color: var(--text-muted);
+      font-size: 15.3px;
+      font-weight: 500;
+      margin-bottom: 5px;
+      line-height: 1.72;
+    }
+    .scenario-features-list {
+      margin-top: 10px;
+      margin-bottom: 0;
+      padding-left: 19px;
+      color: var(--primary);
+      font-size: 15.1px;
+    }
+    .back-link {
+      display: inline-block;
+      color: var(--primary);
+      font-size: 15.4px;
+      margin: 18px 0 18px 1px;
+      text-decoration: underline;
+      font-weight: 700;
+    }
+    /* Footer */
+    .footer-section {
+      background: var(--navy);
+      color: var(--text-muted);
+      padding: 70px 0 22px 0;
+      margin-top: 48px;
+    }
+    .footer-row {
+      max-width: var(--maxwidth);
+      margin: 0 auto;
+      display: flex;
+      gap: 44px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid #1a2942;
+      padding-bottom: 38px;
+    }
+    .footer-brand {
+      flex: 1 1 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 21px;
+      color: #fff;
+    }
+    .footer-logo svg { width: 28px; height: 28px; background: var(--primary); border-radius: 6px; color: #011c2f; padding: 4px;}
+    .footer-link-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 7px; }
+    .footer-col { flex: 1 1 140px;}
+    .footer-col-title { font-weight: 700; color: #fff; font-size: 15.5px; margin-bottom: 11px;}
+    .footer-link {color: var(--text-muted); font-size: 15px; text-decoration: none; font-weight: 500; transition: color 0.15s;}
+    .footer-link:hover { color: var(--primary);}
+    .footer-social {display: flex; gap: 14px; margin-top: 6px;}
+    .footer-social a {color: var(--primary); background: var(--navy-3); border-radius: 5px; padding: 6px 9px; display: flex; align-items: center; font-size: 19px; transition: background 0.18s;}
+    .footer-social a:hover {background: var(--primary); color: var(--navy);}
+    .footer-legal {
+      max-width: var(--maxwidth);
+      margin: 0 auto;
+      font-size: 13.2px;
+      color: #6e7b97;
+      padding-top: 23px;
+      display: flex;
+      gap: 19px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+  <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+</head>
+<body>
+<!-- HEADER / NAV -->
+<header>
+  <div class="nav">
+    <div class="brand">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m18 16l4-4l-4-4M6 8l-4 4l4 4m8.5-12l-5 16"/></svg>
+      CodeFoundry
+    </div>
+    <nav class="nav-menu">
+      <a href="/index.html#services" class="nav-link">Services</a>
+      <a href="/index.html#solutions" class="nav-link">Solutions</a>
+      <a href="/index.html#industries" class="nav-link">Industries</a>
+      <a href="/CaseStudies" class="nav-link active">Case Studies</a>
+      <a href="/AboutUs/" class="nav-link">About</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="nav-btn secondary" style="font-weight:800;">Media Kit</button>
+      <button class="nav-btn primary">Get Started</button>
+    </div>
+    <button class="mobile-hamburger" id="mobileMenuBtn" aria-label="Open menu">
+      <iconify-icon icon="lucide:menu"></iconify-icon>
+    </button>
+  </div>
+</header>
+<a href="/CaseStudies/" class="back-link"><iconify-icon icon="lucide:arrow-left"></iconify-icon> Back to Case Studies</a>
+<section class="section-heading">
+  <span class="section-badge">CASE STUDY</span>
+  <h2 class="section-title">FinTech &amp; Banking Use Cases</h2>
+  <p class="section-desc">CodeFoundry partners with financial leaders to deliver secure, innovative, and scalable digital solutions across the FinTech landscape. Explore real-world scenarios below.</p>
+</section>
+<main class="scenarios-main">
+  <div class="scenario-card">
+    <div class="scenario-title"><iconify-icon icon="lucide:credit-card"></iconify-icon>1. PCI DSS Payment Gateway for Neo-Bank</div>
+    <div class="scenario-text">A digital-only challenger bank needed to rapidly launch in multiple markets. CodeFoundry designed a PCI DSS-compliant payment gateway supporting instant onboarding, modern card issuing, and real-time anti-fraud screening.</div>
+    <ul class="scenario-features-list">
+      <li>Built a scalable microservices architecture on AWS for transaction routing and ledgering.</li>
+      <li>Integrated with MasterCard & Visa APIs for instant card issuance.</li>
+      <li>Real-time AI-powered fraud monitoring reduced chargebacks by 73%.</li>
+      <li>Achieved >99.995% uptime through active-active, multi-region failover and automated healing.</li>
+    </ul>
+  </div>
+  <div class="scenario-card">
+    <div class="scenario-title"><iconify-icon icon="lucide:banknote"></iconify-icon>2. API Platform for Open Banking</div>
+    <div class="scenario-text">A major bank required an open-banking platform to enable safe fintech integrations while maintaining strict regulatory controls.</div>
+    <ul class="scenario-features-list">
+      <li>Developed an OAuth2-secured API suite for third-party access to accounts and payments per PSD2.</li>
+      <li>Deployed sandbox and production environments with audit trails and API analytics for partners.</li>
+      <li>Onboarded 200+ fintech partners with strong onboarding SDKs and documentation.</li>
+    </ul>
+  </div>
+  <div class="scenario-card">
+    <div class="scenario-title"><iconify-icon icon="lucide:safe"></iconify-icon>3. Identity & Biometric Authentication Upgrade</div>
+    <div class="scenario-text">A global payment network needed to modernize security without degrading the user experience.</div>
+    <ul class="scenario-features-list">
+      <li>Added biometric (facial & fingerprint) authentication support to mobile apps and ATMs.</li>
+      <li>Integrated with FIDO2/WebAuthn standard for passwordless login flow.</li>
+      <li>Reduced account takeover incidents by 80% in the first year.</li>
+    </ul>
+  </div>
+  <div class="scenario-card">
+    <div class="scenario-title"><iconify-icon icon="lucide:chart-pie"></iconify-icon>4. Algorithmic Trading Platform Modernization</div>
+    <div class="scenario-text">An institutional asset manager needed real-time AI and analytics for algorithmic trading at scale.</div>
+    <ul class="scenario-features-list">
+      <li>Re-architected on Azure's Kubernetes Service for low-latency, high-frequency execution.</li>
+      <li>Integrated real-time data feeds with big data analytics for ML-based trading decisions.</li>
+      <li>Enabled client access to custom reporting and dashboards via white-label SaaS portal.</li>
+    </ul>
+  </div>
+  <div class="scenario-card">
+    <div class="scenario-title"><iconify-icon icon="lucide:hand-coins"></iconify-icon>5. Digital Lending & Loan Marketplace</div>
+    <div class="scenario-text">A fast-growing fintech startup wanted an integrated loan origination and marketplace platform.</div>
+    <ul class="scenario-features-list">
+      <li>Built a cloud-native, multi-tenant SaaS platform connecting borrowers and lenders.</li>
+      <li>Automated KYC, credit scoring, document workflow, and digital signatures.</li>
+      <li>Seamless integration with multiple credit bureaus and payment rails (ACH, SEPA, UPI).</li>
+    </ul>
+  </div>
+  <div class="scenario-card">
+    <div class="scenario-title"><iconify-icon icon="lucide:cloud-lock"></iconify-icon>6. Crypto Custody & Regulatory Compliance</div>
+    <div class="scenario-text">A fintech innovator needed to launch digital asset custody services aligned to shifting global regulation.</div>
+    <ul class="scenario-features-list">
+      <li>Developed secure, multi-signature crypto custody with hardware security modules (HSM).</li>
+      <li>Implemented continuous KYC/AML and transaction monitoring for compliance in US & EU.</li>
+    </ul>
+  </div>
+  <div class="scenario-card">
+    <div class="scenario-title"><iconify-icon icon="lucide:bell"></iconify-icon>7. Real-time Alerts and Risk Management</div>
+    <div class="scenario-text">To enhance compliance and customer experience, a retail bank leveraged streaming technology to proactively monitor for suspicious banking activity.</div>
+    <ul class="scenario-features-list">
+      <li>Integrated Kafka-based event streaming for instant fraud, limit and compliance monitoring.</li>
+      <li>Automated customer alert engines for rapid response to flagged actions.</li>
+    </ul>
+  </div>
+  <div class="scenario-card">
+    <div class="scenario-title"><iconify-icon icon="lucide:user-check"></iconify-icon>8. Scaling KYC for Global App Expansion</div>
+    <div class="scenario-text">A remittance fintech scaling globally needed robust, automated Know Your Customer flows for high-volume onboarding.</div>
+    <ul class="scenario-features-list">
+      <li>Orchestrated integrations with 40+ global KYC providers and digital ID verifiers.</li>
+      <li>Slashed manual reviews by 90% via ML-driven risk pipeline and OCR.</li>
+    </ul>
+  </div>
+</main>
+<!-- FOOTER -->
+<footer class="footer-section">
+  <div class="footer-row">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m18 16l4-4l-4-4M6 8l-4 4l4 4m8.5-12l-5 16"/></svg>
+        CodeFoundry
+      </div>
+      <div>Empowering businesses with next-generation technology solutions and strategic leadership.</div>
+      <div class="footer-social">
+        <a href="#"><iconify-icon icon="lucide:linkedin"></iconify-icon></a>
+        <a href="#"><iconify-icon icon="lucide:twitter"></iconify-icon></a>
+        <a href="#"><iconify-icon icon="lucide:github"></iconify-icon></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Services</div>
+      <ul class="footer-link-list">
+        <li><a href="#" class="footer-link">Software Development</a></li>
+        <li><a href="#" class="footer-link">Cloud Consulting</a></li>
+        <li><a href="#" class="footer-link">Fractional CTO</a></li>
+        <li><a href="#" class="footer-link">IT Strategy</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-link-list">
+        <li><a href="#" class="footer-link">About Us</a></li>
+        <li><a href="#" class="footer-link">Case Studies</a></li>
+        <li><a href="#" class="footer-link">Careers</a></li>
+        <li><a href="#" class="footer-link">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Resources</div>
+      <ul class="footer-link-list">
+        <li><a href="#" class="footer-link">Blog</a></li>
+        <li><a href="#" class="footer-link">Documentation</a></li>
+        <li><a href="#" class="footer-link">Support</a></li>
+        <li><a href="#" class="footer-link">Privacy Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-legal">
+    <div>© 2024 CodeFoundry. All rights reserved.</div>
+    <div>Crafted with innovation and excellence</div>
+  </div>
+</footer>
+</body>
+</html>
