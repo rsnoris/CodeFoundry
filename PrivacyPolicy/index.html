@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy - CodeFoundry</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0e1828;
+      --navy-2: #121c2b;
+      --navy-3: #161f2f;
+      --primary: #18b3ff;
+      --primary-hover: #009de0;
+      --text: #fff;
+      --text-muted: #92a3bb;
+      --text-subtle: #627193;
+      --border-color: #1a2942;
+      --button-radius: 8px;
+      --maxwidth: 1200px;
+      --card-radius: 12px;
+      --header-height: 68px;
+      --mobile-menu-bg: #0e1828f9;
+    }
+    html, body {
+      background: var(--navy-2);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    body { min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+
+    header {
+      background: var(--navy);
+      color: var(--text);
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid #192746;
+    }
+    .nav {
+      max-width: var(--maxwidth);
+      margin: 0 auto;
+      padding: 0 40px;
+      min-height: var(--header-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      font-weight: 800;
+      font-size: 22px;
+      gap: 12px;
+      letter-spacing: -0.5px;
+    }
+    .brand svg {
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      border-radius: 6px;
+      color: #092340;
+      padding: 4px;
+      margin-right: 4px;
+      box-sizing: border-box;
+    }
+    .nav-menu {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+    }
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 15px;
+      transition: color .2s;
+    }
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--text);
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .nav-btn {
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      border: 0;
+      border-radius: var(--button-radius);
+      padding: 10px 18px;
+      background: var(--navy-3);
+      color: var(--text);
+      outline: 0;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .nav-btn.primary {
+      background: var(--primary);
+      color: var(--navy-2);
+      font-weight: 700;
+    }
+    .nav-btn.secondary {
+      background: #fff;
+      color: var(--navy);
+    }
+    .mobile-hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 29px;
+      padding: 5px 10px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .nav-menu,
+      .nav-actions {
+        display: none;
+      }
+      .mobile-hamburger {
+        display: block;
+      }
+      .nav {
+        padding: 0 20px;
+      }
+    }
+
+    .mobile-nav-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 2000;
+      display: none;
+      backdrop-filter: blur(4px);
+    }
+    .mobile-nav-overlay.open {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .mobile-nav-panel {
+      width: 80%;
+      max-width: 340px;
+      background: var(--mobile-menu-bg);
+      height: 100%;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      backdrop-filter: blur(20px);
+      border-left: 1px solid var(--border-color);
+    }
+    .mobile-menu-close {
+      align-self: flex-end;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 28px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+    .mobile-menu-links {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .mobile-menu-links .nav-link {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .mobile-menu-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: auto;
+    }
+    .mobile-menu-actions .nav-btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 60px 40px;
+    }
+    @media (max-width: 768px) {
+      main {
+        padding: 40px 20px;
+      }
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .page-title {
+      font-size: 3rem;
+      font-weight: 900;
+      margin: 0 0 16px 0;
+      letter-spacing: -2px;
+      line-height: 1.1;
+    }
+    .page-subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 2rem;
+      }
+    }
+
+    .content {
+      background: var(--navy-3);
+      border: 1px solid var(--border-color);
+      border-radius: var(--card-radius);
+      padding: 48px;
+      line-height: 1.8;
+    }
+    @media (max-width: 768px) {
+      .content {
+        padding: 24px;
+      }
+    }
+    .content h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 48px 0 20px 0;
+      letter-spacing: -1px;
+      color: var(--primary);
+    }
+    .content h2:first-child {
+      margin-top: 0;
+    }
+    .content h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 32px 0 16px 0;
+      letter-spacing: -0.5px;
+    }
+    .content p {
+      color: var(--text-muted);
+      margin: 16px 0;
+    }
+    .content ul, .content ol {
+      color: var(--text-muted);
+      margin: 16px 0;
+      padding-left: 28px;
+    }
+    .content li {
+      margin: 8px 0;
+    }
+    .content strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+    .content a {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+    .content a:hover {
+      color: var(--primary-hover);
+    }
+
+    .footer-section {
+      background: var(--navy);
+      color: var(--text-muted);
+      padding: 70px 0 22px 0;
+      margin-top: 80px;
+    }
+    .footer-row {
+      max-width: var(--maxwidth);
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      gap: 44px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #1a2942;
+      padding-bottom: 38px;
+    }
+    @media (max-width: 768px) {
+      .footer-row {
+        padding: 0 20px 38px 20px;
+      }
+    }
+    .footer-brand {
+      flex: 1 1 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 21px;
+      color: #fff;
+    }
+    .footer-logo svg {
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      border-radius: 6px;
+      color: #011c2f;
+      padding: 4px;
+    }
+    .footer-link-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .footer-col {
+      flex: 1 1 140px;
+    }
+    .footer-col-title {
+      font-weight: 700;
+      color: #fff;
+      font-size: 15.5px;
+      margin-bottom: 11px;
+    }
+    .footer-link {
+      color: var(--text-muted);
+      font-size: 15px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .footer-link:hover {
+      color: var(--primary);
+    }
+    .footer-social {
+      display: flex;
+      gap: 14px;
+      margin-top: 6px;
+    }
+    .footer-social a {
+      color: var(--primary);
+      background: var(--navy-3);
+      border-radius: 5px;
+      padding: 6px 9px;
+      display: flex;
+      align-items: center;
+    }
+    .footer-social a:hover {
+      background: var(--primary);
+      color: var(--navy);
+    }
+    .footer-legal {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 23px 40px 0 40px;
+      font-size: 13.2px;
+      color: #6e7b97;
+      display: flex;
+      gap: 19px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    @media (max-width: 768px) {
+      .footer-legal {
+        padding: 23px 20px 0 20px;
+      }
+    }
+  </style>
+  <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+</head>
+<body>
+<header>
+  <div class="nav">
+    <a href="/" class="brand">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m18 16l4-4l-4-4M6 8l-4 4l4 4m8.5-12l-5 16"/></svg>
+      CodeFoundry
+    </a>
+    <nav class="nav-menu">
+      <a href="/#services" class="nav-link">Services</a>
+      <a href="/#solutions" class="nav-link">Solutions</a>
+      <a href="/#industries" class="nav-link">Industries</a>
+      <a href="/CaseStudies/" class="nav-link">Case Studies</a>
+      <a href="/AboutUs" class="nav-link">About</a>
+      <a href="/Careers/" class="nav-link">Careers</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="nav-btn secondary" style="font-weight:800;">Media Kit</button>
+      <button class="nav-btn primary">Get Started</button>
+      <button class="mobile-hamburger" id="mobileMenuBtn" aria-label="Open menu">
+        <iconify-icon icon="lucide:menu"></iconify-icon>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav-overlay" id="mobileNav">
+  <div class="mobile-nav-panel">
+    <button class="mobile-menu-close" id="closeMobileNav" aria-label="Close menu">
+      <iconify-icon icon="lucide:x"></iconify-icon>
+    </button>
+    <div class="mobile-menu-links">
+      <a href="/#services" class="nav-link" onclick="closeMobileNav()">Services</a>
+      <a href="/#solutions" class="nav-link" onclick="closeMobileNav()">Solutions</a>
+      <a href="/#industries" class="nav-link" onclick="closeMobileNav()">Industries</a>
+      <a href="/CaseStudies/" class="nav-link" onclick="closeMobileNav()">Case Studies</a>
+      <a href="/AboutUs" class="nav-link" onclick="closeMobileNav()">About</a>
+      <a href="/Careers/" class="nav-link" onclick="closeMobileNav()">Careers</a>
+    </div>
+    <div class="mobile-menu-actions">
+      <button class="nav-btn secondary" style="font-weight:800;">Media Kit</button>
+      <button class="nav-btn primary">Get Started</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="page-header">
+    <h1 class="page-title">Privacy Policy</h1>
+    <p class="page-subtitle">Last Updated: January 1, 2024</p>
+  </div>
+
+  <div class="content">
+    <h2>Introduction</h2>
+    <p>
+      At CodeFoundry ("we," "our," or "us"), we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or use our services.
+    </p>
+    <p>
+      By accessing or using our services, you agree to the terms of this Privacy Policy. If you do not agree with our policies and practices, please do not use our services.
+    </p>
+
+    <h2>Information We Collect</h2>
+    
+    <h3>Personal Information</h3>
+    <p>We may collect personal information that you voluntarily provide to us, including:</p>
+    <ul>
+      <li>Name and contact information (email address, phone number, mailing address)</li>
+      <li>Company name and business information</li>
+      <li>Professional credentials and work history</li>
+      <li>Payment and billing information</li>
+      <li>Communication preferences</li>
+      <li>Any other information you choose to provide</li>
+    </ul>
+
+    <h3>Automatically Collected Information</h3>
+    <p>When you visit our website, we may automatically collect certain information, including:</p>
+    <ul>
+      <li>IP address and location data</li>
+      <li>Browser type and version</li>
+      <li>Operating system</li>
+      <li>Pages visited and time spent on pages</li>
+      <li>Referring website addresses</li>
+      <li>Device information</li>
+    </ul>
+
+    <h2>How We Use Your Information</h2>
+    <p>We use the information we collect for various purposes, including:</p>
+    <ul>
+      <li>Providing and maintaining our services</li>
+      <li>Processing your requests and transactions</li>
+      <li>Communicating with you about our services</li>
+      <li>Sending marketing and promotional materials (with your consent)</li>
+      <li>Improving our website and services</li>
+      <li>Analyzing usage patterns and trends</li>
+      <li>Detecting and preventing fraud and security issues</li>
+      <li>Complying with legal obligations</li>
+    </ul>
+
+    <h2>Information Sharing and Disclosure</h2>
+    <p>We do not sell your personal information. We may share your information in the following circumstances:</p>
+    <ul>
+      <li><strong>Service Providers:</strong> We may share information with third-party vendors who perform services on our behalf</li>
+      <li><strong>Business Transfers:</strong> In connection with mergers, acquisitions, or sale of assets</li>
+      <li><strong>Legal Requirements:</strong> When required by law or to protect our rights and safety</li>
+      <li><strong>With Your Consent:</strong> When you explicitly authorize us to share your information</li>
+    </ul>
+
+    <h2>Data Security</h2>
+    <p>
+      We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. These measures include:
+    </p>
+    <ul>
+      <li>Encryption of data in transit and at rest</li>
+      <li>Regular security assessments and audits</li>
+      <li>Access controls and authentication mechanisms</li>
+      <li>Employee training on data protection</li>
+      <li>Incident response procedures</li>
+    </ul>
+    <p>
+      However, no method of transmission over the Internet or electronic storage is 100% secure. While we strive to protect your personal information, we cannot guarantee absolute security.
+    </p>
+
+    <h2>Your Rights and Choices</h2>
+    <p>Depending on your location, you may have certain rights regarding your personal information:</p>
+    <ul>
+      <li><strong>Access:</strong> Request access to the personal information we hold about you</li>
+      <li><strong>Correction:</strong> Request correction of inaccurate or incomplete information</li>
+      <li><strong>Deletion:</strong> Request deletion of your personal information</li>
+      <li><strong>Opt-Out:</strong> Opt out of marketing communications</li>
+      <li><strong>Data Portability:</strong> Request a copy of your information in a portable format</li>
+      <li><strong>Restriction:</strong> Request restriction of processing of your information</li>
+    </ul>
+    <p>
+      To exercise these rights, please contact us at <a href="mailto:privacy@codefoundry.cloud">privacy@codefoundry.cloud</a>.
+    </p>
+
+    <h2>Cookies and Tracking Technologies</h2>
+    <p>
+      We use cookies and similar tracking technologies to enhance your experience on our website. Cookies are small data files stored on your device. You can control cookie preferences through your browser settings.
+    </p>
+    <p>We use the following types of cookies:</p>
+    <ul>
+      <li><strong>Essential Cookies:</strong> Required for the website to function properly</li>
+      <li><strong>Analytics Cookies:</strong> Help us understand how visitors interact with our website</li>
+      <li><strong>Marketing Cookies:</strong> Used to deliver relevant advertisements</li>
+      <li><strong>Preference Cookies:</strong> Remember your settings and preferences</li>
+    </ul>
+
+    <h2>Third-Party Links</h2>
+    <p>
+      Our website may contain links to third-party websites. We are not responsible for the privacy practices of these external sites. We encourage you to review the privacy policies of any third-party sites you visit.
+    </p>
+
+    <h2>Children's Privacy</h2>
+    <p>
+      Our services are not directed to individuals under the age of 18. We do not knowingly collect personal information from children. If you believe we have collected information from a child, please contact us immediately.
+    </p>
+
+    <h2>International Data Transfers</h2>
+    <p>
+      Your information may be transferred to and processed in countries other than your country of residence. These countries may have different data protection laws. We ensure appropriate safeguards are in place to protect your information in accordance with this Privacy Policy.
+    </p>
+
+    <h2>Data Retention</h2>
+    <p>
+      We retain your personal information for as long as necessary to fulfill the purposes outlined in this Privacy Policy, unless a longer retention period is required by law. When information is no longer needed, we securely delete or anonymize it.
+    </p>
+
+    <h2>Changes to This Privacy Policy</h2>
+    <p>
+      We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new Privacy Policy on this page and updating the "Last Updated" date. We encourage you to review this Privacy Policy periodically.
+    </p>
+
+    <h2>Contact Us</h2>
+    <p>If you have questions or concerns about this Privacy Policy or our privacy practices, please contact us:</p>
+    <p>
+      <strong>Email:</strong> <a href="mailto:privacy@codefoundry.cloud">privacy@codefoundry.cloud</a><br>
+      <strong>Phone:</strong> +1 234 567 890<br>
+      <strong>Address:</strong> 156 Foundry Ave., Suite 502, New York, NY, USA
+    </p>
+  </div>
+</main>
+
+<footer class="footer-section">
+  <div class="footer-row">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m18 16l4-4l-4-4M6 8l-4 4l4 4m8.5-12l-5 16"/></svg>
+        CodeFoundry
+      </div>
+      <div>Empowering businesses with next-generation technology solutions and strategic leadership.</div>
+      <div class="footer-social">
+        <a href="#"><iconify-icon icon="lucide:linkedin"></iconify-icon></a>
+        <a href="#"><iconify-icon icon="lucide:twitter"></iconify-icon></a>
+        <a href="#"><iconify-icon icon="lucide:github"></iconify-icon></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Services</div>
+      <ul class="footer-link-list">
+        <li><a href="/Services/SoftwareDevelopment/" class="footer-link">Software Development</a></li>
+        <li><a href="/Services/CloudConsulting/" class="footer-link">Cloud Consulting</a></li>
+        <li><a href="/Services/Fractional/" class="footer-link">Fractional CTO</a></li>
+        <li><a href="/Services/ITStrategy/" class="footer-link">IT Strategy</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-link-list">
+        <li><a href="/AboutUs" class="footer-link">About Us</a></li>
+        <li><a href="/CaseStudies/" class="footer-link">Case Studies</a></li>
+        <li><a href="/Careers/" class="footer-link">Careers</a></li>
+        <li><a href="/Contact/" class="footer-link">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Resources</div>
+      <ul class="footer-link-list">
+        <li><a href="/Blog" class="footer-link">Blog</a></li>
+        <li><a href="/Documentation/" class="footer-link">Documentation</a></li>
+        <li><a href="/Support/" class="footer-link">Support</a></li>
+        <li><a href="/PrivacyPolicy/" class="footer-link">Privacy Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-legal">
+    <div>© 2024 CodeFoundry. All rights reserved.</div>
+    <div>Crafted with innovation and excellence</div>
+  </div>
+</footer>
+
+<script>
+  const menuBtn = document.getElementById('mobileMenuBtn');
+  const mobileNav = document.getElementById('mobileNav');
+  const closeBtn = document.getElementById('closeMobileNav');
+  function closeMobileNav() { mobileNav.classList.remove('open'); }
+  menuBtn.onclick = () => mobileNav.classList.add('open');
+  closeBtn.onclick = closeMobileNav;
+  mobileNav.onclick = (e) => {
+    if(e.target === mobileNav) closeMobileNav();
+  };
+</script>
+</body>
+</html>
