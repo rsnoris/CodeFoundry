@@ -2552,15 +2552,15 @@ spec:
 
   // ===== QUIZ FUNCTIONALITY =====
   let currentQuiz = null;
+  let currentQuizKey = null;
   let currentQuestionIndex = 0;
   let userAnswers = [];
-  let quizTimer = null;
-  let timeRemaining = 0;
 
   function startQuiz(quizKey) {
     currentQuiz = quizData[quizKey];
     if (!currentQuiz) return;
     
+    currentQuizKey = quizKey;
     currentQuestionIndex = 0;
     userAnswers = new Array(currentQuiz.questions.length).fill(null);
     
@@ -2669,7 +2669,7 @@ spec:
               'Keep learning! Review the material and try again.'}
           </p>
           <div style="margin-top: 30px; display: flex; gap: 12px; justify-content: center;">
-            <button class="simulator-btn-primary" onclick="startQuiz('${Object.keys(quizData).find(key => quizData[key] === currentQuiz)}')">
+            <button class="simulator-btn-primary" onclick="startQuiz('${currentQuizKey}')">
               Retake Quiz
             </button>
             <button class="simulator-btn-secondary" onclick="closeModal()">
