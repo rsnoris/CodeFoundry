@@ -82,7 +82,6 @@
     .contact-form textarea { min-height: 95px; resize: vertical;}
     .contact-form button { margin-top: 19px; background: var(--primary); color: var(--navy-2); font-weight: 800; border: none; border-radius: 8px; padding: 12px 24px; font-size: 1.1rem; cursor: pointer;}
     .contact-form button:hover { background: var(--primary-hover);}
-    .contact-form button:disabled { opacity: 0.6; cursor: not-allowed; }
     .form-message { margin-top: 16px; padding: 12px 16px; border-radius: 8px; font-weight: 600; text-align: center; }
     .form-message.success { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; }
     .form-message.error { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
@@ -169,7 +168,7 @@
     <input type="email" id="email" name="email" placeholder="Email" required />
     <label for="msg">How can we help?</label>
     <textarea id="msg" name="message" placeholder="Your message..." required></textarea>
-    <button type="submit" id="submitBtn">Send Inquiry</button>
+    <button type="submit">Send Inquiry</button>
     <div id="formMessage" class="form-message" style="display: none;"></div>
   </form>
 </main>
@@ -235,7 +234,6 @@
   // Contact form handling
   const contactForm = document.getElementById('contactForm');
   const formMessage = document.getElementById('formMessage');
-  const submitBtn = document.getElementById('submitBtn');
 
   contactForm.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -251,29 +249,18 @@
       return;
     }
     
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    // Use HTML5 email validation from the input element
+    const emailInput = document.getElementById('email');
+    if (!emailInput.checkValidity()) {
       showMessage('Please enter a valid email address.', 'error');
       return;
     }
     
-    // Disable button and show loading state
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending...';
+    // Show success message (in production, replace with actual API call)
+    showMessage('Thank you for your inquiry! We will get back to you within 24 hours.', 'success');
     
-    // Simulate form submission (in production, this would be an API call)
-    setTimeout(function() {
-      // Show success message
-      showMessage('Thank you for your inquiry! We will get back to you within 24 hours.', 'success');
-      
-      // Reset form
-      contactForm.reset();
-      
-      // Re-enable button
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Send Inquiry';
-    }, 1000);
+    // Reset form
+    contactForm.reset();
   });
 
   function showMessage(text, type) {
