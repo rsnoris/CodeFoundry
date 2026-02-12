@@ -238,21 +238,9 @@
   contactForm.addEventListener('submit', function(e) {
     e.preventDefault();
     
-    // Get form values
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const message = document.getElementById('msg').value.trim();
-    
-    // Basic validation
-    if (!name || !email || !message) {
-      showMessage('Please fill in all fields.', 'error');
-      return;
-    }
-    
-    // Use HTML5 email validation from the input element
-    const emailInput = document.getElementById('email');
-    if (!emailInput.checkValidity()) {
-      showMessage('Please enter a valid email address.', 'error');
+    // Use HTML5 form validation
+    if (!contactForm.checkValidity()) {
+      showMessage('Please fill in all fields correctly.', 'error');
       return;
     }
     
@@ -265,11 +253,13 @@
 
   function showMessage(text, type) {
     formMessage.textContent = text;
-    formMessage.className = 'form-message ' + type;
+    // Validate type parameter to prevent CSS class injection
+    const validType = (type === 'success' || type === 'error') ? type : 'error';
+    formMessage.className = 'form-message ' + validType;
     formMessage.style.display = 'block';
     
     // Auto-hide success messages after 5 seconds
-    if (type === 'success') {
+    if (validType === 'success') {
       setTimeout(function() {
         formMessage.style.display = 'none';
       }, 5000);
