@@ -7,8 +7,6 @@
 
 namespace CodeFoundry\Config;
 
-use type Facebook\TypeAssert\TypeAssert;
-
 /**
  * Immutable value type representing a navigation link.
  */
