@@ -1,0 +1,45 @@
+{
+  "site": {
+    "name": "CodeFoundry",
+    "tagline": "Enterprise Technology Solutions",
+    "email": "hello@codefoundry.cloud",
+    "phone": "+1 234 567 890",
+    "address": "156 Foundry Ave., Suite 502, New York, NY, USA",
+    "copyright": "2024 CodeFoundry. All rights reserved."
+  },
+  "nav": [
+    { "label": "Services",     "href": "/#services",     "id": "services" },
+    { "label": "Solutions",    "href": "/#solutions",    "id": "solutions" },
+    { "label": "Industries",   "href": "/#industries",   "id": "industries" },
+    { "label": "Case Studies", "href": "/CaseStudies/",  "id": "case-studies" },
+    { "label": "Training",     "href": "/Training/",     "id": "training" },
+    { "label": "About",        "href": "/AboutUs/",      "id": "about" },
+    { "label": "Careers",      "href": "/Careers/",      "id": "careers" }
+  ],
+  "footer": {
+    "services": [
+      { "label": "Software Development", "href": "/Services/SoftwareDevelopment/" },
+      { "label": "Cloud Consulting",     "href": "/Services/CloudConsulting/" },
+      { "label": "Fractional CTO",       "href": "/Services/Fractional/" },
+      { "label": "IT Strategy",          "href": "/Services/ITStrategy/" }
+    ],
+    "company": [
+      { "label": "About Us",      "href": "/AboutUs/" },
+      { "label": "Case Studies",  "href": "/CaseStudies/" },
+      { "label": "Careers",       "href": "/Careers/" },
+      { "label": "Contact",       "href": "/Contact/" }
+    ],
+    "resources": [
+      { "label": "Blog",           "href": "/Blog/" },
+      { "label": "Documentation",  "href": "/Documentation/" },
+      { "label": "Training",       "href": "/Training/" },
+      { "label": "Support",        "href": "/Support/" },
+      { "label": "Privacy Policy", "href": "/PrivacyPolicy/" }
+    ],
+    "social": [
+      { "label": "LinkedIn", "href": "#", "icon": "lucide:linkedin" },
+      { "label": "Twitter",  "href": "#", "icon": "lucide:twitter" },
+      { "label": "GitHub",   "href": "#", "icon": "lucide:github" }
+    ]
+  }
+}
