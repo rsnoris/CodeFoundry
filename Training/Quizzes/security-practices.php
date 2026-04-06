@@ -338,6 +338,72 @@ $page_styles = <<<'PAGECSS'
       margin-top: 8px;
     }
 
+    /* Level selector */
+    .quiz-level-selector {
+      padding: 8px 0;
+    }
+    .quiz-level-selector h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+    }
+    .quiz-level-selector p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin: 0 0 20px 0;
+    }
+    .level-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .level-option {
+      background: var(--navy-3);
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      padding: 18px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .level-option:hover {
+      border-color: var(--primary);
+      background: rgba(24, 179, 255, 0.05);
+    }
+    .level-option-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .level-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    .level-badge.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
+    .level-badge.intermediate { background: rgba(245,158,11,0.15);  color: #f59e0b; }
+    .level-badge.advanced     { background: rgba(239,68,68,0.15);   color: #ef4444; }
+    .level-option-name {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .level-option-desc {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    .quiz-level-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    .quiz-level-pill.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
+    .quiz-level-pill.intermediate { background: rgba(245,158,11,0.15);  color: #f59e0b; }
+    .quiz-level-pill.advanced     { background: rgba(239,68,68,0.15);   color: #ef4444; }
+
     @media (max-width: 768px) {
       .nav-menu,
       .nav-actions {
@@ -395,59 +461,96 @@ require_once __DIR__ . '/../../includes/header.php';
     // Quiz Data
     const quizData = {
       title: 'Security Best Practices',
-      questions: [
-        {
-          question: 'What does XSS stand for?',
-          options: ['Extra Style Sheets', 'Cross-Site Scripting', 'XML Security Standard', 'Extended Server Security'],
-          correct: 1
+      levels: {
+        beginner: {
+          label: 'Beginner',
+          description: 'Common vulnerabilities and secure fundamentals',
+          questions: [
+            { question: 'What does XSS stand for?', options: ['Extra Style Sheets', 'Cross-Site Scripting', 'XML Security Standard', 'Extended Server Security'], correct: 1 },
+            { question: 'What is SQL injection?', options: ['A database optimization technique', 'A security vulnerability where malicious SQL code is inserted', 'A data backup method', 'A query optimization tool'], correct: 1 },
+            { question: 'What is HTTPS?', options: ['HTTP with security', 'Hypertext Transfer Protocol Secure', 'High-level Transfer Protocol', 'Host Transfer Protocol System'], correct: 1 },
+            { question: 'What is the purpose of CORS?', options: ['To compress data', 'To control cross-origin resource sharing', 'To encrypt passwords', 'To manage cookies'], correct: 1 },
+            { question: 'What is hashing used for in security?', options: ['Compressing files', 'Storing passwords securely', 'Speeding up queries', 'Managing sessions'], correct: 1 }
+          ]
         },
-        {
-          question: 'What is SQL injection?',
-          options: ['A database optimization technique', 'A security vulnerability where malicious SQL code is inserted', 'A data backup method', 'A query optimization tool'],
-          correct: 1
+        intermediate: {
+          label: 'Intermediate',
+          description: 'OWASP, 2FA, penetration testing, and CSRF',
+          questions: [
+            { question: 'What is OWASP?', options: ['A programming language', 'The Open Web Application Security Project — a foundation for software security', 'An AWS service', 'A JavaScript framework'], correct: 1 },
+            { question: 'What is two-factor authentication (2FA)?', options: ['Using two different passwords', 'Requiring two distinct verification factors to prove identity', 'Hashing a password twice', 'A type of OAuth flow'], correct: 1 },
+            { question: 'What is a penetration test?', options: ['Performance benchmarking', 'An authorized simulated attack to identify security vulnerabilities', 'A database query test', 'A load balancing test'], correct: 1 },
+            { question: 'What is the principle of least privilege?', options: ['Giving administrators full access', 'Granting only the minimum permissions required to perform a task', 'Disabling all authentication', 'Using the shortest passwords'], correct: 1 },
+            { question: 'What is a CSRF attack?', options: ['Cross-Site Resource Sharing', 'Cross-Site Request Forgery — tricking a browser into making unauthorized requests', 'Cross-Server Resource Failure', 'Content Security Response Framework'], correct: 1 }
+          ]
         },
-        {
-          question: 'What is HTTPS?',
-          options: ['HTTP with security', 'Hypertext Transfer Protocol Secure', 'High-level Transfer Protocol', 'Host Transfer Protocol System'],
-          correct: 1
-        },
-        {
-          question: 'What is the purpose of CORS?',
-          options: ['To compress data', 'To control cross-origin resource sharing', 'To encrypt passwords', 'To manage cookies'],
-          correct: 1
-        },
-        {
-          question: 'What is hashing used for in security?',
-          options: ['Compressing files', 'Storing passwords securely', 'Speeding up queries', 'Managing sessions'],
-          correct: 1
+        advanced: {
+          label: 'Advanced',
+          description: 'Zero-days, OAuth 2.0, timing attacks, and defense in depth',
+          questions: [
+            { question: 'What is a zero-day vulnerability?', options: ['A minor software bug', 'A security flaw unknown to the vendor with no available patch', 'An expired SSL certificate', 'A firewall misconfiguration'], correct: 1 },
+            { question: 'What is certificate pinning?', options: ['Permanently storing cookies', 'Associating a host with a specific expected certificate or public key', 'A JWT validation technique', 'An HTTPS redirect rule'], correct: 1 },
+            { question: 'What is OAuth 2.0?', options: ['An encryption algorithm', 'An authorization framework allowing third-party limited access to user resources', 'A password hashing scheme', 'A session storage standard'], correct: 1 },
+            { question: 'What is a timing attack?', options: ['A DDoS technique', 'Exploiting measurable time differences in cryptographic operations to infer secrets', 'A social engineering approach', 'An SQL injection variant'], correct: 1 },
+            { question: 'What is defense in depth?', options: ['Using the strongest firewall', 'Applying multiple independent layers of security controls', 'Encrypting only sensitive data', 'Single sign-on'], correct: 1 }
+          ]
         }
-      ]
+      }
     };
-
     // Quiz State
+    let currentLevel = null;
     let currentQuestionIndex = 0;
-    let userAnswers = new Array(quizData.questions.length).fill(null);
+    let userAnswers = [];
 
-    // Initialize Quiz
-    function initQuiz() {
+    function showLevelSelector() {
+      const levels = Object.keys(quizData.levels);
+      document.getElementById('quizContent').innerHTML = `
+        <div class="quiz-level-selector">
+          <h3>Choose Your Difficulty Level</h3>
+          <p>Select the level that best matches your experience</p>
+          <div class="level-options">
+            ${levels.map(key => {
+              const lvl = quizData.levels[key];
+              return `
+                <div class="level-option" onclick="selectLevel('${key}')">
+                  <div class="level-option-header">
+                    <span class="level-badge ${key}">${lvl.label}</span>
+                    <span class="level-option-name">${lvl.label} — ${lvl.questions.length} Questions</span>
+                  </div>
+                  <div class="level-option-desc">${lvl.description}</div>
+                </div>`;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function selectLevel(level) {
+      currentLevel = level;
+      currentQuestionIndex = 0;
+      userAnswers = new Array(quizData.levels[level].questions.length).fill(null);
       showQuestion();
     }
 
     function showQuestion() {
-      const question = quizData.questions[currentQuestionIndex];
-      const totalQuestions = quizData.questions.length;
+      const levelData = quizData.levels[currentLevel];
+      const question = levelData.questions[currentQuestionIndex];
+      const totalQuestions = levelData.questions.length;
       const quizContent = document.getElementById('quizContent');
-      
+
       quizContent.innerHTML = `
         <div class="quiz-progress">
           <span>Question ${currentQuestionIndex + 1} of ${totalQuestions}</span>
-          <span>${Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)}% Complete</span>
+          <span style="display:flex;align-items:center;gap:8px;">
+            <span class="quiz-level-pill ${currentLevel}">${levelData.label}</span>
+            ${Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)}% Complete
+          </span>
         </div>
         <div class="quiz-question">
           <div class="quiz-question-text">${question.question}</div>
           <div class="quiz-options">
             ${question.options.map((option, index) => `
-              <div class="quiz-option ${userAnswers[currentQuestionIndex] === index ? 'selected' : ''}" 
+              <div class="quiz-option ${userAnswers[currentQuestionIndex] === index ? 'selected' : ''}"
                    onclick="selectAnswer(${index})">
                 ${option}
               </div>
@@ -455,7 +558,7 @@ require_once __DIR__ . '/../../includes/header.php';
           </div>
         </div>
         <div class="quiz-navigation">
-          <button class="simulator-btn-secondary" onclick="previousQuestion()" 
+          <button class="simulator-btn-secondary" onclick="previousQuestion()"
                   ${currentQuestionIndex === 0 ? 'disabled' : ''}>
             Previous
           </button>
@@ -472,7 +575,8 @@ require_once __DIR__ . '/../../includes/header.php';
     }
 
     function nextQuestion() {
-      if (currentQuestionIndex < quizData.questions.length - 1) {
+      const total = quizData.levels[currentLevel].questions.length;
+      if (currentQuestionIndex < total - 1) {
         currentQuestionIndex++;
         showQuestion();
       }
@@ -486,20 +590,20 @@ require_once __DIR__ . '/../../includes/header.php';
     }
 
     function finishQuiz() {
+      const levelData = quizData.levels[currentLevel];
       let correct = 0;
-      quizData.questions.forEach((question, index) => {
-        if (userAnswers[index] === question.correct) {
-          correct++;
-        }
+      levelData.questions.forEach((question, index) => {
+        if (userAnswers[index] === question.correct) correct++;
       });
-      
-      const total = quizData.questions.length;
+
+      const total = levelData.questions.length;
       const percentage = Math.round((correct / total) * 100);
       const quizContent = document.getElementById('quizContent');
-      
+
       quizContent.innerHTML = `
         <div class="quiz-results">
           <h2>Quiz Complete!</h2>
+          <span class="quiz-level-pill ${currentLevel}" style="font-size:0.85rem;padding:4px 12px;">${levelData.label} Level</span>
           <div class="quiz-score">${percentage}%</div>
           <div class="quiz-result-details">
             <div class="quiz-result-stat">
@@ -515,16 +619,19 @@ require_once __DIR__ . '/../../includes/header.php';
               <div class="quiz-result-stat-label">Total</div>
             </div>
           </div>
-          <p style="margin-top: 20px; color: var(--text-muted); font-size: 1.1rem;">
-            ${percentage >= 80 ? 'Excellent work! You have a strong understanding of this topic.' :
-              percentage >= 60 ? 'Good job! Review the topics you missed to improve further.' :
-              'Keep learning! Review the material and try again.'}
+          <p style="margin-top:20px;color:var(--text-muted);font-size:1.1rem;">
+            ${percentage >= 80 ? 'Excellent work! You have a strong grasp of this level.' :
+              percentage >= 60 ? 'Good job! Review the topics you missed to improve.' :
+              'Keep learning! Study the material and try again.'}
           </p>
-          <div style="margin-top: 30px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-            <button class="simulator-btn-primary" onclick="retakeQuiz()">
+          <div style="margin-top:30px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <button class="simulator-btn-secondary" onclick="showLevelSelector()">
+              Change Level
+            </button>
+            <button class="simulator-btn-primary" onclick="selectLevel('${currentLevel}')">
               Retake Quiz
             </button>
-            <a href="/Training/" class="simulator-btn-secondary" style="display: inline-block; text-decoration: none;">
+            <a href="/Training/" class="simulator-btn-secondary" style="display:inline-block;text-decoration:none;">
               Back to Training
             </a>
           </div>
@@ -532,13 +639,7 @@ require_once __DIR__ . '/../../includes/header.php';
       `;
     }
 
-    function retakeQuiz() {
-      currentQuestionIndex = 0;
-      userAnswers = new Array(quizData.questions.length).fill(null);
-      showQuestion();
-    }
-
-    // Start quiz on load
-    initQuiz();
+    // Start with level selector
+    showLevelSelector();
   </script>
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>
