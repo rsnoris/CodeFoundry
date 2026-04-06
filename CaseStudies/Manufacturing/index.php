@@ -1,0 +1,357 @@
+<?php
+$page_title  = 'CodeFoundry Case Study: Manufacturing';
+$active_page = 'case-studies';
+$page_styles = <<<'PAGECSS'
+:root {
+      --navy: #0e1828;
+      --navy-2: #121c2b;
+      --navy-3: #161f2f;
+      --primary: #18b3ff;
+      --primary-hover: #009de0;
+      --text: #fff;
+      --text-muted: #92a3bb;
+      --text-subtle: #627193;
+      --border-color: #1a2942;
+      --button-radius: 8px;
+      --maxwidth: 1200px;
+      --card-radius: 12px;
+      --header-height: 68px;
+      --mobile-menu-bg: #0e1828f9;
+    }
+    html, body {
+      background: var(--navy-2);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    body { min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+    header {
+      background: var(--navy);
+      color: var(--text);
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid #192746;
+    }
+    .nav {
+      max-width: var(--maxwidth);
+      margin: 0 auto;
+      padding: 0 40px;
+      min-height: var(--header-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      font-weight: 800;
+      font-size: 22px;
+      gap: 12px;
+      letter-spacing: -0.5px;
+    }
+    .brand svg {
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      border-radius: 6px;
+      color: #092340;
+      padding: 4px;
+      margin-right: 4px;
+      box-sizing: border-box;
+    }
+    .nav-menu {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+    }
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 15px;
+      transition: color .2s;
+    }
+    .nav-link:hover, .nav-link.active { color: var(--text); }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .nav-btn {
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      border: 0;
+      border-radius: var(--button-radius);
+      padding: 10px 18px;
+      background: var(--navy-3);
+      color: var(--text);
+      outline: 0;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .nav-btn.primary {
+      background: var(--primary);
+      color: var(--navy-2);
+      font-weight: 700;
+    }
+    .nav-btn.primary:hover { background: var(--primary-hover);}
+    .nav-btn.secondary { background: #fff; color: var(--navy);}
+    .mobile-hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 29px;
+      padding: 5px 10px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    /* MOBILE NAV */
+    .mobile-nav-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      height: 100%; width: 100vw;
+      background: var(--mobile-menu-bg);
+      z-index: 9999;
+      transition: opacity .23s, visibility .23s;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-end;
+    }
+    .mobile-nav-overlay.open {
+      opacity: 1; visibility: visible; pointer-events: auto; transition: opacity .32s;
+    }
+    .mobile-nav-panel {
+      min-width: 75vw; max-width: 340px; height: 100%;
+      background: var(--navy);
+      box-shadow: 0 0 22px #00112a88;
+      display: flex; flex-direction: column; align-items: flex-start;
+      padding: 32px 28px 18px 28px;
+    }
+    .mobile-menu-close {
+      align-self: flex-end;
+      background: none; border: none;
+      color: var(--text); font-size: 32px;
+      margin-top: 0; margin-bottom: 22px; cursor: pointer;
+    }
+    .mobile-menu-links {
+      display: flex; flex-direction: column; gap: 18px; width: 100%;
+    }
+    .mobile-menu-links a.nav-link {
+      color: var(--text-muted); font-size: 18px; font-weight: 700; padding: 5px 0; border: none; background: none; text-align: left;
+    }
+    .mobile-menu-actions {
+      margin-top: 35px;
+      display: flex; flex-direction: column; gap: 13px; width: 100%;
+    }
+    .mobile-menu-actions .nav-btn.primary,
+    .mobile-menu-actions .nav-btn.secondary {
+      width: 100%; font-size: 17px;
+    }
+
+    .section-heading {
+      max-width: var(--maxwidth);
+      margin: 0 auto 42px auto;
+      text-align: center;
+    }
+    .section-badge {
+      background: var(--navy-3);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 12px;
+      display: inline-block;
+      padding: 7px 22px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+      letter-spacing: .08em;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .section-title {
+      margin: 0 0 10px 0;
+      font-size: 2.04rem;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      color: var(--text);
+    }
+    .section-desc {
+      margin-top: 0;
+      color: var(--text-subtle);
+      font-size: 1.09rem;
+      font-weight: 500;
+    }
+    .scenarios-main {
+      max-width: var(--maxwidth);
+      margin: 0 auto 40px auto;
+      padding: 0 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 36px;
+    }
+    .scenario-card {
+      background: var(--navy-3);
+      border-radius: var(--card-radius);
+      border:1px solid var(--border-color);
+      margin-bottom:0;
+      padding:32px 28px 22px 28px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .scenario-title { color: var(--primary); font-weight:800; font-size:1.16rem; margin-bottom:11px;}
+    .scenario-text { color: var(--text-muted); font-size:15px; font-weight:500; margin-bottom:8px; }
+    .scenario-features-list { color: var(--primary); margin-top:8px; margin-bottom:0; padding-left:21px;}
+    .back-link { display:inline-block; color:var(--primary); font-size:15px; margin:18px 0 18px 8px; text-decoration:underline; font-weight: 700;}
+
+    .footer-section {
+      background: var(--navy);
+      color: var(--text-muted);
+      padding: 70px 0 22px 0;
+      margin-top: 48px;
+    }
+    .footer-row {
+      max-width: var(--maxwidth);
+      margin: 0 auto;
+      display: flex;
+      gap: 44px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid #1a2942;
+      padding-bottom: 38px;
+    }
+    .footer-brand {
+      flex: 1 1 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-logo {display:flex;align-items:center;gap:10px;font-weight:800;font-size:21px;color:#fff;}
+    .footer-logo svg{width:28px;height:28px;background:var(--primary);border-radius:6px;color:#011c2f;padding:4px;}
+    .footer-link-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:7px;}
+    .footer-col{flex:1 1 140px;}
+    .footer-col-title{font-weight:700;color:#fff;font-size:15.5px;margin-bottom:11px;}
+    .footer-link{color:var(--text-muted);font-size:15px;text-decoration:none;font-weight:500;}
+    .footer-link:hover{color:var(--primary);}
+    .footer-social{display:flex;gap:14px;margin-top:6px;}
+    .footer-social a{color:var(--primary);background:var(--navy-3);border-radius:5px;padding:6px 9px;display:flex;align-items:center;}
+    .footer-social a:hover{background:var(--primary);color:var(--navy);}
+    .footer-legal{
+      max-width: var(--maxwidth);
+      margin: 0 auto;
+      font-size: 13.2px;
+      color: #6e7b97;
+      padding-top: 23px;
+      display: flex;
+      gap: 19px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+    @media (max-width: 990px) {
+      .scenarios-main {grid-template-columns: 1fr;}
+    }
+    @media (max-width: 800px) {
+      .nav-menu, .nav-actions {display: none;}
+      .mobile-hamburger {display: inline-block;}
+    }
+    @media (max-width: 700px) {
+      .nav {padding: 0 10px;}
+      .scenarios-main {padding-left: 3px; padding-right: 3px;}
+    }
+    @media (max-width: 590px) {
+      .scenarios-main {padding-left: 2px; padding-right: 2px;}
+      .section-heading {padding-left: 0; padding-right: 0;}
+      .scenario-card {padding:17px 8px 12px 8px;}
+    }
+PAGECSS;
+$page_scripts = '';
+require_once __DIR__ . '/../../includes/header.php';
+?>
+<a href="https://codefoundry.cloud/CaseStudies" class="back-link"><iconify-icon icon="lucide:arrow-left"></iconify-icon> Back to Case Studies</a>
+<section class="section-heading">
+  <span class="section-badge">CASE STUDY</span>
+  <h2 class="section-title">Manufacturing Use Cases</h2>
+  <p class="section-desc">
+    CodeFoundry drives digital transformation for manufacturing: smart factories, IoT automation, supply chain innovation, and operational analytics for efficiency and resilience.
+  </p>
+</section>
+<main class="scenarios-main">
+  <div class="scenario-card">
+    <div class="scenario-title">1. IoT Smart Factory Deployment</div>
+    <div class="scenario-text">A global manufacturer automated oversight of 20+ plants by rolling out IoT sensors and edge devices.</div>
+    <ul class="scenario-features-list">
+      <li>Real-time telemetry for equipment status, power, and safety.</li>
+      <li>Automated alert system for preventive maintenance.</li>
+      <li>Reduced unplanned downtime by 28% and overall maintenance cost by $2.5M/year.</li>
+    </ul>
+  </div>
+  <div class="scenario-card">
+    <div class="scenario-title">2. Predictive Maintenance with AI</div>
+    <div class="scenario-text">A plant owner wanted to reduce major failures in bottling and assembly machines.</div>
+    <ul class="scenario-features-list">
+      <li>Trained ML models on historical failures and live sensor streams.</li>
+      <li>Maintenance suggestions auto-queued to service teams before breakdowns occurred.</li>
+      <li>Saw drop in catastrophic failure events to near zero within 12 months.</li>
+    </ul>
+  </div>
+  <div class="scenario-card">
+    <div class="scenario-title">3. MES and ERP Integration</div>
+    <div class="scenario-text">Disconnected manufacturing execution systems (MES) needed linking to main ERP for end-to-end visibility on jobs, resources, and inventory.</div>
+    <ul class="scenario-features-list">
+      <li>Custom API bridge for real-time sync of job status, material movement, and waste.</li>
+      <li>Automated inventory triggers for under-stocked or overrun items.</li>
+      <li>Increased OEE (Overall Equipment Effectiveness) and production throughput.</li>
+    </ul>
+  </div>
+  <div class="scenario-card">
+    <div class="scenario-title">4. Quality Automation with Computer Vision</div>
+    <div class="scenario-text">A food packager replaced sample-based human inspection with 99.7% accurate, AI-powered quality assurance.</div>
+    <ul class="scenario-features-list">
+      <li>Installed real-time, high-def cameras at checkpoints in packaging line.</li>
+      <li>Live computer vision flagged defects and removed bad units without human input.</li>
+      <li>Defects detected before shipment increased by 4x.</li>
+    </ul>
+  </div>
+  <div class="scenario-card">
+    <div class="scenario-title">5. Robotics Workflow and MES Data Analytics</div>
+    <div class="scenario-text">A hardware manufacturer used a new analytics dashboard to optimize robotic workflows and operator efficiency.</div>
+    <ul class="scenario-features-list">
+      <li>Cross-referenced sensor, MES, and operator shift data for performance optimization.</li>
+      <li>Visualized causes of downtime and success rate of robots vs. manual intervention.</li>
+      <li>Boosted efficiency of robotic work cells by 18%.</li>
+    </ul>
+  </div>
+  <div class="scenario-card">
+    <div class="scenario-title">6. Smart Supply Chain and Vendor Collaboration</div>
+    <div class="scenario-text">A multi-vendor global supply chain improved collaboration through secure APIs and shared dashboards.</div>
+    <ul class="scenario-features-list">
+      <li>Real-time dashboards of logistics, inventory, and order status for all supply chain partners.</li>
+      <li>Automated notifications of late shipments, shortages, and overages via email/SMS/API.</li>
+      <li>Lowered end-to-end supply delays by 16% and improved partner satisfaction.</li>
+    </ul>
+  </div>
+  <div class="scenario-card">
+    <div class="scenario-title">7. Regulatory Compliance & Traceability</div>
+    <div class="scenario-text">Food & beverage client needed full product traceability for recall and compliance with FDA standards.</div>
+    <ul class="scenario-features-list">
+      <li>Track and record every batch and material movement, from raw intake to end product packaging.</li>
+      <li>Digitized lot recall and regulatory reporting in a single click.</li>
+    </ul>
+  </div>
+  <div class="scenario-card">
+    <div class="scenario-title">8. Energy Management Optimization</div>
+    <div class="scenario-text">CodeFoundry enabled energy metering across a facility, surfacing inefficiencies and saving costs.</div>
+    <ul class="scenario-features-list">
+      <li>Automated real-time alerts for excessive power drain or outages.</li>
+      <li>Historical trend analysis for off-peak load scheduling.</li>
+      <li>Result: Lowered energy cost by 23% over the first year.</li>
+    </ul>
+  </div>
+</main>
+<?php require_once __DIR__ . '/../../includes/footer.php'; ?>

@@ -1,0 +1,229 @@
+<?php
+$page_title  = 'Careers at CodeFoundry';
+$active_page = 'careers';
+$page_styles = <<<'PAGECSS'
+:root {
+      --navy: #0e1828;
+      --navy-2: #121c2b;
+      --navy-3: #161f2f;
+      --primary: #18b3ff;
+      --primary-hover: #009de0;
+      --text: #fff;
+      --text-muted: #92a3bb;
+      --border-color: #1a2942;
+      --card-radius: 12px;
+      --maxwidth: 1200px;
+    }
+    html, body {
+      background: var(--navy-2);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: var(--navy);
+      color: var(--text);
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid #192746;
+    }
+    .nav {
+      max-width: var(--maxwidth);
+      margin: 0 auto;
+      padding: 0 40px;
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      font-weight: 800;
+      font-size: 22px;
+      gap: 12px;
+      letter-spacing: -0.5px;
+    }
+    .brand svg {
+      width: 28px; height: 28px; background: var(--primary); border-radius: 6px; color: #092340; padding: 4px; margin-right: 4px; box-sizing: border-box;
+    }
+    .nav-menu { display: flex; gap: 28px; align-items: center;}
+    .nav-link { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 15px; transition: color .2s;}
+    .nav-link:hover, .nav-link.active { color: var(--text);}
+    .nav-actions { display: flex; align-items: center; gap: 16px;}
+    .nav-btn { font-family: inherit; font-size: 15px; font-weight: 700; border: 0; border-radius: 8px; padding: 10px 18px; background: var(--navy-3); color: var(--text); outline: 0; cursor: pointer; transition: background .2s, color .2s;}
+    .nav-btn.primary { background: var(--primary); color: var(--navy-2); font-weight: 700; }
+    .nav-btn.secondary { background: #fff; color: var(--navy);}
+    .mobile-hamburger { display: none; background: none; border: none; color: var(--text); font-size: 29px; padding: 5px 10px; margin-left: 10px; cursor: pointer; }
+    @media (max-width: 768px) {
+      .nav-menu,
+      .nav-actions {
+        display: none;
+      }
+      .mobile-hamburger {
+        display: block;
+      }
+    }
+    .mobile-nav-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 2000;
+      display: none;
+      backdrop-filter: blur(4px);
+    }
+    .mobile-nav-overlay.open {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .mobile-nav-panel {
+      width: 80%;
+      max-width: 340px;
+      background: #0e1828f9;
+      height: 100%;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      backdrop-filter: blur(20px);
+      border-left: 1px solid var(--border-color);
+    }
+    .mobile-menu-close {
+      align-self: flex-end;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 28px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+    .mobile-menu-links {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .mobile-menu-links .nav-link {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .mobile-menu-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: auto;
+    }
+    .mobile-menu-actions .nav-btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+    }
+    .main-content { max-width: 800px; background: var(--navy-3); border-radius: var(--card-radius); border:1px solid var(--border-color); margin: 44px auto 40px auto; padding: 40px 26px; }
+    @media (max-width: 700px) { .main-content { margin: 28px 6px 28px 6px; padding: 18px 6px;} .nav {padding: 0 6px;} }
+    .section-heading { text-align: center; margin-bottom: 34px;}
+    .section-title { font-size: 2rem; font-weight: 800; margin-bottom: 7px; letter-spacing: -1.2px;}
+    .section-desc { color: var(--text-muted);}
+    .career-list { margin: 22px 0 0 0; padding: 0; list-style: none;}
+    .career-card { background: var(--navy-2); border: 1px solid var(--border-color); border-radius: 9px; margin-bottom: 18px; padding: 23px 18px 18px 18px;}
+    .career-role { font-weight: 800; color: var(--primary); font-size: 1.14rem; margin-bottom: 7px;}
+    .career-location { color: var(--text-muted); font-size: 0.97rem;}
+    .career-desc { margin-top: 6px; color: var(--text-muted);}
+    .career-apply { display: inline-block; margin-top: 13px; color: var(--primary); font-weight: 700; text-decoration: underline; font-size: 15px;}
+    .footer-section {
+      background: var(--navy);
+      color: var(--text-muted);
+      padding: 70px 0 22px 0;
+      margin-top: 48px;
+    }
+    .footer-row { max-width: var(--maxwidth); margin: 0 auto; display: flex; gap: 44px; flex-wrap: wrap; border-bottom: 1px solid #1a2942; padding-bottom: 38px;}
+    .footer-brand { flex: 1 1 260px; display: flex; flex-direction: column; gap: 10px;}
+    .footer-logo {display:flex;align-items:center;gap:10px;font-weight:800;font-size:21px;color:#fff;}
+    .footer-logo svg{width:28px;height:28px;background:var(--primary);border-radius:6px;color:#011c2f;padding:4px;}
+    .footer-link-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:7px;}
+    .footer-col{flex:1 1 140px;}
+    .footer-col-title{font-weight:700;color:#fff;font-size:15.5px;margin-bottom:11px;}
+    .footer-link{color:var(--text-muted);font-size:15px;text-decoration:none;font-weight:500;}
+    .footer-link:hover{color:var(--primary);}
+    .footer-social{display:flex;gap:14px;margin-top:6px;}
+    .footer-social a{color:var(--primary);background:var(--navy-3);border-radius:5px;padding:6px 9px;display:flex;align-items:center;}
+    .footer-social a:hover{background:var(--primary);color:var(--navy);}
+    .footer-legal{max-width:1200px;margin:0 auto;font-size:13.2px;color:#6e7b97;padding-top:23px;display:flex;gap:19px;flex-wrap:wrap;justify-content:space-between;}
+PAGECSS;
+$page_scripts = <<<'PAGEJS'
+const menuBtn = document.getElementById('mobileMenuBtn');
+  const mobileNav = document.getElementById('mobileNav');
+  const closeBtn = document.getElementById('closeMobileNav');
+  function closeMobileNav() { mobileNav.classList.remove('open'); }
+  menuBtn.onclick = () => mobileNav.classList.add('open');
+  closeBtn.onclick = closeMobileNav;
+  mobileNav.onclick = (e) => {
+    if(e.target === mobileNav) closeMobileNav();
+  };
+PAGEJS;
+require_once __DIR__ . '/../includes/header.php';
+?>
+<div class="mobile-nav-overlay" id="mobileNav">
+  <div class="mobile-nav-panel">
+    <button class="mobile-menu-close" id="closeMobileNav" aria-label="Close menu">
+      <iconify-icon icon="lucide:x"></iconify-icon>
+    </button>
+    <div class="mobile-menu-links">
+      <a href="/#services" class="nav-link" onclick="closeMobileNav()">Services</a>
+      <a href="/#solutions" class="nav-link" onclick="closeMobileNav()">Solutions</a>
+      <a href="/#industries" class="nav-link" onclick="closeMobileNav()">Industries</a>
+      <a href="/CaseStudies/" class="nav-link" onclick="closeMobileNav()">Case Studies</a>
+      <a href="/AboutUs/" class="nav-link" onclick="closeMobileNav()">About</a>
+      <a href="/Careers/" class="nav-link active" onclick="closeMobileNav()">Careers</a>
+    </div>
+    <div class="mobile-menu-actions">
+      <a href="/Contact/" class="nav-btn secondary" style="font-weight:800;">Contact Us</a>
+      <a href="/#services" class="nav-btn primary">Get Started</a>
+    </div>
+  </div>
+</div>
+
+<main class="main-content">
+  <section class="section-heading">
+    <h2 class="section-title">Build the Future at CodeFoundry</h2>
+    <div class="section-desc">Join a high-impact team shaping the next generation of digital transformation.</div>
+  </section>
+  <ul class="career-list">
+    <li class="career-card">
+      <div class="career-role">Senior Software Engineer</div>
+      <div class="career-location">Remote (USA preferred)</div>
+      <div class="career-desc">Lead the design and delivery of cloud-native apps. Work with Node.js, Python, Azure/AWS, containers, and CI/CD pipelines in a collaborative agile environment.</div>
+      <a href="mailto:careers@codefoundry.cloud?subject=Application Senior Software Engineer" class="career-apply">Apply Now</a>
+    </li>
+    <li class="career-card">
+      <div class="career-role">Frontend Developer</div>
+      <div class="career-location">New York, NY / Remote</div>
+      <div class="career-desc">Build beautiful, responsive UIs using React, TypeScript, and Next.js. Drive UX best practices from design to deployment.</div>
+      <a href="mailto:careers@codefoundry.cloud?subject=Application Frontend Developer" class="career-apply">Apply Now</a>
+    </li>
+    <li class="career-card">
+      <div class="career-role">Cloud Architect</div>
+      <div class="career-location">Remote (Global)</div>
+      <div class="career-desc">Architect and implement scalable microservices and IaC solutions for global clients on AWS, Azure, or GCP. You will mentor teams and advise on best practices.</div>
+      <a href="mailto:careers@codefoundry.cloud?subject=Application Cloud Architect" class="career-apply">Apply Now</a>
+    </li>
+    <li class="career-card">
+      <div class="career-role">Project Manager (Agile)</div>
+      <div class="career-location">Hybrid (New York HQ / Remote)</div>
+      <div class="career-desc">Facilitate agile delivery, manage multiple client projects, ensure milestones, budgets, and communication excellence. Scrum/Agile exp required.</div>
+      <a href="mailto:careers@codefoundry.cloud?subject=Application Project Manager" class="career-apply">Apply Now</a>
+    </li>
+    <li class="career-card">
+      <div class="career-role">Intern: Software Engineering</div>
+      <div class="career-location">Remote or HQ - Summer 2024</div>
+      <div class="career-desc">Work on real-world digital projects and get mentored by senior engineers. CS or related majors, currently enrolled.</div>
+      <a href="mailto:careers@codefoundry.cloud?subject=Application Internship" class="career-apply">Apply Now</a>
+    </li>
+  </ul>
+</main>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>
