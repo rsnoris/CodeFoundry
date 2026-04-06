@@ -633,6 +633,74 @@ $page_styles = <<<'PAGECSS'
       margin-top: 4px;
     }
 
+    /* QUIZ LEVEL SELECTOR */
+    .quiz-level-selector {
+      padding: 16px 0 8px 0;
+    }
+    .quiz-level-selector h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0 0 6px 0;
+    }
+    .quiz-level-selector p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin: 0 0 20px 0;
+    }
+    .level-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .level-option {
+      background: var(--navy-3);
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      padding: 18px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+    }
+    .level-option:hover {
+      border-color: var(--primary);
+      background: rgba(24, 179, 255, 0.05);
+    }
+    .level-option-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .level-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .level-badge.beginner  { background: rgba(16,185,129,0.15); color: #10b981; }
+    .level-badge.intermediate { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .level-badge.advanced  { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .level-option-name {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .level-option-desc {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    .quiz-level-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    .quiz-level-pill.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
+    .quiz-level-pill.intermediate { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .quiz-level-pill.advanced     { background: rgba(239,68,68,0.15); color: #ef4444; }
+
     /* Guide Modal Specific */
     .guide-modal-content h3 {
       color: var(--primary);
@@ -912,157 +980,195 @@ $page_scripts = <<<'PAGEJS'
   const quizData = {
     'javascript-fundamentals': {
       title: 'JavaScript Fundamentals',
-      questions: [
-        {
-          question: 'What is the correct way to declare a variable in JavaScript?',
-          options: ['variable x = 5;', 'let x = 5;', 'v x = 5;', 'dim x = 5;'],
-          correct: 1
+      levels: {
+        beginner: {
+          label: 'Beginner',
+          description: 'Core JavaScript concepts and basic syntax',
+          questions: [
+            { question: 'What is the correct way to declare a variable in JavaScript?', options: ['variable x = 5;', 'let x = 5;', 'v x = 5;', 'dim x = 5;'], correct: 1 },
+            { question: 'Which of the following is NOT a JavaScript data type?', options: ['String', 'Boolean', 'Float', 'Undefined'], correct: 2 },
+            { question: 'What does "===" check in JavaScript?', options: ['Only value', 'Only type', 'Both value and type', 'Neither value nor type'], correct: 2 },
+            { question: 'Which method is used to add an element to the end of an array?', options: ['push()', 'pop()', 'shift()', 'unshift()'], correct: 0 },
+            { question: 'What is the purpose of the "use strict" directive?', options: ['Improves performance', 'Enables strict mode', 'Compresses code', 'Adds security'], correct: 1 }
+          ]
         },
-        {
-          question: 'Which of the following is NOT a JavaScript data type?',
-          options: ['String', 'Boolean', 'Float', 'Undefined'],
-          correct: 2
+        intermediate: {
+          label: 'Intermediate',
+          description: 'ES6+, closures, and async programming',
+          questions: [
+            { question: 'What is a closure in JavaScript?', options: ['A loop construct', 'A function retaining access to its outer scope variables', 'A CSS technique', 'A data structure'], correct: 1 },
+            { question: 'What does `this` refer to inside an arrow function?', options: ['The arrow function itself', 'The window object', 'The enclosing lexical context', 'undefined'], correct: 2 },
+            { question: 'Which array method returns elements that pass a test?', options: ['map()', 'reduce()', 'filter()', 'find()'], correct: 2 },
+            { question: 'What is the difference between `null` and `undefined`?', options: ['They are identical', 'null is explicitly set; undefined is uninitialized', 'undefined is explicitly set; null is uninitialized', 'Both are the same as false'], correct: 1 },
+            { question: 'What is a Promise in JavaScript?', options: ['A syntax for declaring variables', 'An object representing eventual completion or failure of an async operation', 'A loop mechanism', 'A class decorator'], correct: 1 }
+          ]
         },
-        {
-          question: 'What does "===" check in JavaScript?',
-          options: ['Only value', 'Only type', 'Both value and type', 'Neither value nor type'],
-          correct: 2
-        },
-        {
-          question: 'Which method is used to add an element to the end of an array?',
-          options: ['push()', 'pop()', 'shift()', 'unshift()'],
-          correct: 0
-        },
-        {
-          question: 'What is the purpose of the "use strict" directive?',
-          options: ['Improves performance', 'Enables strict mode', 'Compresses code', 'Adds security'],
-          correct: 1
+        advanced: {
+          label: 'Advanced',
+          description: 'Deep internals, design patterns, optimization',
+          questions: [
+            { question: 'What is the output of `typeof null`?', options: ['"null"', '"object"', '"undefined"', '"boolean"'], correct: 1 },
+            { question: 'What does the JavaScript event loop do?', options: ['Handles synchronous code only', 'Processes the call stack and callback queue to manage async operations', 'Compiles JavaScript to machine code', 'Manages memory allocation'], correct: 1 },
+            { question: 'What is the difference between `call` and `bind`?', options: ['They are identical', 'call invokes immediately; bind returns a new function', 'bind invokes immediately; call returns a new function', 'Neither invokes the function'], correct: 1 },
+            { question: 'What is a generator function?', options: ['A function that creates objects', 'A function that can pause and resume execution using yield', 'A function that runs only once', 'A function with no return value'], correct: 1 },
+            { question: 'What does `Object.freeze()` do?', options: ['Copies an object', 'Removes all properties', 'Prevents adding, removing, or modifying properties', 'Converts object to JSON'], correct: 2 }
+          ]
         }
-      ]
+      }
     },
     'react-modern-web': {
       title: 'React & Modern Web Development',
-      questions: [
-        {
-          question: 'What is a React Hook?',
-          options: ['A JavaScript library', 'A function that lets you use state in functional components', 'A CSS framework', 'A routing method'],
-          correct: 1
+      levels: {
+        beginner: {
+          label: 'Beginner',
+          description: 'React fundamentals and core concepts',
+          questions: [
+            { question: 'What is a React Hook?', options: ['A JavaScript library', 'A function that lets you use state in functional components', 'A CSS framework', 'A routing method'], correct: 1 },
+            { question: 'Which hook is used for side effects in React?', options: ['useState', 'useEffect', 'useContext', 'useReducer'], correct: 1 },
+            { question: 'What does JSX stand for?', options: ['JavaScript XML', 'Java Syntax Extension', 'JavaScript Extra', 'JSON Extension'], correct: 0 },
+            { question: 'How do you pass data from parent to child component?', options: ['Using state', 'Using props', 'Using context', 'Using refs'], correct: 1 },
+            { question: 'What is the virtual DOM?', options: ['A physical representation of the DOM', 'A lightweight copy of the actual DOM', 'A debugging tool', 'A database'], correct: 1 }
+          ]
         },
-        {
-          question: 'Which hook is used for side effects in React?',
-          options: ['useState', 'useEffect', 'useContext', 'useReducer'],
-          correct: 1
+        intermediate: {
+          label: 'Intermediate',
+          description: 'Hooks, context, and performance patterns',
+          questions: [
+            { question: 'What is the React Context API used for?', options: ['Styling components', 'Managing server state', 'Sharing state across components without prop drilling', 'Handling routing'], correct: 2 },
+            { question: 'What does `useMemo` do?', options: ['Memoizes a callback function', 'Memoizes an expensive computed value', 'Fetches data from an API', 'Creates a ref'], correct: 1 },
+            { question: 'What is the `key` prop used for in lists?', options: ['Styling list items', 'Helping React identify which items changed', 'Setting item order', 'Assigning event handlers'], correct: 1 },
+            { question: 'What is React.lazy() used for?', options: ['Lazy state initialization', 'Code splitting and lazy loading of components', 'Delayed rendering', 'Caching API responses'], correct: 1 },
+            { question: 'What does `useCallback` return?', options: ['A memoized value', 'A memoized callback function', 'A new component', 'A ref object'], correct: 1 }
+          ]
         },
-        {
-          question: 'What does JSX stand for?',
-          options: ['JavaScript XML', 'Java Syntax Extension', 'JavaScript Extra', 'JSON Extension'],
-          correct: 0
-        },
-        {
-          question: 'How do you pass data from parent to child component?',
-          options: ['Using state', 'Using props', 'Using context', 'Using refs'],
-          correct: 1
-        },
-        {
-          question: 'What is the virtual DOM?',
-          options: ['A physical representation of the DOM', 'A lightweight copy of the actual DOM', 'A debugging tool', 'A database'],
-          correct: 1
+        advanced: {
+          label: 'Advanced',
+          description: 'Reconciliation, portals, and advanced patterns',
+          questions: [
+            { question: 'What is React reconciliation?', options: ['Fetching remote data', "React's diffing algorithm for efficiently updating the DOM", 'Combining multiple components', 'Managing global state'], correct: 1 },
+            { question: 'What are React portals?', options: ['Navigation links', 'A way to render children outside the parent DOM node', 'Error boundaries', 'Context providers'], correct: 1 },
+            { question: 'What does React.memo() do?', options: ['Saves component state', 'Prevents unnecessary re-renders of functional components', 'Creates a memoized ref', 'Delays hydration'], correct: 1 },
+            { question: 'When would you use useReducer over useState?', options: ['For simple boolean flags', 'For complex state logic with multiple sub-values', 'For accessing the DOM', 'For server-side data'], correct: 1 },
+            { question: 'What is React Suspense used for?', options: ['Canceling renders', 'Declaratively handling async loading states and code splitting', 'Error recovery', 'Batching state updates'], correct: 1 }
+          ]
         }
-      ]
+      }
     },
     'backend-api': {
       title: 'Backend & API Development',
-      questions: [
-        {
-          question: 'What does REST stand for?',
-          options: ['Representational State Transfer', 'Remote Execution Service Technology', 'Rapid Enterprise System Transfer', 'Reliable Endpoint Service Technology'],
-          correct: 0
+      levels: {
+        beginner: {
+          label: 'Beginner',
+          description: 'REST, HTTP methods, and API fundamentals',
+          questions: [
+            { question: 'What does REST stand for?', options: ['Representational State Transfer', 'Remote Execution Service Technology', 'Rapid Enterprise System Transfer', 'Reliable Endpoint Service Technology'], correct: 0 },
+            { question: 'Which HTTP method is used to update a resource?', options: ['GET', 'POST', 'PUT', 'DELETE'], correct: 2 },
+            { question: 'What is GraphQL?', options: ['A database', 'A query language for APIs', 'A programming language', 'A web framework'], correct: 1 },
+            { question: 'What is JWT used for?', options: ['Database queries', 'Authentication and authorization', 'Styling', 'Routing'], correct: 1 },
+            { question: 'Which status code indicates a successful GET request?', options: ['200', '201', '204', '404'], correct: 0 }
+          ]
         },
-        {
-          question: 'Which HTTP method is used to update a resource?',
-          options: ['GET', 'POST', 'PUT', 'DELETE'],
-          correct: 2
+        intermediate: {
+          label: 'Intermediate',
+          description: 'Middleware, idempotency, and security',
+          questions: [
+            { question: 'What is middleware in Express.js?', options: ['A database connector', 'Functions that execute during the request-response cycle', 'A routing algorithm', 'A templating engine'], correct: 1 },
+            { question: 'What is the difference between PUT and PATCH?', options: ['They are identical', 'PUT replaces the entire resource; PATCH partially updates it', 'PATCH replaces the entire resource; PUT partially updates it', 'PUT creates; PATCH deletes'], correct: 1 },
+            { question: 'What does idempotent mean for HTTP methods?', options: ['The method is encrypted', 'Multiple identical requests produce the same result as one', 'The method requires authentication', 'The response is always cached'], correct: 1 },
+            { question: 'What is rate limiting used for?', options: ['Compressing responses', 'Controlling the number of requests a client can make in a time window', 'Caching data', 'Balancing load'], correct: 1 },
+            { question: 'What is CORS?', options: ['A database protocol', 'A policy controlling cross-origin HTTP requests', 'An authentication standard', 'A data format'], correct: 1 }
+          ]
         },
-        {
-          question: 'What is GraphQL?',
-          options: ['A database', 'A query language for APIs', 'A programming language', 'A web framework'],
-          correct: 1
-        },
-        {
-          question: 'What is JWT used for?',
-          options: ['Database queries', 'Authentication and authorization', 'Styling', 'Routing'],
-          correct: 1
-        },
-        {
-          question: 'Which status code indicates a successful GET request?',
-          options: ['200', '201', '204', '404'],
-          correct: 0
+        advanced: {
+          label: 'Advanced',
+          description: 'gRPC, event sourcing, CQRS, and API gateways',
+          questions: [
+            { question: 'What is gRPC?', options: ['A caching system', 'A high-performance RPC framework using Protocol Buffers', 'A GraphQL variant', 'A REST extension'], correct: 1 },
+            { question: 'What is the N+1 query problem?', options: ['Using N database indices', 'Executing N additional queries for each item in a result set', 'Having N API versions', 'Sending N duplicate requests'], correct: 1 },
+            { question: 'What is event sourcing?', options: ['Logging HTTP events', 'Storing state changes as an immutable sequence of events', 'Event-driven CSS', 'DOM event capture'], correct: 1 },
+            { question: 'What is CQRS?', options: ['A CSS framework', 'Command Query Responsibility Segregation — separating read and write models', 'A container registry', 'A CI/CD strategy'], correct: 1 },
+            { question: 'What does an API gateway provide?', options: ['Database migrations', 'A single entry point for clients to access microservices', 'CSS optimization', 'Static file serving'], correct: 1 }
+          ]
         }
-      ]
+      }
     },
     'cloud-devops': {
       title: 'Cloud Architecture & DevOps',
-      questions: [
-        {
-          question: 'What does CI/CD stand for?',
-          options: ['Continuous Integration/Continuous Deployment', 'Cloud Integration/Cloud Deployment', 'Code Integration/Code Development', 'Container Integration/Container Delivery'],
-          correct: 0
+      levels: {
+        beginner: {
+          label: 'Beginner',
+          description: 'CI/CD, Docker, Kubernetes, and cloud basics',
+          questions: [
+            { question: 'What does CI/CD stand for?', options: ['Continuous Integration/Continuous Deployment', 'Cloud Integration/Cloud Deployment', 'Code Integration/Code Development', 'Container Integration/Container Delivery'], correct: 0 },
+            { question: 'What is Docker used for?', options: ['Version control', 'Containerization', 'Database management', 'UI design'], correct: 1 },
+            { question: 'What is Kubernetes?', options: ['A programming language', 'A container orchestration platform', 'A database', 'A web server'], correct: 1 },
+            { question: 'Which AWS service is used for object storage?', options: ['EC2', 'S3', 'Lambda', 'RDS'], correct: 1 },
+            { question: 'What is Infrastructure as Code (IaC)?', options: ['Writing infrastructure configurations in code', 'Building infrastructure manually', 'A cloud provider', 'A deployment strategy'], correct: 0 }
+          ]
         },
-        {
-          question: 'What is Docker used for?',
-          options: ['Version control', 'Containerization', 'Database management', 'UI design'],
-          correct: 1
+        intermediate: {
+          label: 'Intermediate',
+          description: 'Volumes, namespaces, scaling, and deployments',
+          questions: [
+            { question: 'What is a Docker volume?', options: ['A Docker network mode', "Persistent storage that exists outside a container's lifecycle", 'A base image layer', 'A container restart policy'], correct: 1 },
+            { question: 'What is a Kubernetes namespace?', options: ['A DNS record', 'A virtual cluster used to isolate and organize resources', 'A storage class', 'A container image tag'], correct: 1 },
+            { question: 'What is blue-green deployment?', options: ['A color-coded branching strategy', 'Running two identical production environments to enable instant traffic switching', 'A Kubernetes scheduling policy', 'A Docker networking mode'], correct: 1 },
+            { question: 'What does a load balancer do?', options: ['Compresses static assets', 'Distributes incoming traffic across multiple servers', 'Manages database connections', 'Scans for vulnerabilities'], correct: 1 },
+            { question: 'What is serverless computing?', options: ['Running code without any servers', 'Executing code without managing or provisioning servers', 'A bare-metal hosting model', 'A Kubernetes node type'], correct: 1 }
+          ]
         },
-        {
-          question: 'What is Kubernetes?',
-          options: ['A programming language', 'A container orchestration platform', 'A database', 'A web server'],
-          correct: 1
-        },
-        {
-          question: 'Which AWS service is used for object storage?',
-          options: ['EC2', 'S3', 'Lambda', 'RDS'],
-          correct: 1
-        },
-        {
-          question: 'What is Infrastructure as Code (IaC)?',
-          options: ['Writing infrastructure configurations in code', 'Building infrastructure manually', 'A cloud provider', 'A deployment strategy'],
-          correct: 0
+        advanced: {
+          label: 'Advanced',
+          description: 'Service mesh, Helm, GitOps, and chaos engineering',
+          questions: [
+            { question: 'What is a service mesh?', options: ['A Docker network', 'Infrastructure layer managing service-to-service communication in microservices', 'A Kubernetes Ingress type', 'A load-balancing algorithm'], correct: 1 },
+            { question: 'What is Helm in Kubernetes?', options: ['A monitoring tool', 'A package manager for Kubernetes applications', 'A secret manager', 'A network policy engine'], correct: 1 },
+            { question: 'What is GitOps?', options: ['A Git branching strategy', 'Using Git as the single source of truth for declarative infrastructure and application delivery', 'A CI/CD provider', 'A container registry'], correct: 1 },
+            { question: 'What is the difference between vertical and horizontal scaling?', options: ['They are the same', 'Vertical adds more power to existing nodes; horizontal adds more nodes', 'Horizontal adds power; vertical adds nodes', 'Only horizontal scaling is supported in cloud'], correct: 1 },
+            { question: 'What is chaos engineering?', options: ['Writing poorly structured code', 'Intentionally introducing failures into production to test system resilience', 'Random deployment strategies', 'Uncontrolled infrastructure changes'], correct: 1 }
+          ]
         }
-      ]
+      }
     },
     'security-practices': {
       title: 'Security Best Practices',
-      questions: [
-        {
-          question: 'What does XSS stand for?',
-          options: ['Extra Style Sheets', 'Cross-Site Scripting', 'XML Security Standard', 'Extended Server Security'],
-          correct: 1
+      levels: {
+        beginner: {
+          label: 'Beginner',
+          description: 'Common vulnerabilities and secure fundamentals',
+          questions: [
+            { question: 'What does XSS stand for?', options: ['Extra Style Sheets', 'Cross-Site Scripting', 'XML Security Standard', 'Extended Server Security'], correct: 1 },
+            { question: 'What is SQL injection?', options: ['A database optimization technique', 'A security vulnerability where malicious SQL code is inserted', 'A data backup method', 'A query optimization tool'], correct: 1 },
+            { question: 'What is HTTPS?', options: ['HTTP with security', 'Hypertext Transfer Protocol Secure', 'High-level Transfer Protocol', 'Host Transfer Protocol System'], correct: 1 },
+            { question: 'What is the purpose of CORS?', options: ['To compress data', 'To control cross-origin resource sharing', 'To encrypt passwords', 'To manage cookies'], correct: 1 },
+            { question: 'What is hashing used for in security?', options: ['Compressing files', 'Storing passwords securely', 'Speeding up queries', 'Managing sessions'], correct: 1 }
+          ]
         },
-        {
-          question: 'What is SQL injection?',
-          options: ['A database optimization technique', 'A security vulnerability where malicious SQL code is inserted', 'A data backup method', 'A query optimization tool'],
-          correct: 1
+        intermediate: {
+          label: 'Intermediate',
+          description: 'OWASP, 2FA, penetration testing, and CSRF',
+          questions: [
+            { question: 'What is OWASP?', options: ['A programming language', 'The Open Web Application Security Project — a foundation for software security', 'An AWS service', 'A JavaScript framework'], correct: 1 },
+            { question: 'What is two-factor authentication (2FA)?', options: ['Using two different passwords', 'Requiring two distinct verification factors to prove identity', 'Hashing a password twice', 'A type of OAuth flow'], correct: 1 },
+            { question: 'What is a penetration test?', options: ['Performance benchmarking', 'An authorized simulated attack to identify security vulnerabilities', 'A database query test', 'A load balancing test'], correct: 1 },
+            { question: 'What is the principle of least privilege?', options: ['Giving administrators full access', 'Granting only the minimum permissions required to perform a task', 'Disabling all authentication', 'Using the shortest passwords'], correct: 1 },
+            { question: 'What is a CSRF attack?', options: ['Cross-Site Resource Sharing', 'Cross-Site Request Forgery — tricking a browser into making unauthorized requests', 'Cross-Server Resource Failure', 'Content Security Response Framework'], correct: 1 }
+          ]
         },
-        {
-          question: 'What is HTTPS?',
-          options: ['HTTP with security', 'Hypertext Transfer Protocol Secure', 'High-level Transfer Protocol', 'Host Transfer Protocol System'],
-          correct: 1
-        },
-        {
-          question: 'What is the purpose of CORS?',
-          options: ['To compress data', 'To control cross-origin resource sharing', 'To encrypt passwords', 'To manage cookies'],
-          correct: 1
-        },
-        {
-          question: 'What is hashing used for in security?',
-          options: ['Compressing files', 'Storing passwords securely', 'Speeding up queries', 'Managing sessions'],
-          correct: 1
+        advanced: {
+          label: 'Advanced',
+          description: 'Zero-days, OAuth 2.0, timing attacks, and defense in depth',
+          questions: [
+            { question: 'What is a zero-day vulnerability?', options: ['A minor software bug', 'A security flaw unknown to the vendor with no available patch', 'An expired SSL certificate', 'A firewall misconfiguration'], correct: 1 },
+            { question: 'What is certificate pinning?', options: ['Permanently storing cookies', 'Associating a host with a specific expected certificate or public key', 'A JWT validation technique', 'An HTTPS redirect rule'], correct: 1 },
+            { question: 'What is OAuth 2.0?', options: ['An encryption algorithm', 'An authorization framework allowing third-party limited access to user resources', 'A password hashing scheme', 'A session storage standard'], correct: 1 },
+            { question: 'What is a timing attack?', options: ['A DDoS technique', 'Exploiting measurable time differences in cryptographic operations to infer secrets', 'A social engineering approach', 'An SQL injection variant'], correct: 1 },
+            { question: 'What is defense in depth?', options: ['Using the strongest firewall', 'Applying multiple independent layers of security controls', 'Encrypting only sensitive data', 'Single sign-on'], correct: 1 }
+          ]
         }
-      ]
+      }
     }
-  };
-
-  // ===== GUIDE CONTENT =====
+  };  // ===== GUIDE CONTENT =====
   const guideContent = {
     'fullstack-web': {
       title: 'Building a Full-Stack Web Application',
@@ -2015,25 +2121,62 @@ spec:
   // ===== QUIZ FUNCTIONALITY =====
   let currentQuiz = null;
   let currentQuizKey = null;
+  let currentQuizLevel = null;
   let currentQuestionIndex = 0;
   let userAnswers = [];
 
   function startQuiz(quizKey) {
     currentQuiz = quizData[quizKey];
     if (!currentQuiz) return;
-    
+
     currentQuizKey = quizKey;
-    currentQuestionIndex = 0;
-    userAnswers = new Array(currentQuiz.questions.length).fill(null);
-    
-    showQuestion();
+    currentQuizLevel = null;
+
+    const levelKeys = Object.keys(currentQuiz.levels);
+    modalContent.innerHTML = `
+      <div class="modal-header">
+        <h2 class="modal-title">${currentQuiz.title}</h2>
+        <button class="modal-close" onclick="closeModal()">
+          <iconify-icon icon="lucide:x"></iconify-icon>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="quiz-level-selector">
+          <h3>Choose Your Difficulty Level</h3>
+          <p>Select the level that best matches your experience</p>
+          <div class="level-options">
+            ${levelKeys.map(key => {
+              const lvl = currentQuiz.levels[key];
+              return `
+                <div class="level-option" onclick="selectQuizLevel('${key}')">
+                  <div class="level-option-header">
+                    <span class="level-badge ${key}">${lvl.label}</span>
+                    <span class="level-option-name">${lvl.label} — ${lvl.questions.length} Questions</span>
+                  </div>
+                  <div class="level-option-desc">${lvl.description}</div>
+                </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+
     modalOverlay.classList.add('active');
   }
 
+  function selectQuizLevel(level) {
+    if (!currentQuiz || !currentQuiz.levels[level]) return;
+    currentQuizLevel = level;
+    currentQuestionIndex = 0;
+    userAnswers = new Array(currentQuiz.levels[level].questions.length).fill(null);
+    showQuestion();
+  }
+
   function showQuestion() {
-    const question = currentQuiz.questions[currentQuestionIndex];
-    const totalQuestions = currentQuiz.questions.length;
-    
+    const levelData = currentQuiz.levels[currentQuizLevel];
+    const question = levelData.questions[currentQuestionIndex];
+    const totalQuestions = levelData.questions.length;
+
     modalContent.innerHTML = `
       <div class="modal-header">
         <h2 class="modal-title">${currentQuiz.title}</h2>
@@ -2044,13 +2187,16 @@ spec:
       <div class="modal-body">
         <div class="quiz-progress">
           <span>Question ${currentQuestionIndex + 1} of ${totalQuestions}</span>
-          <span>${Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)}% Complete</span>
+          <span style="display:flex;align-items:center;gap:8px;">
+            <span class="quiz-level-pill ${currentQuizLevel}">${levelData.label}</span>
+            ${Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)}% Complete
+          </span>
         </div>
         <div class="quiz-question">
           <div class="quiz-question-text">${question.question}</div>
           <div class="quiz-options">
             ${question.options.map((option, index) => `
-              <div class="quiz-option ${userAnswers[currentQuestionIndex] === index ? 'selected' : ''}" 
+              <div class="quiz-option ${userAnswers[currentQuestionIndex] === index ? 'selected' : ''}"
                    onclick="selectAnswer(${index})">
                 ${option}
               </div>
@@ -2058,7 +2204,7 @@ spec:
           </div>
         </div>
         <div class="quiz-navigation">
-          <button class="simulator-btn-secondary" onclick="previousQuestion()" 
+          <button class="simulator-btn-secondary" onclick="previousQuestion()"
                   ${currentQuestionIndex === 0 ? 'disabled' : ''}>
             Previous
           </button>
@@ -2076,7 +2222,8 @@ spec:
   }
 
   function nextQuestion() {
-    if (currentQuestionIndex < currentQuiz.questions.length - 1) {
+    const total = currentQuiz.levels[currentQuizLevel].questions.length;
+    if (currentQuestionIndex < total - 1) {
       currentQuestionIndex++;
       showQuestion();
     }
@@ -2090,16 +2237,15 @@ spec:
   }
 
   function finishQuiz() {
+    const levelData = currentQuiz.levels[currentQuizLevel];
     let correct = 0;
-    currentQuiz.questions.forEach((question, index) => {
-      if (userAnswers[index] === question.correct) {
-        correct++;
-      }
+    levelData.questions.forEach((question, index) => {
+      if (userAnswers[index] === question.correct) correct++;
     });
-    
-    const total = currentQuiz.questions.length;
+
+    const total = levelData.questions.length;
     const percentage = Math.round((correct / total) * 100);
-    
+
     modalContent.innerHTML = `
       <div class="modal-header">
         <h2 class="modal-title">Quiz Results</h2>
@@ -2109,7 +2255,9 @@ spec:
       </div>
       <div class="modal-body">
         <div class="quiz-results">
-          <h3>Congratulations! You've completed the quiz.</h3>
+          <span class="quiz-level-pill ${currentQuizLevel}" style="font-size:0.85rem;padding:4px 12px;">
+            ${levelData.label} Level
+          </span>
           <div class="quiz-score">${percentage}%</div>
           <div class="quiz-result-details">
             <div class="quiz-result-stat">
@@ -2125,17 +2273,17 @@ spec:
               <div class="quiz-result-stat-label">Total</div>
             </div>
           </div>
-          <p style="margin-top: 20px; color: var(--text-muted);">
-            ${percentage >= 80 ? 'Excellent work! You have a strong understanding of this topic.' :
-              percentage >= 60 ? 'Good job! Review the topics you missed to improve further.' :
-              'Keep learning! Review the material and try again.'}
+          <p style="margin-top:20px;color:var(--text-muted);">
+            ${percentage >= 80 ? 'Excellent work! You have a strong grasp of this level.' :
+              percentage >= 60 ? 'Good job! Review the topics you missed to improve.' :
+              'Keep learning! Study the material and try again.'}
           </p>
-          <div style="margin-top: 30px; display: flex; gap: 12px; justify-content: center;">
-            <button class="simulator-btn-primary" onclick="startQuiz('${currentQuizKey}')">
-              Retake Quiz
+          <div style="margin-top:30px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <button class="simulator-btn-secondary" onclick="startQuiz('${currentQuizKey}')">
+              Change Level
             </button>
-            <button class="simulator-btn-secondary" onclick="closeModal()">
-              Close
+            <button class="simulator-btn-primary" onclick="selectQuizLevel('${currentQuizLevel}')">
+              Retake Quiz
             </button>
           </div>
         </div>
@@ -2148,6 +2296,7 @@ spec:
   window.nextQuestion = nextQuestion;
   window.previousQuestion = previousQuestion;
   window.finishQuiz = finishQuiz;
+  window.selectQuizLevel = selectQuizLevel;
 
   // ===== GUIDE FUNCTIONALITY =====
   function showGuide(guideKey) {
@@ -2170,10 +2319,13 @@ spec:
   }
 
   // ===== SIMULATOR FUNCTIONALITY =====
+  let _currentSimKey = null;
+
   function launchSimulator(simKey) {
     const simulator = simulatorTemplates[simKey];
     if (!simulator) return;
-    
+    _currentSimKey = simKey;
+
     modalContent.innerHTML = `
       <div class="modal-header">
         <h2 class="modal-title">${simulator.name}</h2>
@@ -2185,12 +2337,10 @@ spec:
         <div class="simulator-interface">
           <div class="simulator-editor">
             <div class="simulator-toolbar">
-              <span style="font-weight: 600;">Code Editor</span>
+              <span style="font-weight:600;">Code Editor</span>
               <div class="simulator-actions">
-                <button class="simulator-btn-secondary" onclick="resetSimulator('${simKey}')">
-                  Reset
-                </button>
-                <button class="simulator-btn-primary" onclick="runSimulator()">
+                <button class="simulator-btn-secondary" onclick="resetSimulator('${simKey}')">Reset</button>
+                <button class="simulator-btn-primary" id="runBtn" onclick="runSimulator()">
                   <iconify-icon icon="lucide:play"></iconify-icon> Run Code
                 </button>
               </div>
@@ -2198,117 +2348,273 @@ spec:
             <textarea class="simulator-code" id="simulatorCode">${simulator.defaultCode}</textarea>
           </div>
           <div>
-            <div style="font-weight: 600; margin-bottom: 8px; padding-left: 4px;">Output:</div>
+            <div style="font-weight:600;margin-bottom:8px;padding-left:4px;">Output:</div>
             <div class="simulator-output" id="simulatorOutput">Click "Run Code" to execute your code...</div>
           </div>
         </div>
       </div>
     `;
-    
+
     modalOverlay.classList.add('active');
   }
 
-  function runSimulator() {
-    const code = document.getElementById('simulatorCode')?.value || '';
-    const output = document.getElementById('simulatorOutput');
-    
-    if (!output) return;
-    
-    // Simulate code execution
-    output.textContent = '> Running code...\n\n';
-    
-    setTimeout(() => {
-      // Extract console.log statements (simple simulation)
-      const logMatches = code.match(/console\.log\([^)]+\)/g) || [];
-      const printMatches = code.match(/print\([^)]+\)/g) || [];
-      
-      let result = '> Execution completed\n\n';
-      
-      if (logMatches.length > 0 || printMatches.length > 0) {
-        result += '--- Output ---\n';
-        
-        // Simulate some output
-        if (code.includes('JavaScript')) {
-          result += 'Hello, Developer! Welcome to JavaScript.\n';
-          result += 'Doubled: [ 2, 4, 6, 8, 10 ]\n';
-          result += 'Data loaded!\n';
-        } else if (code.includes('Python')) {
-          result += 'Hello, Developer! Welcome to Python.\n';
-          result += 'Squared: [1, 4, 9, 16, 25]\n';
-          result += "Person: {'name': 'John', 'age': 30, 'city': 'New York'}\n";
-          result += 'Python Lab is ready for learning!\n';
-        } else if (code.includes('React')) {
-          result += '✓ Component structure validated\n';
-          result += '✓ Counter component rendered\n';
-          result += '✓ App component exported\n';
-        } else if (code.includes('Node.js') || code.includes('express')) {
-          result += 'Server running on port 3000\n';
-          result += 'API Endpoints:\n';
-          result += 'GET  / - Welcome message\n';
-          result += 'GET  /api/users - List users\n';
-          result += 'POST /api/users - Create user\n';
-        } else if (code.includes('Java')) {
-          result += 'Welcome to Java Workshop!\n';
-          result += "Hi, I'm John and I'm 30 years old.\n";
-          result += 'Sum: 15\n';
-        } else if (code.includes('TypeScript')) {
-          result += 'Added user: John Doe\n';
-          result += 'Added user: Jane Smith\n';
-          result += "All users: [{id: 1, name: 'John Doe', ...}, {id: 2, name: 'Jane Smith', ...}]\n";
-          result += 'Found: John Doe (admin)\n';
-        } else if (code.includes('Docker')) {
-          result += '✓ Dockerfile syntax valid\n';
-          result += '✓ Docker Compose configuration valid\n';
-          result += '\nDocker concepts demonstrated:\n';
-          result += '- Multi-stage builds\n';
-          result += '- Container networking\n';
-          result += '- Environment variables\n';
-        } else if (code.includes('Kubernetes') || code.includes('kubectl')) {
-          result += '✓ Deployment configuration valid\n';
-          result += '✓ Service configuration valid\n';
-          result += '\nKubernetes resources:\n';
-          result += '- Deployment: web-app (3 replicas)\n';
-          result += '- Service: web-service (LoadBalancer)\n';
-        } else {
-          result += 'Code executed successfully!\n';
-          result += '(This is a simulated environment)\n';
-        }
-        
-        result += '\n✓ No errors';
-      } else {
-        result += '(No output - add console.log() or print() statements)\n';
+  function _setOutput(text) {
+    const el = document.getElementById('simulatorOutput');
+    if (el) el.textContent = text;
+  }
+
+  function _runJavaScript(code) {
+    const logs = [];
+    const _console = {
+      log:   (...a) => logs.push(a.map(_fmt).join(' ')),
+      warn:  (...a) => logs.push('⚠ ' + a.map(_fmt).join(' ')),
+      error: (...a) => logs.push('✖ ' + a.map(_fmt).join(' ')),
+      info:  (...a) => logs.push('ℹ ' + a.map(_fmt).join(' ')),
+    };
+    try {
+      const fn = new Function('console', code);
+      fn(_console);
+      return logs.length ? logs.join('\n') + '\n\n✓ Execution completed' : '(No output — add console.log() statements)\n\n✓ Execution completed';
+    } catch (e) {
+      return '✖ Runtime error: ' + e.message + (logs.length ? '\n\n--- Output before error ---\n' + logs.join('\n') : '');
+    }
+  }
+
+  function _fmt(v) {
+    if (v === null) return 'null';
+    if (v === undefined) return 'undefined';
+    if (typeof v === 'object') {
+      try { return JSON.stringify(v, null, 2); } catch(_) { return String(v); }
+    }
+    return String(v);
+  }
+
+  function _loadScript(src) {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector('script[src="' + src + '"]')) { resolve(); return; }
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = () => reject(new Error('Failed to load: ' + src));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function _runPython(code) {
+    _setOutput('> Loading Python interpreter...');
+    try {
+      await _loadScript('https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js');
+      await _loadScript('https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js');
+    } catch (_) {
+      _setOutput('✖ Could not load Python interpreter. Check your internet connection.');
+      return;
+    }
+    let output = '';
+    Sk.configure({
+      output: (text) => { output += text; },
+      read: (x) => {
+        if (Sk.builtinFiles && Sk.builtinFiles.files[x] !== undefined) return Sk.builtinFiles.files[x];
+        throw 'File not found: \'' + x + '\'';
       }
-      
-      output.textContent = result;
-    }, 500);
+    });
+    _setOutput('> Running Python code...');
+    try {
+      await Sk.misceval.asyncToPromise(() => Sk.importMainWithBody('<stdin>', false, code, true));
+      _setOutput(output.length ? output + '\n✓ Execution completed' : '(No output — add print() statements)\n\n✓ Execution completed');
+    } catch (e) {
+      _setOutput('✖ ' + (e.toString ? e.toString() : String(e)) + (output ? '\n\n--- Output before error ---\n' + output : ''));
+    }
+  }
+
+  async function _runTypeScript(code) {
+    _setOutput('> Loading TypeScript compiler...');
+    try {
+      await _loadScript('https://cdnjs.cloudflare.com/ajax/libs/typescript/5.3.3/typescript.min.js');
+    } catch (_) {
+      _setOutput('✖ Could not load TypeScript compiler. Check your internet connection.');
+      return;
+    }
+    let jsCode;
+    try {
+      const result = ts.transpileModule(code, {
+        compilerOptions: { target: ts.ScriptTarget.ES2017, module: ts.ModuleKind.None }
+      });
+      jsCode = result.outputText;
+    } catch (e) {
+      _setOutput('✖ TypeScript compilation error: ' + e.message);
+      return;
+    }
+    _setOutput('> Running transpiled JavaScript...\n\n' + _runJavaScript(jsCode));
+  }
+
+  async function _runReact(code) {
+    _setOutput('> Loading React + Babel transpiler...');
+    try {
+      await _loadScript('https://unpkg.com/react@18/umd/react.development.js');
+      await _loadScript('https://unpkg.com/react-dom@18/umd/react-dom.development.js');
+      await _loadScript('https://unpkg.com/@babel/standalone/babel.min.js');
+    } catch (_) {
+      _setOutput('✖ Could not load React/Babel. Check your internet connection.');
+      return;
+    }
+    try {
+      const transformed = Babel.transform(code, { presets: ['react'] }).code;
+      const frame = document.createElement('iframe');
+      frame.style.cssText = 'width:100%;height:260px;border:none;background:#fff;border-radius:6px;margin-top:8px;';
+      const outputEl = document.getElementById('simulatorOutput');
+      outputEl.textContent = '';
+      outputEl.appendChild(frame);
+      const doc = frame.contentDocument;
+      doc.open();
+      doc.write(`<!DOCTYPE html><html><head>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"><\/script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"><\/script>
+        <style>body{font-family:sans-serif;padding:16px;margin:0;background:#fff;color:#111;}</style>
+      </head><body><div id="root"></div><script>
+        try { ${transformed}
+          const root = ReactDOM.createRoot(document.getElementById('root'));
+          const AppComp = typeof App !== 'undefined' ? App : (typeof Counter !== 'undefined' ? Counter : null);
+          if (AppComp) root.render(React.createElement(AppComp));
+          else document.getElementById('root').innerHTML = '<p style="color:red">No App component found. Define a component named App.</p>';
+        } catch(e) { document.getElementById('root').innerHTML = '<p style="color:red">Error: ' + e.message + '</p>'; }
+      <\/script></body></html>`);
+      doc.close();
+    } catch (e) {
+      _setOutput('✖ Transpile/render error: ' + e.message);
+    }
+  }
+
+  function _runJava(code) {
+    const lines = [];
+    const printRe = /System\.out\.println\s*\(\s*(.*?)\s*\)\s*;/g;
+    let m;
+    const evalJavaExpr = (expr) => {
+      const strMatch = expr.match(/^"(.*)"$/);
+      if (strMatch) return strMatch[1];
+      try { return Function('"use strict"; return ' + expr.replace(/\bthis\b/g,'undefined'))(); } catch(_) { return expr; }
+    };
+    while ((m = printRe.exec(code)) !== null) lines.push(evalJavaExpr(m[1]));
+    const classes = [...code.matchAll(/\bclass\s+(\w+)/g)].map(x => x[1]);
+    const methods = [...code.matchAll(/(?:public|private|protected|static)[\w\s<>[\]]+\s+(\w+)\s*\(/g)].map(x => x[1]).filter(n => n !== 'main');
+    let result = '';
+    if (classes.length) result += '> Compiling: ' + classes.join(', ') + '\n';
+    if (methods.length) result += '> Methods: ' + methods.join(', ') + '\n';
+    if (lines.length || result) result += '\n--- Output ---\n';
+    result += lines.join('\n');
+    result += lines.length ? '\n\n✓ Compilation and execution successful' : '(No System.out.println() calls found)\n\n✓ Compilation successful';
+    return result;
+  }
+
+  function _runDocker(code) {
+    const instructions = [];
+    const lines = code.split('\n');
+    const validInstructions = ['FROM','RUN','CMD','LABEL','EXPOSE','ENV','ADD','COPY','ENTRYPOINT','VOLUME','USER','WORKDIR','ARG','ONBUILD','STOPSIGNAL','HEALTHCHECK','SHELL'];
+    let step = 0;
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const keyword = trimmed.split(/\s+/)[0].toUpperCase();
+      if (validInstructions.includes(keyword)) {
+        step++;
+        const rest = trimmed.substring(keyword.length).trim();
+        if (keyword === 'FROM') instructions.push(`Step ${step}: Pulling base image ${rest}`);
+        else if (keyword === 'WORKDIR') instructions.push(`Step ${step}: Setting working directory to ${rest}`);
+        else if (keyword === 'COPY') instructions.push(`Step ${step}: Copying files: ${rest}`);
+        else if (keyword === 'RUN') instructions.push(`Step ${step}: Executing: ${rest}`);
+        else if (keyword === 'EXPOSE') instructions.push(`Step ${step}: Exposing port ${rest}`);
+        else if (keyword === 'CMD') instructions.push(`Step ${step}: Setting default command: ${rest}`);
+        else if (keyword === 'ENV') instructions.push(`Step ${step}: Setting env variable: ${rest}`);
+        else instructions.push(`Step ${step}: ${keyword} ${rest}`);
+      }
+    }
+    if (!instructions.length) return '(No valid Dockerfile instructions found)';
+    return '> docker build -t myapp .\n\n' + instructions.join('\n') + '\n\nSuccessfully built myapp\nSuccessfully tagged myapp:latest\n\n✓ Build simulation complete';
+  }
+
+  function _runKubernetes(code) {
+    const resources = [];
+    let current = null;
+    for (const line of code.split('\n')) {
+      const trimmed = line.trim();
+      if (trimmed === '---') { if (current) resources.push(current); current = null; continue; }
+      if (!current) current = {};
+      const kindMatch = trimmed.match(/^kind:\s*(.+)/);
+      const nameMatch = trimmed.match(/^name:\s*(.+)/);
+      const nsMatch = trimmed.match(/^namespace:\s*(.+)/);
+      const replicaMatch = trimmed.match(/^replicas:\s*(\d+)/);
+      if (kindMatch) current.kind = kindMatch[1].trim();
+      if (nameMatch && !current.name) current.name = nameMatch[1].trim();
+      if (nsMatch) current.namespace = nsMatch[1].trim();
+      if (replicaMatch) current.replicas = replicaMatch[1].trim();
+    }
+    if (current && current.kind) resources.push(current);
+    if (!resources.length) return '(No valid Kubernetes resources found in YAML)';
+    const lines = ['> kubectl apply -f manifest.yaml', ''];
+    resources.forEach(r => {
+      const ns = r.namespace ? ' in namespace ' + r.namespace : '';
+      const extra = r.replicas ? ` (${r.replicas} replicas)` : '';
+      lines.push(`${r.kind.toLowerCase()}/${r.name || 'unnamed'} created${ns}${extra}`);
+    });
+    lines.push('');
+    resources.forEach(r => {
+      if (r.kind === 'Deployment') lines.push(`✓ Deployment rolling out: ${r.name}${r.replicas ? ' (' + r.replicas + ' pods)' : ''}`);
+      if (r.kind === 'Service') lines.push(`✓ Service endpoints registered: ${r.name}`);
+      if (r.kind === 'ConfigMap') lines.push(`✓ ConfigMap mounted: ${r.name}`);
+    });
+    lines.push('\n✓ Resources applied successfully');
+    return lines.join('\n');
+  }
+
+  async function runSimulator() {
+    const code = document.getElementById('simulatorCode')?.value || '';
+    const runBtn = document.getElementById('runBtn');
+    if (runBtn) { runBtn.disabled = true; runBtn.textContent = 'Running...'; }
+
+    _setOutput('> Running code...');
+
+    const key = _currentSimKey;
+    let result;
+
+    if (key === 'javascript' || key === 'nodejs') {
+      result = _runJavaScript(code);
+      _setOutput(result);
+    } else if (key === 'python') {
+      await _runPython(code);
+    } else if (key === 'typescript') {
+      await _runTypeScript(code);
+    } else if (key === 'react') {
+      await _runReact(code);
+    } else if (key === 'java') {
+      result = _runJava(code);
+      _setOutput(result);
+    } else if (key === 'docker') {
+      result = _runDocker(code);
+      _setOutput(result);
+    } else if (key === 'kubernetes') {
+      result = _runKubernetes(code);
+      _setOutput(result);
+    }
+
+    if (runBtn) { runBtn.disabled = false; runBtn.innerHTML = '<iconify-icon icon="lucide:play"></iconify-icon> Run Code'; }
   }
 
   function resetSimulator(simKey) {
     const simulator = simulatorTemplates[simKey];
     const codeArea = document.getElementById('simulatorCode');
     const output = document.getElementById('simulatorOutput');
-    
     if (codeArea) codeArea.value = simulator.defaultCode;
-    if (output) output.textContent = 'Click "Run Code" to execute your code...';
+    if (output) { output.textContent = 'Click "Run Code" to execute your code...'; }
   }
 
   // Make functions globally accessible
   window.closeModal = closeModal;
   window.runSimulator = runSimulator;
   window.resetSimulator = resetSimulator;
+  window.launchSimulator = launchSimulator;
+  window.startQuiz = startQuiz;
 
   // ===== EVENT LISTENERS =====
   document.addEventListener('DOMContentLoaded', () => {
-    // Quiz buttons
-    const quizButtons = document.querySelectorAll('.quiz-btn');
-    quizButtons.forEach((btn, index) => {
-      const quizKeys = ['javascript-fundamentals', 'react-modern-web', 'backend-api', 'cloud-devops', 'security-practices'];
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        startQuiz(quizKeys[index]);
-      });
-    });
-    
     // Guide links
     const guideLinks = document.querySelectorAll('.guide-link');
     guideLinks.forEach((link, index) => {
@@ -2318,7 +2624,7 @@ spec:
         showGuide(guideKeys[index]);
       });
     });
-    
+
     // Simulator buttons
     const simulatorButtons = document.querySelectorAll('.simulator-btn');
     simulatorButtons.forEach((btn, index) => {
@@ -2469,54 +2775,62 @@ require_once __DIR__ . '/../includes/header.php';
         JavaScript Fundamentals
       </div>
       <div class="quiz-meta">
-        <span><iconify-icon icon="lucide:list"></iconify-icon>5 Questions</span>
+        <span><iconify-icon icon="lucide:list"></iconify-icon>5 Questions per level</span>
         <span><iconify-icon icon="lucide:clock"></iconify-icon>5 Minutes</span>
-        <span><iconify-icon icon="lucide:bar-chart"></iconify-icon>Beginner</span>
+        <span><span class="quiz-level-pill beginner">Beginner</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
       </div>
-      <div class="card-desc">Test your knowledge of JavaScript basics, variables, functions, and control flow.</div>
-      <a href="/Training/Quizzes/javascript-fundamentals.html" class="quiz-btn">Start Quiz</a>
+      <div class="card-desc">Test your knowledge of JavaScript basics, closures, async programming, and internals.</div>
+      <a href="#" class="quiz-btn" onclick="event.preventDefault();startQuiz('javascript-fundamentals')">Start Quiz</a>
     </div>
 
     <div class="quiz-card">
       <div class="quiz-title">
         <iconify-icon icon="lucide:brain"></iconify-icon>
-        React & Modern Web Development
+        React &amp; Modern Web Development
       </div>
       <div class="quiz-meta">
-        <span><iconify-icon icon="lucide:list"></iconify-icon>5 Questions</span>
+        <span><iconify-icon icon="lucide:list"></iconify-icon>5 Questions per level</span>
         <span><iconify-icon icon="lucide:clock"></iconify-icon>5 Minutes</span>
-        <span><iconify-icon icon="lucide:bar-chart"></iconify-icon>Intermediate</span>
+        <span><span class="quiz-level-pill beginner">Beginner</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
       </div>
-      <div class="card-desc">Assess your understanding of React components, hooks, state management, and routing.</div>
-      <a href="/Training/Quizzes/react-modern-web.html" class="quiz-btn">Start Quiz</a>
+      <div class="card-desc">Assess your understanding of React components, hooks, state management, and advanced patterns.</div>
+      <a href="#" class="quiz-btn" onclick="event.preventDefault();startQuiz('react-modern-web')">Start Quiz</a>
     </div>
 
     <div class="quiz-card">
       <div class="quiz-title">
         <iconify-icon icon="lucide:brain"></iconify-icon>
-        Backend & API Development
+        Backend &amp; API Development
       </div>
       <div class="quiz-meta">
-        <span><iconify-icon icon="lucide:list"></iconify-icon>5 Questions</span>
+        <span><iconify-icon icon="lucide:list"></iconify-icon>5 Questions per level</span>
         <span><iconify-icon icon="lucide:clock"></iconify-icon>5 Minutes</span>
-        <span><iconify-icon icon="lucide:bar-chart"></iconify-icon>Intermediate</span>
+        <span><span class="quiz-level-pill beginner">Beginner</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
       </div>
-      <div class="card-desc">Test your knowledge of REST APIs, GraphQL, authentication, and database design.</div>
-      <a href="/Training/Quizzes/backend-api.html" class="quiz-btn">Start Quiz</a>
+      <div class="card-desc">Test your knowledge of REST APIs, GraphQL, authentication, middleware, and distributed patterns.</div>
+      <a href="#" class="quiz-btn" onclick="event.preventDefault();startQuiz('backend-api')">Start Quiz</a>
     </div>
 
     <div class="quiz-card">
       <div class="quiz-title">
         <iconify-icon icon="lucide:brain"></iconify-icon>
-        Cloud Architecture & DevOps
+        Cloud Architecture &amp; DevOps
       </div>
       <div class="quiz-meta">
-        <span><iconify-icon icon="lucide:list"></iconify-icon>5 Questions</span>
+        <span><iconify-icon icon="lucide:list"></iconify-icon>5 Questions per level</span>
         <span><iconify-icon icon="lucide:clock"></iconify-icon>5 Minutes</span>
-        <span><iconify-icon icon="lucide:bar-chart"></iconify-icon>Advanced</span>
+        <span><span class="quiz-level-pill beginner">Beginner</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
       </div>
-      <div class="card-desc">Advanced assessment covering AWS, Azure, CI/CD, containerization, and orchestration.</div>
-      <a href="/Training/Quizzes/cloud-devops.html" class="quiz-btn">Start Quiz</a>
+      <div class="card-desc">Advanced assessment covering AWS, Azure, CI/CD, containerization, orchestration, and cloud patterns.</div>
+      <a href="#" class="quiz-btn" onclick="event.preventDefault();startQuiz('cloud-devops')">Start Quiz</a>
     </div>
 
     <div class="quiz-card">
@@ -2525,12 +2839,14 @@ require_once __DIR__ . '/../includes/header.php';
         Security Best Practices
       </div>
       <div class="quiz-meta">
-        <span><iconify-icon icon="lucide:list"></iconify-icon>5 Questions</span>
+        <span><iconify-icon icon="lucide:list"></iconify-icon>5 Questions per level</span>
         <span><iconify-icon icon="lucide:clock"></iconify-icon>5 Minutes</span>
-        <span><iconify-icon icon="lucide:bar-chart"></iconify-icon>Intermediate</span>
+        <span><span class="quiz-level-pill beginner">Beginner</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
       </div>
-      <div class="card-desc">Evaluate your knowledge of application security, OWASP Top 10, and secure coding practices.</div>
-      <a href="/Training/Quizzes/security-practices.html" class="quiz-btn">Start Quiz</a>
+      <div class="card-desc">Evaluate your knowledge of application security, OWASP Top 10, cryptography, and secure coding practices.</div>
+      <a href="#" class="quiz-btn" onclick="event.preventDefault();startQuiz('security-practices')">Start Quiz</a>
     </div>
   </div>
 </section>
