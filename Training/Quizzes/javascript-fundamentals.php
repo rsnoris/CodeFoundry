@@ -338,6 +338,72 @@ $page_styles = <<<'PAGECSS'
       margin-top: 8px;
     }
 
+    /* Level selector */
+    .quiz-level-selector {
+      padding: 8px 0;
+    }
+    .quiz-level-selector h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+    }
+    .quiz-level-selector p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin: 0 0 20px 0;
+    }
+    .level-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .level-option {
+      background: var(--navy-3);
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      padding: 18px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .level-option:hover {
+      border-color: var(--primary);
+      background: rgba(24, 179, 255, 0.05);
+    }
+    .level-option-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .level-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    .level-badge.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
+    .level-badge.intermediate { background: rgba(245,158,11,0.15);  color: #f59e0b; }
+    .level-badge.advanced     { background: rgba(239,68,68,0.15);   color: #ef4444; }
+    .level-option-name {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .level-option-desc {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    .quiz-level-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    .quiz-level-pill.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
+    .quiz-level-pill.intermediate { background: rgba(245,158,11,0.15);  color: #f59e0b; }
+    .quiz-level-pill.advanced     { background: rgba(239,68,68,0.15);   color: #ef4444; }
+
     @media (max-width: 768px) {
       .nav-menu,
       .nav-actions {
@@ -395,59 +461,96 @@ require_once __DIR__ . '/../../includes/header.php';
     // Quiz Data
     const quizData = {
       title: 'JavaScript Fundamentals',
-      questions: [
-        {
-          question: 'What is the correct way to declare a variable in JavaScript?',
-          options: ['variable x = 5;', 'let x = 5;', 'v x = 5;', 'dim x = 5;'],
-          correct: 1
+      levels: {
+        beginner: {
+          label: 'Beginner',
+          description: 'Core JavaScript concepts and basic syntax',
+          questions: [
+            { question: 'What is the correct way to declare a variable in JavaScript?', options: ['variable x = 5;', 'let x = 5;', 'v x = 5;', 'dim x = 5;'], correct: 1 },
+            { question: 'Which of the following is NOT a JavaScript data type?', options: ['String', 'Boolean', 'Float', 'Undefined'], correct: 2 },
+            { question: 'What does "===" check in JavaScript?', options: ['Only value', 'Only type', 'Both value and type', 'Neither value nor type'], correct: 2 },
+            { question: 'Which method is used to add an element to the end of an array?', options: ['push()', 'pop()', 'shift()', 'unshift()'], correct: 0 },
+            { question: 'What is the purpose of the "use strict" directive?', options: ['Improves performance', 'Enables strict mode', 'Compresses code', 'Adds security'], correct: 1 }
+          ]
         },
-        {
-          question: 'Which of the following is NOT a JavaScript data type?',
-          options: ['String', 'Boolean', 'Float', 'Undefined'],
-          correct: 2
+        intermediate: {
+          label: 'Intermediate',
+          description: 'ES6+, closures, and async programming',
+          questions: [
+            { question: 'What is a closure in JavaScript?', options: ['A loop construct', 'A function retaining access to its outer scope variables', 'A CSS technique', 'A data structure'], correct: 1 },
+            { question: 'What does `this` refer to inside an arrow function?', options: ['The arrow function itself', 'The window object', 'The enclosing lexical context', 'undefined'], correct: 2 },
+            { question: 'Which array method returns elements that pass a test?', options: ['map()', 'reduce()', 'filter()', 'find()'], correct: 2 },
+            { question: 'What is the difference between `null` and `undefined`?', options: ['They are identical', 'null is explicitly set; undefined is uninitialized', 'undefined is explicitly set; null is uninitialized', 'Both are the same as false'], correct: 1 },
+            { question: 'What is a Promise in JavaScript?', options: ['A syntax for declaring variables', 'An object representing eventual completion or failure of an async operation', 'A loop mechanism', 'A class decorator'], correct: 1 }
+          ]
         },
-        {
-          question: 'What does "===" check in JavaScript?',
-          options: ['Only value', 'Only type', 'Both value and type', 'Neither value nor type'],
-          correct: 2
-        },
-        {
-          question: 'Which method is used to add an element to the end of an array?',
-          options: ['push()', 'pop()', 'shift()', 'unshift()'],
-          correct: 0
-        },
-        {
-          question: 'What is the purpose of the "use strict" directive?',
-          options: ['Improves performance', 'Enables strict mode', 'Compresses code', 'Adds security'],
-          correct: 1
+        advanced: {
+          label: 'Advanced',
+          description: 'Deep internals, design patterns, optimization',
+          questions: [
+            { question: 'What is the output of `typeof null`?', options: ['"null"', '"object"', '"undefined"', '"boolean"'], correct: 1 },
+            { question: 'What does the JavaScript event loop do?', options: ['Handles synchronous code only', 'Processes the call stack and callback queue to manage async operations', 'Compiles JavaScript to machine code', 'Manages memory allocation'], correct: 1 },
+            { question: 'What is the difference between `call` and `bind`?', options: ['They are identical', 'call invokes immediately; bind returns a new function', 'bind invokes immediately; call returns a new function', 'Neither invokes the function'], correct: 1 },
+            { question: 'What is a generator function?', options: ['A function that creates objects', 'A function that can pause and resume execution using yield', 'A function that runs only once', 'A function with no return value'], correct: 1 },
+            { question: 'What does `Object.freeze()` do?', options: ['Copies an object', 'Removes all properties', 'Prevents adding, removing, or modifying properties', 'Converts object to JSON'], correct: 2 }
+          ]
         }
-      ]
+      }
     };
-
     // Quiz State
+    let currentLevel = null;
     let currentQuestionIndex = 0;
-    let userAnswers = new Array(quizData.questions.length).fill(null);
+    let userAnswers = [];
 
-    // Initialize Quiz
-    function initQuiz() {
+    function showLevelSelector() {
+      const levels = Object.keys(quizData.levels);
+      document.getElementById('quizContent').innerHTML = `
+        <div class="quiz-level-selector">
+          <h3>Choose Your Difficulty Level</h3>
+          <p>Select the level that best matches your experience</p>
+          <div class="level-options">
+            ${levels.map(key => {
+              const lvl = quizData.levels[key];
+              return `
+                <div class="level-option" onclick="selectLevel('${key}')">
+                  <div class="level-option-header">
+                    <span class="level-badge ${key}">${lvl.label}</span>
+                    <span class="level-option-name">${lvl.label} — ${lvl.questions.length} Questions</span>
+                  </div>
+                  <div class="level-option-desc">${lvl.description}</div>
+                </div>`;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function selectLevel(level) {
+      currentLevel = level;
+      currentQuestionIndex = 0;
+      userAnswers = new Array(quizData.levels[level].questions.length).fill(null);
       showQuestion();
     }
 
     function showQuestion() {
-      const question = quizData.questions[currentQuestionIndex];
-      const totalQuestions = quizData.questions.length;
+      const levelData = quizData.levels[currentLevel];
+      const question = levelData.questions[currentQuestionIndex];
+      const totalQuestions = levelData.questions.length;
       const quizContent = document.getElementById('quizContent');
-      
+
       quizContent.innerHTML = `
         <div class="quiz-progress">
           <span>Question ${currentQuestionIndex + 1} of ${totalQuestions}</span>
-          <span>${Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)}% Complete</span>
+          <span style="display:flex;align-items:center;gap:8px;">
+            <span class="quiz-level-pill ${currentLevel}">${levelData.label}</span>
+            ${Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)}% Complete
+          </span>
         </div>
         <div class="quiz-question">
           <div class="quiz-question-text">${question.question}</div>
           <div class="quiz-options">
             ${question.options.map((option, index) => `
-              <div class="quiz-option ${userAnswers[currentQuestionIndex] === index ? 'selected' : ''}" 
+              <div class="quiz-option ${userAnswers[currentQuestionIndex] === index ? 'selected' : ''}"
                    onclick="selectAnswer(${index})">
                 ${option}
               </div>
@@ -455,7 +558,7 @@ require_once __DIR__ . '/../../includes/header.php';
           </div>
         </div>
         <div class="quiz-navigation">
-          <button class="simulator-btn-secondary" onclick="previousQuestion()" 
+          <button class="simulator-btn-secondary" onclick="previousQuestion()"
                   ${currentQuestionIndex === 0 ? 'disabled' : ''}>
             Previous
           </button>
@@ -472,7 +575,8 @@ require_once __DIR__ . '/../../includes/header.php';
     }
 
     function nextQuestion() {
-      if (currentQuestionIndex < quizData.questions.length - 1) {
+      const total = quizData.levels[currentLevel].questions.length;
+      if (currentQuestionIndex < total - 1) {
         currentQuestionIndex++;
         showQuestion();
       }
@@ -486,20 +590,20 @@ require_once __DIR__ . '/../../includes/header.php';
     }
 
     function finishQuiz() {
+      const levelData = quizData.levels[currentLevel];
       let correct = 0;
-      quizData.questions.forEach((question, index) => {
-        if (userAnswers[index] === question.correct) {
-          correct++;
-        }
+      levelData.questions.forEach((question, index) => {
+        if (userAnswers[index] === question.correct) correct++;
       });
-      
-      const total = quizData.questions.length;
+
+      const total = levelData.questions.length;
       const percentage = Math.round((correct / total) * 100);
       const quizContent = document.getElementById('quizContent');
-      
+
       quizContent.innerHTML = `
         <div class="quiz-results">
           <h2>Quiz Complete!</h2>
+          <span class="quiz-level-pill ${currentLevel}" style="font-size:0.85rem;padding:4px 12px;">${levelData.label} Level</span>
           <div class="quiz-score">${percentage}%</div>
           <div class="quiz-result-details">
             <div class="quiz-result-stat">
@@ -515,16 +619,19 @@ require_once __DIR__ . '/../../includes/header.php';
               <div class="quiz-result-stat-label">Total</div>
             </div>
           </div>
-          <p style="margin-top: 20px; color: var(--text-muted); font-size: 1.1rem;">
-            ${percentage >= 80 ? 'Excellent work! You have a strong understanding of this topic.' :
-              percentage >= 60 ? 'Good job! Review the topics you missed to improve further.' :
-              'Keep learning! Review the material and try again.'}
+          <p style="margin-top:20px;color:var(--text-muted);font-size:1.1rem;">
+            ${percentage >= 80 ? 'Excellent work! You have a strong grasp of this level.' :
+              percentage >= 60 ? 'Good job! Review the topics you missed to improve.' :
+              'Keep learning! Study the material and try again.'}
           </p>
-          <div style="margin-top: 30px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-            <button class="simulator-btn-primary" onclick="retakeQuiz()">
+          <div style="margin-top:30px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <button class="simulator-btn-secondary" onclick="showLevelSelector()">
+              Change Level
+            </button>
+            <button class="simulator-btn-primary" onclick="selectLevel('${currentLevel}')">
               Retake Quiz
             </button>
-            <a href="/Training/" class="simulator-btn-secondary" style="display: inline-block; text-decoration: none;">
+            <a href="/Training/" class="simulator-btn-secondary" style="display:inline-block;text-decoration:none;">
               Back to Training
             </a>
           </div>
@@ -532,13 +639,7 @@ require_once __DIR__ . '/../../includes/header.php';
       `;
     }
 
-    function retakeQuiz() {
-      currentQuestionIndex = 0;
-      userAnswers = new Array(quizData.questions.length).fill(null);
-      showQuestion();
-    }
-
-    // Start quiz on load
-    initQuiz();
+    // Start with level selector
+    showLevelSelector();
   </script>
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>

@@ -338,6 +338,72 @@ $page_styles = <<<'PAGECSS'
       margin-top: 8px;
     }
 
+    /* Level selector */
+    .quiz-level-selector {
+      padding: 8px 0;
+    }
+    .quiz-level-selector h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+    }
+    .quiz-level-selector p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin: 0 0 20px 0;
+    }
+    .level-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .level-option {
+      background: var(--navy-3);
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      padding: 18px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .level-option:hover {
+      border-color: var(--primary);
+      background: rgba(24, 179, 255, 0.05);
+    }
+    .level-option-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .level-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    .level-badge.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
+    .level-badge.intermediate { background: rgba(245,158,11,0.15);  color: #f59e0b; }
+    .level-badge.advanced     { background: rgba(239,68,68,0.15);   color: #ef4444; }
+    .level-option-name {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .level-option-desc {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    .quiz-level-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    .quiz-level-pill.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
+    .quiz-level-pill.intermediate { background: rgba(245,158,11,0.15);  color: #f59e0b; }
+    .quiz-level-pill.advanced     { background: rgba(239,68,68,0.15);   color: #ef4444; }
+
     @media (max-width: 768px) {
       .nav-menu,
       .nav-actions {
@@ -395,59 +461,96 @@ require_once __DIR__ . '/../../includes/header.php';
     // Quiz Data
     const quizData = {
       title: 'Backend & API Development',
-      questions: [
-        {
-          question: 'What does REST stand for?',
-          options: ['Representational State Transfer', 'Remote Execution Service Technology', 'Rapid Enterprise System Transfer', 'Reliable Endpoint Service Technology'],
-          correct: 0
+      levels: {
+        beginner: {
+          label: 'Beginner',
+          description: 'REST, HTTP methods, and API fundamentals',
+          questions: [
+            { question: 'What does REST stand for?', options: ['Representational State Transfer', 'Remote Execution Service Technology', 'Rapid Enterprise System Transfer', 'Reliable Endpoint Service Technology'], correct: 0 },
+            { question: 'Which HTTP method is used to update a resource?', options: ['GET', 'POST', 'PUT', 'DELETE'], correct: 2 },
+            { question: 'What is GraphQL?', options: ['A database', 'A query language for APIs', 'A programming language', 'A web framework'], correct: 1 },
+            { question: 'What is JWT used for?', options: ['Database queries', 'Authentication and authorization', 'Styling', 'Routing'], correct: 1 },
+            { question: 'Which status code indicates a successful GET request?', options: ['200', '201', '204', '404'], correct: 0 }
+          ]
         },
-        {
-          question: 'Which HTTP method is used to update a resource?',
-          options: ['GET', 'POST', 'PUT', 'DELETE'],
-          correct: 2
+        intermediate: {
+          label: 'Intermediate',
+          description: 'Middleware, idempotency, and security',
+          questions: [
+            { question: 'What is middleware in Express.js?', options: ['A database connector', 'Functions that execute during the request-response cycle', 'A routing algorithm', 'A templating engine'], correct: 1 },
+            { question: 'What is the difference between PUT and PATCH?', options: ['They are identical', 'PUT replaces the entire resource; PATCH partially updates it', 'PATCH replaces the entire resource; PUT partially updates it', 'PUT creates; PATCH deletes'], correct: 1 },
+            { question: 'What does idempotent mean for HTTP methods?', options: ['The method is encrypted', 'Multiple identical requests produce the same result as one', 'The method requires authentication', 'The response is always cached'], correct: 1 },
+            { question: 'What is rate limiting used for?', options: ['Compressing responses', 'Controlling the number of requests a client can make in a time window', 'Caching data', 'Balancing load'], correct: 1 },
+            { question: 'What is CORS?', options: ['A database protocol', 'A policy controlling cross-origin HTTP requests', 'An authentication standard', 'A data format'], correct: 1 }
+          ]
         },
-        {
-          question: 'What is GraphQL?',
-          options: ['A database', 'A query language for APIs', 'A programming language', 'A web framework'],
-          correct: 1
-        },
-        {
-          question: 'What is JWT used for?',
-          options: ['Database queries', 'Authentication and authorization', 'Styling', 'Routing'],
-          correct: 1
-        },
-        {
-          question: 'Which status code indicates a successful GET request?',
-          options: ['200', '201', '204', '404'],
-          correct: 0
+        advanced: {
+          label: 'Advanced',
+          description: 'gRPC, event sourcing, CQRS, and API gateways',
+          questions: [
+            { question: 'What is gRPC?', options: ['A caching system', 'A high-performance RPC framework using Protocol Buffers', 'A GraphQL variant', 'A REST extension'], correct: 1 },
+            { question: 'What is the N+1 query problem?', options: ['Using N database indices', 'Executing N additional queries for each item in a result set', 'Having N API versions', 'Sending N duplicate requests'], correct: 1 },
+            { question: 'What is event sourcing?', options: ['Logging HTTP events', 'Storing state changes as an immutable sequence of events', 'Event-driven CSS', 'DOM event capture'], correct: 1 },
+            { question: 'What is CQRS?', options: ['A CSS framework', 'Command Query Responsibility Segregation — separating read and write models', 'A container registry', 'A CI/CD strategy'], correct: 1 },
+            { question: 'What does an API gateway provide?', options: ['Database migrations', 'A single entry point for clients to access microservices', 'CSS optimization', 'Static file serving'], correct: 1 }
+          ]
         }
-      ]
+      }
     };
-
     // Quiz State
+    let currentLevel = null;
     let currentQuestionIndex = 0;
-    let userAnswers = new Array(quizData.questions.length).fill(null);
+    let userAnswers = [];
 
-    // Initialize Quiz
-    function initQuiz() {
+    function showLevelSelector() {
+      const levels = Object.keys(quizData.levels);
+      document.getElementById('quizContent').innerHTML = `
+        <div class="quiz-level-selector">
+          <h3>Choose Your Difficulty Level</h3>
+          <p>Select the level that best matches your experience</p>
+          <div class="level-options">
+            ${levels.map(key => {
+              const lvl = quizData.levels[key];
+              return `
+                <div class="level-option" onclick="selectLevel('${key}')">
+                  <div class="level-option-header">
+                    <span class="level-badge ${key}">${lvl.label}</span>
+                    <span class="level-option-name">${lvl.label} — ${lvl.questions.length} Questions</span>
+                  </div>
+                  <div class="level-option-desc">${lvl.description}</div>
+                </div>`;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function selectLevel(level) {
+      currentLevel = level;
+      currentQuestionIndex = 0;
+      userAnswers = new Array(quizData.levels[level].questions.length).fill(null);
       showQuestion();
     }
 
     function showQuestion() {
-      const question = quizData.questions[currentQuestionIndex];
-      const totalQuestions = quizData.questions.length;
+      const levelData = quizData.levels[currentLevel];
+      const question = levelData.questions[currentQuestionIndex];
+      const totalQuestions = levelData.questions.length;
       const quizContent = document.getElementById('quizContent');
-      
+
       quizContent.innerHTML = `
         <div class="quiz-progress">
           <span>Question ${currentQuestionIndex + 1} of ${totalQuestions}</span>
-          <span>${Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)}% Complete</span>
+          <span style="display:flex;align-items:center;gap:8px;">
+            <span class="quiz-level-pill ${currentLevel}">${levelData.label}</span>
+            ${Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)}% Complete
+          </span>
         </div>
         <div class="quiz-question">
           <div class="quiz-question-text">${question.question}</div>
           <div class="quiz-options">
             ${question.options.map((option, index) => `
-              <div class="quiz-option ${userAnswers[currentQuestionIndex] === index ? 'selected' : ''}" 
+              <div class="quiz-option ${userAnswers[currentQuestionIndex] === index ? 'selected' : ''}"
                    onclick="selectAnswer(${index})">
                 ${option}
               </div>
@@ -455,7 +558,7 @@ require_once __DIR__ . '/../../includes/header.php';
           </div>
         </div>
         <div class="quiz-navigation">
-          <button class="simulator-btn-secondary" onclick="previousQuestion()" 
+          <button class="simulator-btn-secondary" onclick="previousQuestion()"
                   ${currentQuestionIndex === 0 ? 'disabled' : ''}>
             Previous
           </button>
@@ -472,7 +575,8 @@ require_once __DIR__ . '/../../includes/header.php';
     }
 
     function nextQuestion() {
-      if (currentQuestionIndex < quizData.questions.length - 1) {
+      const total = quizData.levels[currentLevel].questions.length;
+      if (currentQuestionIndex < total - 1) {
         currentQuestionIndex++;
         showQuestion();
       }
@@ -486,20 +590,20 @@ require_once __DIR__ . '/../../includes/header.php';
     }
 
     function finishQuiz() {
+      const levelData = quizData.levels[currentLevel];
       let correct = 0;
-      quizData.questions.forEach((question, index) => {
-        if (userAnswers[index] === question.correct) {
-          correct++;
-        }
+      levelData.questions.forEach((question, index) => {
+        if (userAnswers[index] === question.correct) correct++;
       });
-      
-      const total = quizData.questions.length;
+
+      const total = levelData.questions.length;
       const percentage = Math.round((correct / total) * 100);
       const quizContent = document.getElementById('quizContent');
-      
+
       quizContent.innerHTML = `
         <div class="quiz-results">
           <h2>Quiz Complete!</h2>
+          <span class="quiz-level-pill ${currentLevel}" style="font-size:0.85rem;padding:4px 12px;">${levelData.label} Level</span>
           <div class="quiz-score">${percentage}%</div>
           <div class="quiz-result-details">
             <div class="quiz-result-stat">
@@ -515,16 +619,19 @@ require_once __DIR__ . '/../../includes/header.php';
               <div class="quiz-result-stat-label">Total</div>
             </div>
           </div>
-          <p style="margin-top: 20px; color: var(--text-muted); font-size: 1.1rem;">
-            ${percentage >= 80 ? 'Excellent work! You have a strong understanding of this topic.' :
-              percentage >= 60 ? 'Good job! Review the topics you missed to improve further.' :
-              'Keep learning! Review the material and try again.'}
+          <p style="margin-top:20px;color:var(--text-muted);font-size:1.1rem;">
+            ${percentage >= 80 ? 'Excellent work! You have a strong grasp of this level.' :
+              percentage >= 60 ? 'Good job! Review the topics you missed to improve.' :
+              'Keep learning! Study the material and try again.'}
           </p>
-          <div style="margin-top: 30px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-            <button class="simulator-btn-primary" onclick="retakeQuiz()">
+          <div style="margin-top:30px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <button class="simulator-btn-secondary" onclick="showLevelSelector()">
+              Change Level
+            </button>
+            <button class="simulator-btn-primary" onclick="selectLevel('${currentLevel}')">
               Retake Quiz
             </button>
-            <a href="/Training/" class="simulator-btn-secondary" style="display: inline-block; text-decoration: none;">
+            <a href="/Training/" class="simulator-btn-secondary" style="display:inline-block;text-decoration:none;">
               Back to Training
             </a>
           </div>
@@ -532,13 +639,7 @@ require_once __DIR__ . '/../../includes/header.php';
       `;
     }
 
-    function retakeQuiz() {
-      currentQuestionIndex = 0;
-      userAnswers = new Array(quizData.questions.length).fill(null);
-      showQuestion();
-    }
-
-    // Start quiz on load
-    initQuiz();
+    // Start with level selector
+    showLevelSelector();
   </script>
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>
