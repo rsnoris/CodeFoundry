@@ -470,7 +470,12 @@ require_once __DIR__ . '/../../includes/header.php';
             { question: 'What is Docker used for?', options: ['Version control', 'Containerization', 'Database management', 'UI design'], correct: 1 },
             { question: 'What is Kubernetes?', options: ['A programming language', 'A container orchestration platform', 'A database', 'A web server'], correct: 1 },
             { question: 'Which AWS service is used for object storage?', options: ['EC2', 'S3', 'Lambda', 'RDS'], correct: 1 },
-            { question: 'What is Infrastructure as Code (IaC)?', options: ['Writing infrastructure configurations in code', 'Building infrastructure manually', 'A cloud provider', 'A deployment strategy'], correct: 0 }
+            { question: 'What is Infrastructure as Code (IaC)?', options: ['Writing infrastructure configurations in code', 'Building infrastructure manually', 'A cloud provider', 'A deployment strategy'], correct: 0 },
+            { question: 'What is a container image?', options: ['A screenshot of a container', 'A read-only template used to create containers', 'A virtual machine snapshot', 'A Docker configuration file'], correct: 1 },
+            { question: 'What is AWS EC2?', options: ['A storage service', 'A virtual compute server in the cloud', 'A database service', 'A content delivery network'], correct: 1 },
+            { question: 'What is the purpose of a Dockerfile?', options: ['To configure a web server', 'To define instructions for building a Docker image', 'To manage container networking', 'To deploy to Kubernetes'], correct: 1 },
+            { question: 'What is DevOps?', options: ['A programming language', 'A culture and practice combining development and operations', 'A cloud provider', 'A monitoring tool'], correct: 1 },
+            { question: 'Which cloud provider offers Azure services?', options: ['Amazon', 'Google', 'Microsoft', 'IBM'], correct: 2 }
           ]
         },
         intermediate: {
@@ -481,7 +486,12 @@ require_once __DIR__ . '/../../includes/header.php';
             { question: 'What is a Kubernetes namespace?', options: ['A DNS record', 'A virtual cluster used to isolate and organize resources', 'A storage class', 'A container image tag'], correct: 1 },
             { question: 'What is blue-green deployment?', options: ['A color-coded branching strategy', 'Running two identical production environments to enable instant traffic switching', 'A Kubernetes scheduling policy', 'A Docker networking mode'], correct: 1 },
             { question: 'What does a load balancer do?', options: ['Compresses static assets', 'Distributes incoming traffic across multiple servers', 'Manages database connections', 'Scans for vulnerabilities'], correct: 1 },
-            { question: 'What is serverless computing?', options: ['Running code without any servers', 'Executing code without managing or provisioning servers', 'A bare-metal hosting model', 'A Kubernetes node type'], correct: 1 }
+            { question: 'What is serverless computing?', options: ['Running code without any servers', 'Executing code without managing or provisioning servers', 'A bare-metal hosting model', 'A Kubernetes node type'], correct: 1 },
+            { question: 'What is a Kubernetes Pod?', options: ['A Docker image', 'The smallest deployable unit in Kubernetes containing one or more containers', 'A persistent storage volume', 'A network namespace'], correct: 1 },
+            { question: 'What is canary deployment?', options: ['A deployment to canary testing servers only', 'Gradually rolling out a new version to a small subset of users', 'A blue-green variant for databases', 'A rollback strategy'], correct: 1 },
+            { question: 'What is auto-scaling in cloud computing?', options: ['Automatically updating software', 'Automatically adjusting compute resources based on demand', 'Scaling database schemas', 'Resizing container images'], correct: 1 },
+            { question: 'What is a VPC (Virtual Private Cloud)?', options: ['A virtual programming container', 'An isolated network within a cloud provider', 'A version control platform', 'A CI/CD pipeline tool'], correct: 1 },
+            { question: 'What does Terraform do?', options: ['Monitors cloud resources', 'Provisions and manages infrastructure using code', 'Builds container images', 'Manages Kubernetes pods'], correct: 1 }
           ]
         },
         advanced: {
@@ -492,7 +502,12 @@ require_once __DIR__ . '/../../includes/header.php';
             { question: 'What is Helm in Kubernetes?', options: ['A monitoring tool', 'A package manager for Kubernetes applications', 'A secret manager', 'A network policy engine'], correct: 1 },
             { question: 'What is GitOps?', options: ['A Git branching strategy', 'Using Git as the single source of truth for declarative infrastructure and application delivery', 'A CI/CD provider', 'A container registry'], correct: 1 },
             { question: 'What is the difference between vertical and horizontal scaling?', options: ['They are the same', 'Vertical adds more power to existing nodes; horizontal adds more nodes', 'Horizontal adds power; vertical adds nodes', 'Only horizontal scaling is supported in cloud'], correct: 1 },
-            { question: 'What is chaos engineering?', options: ['Writing poorly structured code', 'Intentionally introducing failures into production to test system resilience', 'Random deployment strategies', 'Uncontrolled infrastructure changes'], correct: 1 }
+            { question: 'What is chaos engineering?', options: ['Writing poorly structured code', 'Intentionally introducing failures into production to test system resilience', 'Random deployment strategies', 'Uncontrolled infrastructure changes'], correct: 1 },
+            { question: 'What is Istio?', options: ['A container registry', 'An open-source service mesh platform for Kubernetes', 'A Helm chart repository', 'A GitOps tool'], correct: 1 },
+            { question: 'What is eBPF in cloud-native observability?', options: ['A container format', 'A kernel technology that allows programs to run in the OS kernel safely', 'A GitOps workflow', 'A cloud database protocol'], correct: 1 },
+            { question: 'What is the purpose of a Kubernetes StatefulSet?', options: ['Running stateless applications', 'Managing stateful applications that require stable network identities and persistent storage', 'Auto-scaling deployments', 'Load balancing pods'], correct: 1 },
+            { question: 'What is multi-tenancy in cloud architecture?', options: ['Using multiple cloud providers', 'Allowing multiple customers to share the same infrastructure while keeping data isolated', 'Running multiple services per container', 'Deploying to multiple regions simultaneously'], correct: 1 },
+            { question: 'What does FinOps refer to?', options: ['Financial software development', 'A practice for managing and optimizing cloud costs across teams', 'A cloud security framework', 'A DevOps pipeline for finance companies'], correct: 1 }
           ]
         }
       }

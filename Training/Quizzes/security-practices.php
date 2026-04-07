@@ -470,7 +470,12 @@ require_once __DIR__ . '/../../includes/header.php';
             { question: 'What is SQL injection?', options: ['A database optimization technique', 'A security vulnerability where malicious SQL code is inserted', 'A data backup method', 'A query optimization tool'], correct: 1 },
             { question: 'What is HTTPS?', options: ['HTTP with security', 'Hypertext Transfer Protocol Secure', 'High-level Transfer Protocol', 'Host Transfer Protocol System'], correct: 1 },
             { question: 'What is the purpose of CORS?', options: ['To compress data', 'To control cross-origin resource sharing', 'To encrypt passwords', 'To manage cookies'], correct: 1 },
-            { question: 'What is hashing used for in security?', options: ['Compressing files', 'Storing passwords securely', 'Speeding up queries', 'Managing sessions'], correct: 1 }
+            { question: 'What is hashing used for in security?', options: ['Compressing files', 'Storing passwords securely', 'Speeding up queries', 'Managing sessions'], correct: 1 },
+            { question: 'What does a firewall do?', options: ['Speeds up network traffic', 'Monitors and controls incoming and outgoing network traffic based on security rules', 'Encrypts all data', 'Manages user accounts'], correct: 1 },
+            { question: 'What is a brute-force attack?', options: ['A physical attack on hardware', 'Systematically trying all possible passwords or keys until the correct one is found', 'A DDoS flood attack', 'An SQL injection variant'], correct: 1 },
+            { question: 'What is the purpose of input validation in security?', options: ['To speed up form processing', 'To prevent malicious data from being processed by an application', 'To compress user input', 'To style form fields'], correct: 1 },
+            { question: 'What does SSL stand for?', options: ['Server-Side Language', 'Secure Sockets Layer', 'Static Security Layer', 'Software Security Library'], correct: 1 },
+            { question: 'What is a phishing attack?', options: ['Attacking a server with traffic', 'Tricking users into revealing sensitive information by impersonating a trusted entity', 'Injecting code into a database', 'Exploiting a zero-day vulnerability'], correct: 1 }
           ]
         },
         intermediate: {
@@ -481,7 +486,12 @@ require_once __DIR__ . '/../../includes/header.php';
             { question: 'What is two-factor authentication (2FA)?', options: ['Using two different passwords', 'Requiring two distinct verification factors to prove identity', 'Hashing a password twice', 'A type of OAuth flow'], correct: 1 },
             { question: 'What is a penetration test?', options: ['Performance benchmarking', 'An authorized simulated attack to identify security vulnerabilities', 'A database query test', 'A load balancing test'], correct: 1 },
             { question: 'What is the principle of least privilege?', options: ['Giving administrators full access', 'Granting only the minimum permissions required to perform a task', 'Disabling all authentication', 'Using the shortest passwords'], correct: 1 },
-            { question: 'What is a CSRF attack?', options: ['Cross-Site Resource Sharing', 'Cross-Site Request Forgery — tricking a browser into making unauthorized requests', 'Cross-Server Resource Failure', 'Content Security Response Framework'], correct: 1 }
+            { question: 'What is a CSRF attack?', options: ['Cross-Site Resource Sharing', 'Cross-Site Request Forgery — tricking a browser into making unauthorized requests', 'Cross-Server Resource Failure', 'Content Security Response Framework'], correct: 1 },
+            { question: 'What is the purpose of a Content Security Policy (CSP)?', options: ['To compress web content', 'To prevent XSS by specifying which content sources browsers are allowed to load', 'To encrypt cookies', 'To restrict HTTP methods'], correct: 1 },
+            { question: 'What is session hijacking?', options: ['Deleting a user session', 'Stealing or forging a session token to impersonate a user', 'Logging out all users', 'Expiring a session prematurely'], correct: 1 },
+            { question: 'What is a rainbow table attack?', options: ['A colorful brute-force method', 'Using precomputed hash values to crack password hashes quickly', 'A phishing technique using visual tricks', 'A DDoS variant'], correct: 1 },
+            { question: 'What is bcrypt used for?', options: ['Encrypting network traffic', 'Securely hashing passwords with an adaptive cost factor', 'Compressing data', 'Generating API keys'], correct: 1 },
+            { question: 'What is the difference between authentication and authorization?', options: ['They are the same', 'Authentication verifies identity; authorization determines what access is allowed', 'Authorization verifies identity; authentication grants access', 'Authentication is for APIs; authorization is for web apps'], correct: 1 }
           ]
         },
         advanced: {
@@ -492,7 +502,12 @@ require_once __DIR__ . '/../../includes/header.php';
             { question: 'What is certificate pinning?', options: ['Permanently storing cookies', 'Associating a host with a specific expected certificate or public key', 'A JWT validation technique', 'An HTTPS redirect rule'], correct: 1 },
             { question: 'What is OAuth 2.0?', options: ['An encryption algorithm', 'An authorization framework allowing third-party limited access to user resources', 'A password hashing scheme', 'A session storage standard'], correct: 1 },
             { question: 'What is a timing attack?', options: ['A DDoS technique', 'Exploiting measurable time differences in cryptographic operations to infer secrets', 'A social engineering approach', 'An SQL injection variant'], correct: 1 },
-            { question: 'What is defense in depth?', options: ['Using the strongest firewall', 'Applying multiple independent layers of security controls', 'Encrypting only sensitive data', 'Single sign-on'], correct: 1 }
+            { question: 'What is defense in depth?', options: ['Using the strongest firewall', 'Applying multiple independent layers of security controls', 'Encrypting only sensitive data', 'Single sign-on'], correct: 1 },
+            { question: 'What is a supply chain attack?', options: ['Attacking a logistics company', 'Compromising software or hardware in the development/distribution pipeline to target end users', 'An SQL injection via third-party APIs', 'A DDoS on a CDN'], correct: 1 },
+            { question: 'What is SSRF (Server-Side Request Forgery)?', options: ['An SQL injection variant', 'Tricking a server into making requests to internal or external resources on behalf of an attacker', 'A client-side scripting attack', 'A DNS poisoning technique'], correct: 1 },
+            { question: 'What is key stretching?', options: ['Extending an encryption key length', 'Making a password-based key derivation computationally expensive to slow brute-force attacks', 'Duplicating encryption keys for redundancy', 'Compressing cryptographic keys'], correct: 1 },
+            { question: 'What is the purpose of HSTS (HTTP Strict Transport Security)?', options: ['Caching HTTP responses', 'Forcing browsers to use HTTPS for all future requests to a domain', 'Blocking cross-origin requests', 'Validating SSL certificates'], correct: 1 },
+            { question: 'What is threat modeling?', options: ['Predicting future cyberattacks', 'A structured process to identify, prioritize, and address security threats in a system', 'Creating security test cases', 'Monitoring system logs for anomalies'], correct: 1 }
           ]
         }
       }

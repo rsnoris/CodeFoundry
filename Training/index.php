@@ -2772,49 +2772,17 @@ require_once __DIR__ . '/../includes/header.php';
     <div class="quiz-card">
       <div class="quiz-title">
         <iconify-icon icon="lucide:brain"></iconify-icon>
-        JavaScript Fundamentals
-      </div>
-      <div class="quiz-meta">
-        <span><iconify-icon icon="lucide:list"></iconify-icon>5 Questions per level</span>
-        <span><iconify-icon icon="lucide:clock"></iconify-icon>5 Minutes</span>
-        <span><span class="quiz-level-pill beginner">Beginner</span></span>
-        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
-        <span><span class="quiz-level-pill advanced">Advanced</span></span>
-      </div>
-      <div class="card-desc">Test your knowledge of JavaScript basics, closures, async programming, and internals.</div>
-      <a href="#" class="quiz-btn" onclick="event.preventDefault();startQuiz('javascript-fundamentals')">Start Quiz</a>
-    </div>
-
-    <div class="quiz-card">
-      <div class="quiz-title">
-        <iconify-icon icon="lucide:brain"></iconify-icon>
-        React &amp; Modern Web Development
-      </div>
-      <div class="quiz-meta">
-        <span><iconify-icon icon="lucide:list"></iconify-icon>5 Questions per level</span>
-        <span><iconify-icon icon="lucide:clock"></iconify-icon>5 Minutes</span>
-        <span><span class="quiz-level-pill beginner">Beginner</span></span>
-        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
-        <span><span class="quiz-level-pill advanced">Advanced</span></span>
-      </div>
-      <div class="card-desc">Assess your understanding of React components, hooks, state management, and advanced patterns.</div>
-      <a href="#" class="quiz-btn" onclick="event.preventDefault();startQuiz('react-modern-web')">Start Quiz</a>
-    </div>
-
-    <div class="quiz-card">
-      <div class="quiz-title">
-        <iconify-icon icon="lucide:brain"></iconify-icon>
         Backend &amp; API Development
       </div>
       <div class="quiz-meta">
-        <span><iconify-icon icon="lucide:list"></iconify-icon>5 Questions per level</span>
-        <span><iconify-icon icon="lucide:clock"></iconify-icon>5 Minutes</span>
+        <span><iconify-icon icon="lucide:list"></iconify-icon>10 Questions per level</span>
+        <span><iconify-icon icon="lucide:clock"></iconify-icon>10 Minutes</span>
         <span><span class="quiz-level-pill beginner">Beginner</span></span>
         <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
         <span><span class="quiz-level-pill advanced">Advanced</span></span>
       </div>
       <div class="card-desc">Test your knowledge of REST APIs, GraphQL, authentication, middleware, and distributed patterns.</div>
-      <a href="#" class="quiz-btn" onclick="event.preventDefault();startQuiz('backend-api')">Start Quiz</a>
+      <a href="Quizzes/backend-api.php" class="quiz-btn">Start Quiz</a>
     </div>
 
     <div class="quiz-card">
@@ -2823,14 +2791,14 @@ require_once __DIR__ . '/../includes/header.php';
         Cloud Architecture &amp; DevOps
       </div>
       <div class="quiz-meta">
-        <span><iconify-icon icon="lucide:list"></iconify-icon>5 Questions per level</span>
-        <span><iconify-icon icon="lucide:clock"></iconify-icon>5 Minutes</span>
+        <span><iconify-icon icon="lucide:list"></iconify-icon>10 Questions per level</span>
+        <span><iconify-icon icon="lucide:clock"></iconify-icon>10 Minutes</span>
         <span><span class="quiz-level-pill beginner">Beginner</span></span>
         <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
         <span><span class="quiz-level-pill advanced">Advanced</span></span>
       </div>
       <div class="card-desc">Advanced assessment covering AWS, Azure, CI/CD, containerization, orchestration, and cloud patterns.</div>
-      <a href="#" class="quiz-btn" onclick="event.preventDefault();startQuiz('cloud-devops')">Start Quiz</a>
+      <a href="Quizzes/cloud-devops.php" class="quiz-btn">Start Quiz</a>
     </div>
 
     <div class="quiz-card">
@@ -2839,14 +2807,14 @@ require_once __DIR__ . '/../includes/header.php';
         Security Best Practices
       </div>
       <div class="quiz-meta">
-        <span><iconify-icon icon="lucide:list"></iconify-icon>5 Questions per level</span>
-        <span><iconify-icon icon="lucide:clock"></iconify-icon>5 Minutes</span>
+        <span><iconify-icon icon="lucide:list"></iconify-icon>10 Questions per level</span>
+        <span><iconify-icon icon="lucide:clock"></iconify-icon>10 Minutes</span>
         <span><span class="quiz-level-pill beginner">Beginner</span></span>
         <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
         <span><span class="quiz-level-pill advanced">Advanced</span></span>
       </div>
       <div class="card-desc">Evaluate your knowledge of application security, OWASP Top 10, cryptography, and secure coding practices.</div>
-      <a href="#" class="quiz-btn" onclick="event.preventDefault();startQuiz('security-practices')">Start Quiz</a>
+      <a href="Quizzes/security-practices.php" class="quiz-btn">Start Quiz</a>
     </div>
 
     <div class="quiz-card">
