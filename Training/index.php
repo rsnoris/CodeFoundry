@@ -4147,6 +4147,86 @@ require_once __DIR__ . '/../includes/header.php';
       <div class="card-desc">Evaluate your Excel expertise from basic formulas and cell references to PivotTables, Power Query, advanced functions, VBA macros, and DAX.</div>
       <a href="Quizzes/excel.php" class="quiz-btn">Start Quiz</a>
     </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:code-2"></iconify-icon>
+        Kotlin
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Expert</span></span>
+      </div>
+      <div class="card-desc">Test your Kotlin skills from null safety and data classes to coroutines, sealed classes, extension functions, and multiplatform development.</div>
+      <a href="Quizzes/kotlin.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:database"></iconify-icon>
+        PostgreSQL
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Expert</span></span>
+      </div>
+      <div class="card-desc">Assess your PostgreSQL expertise from basic queries and data types to indexing, window functions, partitioning, replication, and performance tuning.</div>
+      <a href="Quizzes/postgresql.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:bar-chart-2"></iconify-icon>
+        R
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Expert</span></span>
+      </div>
+      <div class="card-desc">Evaluate your R knowledge from vectors, data frames, and ggplot2 to tidyverse, statistical modelling, and advanced data analysis techniques.</div>
+      <a href="Quizzes/r-lang.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:atom"></iconify-icon>
+        React &amp; Modern Web
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Expert</span></span>
+      </div>
+      <div class="card-desc">Master React and modern web development from JSX, hooks, and routing to Next.js, server components, concurrent features, and performance optimization.</div>
+      <a href="Quizzes/react-modern-web.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:file-code"></iconify-icon>
+        JavaScript Fundamentals
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Expert</span></span>
+      </div>
+      <div class="card-desc">Deepen your JavaScript knowledge from syntax and data types to closures, the event loop, Promises, Proxy, and advanced engine internals.</div>
+      <a href="Quizzes/javascript-fundamentals.php" class="quiz-btn">Start Quiz</a>
+    </div>
   </div>
 </section>
 

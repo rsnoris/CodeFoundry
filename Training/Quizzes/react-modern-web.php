@@ -1,645 +1,168 @@
 <?php
-$page_title  = 'React & Modern Web Development Quiz - CodeFoundry';
+$page_title  = 'React & Modern Web Development Quiz – 100 Levels – CodeFoundry';
 $active_page = 'training';
-$page_styles = <<<'PAGECSS'
-:root {
-      --navy: #0e1828;
-      --navy-2: #121c2b;
-      --navy-3: #161f2f;
-      --primary: #18b3ff;
-      --primary-hover: #009de0;
-      --text: #fff;
-      --text-muted: #92a3bb;
-      --text-subtle: #627193;
-      --border-color: #1a2942;
-      --button-outline: #ffffff22;
-      --button-radius: 8px;
-      --maxwidth: 1200px;
-      --card-radius: 12px;
-      --header-height: 68px;
-      --mobile-menu-bg: #0e1828f9;
-    }
-    html, body {
-      background: var(--navy-2);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    body { min-height: 100vh; }
-    a { color: inherit; text-decoration: none; }
-
-    header {
-      background: var(--navy);
-      color: var(--text);
-      padding: 0;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      border-bottom: 1px solid #192746;
-    }
-    .nav {
-      max-width: var(--maxwidth);
-      margin: 0 auto;
-      padding: 0 40px;
-      min-height: var(--header-height);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      font-weight: 800;
-      font-size: 22px;
-      gap: 12px;
-      letter-spacing: -0.5px;
-    }
-    .brand svg {
-      width: 28px;
-      height: 28px;
-      background: var(--primary);
-      border-radius: 6px;
-      color: #092340;
-      padding: 4px;
-      margin-right: 4px;
-      box-sizing: border-box;
-    }
-    .nav-menu {
-      display: flex;
-      gap: 28px;
-      align-items: center;
-    }
-    .nav-link {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 15px;
-      transition: color .2s;
-    }
-    .nav-link:hover,
-    .nav-link.active {
-      color: var(--text);
-    }
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .nav-btn {
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 700;
-      border: 0;
-      border-radius: var(--button-radius);
-      padding: 10px 18px;
-      background: var(--navy-3);
-      cursor: pointer;
-      color: var(--text);
-      transition: background .2s, color .2s;
-    }
-    .nav-btn.primary {
-      background: var(--primary);
-      color: var(--navy);
-    }
-    .nav-btn.secondary {
-      background: transparent;
-      border: 1px solid var(--button-outline);
-    }
-    .nav-btn:hover {
-      background: var(--primary-hover);
-      color: var(--navy);
-    }
-    .mobile-hamburger {
-      display: none;
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-size: 28px;
-      cursor: pointer;
-      padding: 0;
-      width: 32px;
-      height: 32px;
-      align-items: center;
-      justify-content: center;
-    }
-    .mobile-nav-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--mobile-menu-bg);
-      z-index: 2000;
-      backdrop-filter: blur(10px);
-    }
-    .mobile-nav-overlay.active {
-      display: block;
-    }
-    .mobile-nav-panel {
-      background: var(--navy);
-      height: 100%;
-      width: 300px;
-      max-width: 85%;
-      margin-left: auto;
-      display: flex;
-      flex-direction: column;
-      border-left: 1px solid var(--border-color);
-    }
-    .mobile-menu-close {
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-size: 28px;
-      cursor: pointer;
-      padding: 20px;
-      width: fit-content;
-      margin-left: auto;
-      display: flex;
-    }
-    .mobile-menu-links {
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      gap: 8px;
-    }
-    .mobile-menu-links .nav-link {
-      padding: 12px 16px;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-    .mobile-menu-links .nav-link:hover {
-      background: var(--navy-3);
-    }
-    .mobile-menu-actions {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: auto;
-    }
-    .mobile-menu-actions .nav-btn {
-      width: 100%;
-      text-align: center;
-    }
-
-    .quiz-container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-    .quiz-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    .quiz-header h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin: 0 0 16px 0;
-    }
-    .quiz-header .back-link {
-      color: var(--primary);
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: color 0.2s;
-      margin-bottom: 20px;
-    }
-    .quiz-header .back-link:hover {
-      color: var(--primary-hover);
-    }
-    .quiz-content {
-      background: var(--navy);
-      border: 1px solid var(--border-color);
-      border-radius: var(--card-radius);
-      padding: 40px;
-    }
-    .quiz-progress {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      padding: 12px 16px;
-      background: var(--navy-3);
-      border-radius: 8px;
-    }
-    .quiz-question {
-      margin-bottom: 24px;
-    }
-    .quiz-question-text {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 24px;
-      line-height: 1.5;
-    }
-    .quiz-options {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .quiz-option {
-      background: var(--navy-3);
-      border: 2px solid var(--border-color);
-      border-radius: 8px;
-      padding: 18px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 1rem;
-    }
-    .quiz-option:hover {
-      border-color: var(--primary);
-      background: var(--navy-2);
-    }
-    .quiz-option.selected {
-      border-color: var(--primary);
-      background: rgba(24, 179, 255, 0.1);
-    }
-    .quiz-navigation {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 30px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border-color);
-    }
-    .simulator-btn-primary {
-      background: var(--primary);
-      color: var(--navy-2);
-      border: none;
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s;
-      font-size: 15px;
-    }
-    .simulator-btn-primary:hover:not(:disabled) {
-      background: var(--primary-hover);
-    }
-    .simulator-btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .simulator-btn-secondary {
-      background: var(--navy-3);
-      color: var(--text);
-      border: 1px solid var(--border-color);
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 15px;
-    }
-    .simulator-btn-secondary:hover:not(:disabled) {
-      border-color: var(--primary);
-      background: var(--navy-2);
-    }
-    .simulator-btn-secondary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .quiz-results {
-      text-align: center;
-      padding: 40px 20px;
-    }
-    .quiz-results h2 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 0 0 20px 0;
-    }
-    .quiz-score {
-      font-size: 4rem;
-      font-weight: 800;
-      color: var(--primary);
-      margin: 20px 0;
-    }
-    .quiz-result-details {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 16px;
-      margin: 30px 0;
-    }
-    .quiz-result-stat {
-      background: var(--navy-3);
-      padding: 24px;
-      border-radius: 8px;
-    }
-    .quiz-result-stat-value {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--primary);
-    }
-    .quiz-result-stat-label {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-top: 8px;
-    }
-
-    /* Level selector */
-    .quiz-level-selector {
-      padding: 8px 0;
-    }
-    .quiz-level-selector h3 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin: 0 0 8px 0;
-    }
-    .quiz-level-selector p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      margin: 0 0 20px 0;
-    }
-    .level-options {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .level-option {
-      background: var(--navy-3);
-      border: 2px solid var(--border-color);
-      border-radius: 10px;
-      padding: 18px 20px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .level-option:hover {
-      border-color: var(--primary);
-      background: rgba(24, 179, 255, 0.05);
-    }
-    .level-option-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 4px;
-    }
-    .level-badge {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 3px 10px;
-      border-radius: 20px;
-      text-transform: uppercase;
-    }
-    .level-badge.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
-    .level-badge.intermediate { background: rgba(245,158,11,0.15);  color: #f59e0b; }
-    .level-badge.advanced     { background: rgba(239,68,68,0.15);   color: #ef4444; }
-    .level-option-name {
-      font-weight: 700;
-      font-size: 1rem;
-    }
-    .level-option-desc {
-      color: var(--text-muted);
-      font-size: 0.875rem;
-    }
-    .quiz-level-pill {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 2px 9px;
-      border-radius: 20px;
-      text-transform: uppercase;
-    }
-    .quiz-level-pill.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
-    .quiz-level-pill.intermediate { background: rgba(245,158,11,0.15);  color: #f59e0b; }
-    .quiz-level-pill.advanced     { background: rgba(239,68,68,0.15);   color: #ef4444; }
-
-    @media (max-width: 768px) {
-      .nav-menu,
-      .nav-actions {
-        display: none;
-      }
-      .mobile-hamburger {
-        display: flex;
-      }
-      .quiz-content {
-        padding: 24px;
-      }
-      .quiz-header h1 {
-        font-size: 2rem;
-      }
-      .quiz-question-text {
-        font-size: 1.1rem;
-      }
-      .quiz-score {
-        font-size: 3rem;
-      }
-    }
-PAGECSS;
-$page_scripts = '';
-require_once __DIR__ . '/../../includes/header.php';
-?>
-<div class="quiz-container">
-    <div class="quiz-header">
-      <a href="/Training/" class="back-link">← Back to Training</a>
-      <h1>React & Modern Web Development Quiz</h1>
-    </div>
-    <div class="quiz-content" id="quizContent"></div>
-  </div>
-
-  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-  <script>
-    // Mobile menu functionality
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mobileNav = document.getElementById('mobileNav');
-    const closeMobileNav = document.getElementById('closeMobileNav');
-
-    mobileMenuBtn?.addEventListener('click', () => {
-      mobileNav.classList.add('active');
-    });
-
-    closeMobileNav?.addEventListener('click', () => {
-      mobileNav.classList.remove('active');
-    });
-
-    mobileNav?.addEventListener('click', (e) => {
-      if (e.target === mobileNav) {
-        mobileNav.classList.remove('active');
-      }
-    });
-
-    // Quiz Data
-    const quizData = {
-      title: 'React & Modern Web Development',
-      levels: {
-        beginner: {
-          label: 'Beginner',
-          description: 'React fundamentals and core concepts',
-          questions: [
-            { question: 'What is a React Hook?', options: ['A JavaScript library', 'A function that lets you use state in functional components', 'A CSS framework', 'A routing method'], correct: 1 },
-            { question: 'Which hook is used for side effects in React?', options: ['useState', 'useEffect', 'useContext', 'useReducer'], correct: 1 },
-            { question: 'What does JSX stand for?', options: ['JavaScript XML', 'Java Syntax Extension', 'JavaScript Extra', 'JSON Extension'], correct: 0 },
-            { question: 'How do you pass data from parent to child component?', options: ['Using state', 'Using props', 'Using context', 'Using refs'], correct: 1 },
-            { question: 'What is the virtual DOM?', options: ['A physical representation of the DOM', 'A lightweight copy of the actual DOM', 'A debugging tool', 'A database'], correct: 1 }
-          ]
-        },
-        intermediate: {
-          label: 'Intermediate',
-          description: 'Hooks, context, and performance patterns',
-          questions: [
-            { question: 'What is the React Context API used for?', options: ['Styling components', 'Managing server state', 'Sharing state across components without prop drilling', 'Handling routing'], correct: 2 },
-            { question: 'What does `useMemo` do?', options: ['Memoizes a callback function', 'Memoizes an expensive computed value', 'Fetches data from an API', 'Creates a ref'], correct: 1 },
-            { question: 'What is the `key` prop used for in lists?', options: ['Styling list items', 'Helping React identify which items changed', 'Setting item order', 'Assigning event handlers'], correct: 1 },
-            { question: 'What is React.lazy() used for?', options: ['Lazy state initialization', 'Code splitting and lazy loading of components', 'Delayed rendering', 'Caching API responses'], correct: 1 },
-            { question: 'What does `useCallback` return?', options: ['A memoized value', 'A memoized callback function', 'A new component', 'A ref object'], correct: 1 }
-          ]
-        },
-        advanced: {
-          label: 'Advanced',
-          description: 'Reconciliation, portals, and advanced patterns',
-          questions: [
-            { question: 'What is React reconciliation?', options: ['Fetching remote data', "React's diffing algorithm for efficiently updating the DOM", 'Combining multiple components', 'Managing global state'], correct: 1 },
-            { question: 'What are React portals?', options: ['Navigation links', 'A way to render children outside the parent DOM node', 'Error boundaries', 'Context providers'], correct: 1 },
-            { question: 'What does React.memo() do?', options: ['Saves component state', 'Prevents unnecessary re-renders of functional components', 'Creates a memoized ref', 'Delays hydration'], correct: 1 },
-            { question: 'When would you use useReducer over useState?', options: ['For simple boolean flags', 'For complex state logic with multiple sub-values', 'For accessing the DOM', 'For server-side data'], correct: 1 },
-            { question: 'What is React Suspense used for?', options: ['Canceling renders', 'Declaratively handling async loading states and code splitting', 'Error recovery', 'Batching state updates'], correct: 1 }
-          ]
-        }
-      }
-    };
-    // Quiz State
-    let currentLevel = null;
-    let currentQuestionIndex = 0;
-    let userAnswers = [];
-
-    function showLevelSelector() {
-      const levels = Object.keys(quizData.levels);
-      document.getElementById('quizContent').innerHTML = `
-        <div class="quiz-level-selector">
-          <h3>Choose Your Difficulty Level</h3>
-          <p>Select the level that best matches your experience</p>
-          <div class="level-options">
-            ${levels.map(key => {
-              const lvl = quizData.levels[key];
-              return `
-                <div class="level-option" onclick="selectLevel('${key}')">
-                  <div class="level-option-header">
-                    <span class="level-badge ${key}">${lvl.label}</span>
-                    <span class="level-option-name">${lvl.label} — ${lvl.questions.length} Questions</span>
-                  </div>
-                  <div class="level-option-desc">${lvl.description}</div>
-                </div>`;
-            }).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    function selectLevel(level) {
-      currentLevel = level;
-      currentQuestionIndex = 0;
-      userAnswers = new Array(quizData.levels[level].questions.length).fill(null);
-      showQuestion();
-    }
-
-    function showQuestion() {
-      const levelData = quizData.levels[currentLevel];
-      const question = levelData.questions[currentQuestionIndex];
-      const totalQuestions = levelData.questions.length;
-      const quizContent = document.getElementById('quizContent');
-
-      quizContent.innerHTML = `
-        <div class="quiz-progress">
-          <span>Question ${currentQuestionIndex + 1} of ${totalQuestions}</span>
-          <span style="display:flex;align-items:center;gap:8px;">
-            <span class="quiz-level-pill ${currentLevel}">${levelData.label}</span>
-            ${Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)}% Complete
-          </span>
-        </div>
-        <div class="quiz-question">
-          <div class="quiz-question-text">${question.question}</div>
-          <div class="quiz-options">
-            ${question.options.map((option, index) => `
-              <div class="quiz-option ${userAnswers[currentQuestionIndex] === index ? 'selected' : ''}"
-                   onclick="selectAnswer(${index})">
-                ${option}
-              </div>
-            `).join('')}
-          </div>
-        </div>
-        <div class="quiz-navigation">
-          <button class="simulator-btn-secondary" onclick="previousQuestion()"
-                  ${currentQuestionIndex === 0 ? 'disabled' : ''}>
-            Previous
-          </button>
-          <button class="simulator-btn-primary" onclick="${currentQuestionIndex === totalQuestions - 1 ? 'finishQuiz()' : 'nextQuestion()'}">
-            ${currentQuestionIndex === totalQuestions - 1 ? 'Finish Quiz' : 'Next'}
-          </button>
-        </div>
-      `;
-    }
-
-    function selectAnswer(answerIndex) {
-      userAnswers[currentQuestionIndex] = answerIndex;
-      showQuestion();
-    }
-
-    function nextQuestion() {
-      const total = quizData.levels[currentLevel].questions.length;
-      if (currentQuestionIndex < total - 1) {
-        currentQuestionIndex++;
-        showQuestion();
-      }
-    }
-
-    function previousQuestion() {
-      if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        showQuestion();
-      }
-    }
-
-    function finishQuiz() {
-      const levelData = quizData.levels[currentLevel];
-      let correct = 0;
-      levelData.questions.forEach((question, index) => {
-        if (userAnswers[index] === question.correct) correct++;
-      });
-
-      const total = levelData.questions.length;
-      const percentage = Math.round((correct / total) * 100);
-      const quizContent = document.getElementById('quizContent');
-
-      quizContent.innerHTML = `
-        <div class="quiz-results">
-          <h2>Quiz Complete!</h2>
-          <span class="quiz-level-pill ${currentLevel}" style="font-size:0.85rem;padding:4px 12px;">${levelData.label} Level</span>
-          <div class="quiz-score">${percentage}%</div>
-          <div class="quiz-result-details">
-            <div class="quiz-result-stat">
-              <div class="quiz-result-stat-value">${correct}</div>
-              <div class="quiz-result-stat-label">Correct</div>
-            </div>
-            <div class="quiz-result-stat">
-              <div class="quiz-result-stat-value">${total - correct}</div>
-              <div class="quiz-result-stat-label">Incorrect</div>
-            </div>
-            <div class="quiz-result-stat">
-              <div class="quiz-result-stat-value">${total}</div>
-              <div class="quiz-result-stat-label">Total</div>
-            </div>
-          </div>
-          <p style="margin-top:20px;color:var(--text-muted);font-size:1.1rem;">
-            ${percentage >= 80 ? 'Excellent work! You have a strong grasp of this level.' :
-              percentage >= 60 ? 'Good job! Review the topics you missed to improve.' :
-              'Keep learning! Study the material and try again.'}
-          </p>
-          <div style="margin-top:30px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-            <button class="simulator-btn-secondary" onclick="showLevelSelector()">
-              Change Level
-            </button>
-            <button class="simulator-btn-primary" onclick="selectLevel('${currentLevel}')">
-              Retake Quiz
-            </button>
-            <a href="/Training/" class="simulator-btn-secondary" style="display:inline-block;text-decoration:none;">
-              Back to Training
-            </a>
-          </div>
-        </div>
-      `;
-    }
-
-    // Start with level selector
-    showLevelSelector();
-  </script>
-<?php require_once __DIR__ . '/../../includes/footer.php'; ?>
+$quiz_title  = 'React & Modern Web';
+$quiz_slug   = 'react-modern-web';
+$quiz_tiers  = [
+    ['label' => 'Introduction', 'questions' => [
+        ['question' => 'What is React?', 'options' => ['A CSS framework', 'A JavaScript library for building user interfaces', 'A full-stack framework', 'A database ORM'], 'correct' => 1],
+        ['question' => 'What does JSX stand for?', 'options' => ['JavaScript XML', 'JavaScript Extension', 'Java Syntax Extra', 'JSON Extension'], 'correct' => 0],
+        ['question' => 'Who created React?', 'options' => ['Google', 'Facebook (Meta)', 'Microsoft', 'Twitter'], 'correct' => 1],
+        ['question' => 'What is a React component?', 'options' => ['A CSS class', 'A reusable piece of UI', 'An HTML element', 'A database model'], 'correct' => 1],
+        ['question' => 'What are props in React?', 'options' => ['State variables', 'Data passed from a parent to a child component', 'CSS properties', 'DOM attributes'], 'correct' => 1],
+        ['question' => 'What is state in React?', 'options' => ['A global variable', 'Data managed within a component that affects rendering', 'A CSS variable', 'A server-side concept'], 'correct' => 1],
+        ['question' => 'Which hook manages state in a functional component?', 'options' => ['useEffect', 'useContext', 'useState', 'useRef'], 'correct' => 2],
+        ['question' => 'What does useEffect do?', 'options' => ['Manages state', 'Performs side effects in functional components', 'Accesses context', 'Creates refs'], 'correct' => 1],
+        ['question' => 'How do you render a list in React?', 'options' => ['Using a for loop in the template', 'Using Array.map() in JSX', 'Using v-for directive', 'Using ng-repeat'], 'correct' => 1],
+        ['question' => 'Why is the key prop important in lists?', 'options' => ['For CSS styling', 'Helps React identify which items changed', 'Required by HTML', 'For accessibility'], 'correct' => 1],
+        ['question' => 'What is the virtual DOM?', 'options' => ['A shadow copy of the real DOM in memory', 'A database', 'A CSS rendering engine', 'A JavaScript runtime'], 'correct' => 0],
+        ['question' => 'How do you conditionally render in React?', 'options' => ['Using v-if', 'Using ternary operator or && in JSX', 'Using ngIf', 'Using display:none always'], 'correct' => 1],
+        ['question' => 'What does React.Fragment allow?', 'options' => ['Code splitting', 'Grouping multiple elements without adding extra DOM nodes', 'Lazy loading', 'Context creation'], 'correct' => 1],
+        ['question' => 'What is CSS Modules?', 'options' => ['A CSS preprocessor', 'CSS files where class names are locally scoped to the component', 'A CSS framework', 'A style reset library'], 'correct' => 1],
+        ['question' => 'What does className mean in JSX?', 'options' => ['A custom attribute', 'The JSX equivalent of the HTML class attribute', 'A component name', 'An ARIA attribute'], 'correct' => 1],
+        ['question' => 'What is a React event handler?', 'options' => ['A DOM listener added with addEventListener', 'A function passed as a prop to handle events in JSX', 'A server-side handler', 'An error boundary'], 'correct' => 1],
+        ['question' => 'How do you prevent default form submission in React?', 'options' => ['return false', 'event.preventDefault()', 'stopSubmit()', 'Using onSubmitPrevent prop'], 'correct' => 1],
+        ['question' => 'What is an uncontrolled component?', 'options' => ['A component without props', 'A form input whose value is managed by the DOM, not React state', 'A component without hooks', 'A static component'], 'correct' => 1],
+        ['question' => 'What is a controlled component?', 'options' => ['A component with many props', 'A form input whose value is fully controlled by React state', 'A TypeScript component', 'A server-side component'], 'correct' => 1],
+        ['question' => 'What does create-react-app do?', 'options' => ['Deploys a React app', 'Bootstraps a new React project with a sensible default configuration', 'Creates a component', 'Builds for production'], 'correct' => 1],
+        ['question' => 'What tool is commonly used to bundle React apps?', 'options' => ['Gulp', 'Webpack or Vite', 'Make', 'Grunt'], 'correct' => 1],
+        ['question' => 'What is Vite?', 'options' => ['A CSS framework', 'A fast build tool and dev server for modern web projects', 'A React component library', 'A state management library'], 'correct' => 1],
+        ['question' => 'What does npm start do in a CRA project?', 'options' => ['Builds for production', 'Starts the development server', 'Runs tests', 'Deploys the app'], 'correct' => 1],
+        ['question' => 'What does React.StrictMode do?', 'options' => ['Enables TypeScript', 'Highlights potential problems in development mode', 'Enforces PropTypes', 'Enables server-side rendering'], 'correct' => 1],
+        ['question' => 'What is the purpose of a ref in React?', 'options' => ['To pass data between components', 'To access a DOM node or persist a value without causing re-renders', 'To declare state', 'To subscribe to context'], 'correct' => 1],
+        ['question' => 'What does useRef return?', 'options' => ['A state value', 'A mutable ref object with a .current property', 'A DOM element directly', 'A callback'], 'correct' => 1],
+        ['question' => 'What is prop drilling?', 'options' => ['A performance optimization', 'Passing props through many component layers that don\'t need them', 'A React anti-pattern for state', 'A TypeScript concept'], 'correct' => 1],
+        ['question' => 'What does React.memo() do?', 'options' => ['Adds memoization to state', 'Wraps a component to prevent re-renders if props have not changed', 'Caches API responses', 'Creates a memoized callback'], 'correct' => 1],
+        ['question' => 'What is the difference between class and functional components?', 'options' => ['No difference', 'Class components use lifecycle methods; functional components use hooks', 'Functional components can\'t use state', 'Class components are faster'], 'correct' => 1],
+        ['question' => 'What is hydration in React?', 'options' => ['Adding data to state', 'The process of attaching event listeners to server-rendered HTML', 'A CSS animation', 'A data-fetching technique'], 'correct' => 1],
+    ]],
+    ['label' => 'Beginner', 'questions' => [
+        ['question' => 'What is React Router used for?', 'options' => ['State management', 'Client-side navigation between pages/views', 'API requests', 'CSS routing'], 'correct' => 1],
+        ['question' => 'Which React Router component renders a route match?', 'options' => ['<Link>', '<Route>', '<Switch>', '<Navigate>'], 'correct' => 1],
+        ['question' => 'What does the useNavigate hook return?', 'options' => ['Current URL', 'A function to programmatically navigate', 'Route params', 'A history object'], 'correct' => 1],
+        ['question' => 'What does the useParams hook return?', 'options' => ['Query string params', 'URL dynamic segment values', 'Form values', 'Props'], 'correct' => 1],
+        ['question' => 'What is the Context API used for?', 'options' => ['Fetching data', 'Sharing state across components without prop drilling', 'Routing', 'Styling'], 'correct' => 1],
+        ['question' => 'What does useContext return?', 'options' => ['The provider component', 'The current context value', 'A ref', 'A state setter'], 'correct' => 1],
+        ['question' => 'What is useMemo used for?', 'options' => ['Caching side effects', 'Memoizing expensive computed values', 'Persisting refs', 'Creating context'], 'correct' => 1],
+        ['question' => 'What is useCallback used for?', 'options' => ['Memoizing component state', 'Memoizing a function reference to avoid unnecessary child re-renders', 'Creating reducers', 'Fetching data'], 'correct' => 1],
+        ['question' => 'What is useReducer used for?', 'options' => ['Managing simple toggle state', 'Complex state logic with multiple sub-values or actions', 'Accessing the DOM', 'Creating context'], 'correct' => 1],
+        ['question' => 'What are the arguments to useReducer?', 'options' => ['(state, action)', '(reducer, initialState)', '(dispatch, action)', '(state, initializer)'], 'correct' => 1],
+        ['question' => 'When does useEffect cleanup run?', 'options' => ['Before every render', 'Before the next effect and when the component unmounts', 'Only on unmount', 'On every state change'], 'correct' => 1],
+        ['question' => 'What does an empty dependency array [] in useEffect mean?', 'options' => ['Run on every render', 'Run only once after the first render', 'Never run', 'Run when state changes'], 'correct' => 1],
+        ['question' => 'What is React.lazy() used for?', 'options' => ['Lazy state initialization', 'Code splitting with lazy loading of components', 'Lazy evaluation', 'Deferred hydration'], 'correct' => 1],
+        ['question' => 'What must wrap React.lazy() components?', 'options' => ['React.Fragment', 'React.Suspense', 'React.StrictMode', 'ErrorBoundary'], 'correct' => 1],
+        ['question' => 'What is an Error Boundary?', 'options' => ['A try/catch for JSX', 'A class component that catches JS errors in child components', 'A hooks error handler', 'A TypeScript type guard'], 'correct' => 1],
+        ['question' => 'What lifecycle method must Error Boundaries implement?', 'options' => ['componentDidUpdate', 'componentDidCatch and/or getDerivedStateFromError', 'componentWillMount', 'shouldComponentUpdate'], 'correct' => 1],
+        ['question' => 'What is React Portals used for?', 'options' => ['Data fetching portals', 'Rendering children outside the parent DOM hierarchy', 'Navigation portals', 'Module imports'], 'correct' => 1],
+        ['question' => 'What is the React DevTools extension for?', 'options' => ['Deploying React apps', 'Inspecting component trees, props, state, and profiling', 'Writing tests', 'Managing packages'], 'correct' => 1],
+        ['question' => 'What does the Profiler component do?', 'options' => ['Logs user sessions', 'Measures rendering performance of components', 'Validates prop types', 'Enables strict mode'], 'correct' => 1],
+        ['question' => 'What is lifting state up?', 'options' => ['Moving state to a global store', 'Moving state to the nearest common ancestor', 'Upgrading React version', 'Promoting to class component'], 'correct' => 1],
+        ['question' => 'What is the difference between useEffect and useLayoutEffect?', 'options' => ['No difference', 'useLayoutEffect fires synchronously after DOM mutations but before paint', 'useLayoutEffect is asynchronous', 'useEffect fires before DOM mutations'], 'correct' => 1],
+        ['question' => 'What is React.cloneElement() used for?', 'options' => ['Deep cloning JSX trees', 'Creating a copy of a React element with new props merged in', 'Copying components', 'Creating portals'], 'correct' => 1],
+        ['question' => 'What is the children prop?', 'options' => ['A required prop', 'JSX content passed between a component\'s opening and closing tags', 'A list of child components', 'An array prop only'], 'correct' => 1],
+        ['question' => 'What does React.Children.map() do?', 'options' => ['Creates child components', 'Iterates over children with null/undefined safety', 'Filters children', 'Counts children'], 'correct' => 1],
+        ['question' => 'What are custom hooks?', 'options' => ['Modified built-in hooks', 'Functions prefixed with use that encapsulate reusable stateful logic', 'Third-party hooks', 'Class-based hooks'], 'correct' => 1],
+        ['question' => 'What is the naming convention for custom hooks?', 'options' => ['Must end in Hook', 'Must start with use', 'Must be in a hooks folder', 'Must be uppercase'], 'correct' => 1],
+        ['question' => 'What is React.forwardRef() used for?', 'options' => ['Passing refs from parent to a DOM node in a child component', 'Forwarding props', 'Creating HOCs', 'Passing context'], 'correct' => 0],
+        ['question' => 'What is the useImperativeHandle hook?', 'options' => ['Creates imperative animations', 'Customizes the instance value exposed to parent via a ref', 'Directly updates the DOM', 'Triggers imperative navigation'], 'correct' => 1],
+        ['question' => 'What is reconciliation in React?', 'options' => ['Merging two states', 'React\'s diffing algorithm that efficiently updates the real DOM from the virtual DOM', 'Combining multiple contexts', 'Error recovery process'], 'correct' => 1],
+        ['question' => 'What is batch updating in React?', 'options' => ['A for loop over components', 'React grouping multiple state updates into a single re-render for performance', 'Fetching data in batches', 'A code-splitting technique'], 'correct' => 1],
+    ]],
+    ['label' => 'Intermediate', 'questions' => [
+        ['question' => 'What is Next.js?', 'options' => ['A CSS framework', 'A React framework with SSR, SSG, routing, and API routes built-in', 'A state management library', 'A build tool only'], 'correct' => 1],
+        ['question' => 'What is SSR in Next.js?', 'options' => ['Static Site Rendering', 'Server-Side Rendering — HTML is generated on the server per request', 'Streaming Server Response', 'Synchronous State Refresh'], 'correct' => 1],
+        ['question' => 'What is SSG in Next.js?', 'options' => ['Server-Side Generator', 'Static Site Generation — HTML pre-built at build time', 'Style Sheet Generation', 'Streaming Server Graph'], 'correct' => 1],
+        ['question' => 'What is ISR in Next.js?', 'options' => ['Incremental Static Regeneration — revalidating static pages in the background', 'Image Size Reduction', 'Immediate Server Response', 'Inline Script Rendering'], 'correct' => 0],
+        ['question' => 'What does getServerSideProps do in Next.js?', 'options' => ['Runs code in the browser', 'Fetches data on the server for each request and passes it as props', 'Generates static props at build time', 'Creates API routes'], 'correct' => 1],
+        ['question' => 'What does getStaticProps do in Next.js?', 'options' => ['Runs on every request', 'Fetches data at build time to generate static pages', 'Creates server functions', 'Fetches client-side data'], 'correct' => 1],
+        ['question' => 'What is the App Router in Next.js 13+?', 'options' => ['A new routing library', 'The new file-based router using the app/ directory with React Server Components', 'A state router', 'A navigation library'], 'correct' => 1],
+        ['question' => 'What are React Server Components?', 'options' => ['Components that run only on Node.js servers', 'Components that render on the server and send HTML to the client with zero client-side JS', 'Components for SSR only', 'Next.js-exclusive components'], 'correct' => 1],
+        ['question' => 'What is the difference between Server and Client Components?', 'options' => ['No difference', 'Server components run on server (no hooks/state); client components run in the browser (can use hooks)', 'Client components are faster', 'Server components can use useState'], 'correct' => 1],
+        ['question' => 'What is the "use client" directive in Next.js?', 'options' => ['Enables client-side CSS', 'Marks a component as a Client Component that runs in the browser', 'Fetches client data', 'Defines client-side routes'], 'correct' => 1],
+        ['question' => 'What is React Query used for?', 'options' => ['SQL querying', 'Asynchronous server state management (fetching, caching, updating)', 'Component querying', 'GraphQL client'], 'correct' => 1],
+        ['question' => 'What is SWR?', 'options' => ['A streaming library', 'A React Hooks library for remote data fetching with stale-while-revalidate strategy', 'A service worker utility', 'A Webpack plugin'], 'correct' => 1],
+        ['question' => 'What is Zustand?', 'options' => ['A CSS-in-JS library', 'A small, fast state management library for React', 'A TypeScript utility', 'A routing library'], 'correct' => 1],
+        ['question' => 'What is Jotai?', 'options' => ['A CSS preprocessor', 'An atomic state management library for React', 'A testing framework', 'A build tool'], 'correct' => 1],
+        ['question' => 'What is Recoil?', 'options' => ['A CSS animation library', 'Facebook\'s experimental atomic state management library for React', 'A HTTP client', 'A router for React'], 'correct' => 1],
+        ['question' => 'What are React Server Actions?', 'options' => ['Server-side event handlers', 'Async functions that run on the server, callable from client components for form mutations', 'API route handlers', 'Server push notifications'], 'correct' => 1],
+        ['question' => 'What is Suspense used for in data fetching?', 'options' => ['Caching data', 'Declaratively specifying a loading state while waiting for async data', 'Throttling requests', 'Error handling'], 'correct' => 1],
+        ['question' => 'What is Concurrent Mode / concurrent features in React?', 'options' => ['Multi-threading in React', 'Features enabling React to interrupt, prioritize, and resume rendering work', 'Running multiple apps simultaneously', 'Concurrent API requests'], 'correct' => 1],
+        ['question' => 'What is startTransition?', 'options' => ['CSS transition helper', 'Marks state updates as non-urgent transitions, keeping UI responsive', 'Starts an animation', 'Defers component mounting'], 'correct' => 1],
+        ['question' => 'What is the useDeferredValue hook?', 'options' => ['Defers a Promise', 'Returns a deferred version of a value that "lags behind" to keep UI responsive during expensive renders', 'Creates a deferred ref', 'Delays a context update'], 'correct' => 1],
+        ['question' => 'What is the useTransition hook?', 'options' => ['Manages CSS transitions', 'Returns isPending flag and startTransition to mark non-urgent state updates', 'Transitions between pages', 'Animates component mount'], 'correct' => 1],
+        ['question' => 'What is Tailwind CSS?', 'options' => ['A CSS preprocessor', 'A utility-first CSS framework with pre-defined classes', 'A CSS-in-JS library', 'A styled-components plugin'], 'correct' => 1],
+        ['question' => 'What is CSS-in-JS?', 'options' => ['Writing CSS in JavaScript files using libraries', 'Inline style attributes', 'A browser standard', 'A PostCSS plugin'], 'correct' => 0],
+        ['question' => 'What is a Higher-Order Component (HOC)?', 'options' => ['A component with many props', 'A function that takes a component and returns an enhanced component', 'A class component', 'A context consumer'], 'correct' => 1],
+        ['question' => 'What is the render props pattern?', 'options' => ['Returning JSX from props', 'Sharing code by passing a render function as a prop', 'A routing technique', 'A state management pattern'], 'correct' => 1],
+        ['question' => 'What is React Testing Library?', 'options' => ['A React performance library', 'A testing utility for React that focuses on testing from a user perspective', 'A unit testing framework', 'A snapshot testing tool'], 'correct' => 1],
+        ['question' => 'What does the screen object provide in React Testing Library?', 'options' => ['Screen size utilities', 'Queries for finding elements in the DOM', 'A virtual screen renderer', 'CSS viewport utilities'], 'correct' => 1],
+        ['question' => 'What is the difference between getBy* and queryBy* queries?', 'options' => ['No difference', 'getBy* throws if not found; queryBy* returns null if not found', 'queryBy* throws if not found', 'getBy* returns null if not found'], 'correct' => 1],
+        ['question' => 'What is React Suspense with concurrent features?', 'options' => ['Only for code splitting', 'Enables showing fallback UI while waiting for data or components without blocking rendering', 'A performance profiler', 'An error boundary'], 'correct' => 1],
+        ['question' => 'What does the Outlet component do in React Router v6?', 'options' => ['Creates an external link', 'Renders the matched child route within a parent layout route', 'Registers a route outlet', 'Provides route context'], 'correct' => 1],
+    ]],
+    ['label' => 'Advanced', 'questions' => [
+        ['question' => 'What is React Fiber?', 'options' => ['A React add-on library', 'The reimplemented React core algorithm enabling incremental rendering and concurrency', 'A fiber optics API', 'A state manager'], 'correct' => 1],
+        ['question' => 'What is the React reconciler?', 'options' => ['A financial reconciler', 'The part of React that computes the difference between virtual DOM trees', 'A state differ', 'A prop validator'], 'correct' => 1],
+        ['question' => 'What are lanes in React Fiber?', 'options' => ['Navigation lanes', 'A priority scheduling mechanism to batch and prioritize different types of updates', 'Data pipelines', 'Component layers'], 'correct' => 1],
+        ['question' => 'What is React\'s automatic batching (React 18)?', 'options' => ['Manual batching with unstable_batchedUpdates', 'React 18 batches all state updates in event handlers AND async code (setTimeout, Promises)', 'A build optimization only', 'Batching only in class components'], 'correct' => 1],
+        ['question' => 'What is the createRoot API in React 18?', 'options' => ['Creates a root state store', 'The new root API enabling concurrent features; replaces ReactDOM.render', 'Creates a custom root element', 'Initializes the virtual DOM'], 'correct' => 1],
+        ['question' => 'What is hydrateRoot in React 18?', 'options' => ['Adds data to the root', 'Used to hydrate server-rendered HTML with React, enabling concurrent features', 'A new data-fetching hook', 'A portal method'], 'correct' => 1],
+        ['question' => 'What is React\'s tearing problem?', 'options' => ['Memory leaks in components', 'Inconsistent UI when components read different values from an external store during concurrent rendering', 'Breaking down components', 'Prop mutation bugs'], 'correct' => 1],
+        ['question' => 'What does useSyncExternalStore solve?', 'options' => ['Syncs state with local storage', 'Subscribes to external stores safely in concurrent mode, preventing tearing', 'Persists state across sessions', 'Synchronizes two states'], 'correct' => 1],
+        ['question' => 'What is selective hydration in React 18?', 'options' => ['Hydrating only some components', 'Hydrating parts of the page with higher priority based on user interaction', 'A partial SSR technique', 'A lazy loading method'], 'correct' => 1],
+        ['question' => 'What is streaming SSR in React 18?', 'options' => ['Video streaming with React', 'Sending HTML to the browser in chunks as it is rendered on the server', 'Streaming data fetching', 'A WebSocket integration'], 'correct' => 1],
+        ['question' => 'What is the purpose of Suspense boundaries in streaming SSR?', 'options' => ['Error handling', 'Deferring parts of the page until ready, allowing the rest to stream', 'Code splitting markers', 'Waterfall prevention only'], 'correct' => 1],
+        ['question' => 'What is the useId hook?', 'options' => ['Generates user IDs', 'Generates a unique stable ID for accessibility attributes that is consistent between server and client', 'Returns component ID', 'Creates a UUID'], 'correct' => 1],
+        ['question' => 'What is the use() hook (React 19)?', 'options' => ['An alias for useEffect', 'A hook that unwraps a Promise or context directly in render', 'A universal lifecycle hook', 'A build-time optimization hook'], 'correct' => 1],
+        ['question' => 'What is React Forget (now React Compiler)?', 'options' => ['A component naming tool', 'An auto-memoization compiler removing the need to manually use memo/useMemo/useCallback', 'A TypeScript plugin', 'A code formatter'], 'correct' => 1],
+        ['question' => 'What is module federation in Webpack 5?', 'options' => ['Splitting CSS modules', 'Loading separately deployed app bundles at runtime to share code across micro-frontends', 'Federated module naming', 'A code-splitting pattern only'], 'correct' => 1],
+        ['question' => 'What is a micro-frontend?', 'options' => ['A very small React component', 'An architecture where the frontend is split into independently deployable vertical features', 'A mobile-first pattern', 'A micro-optimization technique'], 'correct' => 1],
+        ['question' => 'What is the islands architecture?', 'options' => ['Isolated CSS modules', 'Static HTML with isolated interactive JS components ("islands") for performance', 'A data-fetching pattern', 'A mobile layout pattern'], 'correct' => 1],
+        ['question' => 'What is Astro in the modern web landscape?', 'options' => ['An astronomy app', 'A web framework that ships zero JS by default, hydrating only interactive islands', 'A React meta-framework', 'A static site theme'], 'correct' => 1],
+        ['question' => 'What is the purpose of Webpack\'s splitChunks optimization?', 'options' => ['Splitting CSS from JS', 'Automatically splitting code to reduce bundle size and enable caching of shared dependencies', 'Splitting files by size only', 'Minifying chunks'], 'correct' => 1],
+        ['question' => 'What is the use of React.createContext vs useContext?', 'options' => ['They are the same', 'createContext creates the context object; useContext consumes it inside a component', 'useContext also creates context', 'createContext must be used inside a hook'], 'correct' => 1],
+        ['question' => 'What does the useInsertionEffect hook do?', 'options' => ['Inserts DOM elements', 'Fires synchronously before DOM mutations for injecting CSS-in-JS styles at the right time', 'Inserts data into state', 'Creates portals'], 'correct' => 1],
+        ['question' => 'What is the difference between React.memo and useMemo?', 'options' => ['They are interchangeable', 'React.memo memoizes a component; useMemo memoizes a computed value', 'useMemo memoizes a component', 'React.memo works only in class components'], 'correct' => 1],
+        ['question' => 'What is the flushSync API?', 'options' => ['Clears localStorage', 'Forces React to flush all updates synchronously, bypassing automatic batching', 'Clears the event queue', 'A debug utility'], 'correct' => 1],
+        ['question' => 'What is Zustand\'s approach to avoiding re-renders?', 'options' => ['Immutable updates only', 'Subscriptions only re-render when selected slice of state changes', 'Shallow comparisons only', 'Global re-renders always'], 'correct' => 1],
+        ['question' => 'What is the compound component pattern?', 'options' => ['Combining multiple states', 'A pattern where a parent component manages state and exposes sub-components via context', 'Composing HOCs', 'A class inheritance pattern'], 'correct' => 1],
+        ['question' => 'What is PRPL pattern?', 'options' => ['Push, Render, Pre-cache, Lazy-load — a performance strategy for fast initial load', 'A React routing pattern', 'A CSS naming convention', 'A pre-rendering language'], 'correct' => 0],
+        ['question' => 'What is the purpose of Lighthouse?', 'options' => ['A React error reporter', 'An automated tool for auditing performance, accessibility, SEO, and best practices', 'A bundle analyzer', 'A deployment platform'], 'correct' => 1],
+        ['question' => 'What is Core Web Vitals?', 'options' => ['React performance metrics', 'Google\'s set of metrics for real-world user experience (LCP, FID/INP, CLS)', 'A web security standard', 'An HTML validation set'], 'correct' => 1],
+        ['question' => 'What is LCP (Largest Contentful Paint)?', 'options' => ['Largest CSS property', 'The render time of the largest image or text block visible within the viewport', 'A layout algorithm', 'A compression metric'], 'correct' => 1],
+        ['question' => 'What is CLS (Cumulative Layout Shift)?', 'options' => ['CSS layout system', 'A measure of unexpected layout shifts that occur during page load', 'A CSS class limit', 'A canvas layout standard'], 'correct' => 1],
+    ]],
+    ['label' => 'Expert', 'questions' => [
+        ['question' => 'What is the React work loop?', 'options' => ['A useEffect loop', 'The internal Fiber loop that processes units of work during render and commit phases', 'An event processing loop', 'A render method loop'], 'correct' => 1],
+        ['question' => 'What are the two phases of React\'s rendering?', 'options' => ['compile and execute', 'render (interruptible) and commit (synchronous)', 'virtual and real', 'async and sync'], 'correct' => 1],
+        ['question' => 'What is the commit phase in React?', 'options' => ['Git commit for components', 'The synchronous phase where React applies DOM mutations from the work-in-progress tree', 'Saving state to storage', 'The build step'], 'correct' => 1],
+        ['question' => 'What is work-in-progress tree in React Fiber?', 'options' => ['A draft component tree', 'The alternate fiber tree being built during reconciliation, swapped on commit', 'A pending state object', 'A snapshot for debugging'], 'correct' => 1],
+        ['question' => 'What is the double buffering technique in React?', 'options' => ['Caching two API responses', 'Maintaining current and work-in-progress fiber trees to allow interruptible rendering', 'A video frame technique', 'Buffering two state updates'], 'correct' => 1],
+        ['question' => 'What is React\'s priority scheduling via Scheduler package?', 'options' => ['Node.js process priority', 'Assigning priority levels to tasks so higher-priority work can interrupt lower-priority work', 'Thread scheduling', 'A build-time scheduler'], 'correct' => 1],
+        ['question' => 'What is requestIdleCallback and how does React use it?', 'options' => ['A CSS animation callback', 'A browser API for scheduling work when idle; React\'s Scheduler polyfills this for consistent behavior', 'A network idle handler', 'A garbage collection trigger'], 'correct' => 1],
+        ['question' => 'What is the ReactDOM.flushSync impact on Fiber scheduling?', 'options' => ['No impact', 'Forces synchronous rendering, bypassing Fiber\'s interruptible work loop', 'Clears the Fiber tree', 'Pauses the scheduler'], 'correct' => 1],
+        ['question' => 'What is the purpose of getDerivedStateFromProps?', 'options' => ['Async prop loading', 'A static lifecycle method to update state from props before rendering', 'Server-side prop fetching', 'A hook equivalent'], 'correct' => 1],
+        ['question' => 'What is shouldComponentUpdate used for?', 'options' => ['Blocking all updates', 'Optimizing class components by manually deciding whether to re-render', 'Deferring state', 'Canceling effects'], 'correct' => 1],
+        ['question' => 'What is the Stale Closure problem in React hooks?', 'options' => ['Outdated module imports', 'A hook capturing an old value in its closure instead of the latest state or prop', 'A memory leak in closures', 'Stale DOM references'], 'correct' => 1],
+        ['question' => 'How do you solve the stale closure problem with refs?', 'options' => ['Use Redux', 'Store the latest value in a ref so the callback always reads the current value', 'Add deps to useEffect', 'Use class components'], 'correct' => 1],
+        ['question' => 'What is the purpose of the eslint-plugin-react-hooks exhaustive-deps rule?', 'options' => ['Enforces hook naming', 'Ensures all variables used inside hooks are included in dependency arrays', 'Limits hook count', 'Detects hook order violations'], 'correct' => 1],
+        ['question' => 'What is the React DevTools Profiler\'s flamegraph?', 'options' => ['CPU temperature chart', 'A visualization of component render times helping identify performance bottlenecks', 'A fire hazard detector', 'A graph of component hierarchy'], 'correct' => 1],
+        ['question' => 'What is bundle analysis and why is it useful?', 'options' => ['Analyzing HTML output', 'Visualizing bundle composition to identify large dependencies and optimization opportunities', 'Checking code quality', 'Detecting security vulnerabilities'], 'correct' => 1],
+        ['question' => 'What is the key difference between Remix and Next.js?', 'options' => ['Remix uses Vue', 'Remix is built around web fundamentals (fetch, form, HTTP semantics); Next.js has more rendering strategies', 'Next.js uses Remix loaders', 'Remix doesn\'t support SSR'], 'correct' => 1],
+        ['question' => 'What is partial pre-rendering (PPR) in Next.js 14+?', 'options' => ['Pre-rendering some pages only', 'Combining static shell with dynamic holes that stream in concurrently', 'A CSS optimization', 'A server action pattern'], 'correct' => 1],
+        ['question' => 'What is the cache() function in React 19 / Next.js?', 'options' => ['Browser cache API wrapper', 'A function to memoize data fetching per render pass in server components', 'Redis caching helper', 'An HTTP cache header setter'], 'correct' => 1],
+        ['question' => 'What is React\'s "owner" vs "parent" distinction?', 'options' => ['They are identical', 'The owner is the component that rendered an element (set its props); the parent is its DOM/React parent', 'Owner is always the root', 'Parent is always a class component'], 'correct' => 1],
+        ['question' => 'What is the purpose of React.act() in testing?', 'options' => ['A performance audit', 'Ensures all state updates and effects are flushed and processed before making assertions', 'An accessibility check', 'A snapshot runner'], 'correct' => 1],
+        ['question' => 'What is contract testing in component libraries?', 'options' => ['Signing legal contracts', 'Testing that a component adheres to its public API contract regardless of implementation', 'Testing CSS contracts', 'Integration testing only'], 'correct' => 1],
+        ['question' => 'What is Storybook used for?', 'options' => ['Version control stories', 'Building, documenting, and testing UI components in isolation', 'A React state manager', 'A deployment platform'], 'correct' => 1],
+        ['question' => 'What is the Rendering Prop vs Hook tradeoff?', 'options' => ['No tradeoff', 'Render props are more flexible for JSX injection; hooks are more ergonomic but can\'t directly inject JSX', 'Hooks are always preferred', 'Render props are deprecated'], 'correct' => 1],
+        ['question' => 'What is INP (Interaction to Next Paint)?', 'options' => ['Internal Node Process', 'The Core Web Vital measuring responsiveness from user interaction to next visual update', 'An input event metric', 'A navigation performance metric'], 'correct' => 1],
+        ['question' => 'What is React Scan?', 'options' => ['A security scanner', 'A tool that highlights components that re-render unnecessarily in the browser', 'A code scanner', 'A bundle analyzer'], 'correct' => 1],
+        ['question' => 'What is the purpose of Tanstack Query\'s queryKey?', 'options' => ['A cache authentication key', 'A unique identifier for a query used for caching, deduplication, and invalidation', 'A sort key', 'A security token'], 'correct' => 1],
+        ['question' => 'What is optimistic UI?', 'options' => ['UI that assumes success and updates immediately, then reconciles with server response', 'A positive design philosophy', 'A loading spinner pattern', 'A dark mode setting'], 'correct' => 0],
+        ['question' => 'What is the purpose of useOptimistic in React 19?', 'options' => ['Optimizes re-renders', 'Manages optimistic state updates during async mutations, reverting if they fail', 'An alias for useMemo', 'A performance hook'], 'correct' => 1],
+        ['question' => 'What is the virtual list (windowing) technique?', 'options' => ['A window.open wrapper', 'Rendering only the visible portion of a large list to improve performance', 'A CSS viewport trick', 'A lazy loading strategy'], 'correct' => 1],
+        ['question' => 'What is the purpose of the content-visibility CSS property in web performance?', 'options' => ['Sets text visibility', 'Allows the browser to skip rendering offscreen content, improving initial load performance', 'A CSS display mode', 'An animation property'], 'correct' => 1],
+    ]],
+];
+require_once __DIR__ . '/quiz-engine.php';

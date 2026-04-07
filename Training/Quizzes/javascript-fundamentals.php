@@ -1,645 +1,168 @@
 <?php
-$page_title  = 'JavaScript Fundamentals Quiz - CodeFoundry';
+$page_title  = 'JavaScript Fundamentals Quiz – 100 Levels – CodeFoundry';
 $active_page = 'training';
-$page_styles = <<<'PAGECSS'
-:root {
-      --navy: #0e1828;
-      --navy-2: #121c2b;
-      --navy-3: #161f2f;
-      --primary: #18b3ff;
-      --primary-hover: #009de0;
-      --text: #fff;
-      --text-muted: #92a3bb;
-      --text-subtle: #627193;
-      --border-color: #1a2942;
-      --button-outline: #ffffff22;
-      --button-radius: 8px;
-      --maxwidth: 1200px;
-      --card-radius: 12px;
-      --header-height: 68px;
-      --mobile-menu-bg: #0e1828f9;
-    }
-    html, body {
-      background: var(--navy-2);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    body { min-height: 100vh; }
-    a { color: inherit; text-decoration: none; }
-
-    header {
-      background: var(--navy);
-      color: var(--text);
-      padding: 0;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      border-bottom: 1px solid #192746;
-    }
-    .nav {
-      max-width: var(--maxwidth);
-      margin: 0 auto;
-      padding: 0 40px;
-      min-height: var(--header-height);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      font-weight: 800;
-      font-size: 22px;
-      gap: 12px;
-      letter-spacing: -0.5px;
-    }
-    .brand svg {
-      width: 28px;
-      height: 28px;
-      background: var(--primary);
-      border-radius: 6px;
-      color: #092340;
-      padding: 4px;
-      margin-right: 4px;
-      box-sizing: border-box;
-    }
-    .nav-menu {
-      display: flex;
-      gap: 28px;
-      align-items: center;
-    }
-    .nav-link {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 15px;
-      transition: color .2s;
-    }
-    .nav-link:hover,
-    .nav-link.active {
-      color: var(--text);
-    }
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .nav-btn {
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 700;
-      border: 0;
-      border-radius: var(--button-radius);
-      padding: 10px 18px;
-      background: var(--navy-3);
-      cursor: pointer;
-      color: var(--text);
-      transition: background .2s, color .2s;
-    }
-    .nav-btn.primary {
-      background: var(--primary);
-      color: var(--navy);
-    }
-    .nav-btn.secondary {
-      background: transparent;
-      border: 1px solid var(--button-outline);
-    }
-    .nav-btn:hover {
-      background: var(--primary-hover);
-      color: var(--navy);
-    }
-    .mobile-hamburger {
-      display: none;
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-size: 28px;
-      cursor: pointer;
-      padding: 0;
-      width: 32px;
-      height: 32px;
-      align-items: center;
-      justify-content: center;
-    }
-    .mobile-nav-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--mobile-menu-bg);
-      z-index: 2000;
-      backdrop-filter: blur(10px);
-    }
-    .mobile-nav-overlay.active {
-      display: block;
-    }
-    .mobile-nav-panel {
-      background: var(--navy);
-      height: 100%;
-      width: 300px;
-      max-width: 85%;
-      margin-left: auto;
-      display: flex;
-      flex-direction: column;
-      border-left: 1px solid var(--border-color);
-    }
-    .mobile-menu-close {
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-size: 28px;
-      cursor: pointer;
-      padding: 20px;
-      width: fit-content;
-      margin-left: auto;
-      display: flex;
-    }
-    .mobile-menu-links {
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      gap: 8px;
-    }
-    .mobile-menu-links .nav-link {
-      padding: 12px 16px;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-    .mobile-menu-links .nav-link:hover {
-      background: var(--navy-3);
-    }
-    .mobile-menu-actions {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: auto;
-    }
-    .mobile-menu-actions .nav-btn {
-      width: 100%;
-      text-align: center;
-    }
-
-    .quiz-container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-    .quiz-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    .quiz-header h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin: 0 0 16px 0;
-    }
-    .quiz-header .back-link {
-      color: var(--primary);
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: color 0.2s;
-      margin-bottom: 20px;
-    }
-    .quiz-header .back-link:hover {
-      color: var(--primary-hover);
-    }
-    .quiz-content {
-      background: var(--navy);
-      border: 1px solid var(--border-color);
-      border-radius: var(--card-radius);
-      padding: 40px;
-    }
-    .quiz-progress {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      padding: 12px 16px;
-      background: var(--navy-3);
-      border-radius: 8px;
-    }
-    .quiz-question {
-      margin-bottom: 24px;
-    }
-    .quiz-question-text {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 24px;
-      line-height: 1.5;
-    }
-    .quiz-options {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .quiz-option {
-      background: var(--navy-3);
-      border: 2px solid var(--border-color);
-      border-radius: 8px;
-      padding: 18px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 1rem;
-    }
-    .quiz-option:hover {
-      border-color: var(--primary);
-      background: var(--navy-2);
-    }
-    .quiz-option.selected {
-      border-color: var(--primary);
-      background: rgba(24, 179, 255, 0.1);
-    }
-    .quiz-navigation {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 30px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border-color);
-    }
-    .simulator-btn-primary {
-      background: var(--primary);
-      color: var(--navy-2);
-      border: none;
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s;
-      font-size: 15px;
-    }
-    .simulator-btn-primary:hover:not(:disabled) {
-      background: var(--primary-hover);
-    }
-    .simulator-btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .simulator-btn-secondary {
-      background: var(--navy-3);
-      color: var(--text);
-      border: 1px solid var(--border-color);
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 15px;
-    }
-    .simulator-btn-secondary:hover:not(:disabled) {
-      border-color: var(--primary);
-      background: var(--navy-2);
-    }
-    .simulator-btn-secondary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .quiz-results {
-      text-align: center;
-      padding: 40px 20px;
-    }
-    .quiz-results h2 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 0 0 20px 0;
-    }
-    .quiz-score {
-      font-size: 4rem;
-      font-weight: 800;
-      color: var(--primary);
-      margin: 20px 0;
-    }
-    .quiz-result-details {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 16px;
-      margin: 30px 0;
-    }
-    .quiz-result-stat {
-      background: var(--navy-3);
-      padding: 24px;
-      border-radius: 8px;
-    }
-    .quiz-result-stat-value {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--primary);
-    }
-    .quiz-result-stat-label {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-top: 8px;
-    }
-
-    /* Level selector */
-    .quiz-level-selector {
-      padding: 8px 0;
-    }
-    .quiz-level-selector h3 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin: 0 0 8px 0;
-    }
-    .quiz-level-selector p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      margin: 0 0 20px 0;
-    }
-    .level-options {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .level-option {
-      background: var(--navy-3);
-      border: 2px solid var(--border-color);
-      border-radius: 10px;
-      padding: 18px 20px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .level-option:hover {
-      border-color: var(--primary);
-      background: rgba(24, 179, 255, 0.05);
-    }
-    .level-option-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 4px;
-    }
-    .level-badge {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 3px 10px;
-      border-radius: 20px;
-      text-transform: uppercase;
-    }
-    .level-badge.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
-    .level-badge.intermediate { background: rgba(245,158,11,0.15);  color: #f59e0b; }
-    .level-badge.advanced     { background: rgba(239,68,68,0.15);   color: #ef4444; }
-    .level-option-name {
-      font-weight: 700;
-      font-size: 1rem;
-    }
-    .level-option-desc {
-      color: var(--text-muted);
-      font-size: 0.875rem;
-    }
-    .quiz-level-pill {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 2px 9px;
-      border-radius: 20px;
-      text-transform: uppercase;
-    }
-    .quiz-level-pill.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
-    .quiz-level-pill.intermediate { background: rgba(245,158,11,0.15);  color: #f59e0b; }
-    .quiz-level-pill.advanced     { background: rgba(239,68,68,0.15);   color: #ef4444; }
-
-    @media (max-width: 768px) {
-      .nav-menu,
-      .nav-actions {
-        display: none;
-      }
-      .mobile-hamburger {
-        display: flex;
-      }
-      .quiz-content {
-        padding: 24px;
-      }
-      .quiz-header h1 {
-        font-size: 2rem;
-      }
-      .quiz-question-text {
-        font-size: 1.1rem;
-      }
-      .quiz-score {
-        font-size: 3rem;
-      }
-    }
-PAGECSS;
-$page_scripts = '';
-require_once __DIR__ . '/../../includes/header.php';
-?>
-<div class="quiz-container">
-    <div class="quiz-header">
-      <a href="/Training/" class="back-link">← Back to Training</a>
-      <h1>JavaScript Fundamentals Quiz</h1>
-    </div>
-    <div class="quiz-content" id="quizContent"></div>
-  </div>
-
-  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-  <script>
-    // Mobile menu functionality
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mobileNav = document.getElementById('mobileNav');
-    const closeMobileNav = document.getElementById('closeMobileNav');
-
-    mobileMenuBtn?.addEventListener('click', () => {
-      mobileNav.classList.add('active');
-    });
-
-    closeMobileNav?.addEventListener('click', () => {
-      mobileNav.classList.remove('active');
-    });
-
-    mobileNav?.addEventListener('click', (e) => {
-      if (e.target === mobileNav) {
-        mobileNav.classList.remove('active');
-      }
-    });
-
-    // Quiz Data
-    const quizData = {
-      title: 'JavaScript Fundamentals',
-      levels: {
-        beginner: {
-          label: 'Beginner',
-          description: 'Core JavaScript concepts and basic syntax',
-          questions: [
-            { question: 'What is the correct way to declare a variable in JavaScript?', options: ['variable x = 5;', 'let x = 5;', 'v x = 5;', 'dim x = 5;'], correct: 1 },
-            { question: 'Which of the following is NOT a JavaScript data type?', options: ['String', 'Boolean', 'Float', 'Undefined'], correct: 2 },
-            { question: 'What does "===" check in JavaScript?', options: ['Only value', 'Only type', 'Both value and type', 'Neither value nor type'], correct: 2 },
-            { question: 'Which method is used to add an element to the end of an array?', options: ['push()', 'pop()', 'shift()', 'unshift()'], correct: 0 },
-            { question: 'What is the purpose of the "use strict" directive?', options: ['Improves performance', 'Enables strict mode', 'Compresses code', 'Adds security'], correct: 1 }
-          ]
-        },
-        intermediate: {
-          label: 'Intermediate',
-          description: 'ES6+, closures, and async programming',
-          questions: [
-            { question: 'What is a closure in JavaScript?', options: ['A loop construct', 'A function retaining access to its outer scope variables', 'A CSS technique', 'A data structure'], correct: 1 },
-            { question: 'What does `this` refer to inside an arrow function?', options: ['The arrow function itself', 'The window object', 'The enclosing lexical context', 'undefined'], correct: 2 },
-            { question: 'Which array method returns elements that pass a test?', options: ['map()', 'reduce()', 'filter()', 'find()'], correct: 2 },
-            { question: 'What is the difference between `null` and `undefined`?', options: ['They are identical', 'null is explicitly set; undefined is uninitialized', 'undefined is explicitly set; null is uninitialized', 'Both are the same as false'], correct: 1 },
-            { question: 'What is a Promise in JavaScript?', options: ['A syntax for declaring variables', 'An object representing eventual completion or failure of an async operation', 'A loop mechanism', 'A class decorator'], correct: 1 }
-          ]
-        },
-        advanced: {
-          label: 'Advanced',
-          description: 'Deep internals, design patterns, optimization',
-          questions: [
-            { question: 'What is the output of `typeof null`?', options: ['"null"', '"object"', '"undefined"', '"boolean"'], correct: 1 },
-            { question: 'What does the JavaScript event loop do?', options: ['Handles synchronous code only', 'Processes the call stack and callback queue to manage async operations', 'Compiles JavaScript to machine code', 'Manages memory allocation'], correct: 1 },
-            { question: 'What is the difference between `call` and `bind`?', options: ['They are identical', 'call invokes immediately; bind returns a new function', 'bind invokes immediately; call returns a new function', 'Neither invokes the function'], correct: 1 },
-            { question: 'What is a generator function?', options: ['A function that creates objects', 'A function that can pause and resume execution using yield', 'A function that runs only once', 'A function with no return value'], correct: 1 },
-            { question: 'What does `Object.freeze()` do?', options: ['Copies an object', 'Removes all properties', 'Prevents adding, removing, or modifying properties', 'Converts object to JSON'], correct: 2 }
-          ]
-        }
-      }
-    };
-    // Quiz State
-    let currentLevel = null;
-    let currentQuestionIndex = 0;
-    let userAnswers = [];
-
-    function showLevelSelector() {
-      const levels = Object.keys(quizData.levels);
-      document.getElementById('quizContent').innerHTML = `
-        <div class="quiz-level-selector">
-          <h3>Choose Your Difficulty Level</h3>
-          <p>Select the level that best matches your experience</p>
-          <div class="level-options">
-            ${levels.map(key => {
-              const lvl = quizData.levels[key];
-              return `
-                <div class="level-option" onclick="selectLevel('${key}')">
-                  <div class="level-option-header">
-                    <span class="level-badge ${key}">${lvl.label}</span>
-                    <span class="level-option-name">${lvl.label} — ${lvl.questions.length} Questions</span>
-                  </div>
-                  <div class="level-option-desc">${lvl.description}</div>
-                </div>`;
-            }).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    function selectLevel(level) {
-      currentLevel = level;
-      currentQuestionIndex = 0;
-      userAnswers = new Array(quizData.levels[level].questions.length).fill(null);
-      showQuestion();
-    }
-
-    function showQuestion() {
-      const levelData = quizData.levels[currentLevel];
-      const question = levelData.questions[currentQuestionIndex];
-      const totalQuestions = levelData.questions.length;
-      const quizContent = document.getElementById('quizContent');
-
-      quizContent.innerHTML = `
-        <div class="quiz-progress">
-          <span>Question ${currentQuestionIndex + 1} of ${totalQuestions}</span>
-          <span style="display:flex;align-items:center;gap:8px;">
-            <span class="quiz-level-pill ${currentLevel}">${levelData.label}</span>
-            ${Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)}% Complete
-          </span>
-        </div>
-        <div class="quiz-question">
-          <div class="quiz-question-text">${question.question}</div>
-          <div class="quiz-options">
-            ${question.options.map((option, index) => `
-              <div class="quiz-option ${userAnswers[currentQuestionIndex] === index ? 'selected' : ''}"
-                   onclick="selectAnswer(${index})">
-                ${option}
-              </div>
-            `).join('')}
-          </div>
-        </div>
-        <div class="quiz-navigation">
-          <button class="simulator-btn-secondary" onclick="previousQuestion()"
-                  ${currentQuestionIndex === 0 ? 'disabled' : ''}>
-            Previous
-          </button>
-          <button class="simulator-btn-primary" onclick="${currentQuestionIndex === totalQuestions - 1 ? 'finishQuiz()' : 'nextQuestion()'}">
-            ${currentQuestionIndex === totalQuestions - 1 ? 'Finish Quiz' : 'Next'}
-          </button>
-        </div>
-      `;
-    }
-
-    function selectAnswer(answerIndex) {
-      userAnswers[currentQuestionIndex] = answerIndex;
-      showQuestion();
-    }
-
-    function nextQuestion() {
-      const total = quizData.levels[currentLevel].questions.length;
-      if (currentQuestionIndex < total - 1) {
-        currentQuestionIndex++;
-        showQuestion();
-      }
-    }
-
-    function previousQuestion() {
-      if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        showQuestion();
-      }
-    }
-
-    function finishQuiz() {
-      const levelData = quizData.levels[currentLevel];
-      let correct = 0;
-      levelData.questions.forEach((question, index) => {
-        if (userAnswers[index] === question.correct) correct++;
-      });
-
-      const total = levelData.questions.length;
-      const percentage = Math.round((correct / total) * 100);
-      const quizContent = document.getElementById('quizContent');
-
-      quizContent.innerHTML = `
-        <div class="quiz-results">
-          <h2>Quiz Complete!</h2>
-          <span class="quiz-level-pill ${currentLevel}" style="font-size:0.85rem;padding:4px 12px;">${levelData.label} Level</span>
-          <div class="quiz-score">${percentage}%</div>
-          <div class="quiz-result-details">
-            <div class="quiz-result-stat">
-              <div class="quiz-result-stat-value">${correct}</div>
-              <div class="quiz-result-stat-label">Correct</div>
-            </div>
-            <div class="quiz-result-stat">
-              <div class="quiz-result-stat-value">${total - correct}</div>
-              <div class="quiz-result-stat-label">Incorrect</div>
-            </div>
-            <div class="quiz-result-stat">
-              <div class="quiz-result-stat-value">${total}</div>
-              <div class="quiz-result-stat-label">Total</div>
-            </div>
-          </div>
-          <p style="margin-top:20px;color:var(--text-muted);font-size:1.1rem;">
-            ${percentage >= 80 ? 'Excellent work! You have a strong grasp of this level.' :
-              percentage >= 60 ? 'Good job! Review the topics you missed to improve.' :
-              'Keep learning! Study the material and try again.'}
-          </p>
-          <div style="margin-top:30px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-            <button class="simulator-btn-secondary" onclick="showLevelSelector()">
-              Change Level
-            </button>
-            <button class="simulator-btn-primary" onclick="selectLevel('${currentLevel}')">
-              Retake Quiz
-            </button>
-            <a href="/Training/" class="simulator-btn-secondary" style="display:inline-block;text-decoration:none;">
-              Back to Training
-            </a>
-          </div>
-        </div>
-      `;
-    }
-
-    // Start with level selector
-    showLevelSelector();
-  </script>
-<?php require_once __DIR__ . '/../../includes/footer.php'; ?>
+$quiz_title  = 'JavaScript Fundamentals';
+$quiz_slug   = 'javascript-fundamentals';
+$quiz_tiers  = [
+    ['label' => 'Introduction', 'questions' => [
+        ['question' => 'What does JavaScript primarily run in?', 'options' => ['Databases', 'Web browsers', 'Desktop apps only', 'Compilers'], 'correct' => 1],
+        ['question' => 'Which keyword declares a variable in modern JavaScript?', 'options' => ['var', 'let', 'const', 'Both let and const'], 'correct' => 3],
+        ['question' => 'What does const prevent?', 'options' => ['Changing object properties', 'Reassigning the variable binding', 'Calling methods', 'Reading the value'], 'correct' => 1],
+        ['question' => 'Which data type represents text?', 'options' => ['number', 'boolean', 'string', 'char'], 'correct' => 2],
+        ['question' => 'What is the result of typeof 42?', 'options' => ['"int"', '"number"', '"integer"', '"float"'], 'correct' => 1],
+        ['question' => 'What does console.log() do?', 'options' => ['Creates a log file', 'Outputs to browser console', 'Logs users in', 'Clears the screen'], 'correct' => 1],
+        ['question' => 'Which operator checks value AND type equality?', 'options' => ['==', '=', '===', '!=='], 'correct' => 2],
+        ['question' => 'What is the result of 5 + "3"?', 'options' => ['8', '"53"', 'Error', '15'], 'correct' => 1],
+        ['question' => 'What keyword creates a function declaration?', 'options' => ['def', 'func', 'function', 'fn'], 'correct' => 2],
+        ['question' => 'How do you write a single-line comment in JavaScript?', 'options' => ['# comment', '-- comment', '// comment', '/* comment */'], 'correct' => 2],
+        ['question' => 'What is undefined in JavaScript?', 'options' => ['A variable set to zero', 'A variable declared but not assigned a value', 'An error type', 'The string "undefined"'], 'correct' => 1],
+        ['question' => 'How do you create an array?', 'options' => ['{}', '[]', '()', '<>'], 'correct' => 1],
+        ['question' => 'How do you access the first element of array arr?', 'options' => ['arr[0]', 'arr[1]', 'arr.first()', 'arr.get(0)'], 'correct' => 0],
+        ['question' => 'What is the length property of an array?', 'options' => ['The last index', 'The number of elements', 'The max value', 'A method'], 'correct' => 1],
+        ['question' => 'Which method adds an element to the END of an array?', 'options' => ['unshift()', 'shift()', 'push()', 'pop()'], 'correct' => 2],
+        ['question' => 'Which method removes the LAST element of an array?', 'options' => ['push()', 'shift()', 'pop()', 'splice()'], 'correct' => 2],
+        ['question' => 'How do you create an object literal?', 'options' => ['[]', 'new Object[]', '{}', 'Object()'], 'correct' => 2],
+        ['question' => 'How do you access property "name" of object obj?', 'options' => ['obj->name', 'obj::name', 'obj.name', 'obj[name]'], 'correct' => 2],
+        ['question' => 'What does NaN stand for?', 'options' => ['Not a Name', 'Not a Number', 'New and Null', 'Null and Null'], 'correct' => 1],
+        ['question' => 'What does the ! operator do to a boolean?', 'options' => ['Doubles it', 'Negates it', 'Increments it', 'Converts to string'], 'correct' => 1],
+        ['question' => 'What is the result of Boolean("")?', 'options' => ['true', 'null', 'undefined', 'false'], 'correct' => 3],
+        ['question' => 'What is the result of Boolean(0)?', 'options' => ['true', 'false', 'null', '0'], 'correct' => 1],
+        ['question' => 'Which loop runs while a condition is true?', 'options' => ['for', 'while', 'do...while', 'Both while and do...while'], 'correct' => 3],
+        ['question' => 'What does break do in a loop?', 'options' => ['Pauses execution', 'Skips to next iteration', 'Exits the loop', 'Restarts the loop'], 'correct' => 2],
+        ['question' => 'What does continue do in a loop?', 'options' => ['Exits the loop', 'Skips to the next iteration', 'Pauses the loop', 'Restarts from beginning'], 'correct' => 1],
+        ['question' => 'What does parseInt("10px") return?', 'options' => ['NaN', '"10px"', '10', 'Error'], 'correct' => 2],
+        ['question' => 'Which method converts a number to a string?', 'options' => ['String()', 'parseInt()', 'Number()', 'parseFloat()'], 'correct' => 0],
+        ['question' => 'What is the ternary operator syntax?', 'options' => ['condition ? a : b', 'condition ! a : b', 'a if condition else b', 'a unless condition'], 'correct' => 0],
+        ['question' => 'What does typeof null return?', 'options' => ['"null"', '"undefined"', '"object"', '"boolean"'], 'correct' => 2],
+        ['question' => 'What does the && operator return?', 'options' => ['Always true or false', 'The last truthy value or first falsy value', 'Only booleans', 'The left operand only'], 'correct' => 1],
+    ]],
+    ['label' => 'Beginner', 'questions' => [
+        ['question' => 'What is a function expression?', 'options' => ['A function declared with function keyword', 'A function assigned to a variable', 'A built-in function', 'A named function'], 'correct' => 1],
+        ['question' => 'What is an arrow function?', 'options' => ['A function created with function keyword', 'A shorthand function syntax using =>', 'A recursive function', 'A generator function'], 'correct' => 1],
+        ['question' => 'What is a default parameter?', 'options' => ['A required parameter', 'A parameter with a fallback value', 'The first parameter', 'A read-only parameter'], 'correct' => 1],
+        ['question' => 'What does the rest parameter (...args) collect?', 'options' => ['Named keyword arguments', 'Remaining positional arguments into an array', 'Default arguments', 'First argument only'], 'correct' => 1],
+        ['question' => 'What does the spread operator (...) do to an array?', 'options' => ['Copies it by reference', 'Expands its elements in place', 'Sorts it', 'Reverses it'], 'correct' => 1],
+        ['question' => 'What is destructuring assignment?', 'options' => ['Deleting properties', 'Extracting values from objects/arrays into variables', 'Copying an object', 'Merging two objects'], 'correct' => 1],
+        ['question' => 'What is template literal syntax?', 'options' => ['Using single quotes', '"string ${var}"', '`string ${var}`', 'String(var)'], 'correct' => 2],
+        ['question' => 'What does Array.map() return?', 'options' => ['The original array', 'A new array with transformed elements', 'The first matching element', 'A boolean'], 'correct' => 1],
+        ['question' => 'What does Array.filter() return?', 'options' => ['The first matching element', 'A new array with elements that pass the test', 'true or false', 'The array mutated in place'], 'correct' => 1],
+        ['question' => 'What does Array.reduce() do?', 'options' => ['Removes elements', 'Accumulates values into a single result', 'Finds minimum value', 'Flattens nested arrays'], 'correct' => 1],
+        ['question' => 'What does Array.find() return?', 'options' => ['All matching elements', 'The index of the match', 'The first matching element', 'true or false'], 'correct' => 2],
+        ['question' => 'What does Array.some() return?', 'options' => ['A subset array', 'The first truthy element', 'true if at least one element passes the test', 'The count of matches'], 'correct' => 2],
+        ['question' => 'What does Array.every() return?', 'options' => ['Each element one by one', 'true if ALL elements pass the test', 'The count of elements', 'A filtered array'], 'correct' => 1],
+        ['question' => 'What does String.includes() return?', 'options' => ['The position of the substring', 'The substring itself', 'true or false', 'An array of matches'], 'correct' => 2],
+        ['question' => 'What does String.split() return?', 'options' => ['The string reversed', 'An array of substrings', 'The first part only', 'A number'], 'correct' => 1],
+        ['question' => 'What is the difference between == and ===?', 'options' => ['No difference', '== checks only value with type coercion; === checks both value and type', '=== is faster only', '== is stricter'], 'correct' => 1],
+        ['question' => 'What does short-circuit evaluation mean?', 'options' => ['Faster code execution', 'The second operand is not evaluated if the first determines the result', 'A syntax shortcut', 'Loop optimization'], 'correct' => 1],
+        ['question' => 'What does Object.keys() return?', 'options' => ['The object values', 'An array of the object\'s own property names', 'The prototype chain', 'The object itself'], 'correct' => 1],
+        ['question' => 'What does Object.values() return?', 'options' => ['An array of property names', 'An array of the object\'s own values', 'A Map', 'The object stringified'], 'correct' => 1],
+        ['question' => 'What does Object.entries() return?', 'options' => ['Property names only', 'Values only', 'An array of [key, value] pairs', 'A new object'], 'correct' => 2],
+        ['question' => 'What is the difference between null and undefined?', 'options' => ['They are identical', 'null is intentional absence of value; undefined means not yet assigned', 'undefined is always an error', 'null is a number'], 'correct' => 1],
+        ['question' => 'What does typeof function(){}  return?', 'options' => ['"object"', '"function"', '"callable"', '"method"'], 'correct' => 1],
+        ['question' => 'What does the in operator check?', 'options' => ['If a value is inside an array', 'If a property exists in an object', 'If a module is loaded', 'If a string contains a character'], 'correct' => 1],
+        ['question' => 'What does Array.indexOf() return when not found?', 'options' => ['0', 'null', 'undefined', '-1'], 'correct' => 3],
+        ['question' => 'What does the for...of loop iterate over?', 'options' => ['Object properties', 'Iterable values (arrays, strings, etc.)', 'Prototype chain', 'Object keys only'], 'correct' => 1],
+        ['question' => 'What does the for...in loop iterate over?', 'options' => ['Array elements', 'Enumerable property keys of an object', 'Iterable values', 'Array indices only'], 'correct' => 1],
+        ['question' => 'What does Object.assign() do?', 'options' => ['Creates a deep clone', 'Copies enumerable own properties from source to target', 'Freezes an object', 'Compares two objects'], 'correct' => 1],
+        ['question' => 'What is a truthy value?', 'options' => ['A value that equals true', 'Any value that coerces to true in a boolean context', 'Only the boolean true', 'Numbers greater than zero only'], 'correct' => 1],
+        ['question' => 'Which of these is a falsy value?', 'options' => ['[]', '{}', '0', '"false"'], 'correct' => 2],
+        ['question' => 'What does the nullish coalescing operator (??) return?', 'options' => ['The left side if truthy', 'The right side if left is null or undefined', 'Always the right side', 'null if either side is falsy'], 'correct' => 1],
+    ]],
+    ['label' => 'Intermediate', 'questions' => [
+        ['question' => 'What is a closure in JavaScript?', 'options' => ['A sealed object', 'A function that retains access to its outer scope variables', 'A locked module', 'A self-invoking function'], 'correct' => 1],
+        ['question' => 'What does hoisting mean?', 'options' => ['Variables are removed', 'Declarations are moved to the top of their scope before execution', 'Functions are inlined', 'Code is minified'], 'correct' => 1],
+        ['question' => 'Are let and const hoisted?', 'options' => ['No, they are never hoisted', 'Yes, but they are not initialized until their declaration (temporal dead zone)', 'Yes, and they are initialized to undefined', 'Only let is hoisted'], 'correct' => 1],
+        ['question' => 'What is the prototype chain?', 'options' => ['A chain of imports', 'The mechanism by which objects inherit properties from other objects', 'A debugging technique', 'A list of class hierarchies'], 'correct' => 1],
+        ['question' => 'What does the this keyword refer to in a regular function?', 'options' => ['Always the global object', 'The object that called the function', 'The function itself', 'undefined always'], 'correct' => 1],
+        ['question' => 'What does this refer to in an arrow function?', 'options' => ['The calling object', 'The arrow function itself', 'The enclosing lexical this', 'undefined'], 'correct' => 2],
+        ['question' => 'What is an IIFE?', 'options' => ['A type of import', 'An Immediately Invoked Function Expression', 'An infinite loop', 'An inline if expression'], 'correct' => 1],
+        ['question' => 'What does call() do?', 'options' => ['Defines a function', 'Invokes a function with a specified this value and individual arguments', 'Returns a new function', 'Binds arguments only'], 'correct' => 1],
+        ['question' => 'What does apply() differ from call() in?', 'options' => ['apply() does not set this', 'apply() takes arguments as an array instead of individually', 'apply() returns a new function', 'They are identical'], 'correct' => 1],
+        ['question' => 'What does bind() return?', 'options' => ['The result of calling the function', 'A new function with a fixed this and optionally fixed arguments', 'A Promise', 'The original function'], 'correct' => 1],
+        ['question' => 'What is a Promise?', 'options' => ['A data structure', 'An object representing the eventual completion or failure of an async operation', 'A type of callback', 'A synchronous wrapper'], 'correct' => 1],
+        ['question' => 'What are the three states of a Promise?', 'options' => ['start, running, done', 'pending, fulfilled, rejected', 'open, processing, closed', 'init, exec, end'], 'correct' => 1],
+        ['question' => 'What does Promise.then() receive?', 'options' => ['A rejection handler', 'A fulfillment handler', 'An error object', 'A new Promise'], 'correct' => 1],
+        ['question' => 'What does Promise.catch() handle?', 'options' => ['Fulfilled promises', 'Rejected promises', 'Pending promises', 'All promise states'], 'correct' => 1],
+        ['question' => 'What does async/await do?', 'options' => ['Adds multithreading', 'Makes asynchronous code look and behave like synchronous code', 'Speeds up Promises', 'Replaces callbacks entirely'], 'correct' => 1],
+        ['question' => 'What does the await keyword do?', 'options' => ['Creates a Promise', 'Pauses function execution until a Promise settles', 'Rejects a Promise', 'Runs code in parallel'], 'correct' => 1],
+        ['question' => 'What is event delegation?', 'options' => ['Removing event listeners', 'Attaching a single listener to a parent to handle events from children', 'Delegating tasks to workers', 'A pattern for emitting events'], 'correct' => 1],
+        ['question' => 'What is the event bubbling phase?', 'options' => ['Events travel from child to parent', 'Events travel from parent to child', 'Events are cancelled', 'Events are queued'], 'correct' => 0],
+        ['question' => 'What does event.stopPropagation() do?', 'options' => ['Prevents the default browser action', 'Stops the event from bubbling or capturing further', 'Removes the event listener', 'Cancels the event permanently'], 'correct' => 1],
+        ['question' => 'What does event.preventDefault() do?', 'options' => ['Stops propagation', 'Prevents the default browser behavior for the event', 'Removes event listeners', 'Clones the event'], 'correct' => 1],
+        ['question' => 'What is a WeakMap?', 'options' => ['A normal Map with fewer features', 'A Map where keys are weakly referenced objects', 'A read-only Map', 'A sorted Map'], 'correct' => 1],
+        ['question' => 'What is a Set in JavaScript?', 'options' => ['An object with only methods', 'A collection of unique values', 'A sorted array', 'A key-value store'], 'correct' => 1],
+        ['question' => 'What is the difference between Map and Object?', 'options' => ['They are identical', 'Map preserves insertion order, has any key type, and has size property', 'Object is faster always', 'Map only stores strings'], 'correct' => 1],
+        ['question' => 'What does Symbol() create?', 'options' => ['A string identifier', 'A unique, immutable primitive value', 'A numeric ID', 'A new object'], 'correct' => 1],
+        ['question' => 'What is optional chaining (?.)?', 'options' => ['A conditional import syntax', 'Safe property access that returns undefined instead of throwing on null/undefined', 'A fallback value operator', 'A try-catch shorthand'], 'correct' => 1],
+        ['question' => 'What does Array.flat() do?', 'options' => ['Sorts the array', 'Creates a new array with sub-arrays flattened', 'Removes duplicates', 'Converts to a string'], 'correct' => 1],
+        ['question' => 'What does Array.flatMap() do?', 'options' => ['Flattens only', 'Maps then flattens one level', 'Flattens all levels deeply', 'Maps without creating a new array'], 'correct' => 1],
+        ['question' => 'What does Promise.all() do?', 'options' => ['Runs promises sequentially', 'Resolves when all promises resolve, rejects if any rejects', 'Returns the first resolved promise', 'Ignores rejections'], 'correct' => 1],
+        ['question' => 'What does Promise.race() do?', 'options' => ['Resolves with all results', 'Resolves or rejects with the first settled promise', 'Always rejects', 'Runs promises one by one'], 'correct' => 1],
+        ['question' => 'What is a generator function (function*)?', 'options' => ['A function that generates objects', 'A function that can pause and resume execution using yield', 'A self-calling function', 'A pure function'], 'correct' => 1],
+    ]],
+    ['label' => 'Advanced', 'questions' => [
+        ['question' => 'What is the JavaScript event loop?', 'options' => ['A looping construct', 'The mechanism that processes call stack and callback queue for async operations', 'An error-handling loop', 'A recursive function pattern'], 'correct' => 1],
+        ['question' => 'What is the call stack?', 'options' => ['A list of function calls waiting to execute', 'A LIFO structure tracking currently executing function calls', 'An array of callbacks', 'A thread pool'], 'correct' => 1],
+        ['question' => 'What is the microtask queue?', 'options' => ['A queue for setTimeout callbacks', 'A high-priority queue for Promise callbacks, processed before the macrotask queue', 'A thread for micro-optimizations', 'A system-level queue'], 'correct' => 1],
+        ['question' => 'What does Object.freeze() do?', 'options' => ['Creates a deep immutable copy', 'Prevents adding, removing, or modifying properties (shallow)', 'Converts to a const', 'Locks the prototype'], 'correct' => 1],
+        ['question' => 'What is memoization?', 'options' => ['Memorizing code', 'Caching function results for the same inputs to avoid recomputation', 'A memory-management technique', 'Storing state in localStorage'], 'correct' => 1],
+        ['question' => 'What is currying?', 'options' => ['Combining two functions', 'Transforming a function that takes multiple arguments into a series of unary functions', 'Adding spice to code', 'Recursive function calling'], 'correct' => 1],
+        ['question' => 'What is function composition?', 'options' => ['Writing a complex function', 'Combining functions so the output of one is the input of the next', 'Extending a class', 'Merging modules'], 'correct' => 1],
+        ['question' => 'What is the Proxy object?', 'options' => ['A network proxy', 'An object that intercepts and customizes fundamental operations on another object', 'A frozen object', 'A class decorator'], 'correct' => 1],
+        ['question' => 'What is Reflect in JavaScript?', 'options' => ['Mirroring a variable', 'A built-in object providing methods for interceptable operations (mirrors Proxy traps)', 'A DOM API', 'An async utility'], 'correct' => 1],
+        ['question' => 'What does Object.create() do?', 'options' => ['Clones an object deeply', 'Creates a new object with the specified prototype', 'Freezes an object', 'Compares two objects'], 'correct' => 1],
+        ['question' => 'What is the difference between Object.create(null) and {}?', 'options' => ['No difference', 'Object.create(null) has no prototype chain; {} inherits from Object.prototype', 'Object.create(null) is faster always', '{} creates an empty array'], 'correct' => 1],
+        ['question' => 'What is a WeakRef?', 'options' => ['A reference that prevents garbage collection', 'A weak reference that allows the object to be garbage collected', 'A read-only reference', 'A cached reference'], 'correct' => 1],
+        ['question' => 'What does FinalizationRegistry do?', 'options' => ['Finalizes a build', 'Registers a callback to run when a weakly-referenced object is garbage collected', 'Closes database connections', 'Prevents memory leaks'], 'correct' => 1],
+        ['question' => 'What is tail call optimization?', 'options' => ['Optimizing the last line of code', 'A JS engine optimization reusing the current stack frame when the last action is a function call', 'A compiler trick', 'A loop unrolling technique'], 'correct' => 1],
+        ['question' => 'What is the difference between shallow copy and deep copy?', 'options' => ['No difference', 'Shallow copy copies top-level properties by reference; deep copy recursively clones all nested objects', 'Deep copy is always slower', 'Shallow copy only works on arrays'], 'correct' => 1],
+        ['question' => 'What is structuredClone()?', 'options' => ['Copies object structure schema', 'A built-in method for deep cloning objects', 'Clones the prototype', 'A polyfill for JSON.parse'], 'correct' => 1],
+        ['question' => 'What does the instanceof operator check?', 'options' => ['If a value is a specific primitive type', 'If an object has a constructor in its prototype chain', 'If a module is loaded', 'If a variable is defined'], 'correct' => 1],
+        ['question' => 'What is the temporal dead zone (TDZ)?', 'options' => ['A time-based caching strategy', 'The period between let/const hoisting and their actual declaration where access throws ReferenceError', 'A deprecated JS feature', 'A timeout handler'], 'correct' => 1],
+        ['question' => 'What is a tagged template literal?', 'options' => ['A template with HTML tags', 'A template literal processed by a function that receives template parts and values', 'A styled-components feature', 'A multi-line string only'], 'correct' => 1],
+        ['question' => 'What is the purpose of Symbol.iterator?', 'options' => ['To name symbols', 'To define a custom iteration protocol for an object', 'To iterate over symbol properties', 'To create unique IDs'], 'correct' => 1],
+        ['question' => 'What does yield* do inside a generator?', 'options' => ['Returns multiple values at once', 'Delegates to another iterable or generator', 'Creates a nested generator', 'Terminates the generator'], 'correct' => 1],
+        ['question' => 'What is lazy evaluation in JavaScript?', 'options' => ['Slow code execution', 'Deferring computation until the value is actually needed', 'Using setTimeout', 'Async evaluation'], 'correct' => 1],
+        ['question' => 'What does Object.getOwnPropertyDescriptor() return?', 'options' => ['The property value', 'A descriptor object with value, writable, enumerable, configurable properties', 'The property name', 'The prototype property'], 'correct' => 1],
+        ['question' => 'What is a pure function?', 'options' => ['A function with no parameters', 'A function with no side effects that always returns the same output for the same input', 'A function that returns void', 'A built-in function'], 'correct' => 1],
+        ['question' => 'What is debouncing?', 'options' => ['Removing bugs', 'Limiting a function to execute only after a specified delay since its last call', 'A caching strategy', 'An event-handling technique only'], 'correct' => 1],
+        ['question' => 'What is throttling?', 'options' => ['Slowing down loops', 'Ensuring a function executes at most once in a specified time period', 'A compression technique', 'A memory limit'], 'correct' => 1],
+        ['question' => 'What are Atomics in JavaScript?', 'options' => ['Primitive value wrappers', 'Static methods for atomic operations on SharedArrayBuffer', 'Small JavaScript modules', 'A build tool API'], 'correct' => 1],
+        ['question' => 'What is SharedArrayBuffer?', 'options' => ['A global shared variable', 'A fixed-length binary buffer that can be shared between multiple workers', 'A shared module cache', 'A cross-tab storage API'], 'correct' => 1],
+        ['question' => 'What does Promise.allSettled() do?', 'options' => ['Rejects if any promise rejects', 'Resolves with results of all promises regardless of outcome', 'Only handles rejections', 'Runs promises in sequence'], 'correct' => 1],
+        ['question' => 'What does Promise.any() do?', 'options' => ['Rejects if any promise rejects', 'Resolves with the first fulfilled promise, rejects only if all reject', 'Resolves when all settle', 'Returns all results'], 'correct' => 1],
+    ]],
+    ['label' => 'Expert', 'questions' => [
+        ['question' => 'What is the V8 JIT compiler?', 'options' => ['A minification tool', 'A just-in-time compiler that compiles JavaScript to machine code for faster execution', 'A virtual CPU', 'An AOT compiler only'], 'correct' => 1],
+        ['question' => 'What are hidden classes in V8?', 'options' => ['Private class fields', 'Internal representations V8 uses to optimize property access on objects with the same shape', 'A CSS concept', 'Prototype chains'], 'correct' => 1],
+        ['question' => 'What is inline caching in JavaScript engines?', 'options' => ['Storing HTML in memory', 'An optimization that caches the result of property lookups at a specific call site', 'HTTP caching headers', 'A module bundling strategy'], 'correct' => 1],
+        ['question' => 'What is the difference between macrotasks and microtasks?', 'options' => ['Size of the task', 'Microtasks (Promises, queueMicrotask) run after the current task before the next macrotask (setTimeout, I/O)', 'Macrotasks are synchronous', 'They are identical'], 'correct' => 1],
+        ['question' => 'What is the module pattern?', 'options' => ['A Node.js feature only', 'An IIFE-based pattern for encapsulation that exposes a public API while hiding internals', 'A class pattern', 'A build tool pattern'], 'correct' => 1],
+        ['question' => 'What is tree shaking?', 'options' => ['Removing DOM nodes', 'Dead code elimination during bundling by removing exports that are never imported', 'Clearing event listeners', 'An optimization for trees/graphs'], 'correct' => 1],
+        ['question' => 'What is code splitting?', 'options' => ['Refactoring long files', 'Breaking a bundle into smaller chunks loaded on demand to improve performance', 'Splitting a string into tokens', 'Running code in parallel'], 'correct' => 1],
+        ['question' => 'What is a Service Worker?', 'options' => ['A background thread for heavy computation', 'A script that runs separately from the page to intercept requests and enable offline capabilities', 'A server-side JavaScript process', 'A DOM worker'], 'correct' => 1],
+        ['question' => 'What is the Transferable Objects mechanism?', 'options' => ['Moving objects between modules', 'Transferring ownership of ArrayBuffers between workers without copying', 'Cloning objects across iframes', 'Serializing objects for storage'], 'correct' => 1],
+        ['question' => 'What is the Temporal proposal in JavaScript?', 'options' => ['A temporary variable scope', 'A modern API for working with dates and times to replace the Date object', 'A time-travel debugging tool', 'A timer utility'], 'correct' => 1],
+        ['question' => 'What is the purpose of Object.defineProperty()?', 'options' => ['Adds a method to a class', 'Defines a property with configurable descriptors (writable, enumerable, configurable, get, set)', 'Freezes a property', 'Copies a property'], 'correct' => 1],
+        ['question' => 'What is the Observable pattern vs Promise?', 'options' => ['They are identical', 'Observables are lazy, cancellable, and can emit multiple values over time; Promises are eager and single-value', 'Promises can emit multiple values', 'Observables are only for HTTP'], 'correct' => 1],
+        ['question' => 'What is the Abstract Syntax Tree (AST) in JS tooling?', 'options' => ['A UI rendering tree', 'A tree representation of the syntactic structure of source code, used by parsers and compilers', 'The virtual DOM', 'A module dependency graph'], 'correct' => 1],
+        ['question' => 'What does the logical assignment operator ||= do?', 'options' => ['Always assigns', 'Assigns the right side only if the left side is falsy', 'Merges two values', 'Checks strict equality'], 'correct' => 1],
+        ['question' => 'What is Array.fromAsync()?', 'options' => ['Creates an array from an async function', 'Creates an array from an async iterable or array-like', 'Wraps an array in a Promise', 'Fetches data into an array'], 'correct' => 1],
+        ['question' => 'What does the using declaration (explicit resource management proposal) do?', 'options' => ['Imports a module', 'Ensures a resource\'s Symbol.dispose method is called when leaving the block scope', 'Declares a constant', 'Pins a variable to a specific scope'], 'correct' => 1],
+        ['question' => 'What is speculative optimization in JS engines?', 'options' => ['Guessing variable names', 'Compiling code with assumptions about types; deoptimizing if assumptions fail', 'An experimental API', 'Predicting user input'], 'correct' => 1],
+        ['question' => 'What is the purpose of performance.mark() and performance.measure()?', 'options' => ['CSS animation marks', 'Creating high-resolution timing markers for custom performance measurements', 'Marking code as optimized', 'Setting memory limits'], 'correct' => 1],
+        ['question' => 'What is the purpose of queueMicrotask()?', 'options' => ['Queues a macrotask', 'Schedules a callback as a microtask to run after current synchronous code but before the next macrotask', 'Creates a worker thread', 'Delays execution by one frame'], 'correct' => 1],
+        ['question' => 'What is the Record and Tuple proposal?', 'options' => ['A TypeScript feature', 'Immutable, deeply-comparable value types for objects and arrays', 'A new loop construct', 'A type annotation syntax'], 'correct' => 1],
+        ['question' => 'What is the purpose of globalThis?', 'options' => ['Accesses the global object uniformly across environments (browser, Node.js, workers)', 'Sets global variables', 'A replacement for window', 'A browser-only API'], 'correct' => 0],
+        ['question' => 'What is the Garbage Collector\'s generational hypothesis?', 'options' => ['Old objects live longer', 'Most objects die young, so short-lived allocations are collected cheaply in the young generation', 'Memory grows generationally', 'GC runs once per generation'], 'correct' => 1],
+        ['question' => 'What is monomorphic vs polymorphic call site in V8?', 'options' => ['One function vs many functions', 'A monomorphic site always sees the same hidden class, enabling better optimization; polymorphic sees multiple', 'A method count difference', 'A class inheritance level'], 'correct' => 1],
+        ['question' => 'What is the Error.cause property?', 'options' => ['A deprecated property', 'A way to chain errors by specifying the underlying cause when throwing a new Error', 'The error stack trace', 'A type field for errors'], 'correct' => 1],
+        ['question' => 'What is top-level await?', 'options' => ['await used only in top-level functions', 'Using await outside an async function at the top level of an ES module', 'A performance optimization', 'A Node.js-only feature'], 'correct' => 1],
+        ['question' => 'What is the purpose of import.meta?', 'options' => ['Imports metadata from npm', 'Provides host-specific metadata about the current module (e.g., import.meta.url)', 'A build tool configuration', 'An import assertion syntax'], 'correct' => 1],
+        ['question' => 'What does import() (dynamic import) return?', 'options' => ['The module object directly', 'A Promise that resolves with the module namespace object', 'A string path', 'A synchronous module'], 'correct' => 1],
+        ['question' => 'What is the purpose of the Intl API?', 'options' => ['International networking', 'ECMAScript Internationalization API for locale-sensitive string comparison, number formatting, date formatting', 'An integer library', 'A translation service'], 'correct' => 1],
+        ['question' => 'What is a Decorator in JavaScript (proposal)?', 'options' => ['A design pattern only', 'A special syntax for annotating or modifying class declarations, methods, and properties', 'A CSS concept', 'A function wrapper utility'], 'correct' => 1],
+        ['question' => 'What is the purpose of Array.prototype.at()?', 'options' => ['Checks if index exists', 'Accesses an element by index, supporting negative indices to count from the end', 'Attaches a listener', 'Returns a reference'], 'correct' => 1],
+    ]],
+];
+require_once __DIR__ . '/quiz-engine.php';
