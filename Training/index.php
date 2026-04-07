@@ -3264,6 +3264,198 @@ require_once __DIR__ . '/../includes/header.php';
       <div class="card-desc">Test your XML knowledge covering syntax, DTD, XML Schema, XPath, XSLT, and XML processing techniques.</div>
       <a href="Quizzes/xml.php" class="quiz-btn">Start Quiz</a>
     </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Swift
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Test your Swift knowledge from basic syntax and optionals to protocols, generics, concurrency, and advanced Swift internals.</div>
+      <a href="Quizzes/swift.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        SASS/SCSS
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Assess your SASS/SCSS skills covering variables, nesting, mixins, extends, functions, and advanced stylesheet architecture.</div>
+      <a href="Quizzes/sass.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Generative AI
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Explore Generative AI concepts from foundational models and prompt engineering to fine-tuning, RAG, and responsible AI practices.</div>
+      <a href="Quizzes/genai.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        SciPy
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Challenge your SciPy knowledge spanning numerical integration, optimization, linear algebra, signal processing, and scientific computing.</div>
+      <a href="Quizzes/scipy.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        AWS
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Test your AWS knowledge from core services like EC2 and S3 to advanced topics including serverless, networking, and cloud architecture.</div>
+      <a href="Quizzes/aws.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Data Science
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Evaluate your Data Science skills covering data wrangling, statistics, visualisation, feature engineering, and model evaluation.</div>
+      <a href="Quizzes/data-science.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Intro to Programming
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Begin your coding journey with fundamental programming concepts including variables, loops, functions, and problem-solving techniques.</div>
+      <a href="Quizzes/intro-programming.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Intro to HTML &amp; CSS
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Start building web pages with this beginner-friendly quiz on HTML structure, CSS styling, and foundational web design concepts.</div>
+      <a href="Quizzes/intro-html-css.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Bash
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Test your Bash skills from basic shell commands and scripting to pipelines, process management, and advanced shell programming.</div>
+      <a href="Quizzes/bash.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Rust
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Challenge yourself on Rust fundamentals including ownership, borrowing, lifetimes, traits, concurrency, and systems programming patterns.</div>
+      <a href="Quizzes/rust.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Machine Learning
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Deepen your Machine Learning knowledge from supervised and unsupervised learning to neural networks, model evaluation, and MLOps.</div>
+      <a href="Quizzes/machine-learning.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        AI Tool Development
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Master AI tool development covering LLM APIs, prompt engineering, RAG pipelines, agents, embeddings, and production AI application patterns.</div>
+      <a href="Quizzes/ai-tools.php" class="quiz-btn">Start Quiz</a>
+    </div>
   </div>
 </section>
 
