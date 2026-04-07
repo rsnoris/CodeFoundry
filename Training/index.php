@@ -4227,6 +4227,86 @@ require_once __DIR__ . '/../includes/header.php';
       <div class="card-desc">Deepen your JavaScript knowledge from syntax and data types to closures, the event loop, Promises, Proxy, and advanced engine internals.</div>
       <a href="Quizzes/javascript-fundamentals.php" class="quiz-btn">Start Quiz</a>
     </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:gem"></iconify-icon>
+        Ruby
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Expert</span></span>
+      </div>
+      <div class="card-desc">Test your Ruby knowledge from syntax, blocks, and modules to metaprogramming, Rails patterns, concurrency, and performance internals.</div>
+      <a href="Quizzes/ruby.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:database-zap"></iconify-icon>
+        Redis
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Expert</span></span>
+      </div>
+      <div class="card-desc">Master Redis from basic key-value commands and data structures to persistence, Pub/Sub, Streams, Cluster, Lua scripting, and internals.</div>
+      <a href="Quizzes/redis.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:git-merge"></iconify-icon>
+        GraphQL
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Expert</span></span>
+      </div>
+      <div class="card-desc">Evaluate your GraphQL expertise from queries, mutations, and resolvers to schema federation, DataLoader, subscriptions, and spec internals.</div>
+      <a href="Quizzes/graphql.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:zap"></iconify-icon>
+        Svelte
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Expert</span></span>
+      </div>
+      <div class="card-desc">Challenge your Svelte skills from components, stores, and animations to SvelteKit routing, SSR, adapters, and Svelte 5 runes.</div>
+      <a href="Quizzes/svelte.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:smartphone"></iconify-icon>
+        Flutter
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Expert</span></span>
+      </div>
+      <div class="card-desc">Assess your Flutter expertise from widgets and state management to rendering pipeline, Isolates, testing, and production build optimization.</div>
+      <a href="Quizzes/flutter.php" class="quiz-btn">Start Quiz</a>
+    </div>
   </div>
 </section>
 
