@@ -3024,6 +3024,32 @@ jobs:
     return output.join('\n');
   }
 
+  function _evalArith(expr) {
+    const tokens = expr.trim().match(/\d+\.?\d*|[+\-*/%()]/g) || [];
+    let pos = 0;
+    function num() {
+      if (tokens[pos] === '(') { pos++; const v = addSub(); pos++; return v; }
+      return parseFloat(tokens[pos++]) || 0;
+    }
+    function mulDiv() {
+      let v = num();
+      while (pos < tokens.length && (tokens[pos] === '*' || tokens[pos] === '/' || tokens[pos] === '%')) {
+        const op = tokens[pos++]; const r = num();
+        if (op === '*') v *= r; else if (op === '/') v = r !== 0 ? Math.trunc(v / r) : 0; else v = r !== 0 ? v % r : 0;
+      }
+      return v;
+    }
+    function addSub() {
+      let v = mulDiv();
+      while (pos < tokens.length && (tokens[pos] === '+' || tokens[pos] === '-')) {
+        const op = tokens[pos++]; const r = mulDiv();
+        if (op === '+') v += r; else v -= r;
+      }
+      return v;
+    }
+    try { return String(Math.trunc(addSub())); } catch(_) { return '0'; }
+  }
+
   function _runBash(code) {
     const lines = code.split('\n');
     const output = [];
@@ -3051,10 +3077,7 @@ jobs:
       if (varMatch) {
         let val = varMatch[2].replace(/^["']|["']$/g, '');
         val = val.replace(/\$\(\(([^)]+)\)\)/g, (_, expr) => {
-          if (/^[\d\s+\-*/()%]+$/.test(expr)) {
-            try { return String(Function('"use strict";return (' + expr + ')')()) } catch(_) { return '0'; }
-          }
-          return '0';
+          return /^[\d\s+\-*/()%]+$/.test(expr) ? _evalArith(expr) : '0';
         });
         vars[varMatch[1]] = val;
         continue;
