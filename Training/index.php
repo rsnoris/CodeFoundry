@@ -2848,6 +2848,422 @@ require_once __DIR__ . '/../includes/header.php';
       <div class="card-desc">Evaluate your knowledge of application security, OWASP Top 10, cryptography, and secure coding practices.</div>
       <a href="#" class="quiz-btn" onclick="event.preventDefault();startQuiz('security-practices')">Start Quiz</a>
     </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        HTML
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Test your HTML knowledge from basic tags and forms to advanced semantic elements, accessibility, and performance.</div>
+      <a href="Quizzes/html.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        CSS
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Assess your CSS skills across selectors, the box model, Flexbox, Grid, animations, and modern CSS features.</div>
+      <a href="Quizzes/css.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        JavaScript
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Deepen your JavaScript knowledge covering syntax, ES6+, closures, async patterns, and advanced internals.</div>
+      <a href="Quizzes/javascript.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        TypeScript
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Test your TypeScript skills from basic type annotations and interfaces to generics, decorators, and advanced type system patterns.</div>
+      <a href="Quizzes/typescript.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        React
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Challenge yourself on React components, hooks, state management, context, and performance optimization techniques.</div>
+      <a href="Quizzes/react.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Angular
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Evaluate your Angular expertise from components and data binding to NgRx, change detection strategies, and SSR.</div>
+      <a href="Quizzes/angular.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Vue.js
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Test your Vue.js skills covering templates, components, Composition API, Pinia, Vue Router, and Nuxt.js concepts.</div>
+      <a href="Quizzes/vuejs.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Bootstrap
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Assess your Bootstrap knowledge from the grid system and utilities to components, JavaScript plugins, and customization.</div>
+      <a href="Quizzes/bootstrap.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        jQuery
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Test your jQuery expertise in DOM manipulation, event handling, AJAX, animations, and plugin development.</div>
+      <a href="Quizzes/jquery.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Node.js
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Challenge your Node.js skills from core modules and npm through Express, streams, worker threads, and production deployment.</div>
+      <a href="Quizzes/nodejs.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Python
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Evaluate your Python knowledge from syntax and data structures to OOP, decorators, generators, and advanced patterns.</div>
+      <a href="Quizzes/python.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Django
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Test your Django skills covering models, views, templates, ORM, REST framework, and deployment best practices.</div>
+      <a href="Quizzes/django.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Java
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Assess your Java expertise from OOP fundamentals and collections to concurrency, JVM internals, and design patterns.</div>
+      <a href="Quizzes/java.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        PHP
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Test your PHP knowledge from syntax and functions to OOP, Composer, frameworks, and modern PHP best practices.</div>
+      <a href="Quizzes/php-quiz.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        C
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Evaluate your C programming skills from variables and control flow to pointers, memory management, and systems programming.</div>
+      <a href="Quizzes/c-lang.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        C++
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Challenge your C++ knowledge covering OOP, templates, the STL, move semantics, and modern C++ features.</div>
+      <a href="Quizzes/cpp.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        C#
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Test your C# skills from language fundamentals and LINQ to async/await, .NET libraries, and advanced patterns.</div>
+      <a href="Quizzes/csharp.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Go
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Assess your Go programming knowledge from basic syntax and goroutines to interfaces, generics, and the Go runtime.</div>
+      <a href="Quizzes/golang.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        SQL
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Test your SQL knowledge covering queries, joins, aggregations, indexes, transactions, and query optimization.</div>
+      <a href="Quizzes/sql.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        MySQL
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Evaluate your MySQL expertise from basic queries and schema design to stored procedures, replication, and performance tuning.</div>
+      <a href="Quizzes/mysql.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        MongoDB
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Test your MongoDB knowledge from CRUD operations and aggregation to indexing, replica sets, sharding, and Atlas.</div>
+      <a href="Quizzes/mongodb.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        NumPy
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Assess your NumPy skills covering arrays, shapes, broadcasting, linear algebra, random number generation, and performance.</div>
+      <a href="Quizzes/numpy.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Pandas
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Test your Pandas expertise from Series and DataFrames to merging, groupby, time series, and performance optimization.</div>
+      <a href="Quizzes/pandas.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Git
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Evaluate your Git knowledge from basic commits and branching through rebasing, hooks, and Git internals.</div>
+      <a href="Quizzes/git.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        Docker
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Challenge your Docker skills from containers and Dockerfiles to Compose, networking, Swarm, and container security.</div>
+      <a href="Quizzes/docker.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:brain"></iconify-icon>
+        XML
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Advanced</span></span>
+      </div>
+      <div class="card-desc">Test your XML knowledge covering syntax, DTD, XML Schema, XPath, XSLT, and XML processing techniques.</div>
+      <a href="Quizzes/xml.php" class="quiz-btn">Start Quiz</a>
+    </div>
   </div>
 </section>
 

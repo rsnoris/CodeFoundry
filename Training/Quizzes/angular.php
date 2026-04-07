@@ -50,7 +50,7 @@ $quiz_tiers  = [
             ['question' => 'What decorator marks a class as an Angular service that can be injected?', 'options' => ['@Service', '@Provider', '@Component', '@Injectable'], 'correct' => 3],
             ['question' => 'How is a service typically injected into a component?', 'options' => ['By importing its file', 'By adding it to declarations', 'As a constructor parameter', 'Through the template'], 'correct' => 2],
             ['question' => 'What is Angular dependency injection?', 'options' => ['Injecting HTML into templates', 'A design pattern where Angular provides class dependencies automatically', 'Importing npm packages', 'Linking CSS stylesheets'], 'correct' => 1],
-            ['question' => 'Which directive renders the matched route\'s component in Angular Router?', 'options' => ['router-link', 'ng-outlet', 'router-outlet', 'route-view'], 'correct' => 2],
+            ['question' => 'Which Angular Router component acts as a placeholder that renders the matched route\'s component?', 'options' => ['router-link', 'ng-outlet', 'router-outlet', 'route-view'], 'correct' => 2],
             ['question' => 'Which directive creates a router navigation link?', 'options' => ['href', 'navigate', 'routerLink', 'navLink'], 'correct' => 2],
             ['question' => 'What module must be imported to use Angular Router?', 'options' => ['NavigationModule', 'HttpClientModule', 'RouterModule', 'BrowserModule'], 'correct' => 2],
             ['question' => 'What does the uppercase pipe do?', 'options' => ['Formats currency', 'Converts text to uppercase', 'Makes text bold', 'URL-encodes a string'], 'correct' => 1],
