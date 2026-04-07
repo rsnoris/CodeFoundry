@@ -4071,7 +4071,7 @@ require_once __DIR__ . '/../includes/header.php';
     <div class="quiz-card">
       <div class="quiz-title">
         <iconify-icon icon="lucide:cpu"></iconify-icon>
-        AI
+        Artificial Intelligence
       </div>
       <div class="quiz-meta">
         <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
