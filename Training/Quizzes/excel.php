@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Excel Quiz – 100 Levels – CodeFoundry';
+$page_title = 'Excel Quiz – 5 Tiers – CodeFoundry';
 $active_page = 'training';
 $quiz_title  = 'Excel';
 $quiz_slug   = 'excel';
