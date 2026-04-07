@@ -4067,6 +4067,86 @@ require_once __DIR__ . '/../includes/header.php';
       <div class="card-desc">Master AI tool development covering LLM APIs, prompt engineering, RAG pipelines, agents, embeddings, and production AI application patterns.</div>
       <a href="Quizzes/ai-tools.php" class="quiz-btn">Start Quiz</a>
     </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:cpu"></iconify-icon>
+        AI
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Expert</span></span>
+      </div>
+      <div class="card-desc">Explore the foundations and frontiers of Artificial Intelligence, from early history and narrow AI to neural networks, ethics, and cutting-edge research.</div>
+      <a href="Quizzes/ai.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:layers"></iconify-icon>
+        AngularJS
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Expert</span></span>
+      </div>
+      <div class="card-desc">Test your AngularJS knowledge from two-way data binding and directives to services, dependency injection, routing, and performance optimization.</div>
+      <a href="Quizzes/angularjs.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:server"></iconify-icon>
+        ASP.NET
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Expert</span></span>
+      </div>
+      <div class="card-desc">Assess your ASP.NET skills covering the MVC pattern, Razor Pages, Web API, middleware pipeline, authentication, and deployment on Azure.</div>
+      <a href="Quizzes/asp.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:git-branch"></iconify-icon>
+        Data Structures &amp; Algorithms
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Expert</span></span>
+      </div>
+      <div class="card-desc">Master data structures and algorithms from arrays, stacks, and sorting to trees, graphs, dynamic programming, and advanced algorithmic techniques.</div>
+      <a href="Quizzes/dsa.php" class="quiz-btn">Start Quiz</a>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-title">
+        <iconify-icon icon="lucide:table"></iconify-icon>
+        Excel
+      </div>
+      <div class="quiz-meta">
+        <span><iconify-icon icon="lucide:list"></iconify-icon>100 Levels</span>
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><span class="quiz-level-pill beginner">Intro</span></span>
+        <span><span class="quiz-level-pill intermediate">Intermediate</span></span>
+        <span><span class="quiz-level-pill advanced">Expert</span></span>
+      </div>
+      <div class="card-desc">Evaluate your Excel expertise from basic formulas and cell references to PivotTables, Power Query, advanced functions, VBA macros, and DAX.</div>
+      <a href="Quizzes/excel.php" class="quiz-btn">Start Quiz</a>
+    </div>
   </div>
 </section>
 
