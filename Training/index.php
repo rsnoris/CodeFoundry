@@ -2100,6 +2100,277 @@ spec:
 # - Secrets: Sensitive data
 
 # Click Run to explore Kubernetes!`
+    },
+    'aws': {
+      name: 'AWS Cloud Lab',
+      defaultCode: `# AWS CLI Simulator — Hands-on Cloud Lab
+# Practice AWS commands without incurring real costs
+
+# List all S3 buckets
+aws s3 ls
+
+# Create an S3 bucket
+aws s3 mb s3://my-demo-bucket --region us-east-1
+
+# Upload a file to S3
+aws s3 cp ./app.zip s3://my-demo-bucket/
+
+# List EC2 instances
+aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,State.Name,InstanceType]' --output table
+
+# Create a Lambda function
+aws lambda create-function \\
+  --function-name my-function \\
+  --runtime nodejs18.x \\
+  --role arn:aws:iam::123456789012:role/lambda-role \\
+  --handler index.handler \\
+  --zip-file fileb://function.zip
+
+# List IAM users
+aws iam list-users
+
+# Describe a CloudFormation stack
+aws cloudformation describe-stacks --stack-name my-stack
+
+# Click Run to see simulated AWS output`
+    },
+    'azure': {
+      name: 'Azure Sandbox',
+      defaultCode: `# Azure CLI Simulator — Cloud Sandbox
+# Practice Azure commands in a safe environment
+
+# Login to Azure
+az login
+
+# List subscriptions
+az account list --output table
+
+# Create a resource group
+az group create --name MyResourceGroup --location eastus
+
+# Create a virtual machine
+az vm create \\
+  --resource-group MyResourceGroup \\
+  --name MyVM \\
+  --image UbuntuLTS \\
+  --admin-username azureuser \\
+  --generate-ssh-keys
+
+# List all VMs
+az vm list --output table
+
+# Create Azure Container Registry
+az acr create --resource-group MyResourceGroup \\
+  --name myregistry --sku Basic
+
+# Deploy a web app
+az webapp create \\
+  --resource-group MyResourceGroup \\
+  --plan MyAppServicePlan \\
+  --name my-web-app \\
+  --runtime "NODE|18-lts"
+
+# Click Run to see simulated Azure output`
+    },
+    'gcp': {
+      name: 'GCP Cloud Shell',
+      defaultCode: `# GCP Cloud Shell Simulator
+# Practice Google Cloud Platform commands
+
+# Authenticate and set project
+gcloud auth login
+gcloud config set project my-project-id
+
+# List Compute Engine instances
+gcloud compute instances list
+
+# Create a VM instance
+gcloud compute instances create my-vm \\
+  --zone=us-central1-a \\
+  --machine-type=e2-medium \\
+  --image-family=debian-11 \\
+  --image-project=debian-cloud
+
+# List Cloud Storage buckets
+gsutil ls
+
+# Create a GCS bucket
+gsutil mb gs://my-gcs-bucket
+
+# List GKE clusters
+gcloud container clusters list
+
+# Create a GKE cluster
+gcloud container clusters create my-cluster \\
+  --zone us-central1-a \\
+  --num-nodes 3
+
+# Deploy a Cloud Function
+gcloud functions deploy my-function \\
+  --runtime nodejs18 \\
+  --trigger-http \\
+  --allow-unauthenticated
+
+# Click Run to see simulated GCP output`
+    },
+    'terraform': {
+      name: 'Terraform Lab',
+      defaultCode: `# Terraform Infrastructure-as-Code Lab
+# Write HCL configurations and simulate plan/apply
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "us-east-1"
+}
+
+# S3 Bucket Resource
+resource "aws_s3_bucket" "demo_bucket" {
+  bucket = "my-terraform-demo-bucket"
+  tags = {
+    Environment = "Demo"
+    ManagedBy   = "Terraform"
+  }
+}
+
+# EC2 Instance
+resource "aws_instance" "web_server" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "WebServer"
+  }
+}
+
+# Security Group
+resource "aws_security_group" "web_sg" {
+  name        = "web-security-group"
+  description = "Allow HTTP and HTTPS traffic"
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Click Run to simulate terraform plan & apply`
+    },
+    'bash': {
+      name: 'Bash Terminal',
+      defaultCode: `#!/bin/bash
+# Bash Terminal Simulator
+# Practice shell scripting and Linux commands
+
+# Variables
+NAME="CloudFoundry"
+echo "Welcome to $NAME!"
+
+# Arithmetic
+COUNT=$((10 + 5))
+echo "Count: $COUNT"
+
+# Conditional (echoed as documentation)
+echo "Check: Count is greater than 10"
+
+# Listing items
+echo "Project files:"
+for FILE in app.js package.json README.md Dockerfile; do
+  echo "  - $FILE"
+done
+
+# Function definition and call
+deploy() {
+  local ENV=$1
+  echo "Deploying to $ENV environment..."
+  echo "  Building Docker image..."
+  echo "  Pushing to registry..."
+  echo "  Updating Kubernetes deployment..."
+  echo "  Deployment complete!"
+}
+
+deploy "production"
+
+# System info output
+echo ""
+echo "System info:"
+echo "  OS: Ubuntu 22.04 LTS"
+echo "  Kernel: 5.15.0-1034-aws"
+echo "  CPU: 2 vCPU"
+echo "  Memory: 4 GB"
+
+# Click Run to execute`
+    },
+    'cicd': {
+      name: 'CI/CD Pipeline Lab',
+      defaultCode: `# GitHub Actions CI/CD Pipeline
+# Simulate your deployment pipeline
+
+name: Deploy to Production
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  NODE_VERSION: '18'
+  AWS_REGION: 'us-east-1'
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: \${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        run: npm ci
+      - name: Run unit tests
+        run: npm test
+      - name: Run linter
+        run: npm run lint
+
+  build:
+    name: Build and Push Docker Image
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t myapp:\${{ github.sha }} .
+      - name: Push to ECR
+        run: |
+          aws ecr get-login-password | docker login --username AWS --password-stdin \$ECR_URL
+          docker push \$ECR_URL/myapp:\${{ github.sha }}
+
+  deploy:
+    name: Deploy to Kubernetes
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update K8s deployment
+        run: |
+          kubectl set image deployment/myapp myapp=\$ECR_URL/myapp:\${{ github.sha }}
+          kubectl rollout status deployment/myapp
+
+# Click Run to simulate the pipeline`
     }
   };
 
@@ -2565,6 +2836,299 @@ spec:
     return lines.join('\n');
   }
 
+  function _runAWS(code) {
+    const lines = code.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+    const output = [];
+    output.push('AWS CLI Simulator — Sandbox Environment');
+    output.push('Account: 123456789012 | Region: us-east-1');
+    output.push('');
+    let commandFound = false;
+    for (const raw of lines) {
+      const cmd = raw.replace(/\s*\\\s*$/, '').trim();
+      if (!cmd.startsWith('aws ')) continue;
+      commandFound = true;
+      output.push('$ ' + cmd);
+      if (/aws s3 ls/.test(cmd)) {
+        output.push('2024-01-15 10:23:01 my-app-bucket');
+        output.push('2024-02-20 14:11:45 my-backup-bucket');
+        output.push('2024-03-01 09:05:30 my-logs-bucket');
+      } else if (/aws s3 mb/.test(cmd)) {
+        const m = cmd.match(/s3:\/\/([\w-]+)/);
+        output.push('make_bucket: ' + (m ? m[1] : 'new-bucket'));
+      } else if (/aws s3 cp/.test(cmd)) {
+        output.push('upload: ./app.zip to s3://my-demo-bucket/app.zip');
+      } else if (/aws ec2 describe-instances/.test(cmd)) {
+        output.push('--------------------------------------------');
+        output.push('|         DescribeInstances                |');
+        output.push('+-----------+----------+---------------+');
+        output.push('| i-0abc123 | running  | t3.micro      |');
+        output.push('| i-0def456 | stopped  | t3.small      |');
+        output.push('+-----------+----------+---------------+');
+      } else if (/aws lambda create-function/.test(cmd)) {
+        output.push(JSON.stringify({ FunctionName: 'my-function', Runtime: 'nodejs18.x', State: 'Active', FunctionArn: 'arn:aws:lambda:us-east-1:123456789012:function:my-function' }, null, 2));
+      } else if (/aws iam list-users/.test(cmd)) {
+        output.push('{ "Users": [ { "UserName": "admin" }, { "UserName": "developer" } ] }');
+      } else if (/aws cloudformation describe-stacks/.test(cmd)) {
+        output.push('{ "Stacks": [ { "StackName": "my-stack", "StackStatus": "CREATE_COMPLETE" } ] }');
+      } else {
+        output.push('{ "ResponseMetadata": { "RequestId": "abc-123", "HTTPStatusCode": 200 } }');
+      }
+      output.push('');
+    }
+    if (!commandFound) return '(No AWS CLI commands found — commands must start with "aws ")\n\n✓ Sandbox ready';
+    output.push('✓ All commands executed in simulated AWS environment');
+    return output.join('\n');
+  }
+
+  function _runAzure(code) {
+    const lines = code.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+    const output = [];
+    output.push('Azure CLI Simulator — Sandbox Environment');
+    output.push('Subscription: Demo Subscription (00000000-0000-0000-0000-000000000000)');
+    output.push('');
+    let commandFound = false;
+    for (const raw of lines) {
+      const cmd = raw.replace(/\s*\\\s*$/, '').trim();
+      if (!cmd.startsWith('az ')) continue;
+      commandFound = true;
+      output.push('$ ' + cmd);
+      if (/az login/.test(cmd)) {
+        output.push('[{ "cloudName": "AzureCloud", "name": "Demo Subscription", "state": "Enabled", "isDefault": true }]');
+      } else if (/az account list/.test(cmd)) {
+        output.push('Name                  State    IsDefault');
+        output.push('--------------------  -------  ---------');
+        output.push('Demo Subscription     Enabled  True');
+      } else if (/az group create/.test(cmd)) {
+        const rg = cmd.match(/--name\s+([\w-]+)/)?.[1] || 'MyResourceGroup';
+        output.push(`{ "name": "${rg}", "location": "eastus", "properties": { "provisioningState": "Succeeded" } }`);
+      } else if (/az vm create/.test(cmd)) {
+        output.push('{ "fqdns": "", "location": "eastus", "powerState": "VM running", "privateIpAddress": "10.0.0.4" }');
+      } else if (/az vm list/.test(cmd)) {
+        output.push('Name   ResourceGroup      Location  PowerState');
+        output.push('-----  -----------------  --------  ----------');
+        output.push('MyVM   MyResourceGroup    eastus    VM running');
+      } else if (/az acr create/.test(cmd)) {
+        output.push('{ "loginServer": "myregistry.azurecr.io", "name": "myregistry", "provisioningState": "Succeeded" }');
+      } else if (/az webapp create/.test(cmd)) {
+        output.push('{ "defaultHostName": "my-web-app.azurewebsites.net", "name": "my-web-app", "state": "Running" }');
+      } else {
+        output.push('{ "status": "Succeeded" }');
+      }
+      output.push('');
+    }
+    if (!commandFound) return '(No Azure CLI commands found — commands must start with "az ")\n\n✓ Sandbox ready';
+    output.push('✓ All commands executed in simulated Azure environment');
+    return output.join('\n');
+  }
+
+  function _runGCP(code) {
+    const lines = code.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+    const output = [];
+    output.push('GCP Cloud Shell Simulator — Sandbox Environment');
+    output.push('Project: my-project-id | Region: us-central1');
+    output.push('');
+    let commandFound = false;
+    for (const raw of lines) {
+      const cmd = raw.replace(/\s*\\\s*$/, '').trim();
+      if (!cmd.startsWith('gcloud') && !cmd.startsWith('gsutil') && !cmd.startsWith('kubectl')) continue;
+      commandFound = true;
+      output.push('$ ' + cmd);
+      if (/gcloud auth login/.test(cmd)) {
+        output.push('You are now logged in as [user@example.com].');
+        output.push('Your current project is [my-project-id].');
+      } else if (/gcloud config set project/.test(cmd)) {
+        output.push('Updated property [core/project].');
+      } else if (/gcloud compute instances list/.test(cmd)) {
+        output.push('NAME    ZONE           MACHINE_TYPE  STATUS');
+        output.push('my-vm   us-central1-a  e2-medium     RUNNING');
+        output.push('api-vm  us-central1-b  e2-small      TERMINATED');
+      } else if (/gcloud compute instances create/.test(cmd)) {
+        output.push('NAME   ZONE           MACHINE_TYPE  PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP   STATUS');
+        output.push('my-vm  us-central1-a  e2-medium                  10.128.0.2   34.67.100.10  RUNNING');
+      } else if (/gsutil ls/.test(cmd)) {
+        output.push('gs://my-app-bucket/');
+        output.push('gs://my-backup-bucket/');
+      } else if (/gsutil mb/.test(cmd)) {
+        const m = cmd.match(/gs:\/\/([\w-]+)/);
+        output.push('Creating ' + (m ? 'gs://' + m[1] + '/' : 'bucket') + '...');
+      } else if (/gcloud container clusters list/.test(cmd)) {
+        output.push('NAME        LOCATION       MASTER_VERSION  NUM_NODES  STATUS');
+        output.push('my-cluster  us-central1-a  1.27.3-gke      3          RUNNING');
+      } else if (/gcloud container clusters create/.test(cmd)) {
+        output.push('Creating cluster my-cluster in us-central1-a...');
+        output.push('kubeconfig entry generated for my-cluster.');
+        output.push('NAME        LOCATION       NUM_NODES  STATUS');
+        output.push('my-cluster  us-central1-a  3          RUNNING');
+      } else if (/gcloud functions deploy/.test(cmd)) {
+        output.push('Deploying function...');
+        output.push('httpsTrigger: { url: "https://us-central1-my-project.cloudfunctions.net/my-function" }');
+        output.push('status: ACTIVE');
+      } else {
+        output.push('OK');
+      }
+      output.push('');
+    }
+    if (!commandFound) return '(No gcloud/gsutil commands found)\n\n✓ Cloud Shell ready';
+    output.push('✓ All commands executed in simulated GCP environment');
+    return output.join('\n');
+  }
+
+  function _runTerraform(code) {
+    const resources = [];
+    const providers = [];
+    const providerRe = /provider\s+"([\w-]+)"/g;
+    const resourceRe = /resource\s+"([\w-]+)"\s+"([\w-]+)"/g;
+    let m;
+    while ((m = providerRe.exec(code)) !== null) providers.push(m[1]);
+    while ((m = resourceRe.exec(code)) !== null) resources.push({ type: m[1], name: m[2] });
+    const output = [];
+    output.push('> terraform init');
+    output.push('');
+    output.push('Initializing the backend...');
+    output.push('Initializing provider plugins...');
+    if (providers.length) {
+      providers.forEach(p => output.push('  - Finding hashicorp/' + p + ' versions...'));
+      providers.forEach(p => output.push('  - Installing hashicorp/' + p + '...'));
+    }
+    output.push('');
+    output.push('Terraform has been successfully initialized!');
+    output.push('');
+    output.push('> terraform plan');
+    output.push('');
+    if (!resources.length) {
+      output.push('No changes. Your infrastructure matches the configuration.');
+      return output.join('\n') + '\n\n✓ Terraform simulation complete';
+    }
+    output.push('Terraform will perform the following actions:');
+    output.push('');
+    resources.forEach(r => {
+      output.push('  # ' + r.type + '.' + r.name + ' will be created');
+      output.push('  + resource "' + r.type + '" "' + r.name + '" {');
+      output.push('      + id  = (known after apply)');
+      output.push('      + arn = (known after apply)');
+      output.push('    }');
+      output.push('');
+    });
+    output.push('Plan: ' + resources.length + ' to add, 0 to change, 0 to destroy.');
+    output.push('');
+    output.push('> terraform apply -auto-approve');
+    output.push('');
+    resources.forEach((r, i) => {
+      const suffix = Math.random().toString(36).substring(2, 8);
+      output.push(r.type + '.' + r.name + ': Creating...');
+      output.push(r.type + '.' + r.name + ': Creation complete after ' + (i + 1) + 's [id=' + r.type.split('_').pop() + '-' + suffix + ']');
+    });
+    output.push('');
+    output.push('Apply complete! Resources: ' + resources.length + ' added, 0 changed, 0 destroyed.');
+    output.push('\n✓ Terraform simulation complete');
+    return output.join('\n');
+  }
+
+  function _runBash(code) {
+    const lines = code.split('\n');
+    const output = [];
+    const vars = {};
+    const functions = {};
+    let currentFn = null;
+    let fnLines = [];
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (/^\w+\s*\(\)\s*\{/.test(trimmed) || /^function\s+\w+/.test(trimmed)) {
+        currentFn = trimmed.match(/^(?:function\s+)?(\w+)/)?.[1] || null;
+        fnLines = [];
+      } else if (currentFn && trimmed === '}') {
+        functions[currentFn] = [...fnLines];
+        currentFn = null;
+      } else if (currentFn) {
+        fnLines.push(trimmed);
+      }
+    }
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#') || /^\w+\s*\(\)\s*\{/.test(trimmed) || /^function\s+\w+/.test(trimmed) || trimmed === '}') continue;
+      if (/^(if|fi|for|do|done|then|else|\[\[|shebang)/.test(trimmed) || trimmed === 'do' || trimmed === 'done') continue;
+      const varMatch = trimmed.match(/^([A-Z_][A-Z0-9_]*)=(.+)$/);
+      if (varMatch) {
+        let val = varMatch[2].replace(/^["']|["']$/g, '');
+        val = val.replace(/\$\(\(([^)]+)\)\)/g, (_, expr) => {
+          try { return String(Function('"use strict";return (' + expr + ')')()) } catch(_) { return '0'; }
+        });
+        vars[varMatch[1]] = val;
+        continue;
+      }
+      if (/^echo\s/.test(trimmed)) {
+        let msg = trimmed.replace(/^echo\s+/, '').replace(/^["']|["']$/g, '');
+        msg = msg.replace(/\$\{?(\w+)\}?/g, (_, n) => vars[n] !== undefined ? vars[n] : '$' + n);
+        output.push(msg);
+        continue;
+      }
+      const fnCallMatch = trimmed.match(/^(\w+)\s*(?:"([^"]*)"|\S+)?/);
+      if (fnCallMatch && functions[fnCallMatch[1]]) {
+        const arg = fnCallMatch[2] || fnCallMatch[0].split(/\s+/)[1]?.replace(/['"]/g, '') || '';
+        for (const fl of functions[fnCallMatch[1]]) {
+          if (!fl || fl.startsWith('#')) continue;
+          if (/^local\s/.test(fl)) {
+            const parts = fl.replace(/^local\s+/, '').split('=');
+            if (parts[1]) vars[parts[0]] = parts[1].replace(/['"]/g, '').replace(/\$1/g, arg);
+            continue;
+          }
+          if (/^echo\s/.test(fl)) {
+            let msg = fl.replace(/^echo\s+/, '').replace(/^["']|["']$/g, '');
+            msg = msg.replace(/\$1/g, arg).replace(/\$\{?(\w+)\}?/g, (_, n) => vars[n] !== undefined ? vars[n] : '$' + n);
+            output.push(msg);
+          }
+        }
+      }
+    }
+    if (!output.length) return '(No output — add echo statements to see results)\n\n✓ Shell ready';
+    return output.join('\n') + '\n\n✓ Script execution complete';
+  }
+
+  function _runCICD(code) {
+    const jobRe = /^\s{2}([\w-]+):/gm;
+    const jobs = [];
+    let m;
+    while ((m = jobRe.exec(code)) !== null) {
+      if (!['on', 'env', 'name', 'push', 'pull_request'].includes(m[1])) jobs.push(m[1]);
+    }
+    const wfName = code.match(/^name:\s*(.+)/m)?.[1]?.trim() || 'CI/CD Pipeline';
+    const branch = code.match(/branches:\s*\[\s*([\w,\s/]+)\]/)?.[1]?.split(',')[0]?.trim() || 'main';
+    const runId = Math.floor(Math.random() * 9000) + 1000;
+    const output = [];
+    output.push('\uD83D\uDE80 Running: ' + wfName);
+    output.push('   Trigger: push to ' + branch);
+    output.push('   Run ID: #' + runId);
+    output.push('');
+    const icons = { test: '\uD83E\uDDEA', build: '\uD83D\uDD28', deploy: '\uD83D\uDE80' };
+    const durations = { test: '1m 24s', build: '2m 07s', deploy: '45s' };
+    jobs.forEach((job, i) => {
+      const icon = icons[job] || '\u2699\uFE0F';
+      const duration = durations[job] || (Math.floor(Math.random() * 60) + 20) + 's';
+      output.push(icon + ' Job: ' + job);
+      output.push('   Runner: ubuntu-latest');
+      const jobIdx = code.indexOf('  ' + job + ':');
+      const nextJobIdx = jobs[i + 1] ? code.indexOf('  ' + jobs[i + 1] + ':', jobIdx + 1) : code.length;
+      const jobBody = code.substring(jobIdx, nextJobIdx);
+      const stepRe = /- name:\s*(.+)/g;
+      const steps = [];
+      let sm;
+      while ((sm = stepRe.exec(jobBody)) !== null) steps.push(sm[1].trim());
+      if (steps.length) {
+        steps.forEach(s => output.push('   \u2713 ' + s));
+      } else {
+        output.push('   \u2713 Steps completed');
+      }
+      output.push('   \u23F1 Duration: ' + duration);
+      output.push('   \u2705 ' + job + ' \u2014 Passed');
+      output.push('');
+    });
+    output.push('\u2501'.repeat(34));
+    output.push('\u2705 Pipeline completed successfully');
+    output.push('   Total jobs: ' + jobs.length + ' | All passed');
+    output.push('\n\u2713 CI/CD simulation complete');
+    return output.join('\n');
+  }
+
   async function runSimulator() {
     const code = document.getElementById('simulatorCode')?.value || '';
     const runBtn = document.getElementById('runBtn');
@@ -2592,6 +3156,24 @@ spec:
       _setOutput(result);
     } else if (key === 'kubernetes') {
       result = _runKubernetes(code);
+      _setOutput(result);
+    } else if (key === 'aws') {
+      result = _runAWS(code);
+      _setOutput(result);
+    } else if (key === 'azure') {
+      result = _runAzure(code);
+      _setOutput(result);
+    } else if (key === 'gcp') {
+      result = _runGCP(code);
+      _setOutput(result);
+    } else if (key === 'terraform') {
+      result = _runTerraform(code);
+      _setOutput(result);
+    } else if (key === 'bash') {
+      result = _runBash(code);
+      _setOutput(result);
+    } else if (key === 'cicd') {
+      result = _runCICD(code);
       _setOutput(result);
     }
 
@@ -2626,12 +3208,11 @@ spec:
     });
 
     // Simulator buttons
-    const simulatorButtons = document.querySelectorAll('.simulator-btn');
-    simulatorButtons.forEach((btn, index) => {
-      const simKeys = ['javascript', 'python', 'react', 'nodejs', 'java', 'typescript', 'docker', 'kubernetes'];
+    const simulatorButtons = document.querySelectorAll('.simulator-btn[data-sim]');
+    simulatorButtons.forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
-        launchSimulator(simKeys[index]);
+        launchSimulator(btn.dataset.sim);
       });
     });
   });
@@ -2657,12 +3238,12 @@ require_once __DIR__ . '/../includes/header.php';
   <div class="card-grid">
     <div class="resource-card">
       <div class="card-icon"><iconify-icon icon="lucide:code-2"></iconify-icon></div>
-      <div class="card-title">Coding Simulators</div>
-      <div class="card-desc">Practice coding in real-world scenarios with interactive simulators for multiple programming languages and frameworks.</div>
+      <div class="card-title">Coding Simulators &amp; Cloud Labs</div>
+      <div class="card-desc">Practice coding and cloud operations in real-world scenarios with interactive simulators for programming languages, frameworks, and major cloud providers (AWS, Azure, GCP) — no installation required.</div>
       <ul class="feature-list">
         <li class="feature-item"><iconify-icon icon="lucide:check"></iconify-icon>Real-time Code Execution</li>
-        <li class="feature-item"><iconify-icon icon="lucide:check"></iconify-icon>Instant Feedback</li>
-        <li class="feature-item"><iconify-icon icon="lucide:check"></iconify-icon>Progressive Difficulty</li>
+        <li class="feature-item"><iconify-icon icon="lucide:check"></iconify-icon>Cloud Provider Sandboxes</li>
+        <li class="feature-item"><iconify-icon icon="lucide:check"></iconify-icon>DevOps &amp; IaC Labs</li>
       </ul>
       <a href="#simulators" class="card-btn">Explore Simulators</a>
     </div>
@@ -2706,57 +3287,93 @@ require_once __DIR__ . '/../includes/header.php';
 <section id="simulators">
   <div class="section-heading">
     <span class="section-badge">INTERACTIVE LEARNING</span>
-    <h2 class="section-title">Coding Simulators</h2>
-    <p class="section-desc">Practice programming in real-time with our interactive coding environments.</p>
+    <h2 class="section-title">Coding Simulators &amp; Cloud Labs</h2>
+    <p class="section-desc">Practice programming and cloud operations in real-time with our interactive coding environments and sandbox labs for AWS, Azure, and GCP — no local installation or cloud costs required.</p>
   </div>
   <div class="simulator-grid">
     <div class="simulator-card">
       <div class="simulator-icon"><iconify-icon icon="logos:javascript"></iconify-icon></div>
       <div class="simulator-name">JavaScript Playground</div>
       <div class="simulator-desc">Learn modern JavaScript, ES6+, and asynchronous programming.</div>
-      <a href="#" class="simulator-btn">Launch Simulator</a>
+      <a href="#" class="simulator-btn" data-sim="javascript">Launch Simulator</a>
     </div>
     <div class="simulator-card">
       <div class="simulator-icon"><iconify-icon icon="logos:python"></iconify-icon></div>
       <div class="simulator-name">Python Lab</div>
       <div class="simulator-desc">Master Python fundamentals, data structures, and algorithms.</div>
-      <a href="#" class="simulator-btn">Launch Simulator</a>
+      <a href="#" class="simulator-btn" data-sim="python">Launch Simulator</a>
     </div>
     <div class="simulator-card">
       <div class="simulator-icon"><iconify-icon icon="logos:react"></iconify-icon></div>
       <div class="simulator-name">React Builder</div>
       <div class="simulator-desc">Build interactive UIs with React components and hooks.</div>
-      <a href="#" class="simulator-btn">Launch Simulator</a>
+      <a href="#" class="simulator-btn" data-sim="react">Launch Simulator</a>
     </div>
     <div class="simulator-card">
       <div class="simulator-icon"><iconify-icon icon="logos:nodejs-icon"></iconify-icon></div>
       <div class="simulator-name">Node.js Studio</div>
       <div class="simulator-desc">Create backend services with Node.js and Express.</div>
-      <a href="#" class="simulator-btn">Launch Simulator</a>
+      <a href="#" class="simulator-btn" data-sim="nodejs">Launch Simulator</a>
     </div>
     <div class="simulator-card">
       <div class="simulator-icon"><iconify-icon icon="logos:java"></iconify-icon></div>
       <div class="simulator-name">Java Workshop</div>
       <div class="simulator-desc">Practice Java programming and OOP concepts.</div>
-      <a href="#" class="simulator-btn">Launch Simulator</a>
+      <a href="#" class="simulator-btn" data-sim="java">Launch Simulator</a>
     </div>
     <div class="simulator-card">
       <div class="simulator-icon"><iconify-icon icon="logos:typescript-icon"></iconify-icon></div>
       <div class="simulator-name">TypeScript Arena</div>
       <div class="simulator-desc">Learn type-safe JavaScript with TypeScript.</div>
-      <a href="#" class="simulator-btn">Launch Simulator</a>
+      <a href="#" class="simulator-btn" data-sim="typescript">Launch Simulator</a>
     </div>
     <div class="simulator-card">
       <div class="simulator-icon"><iconify-icon icon="logos:docker-icon"></iconify-icon></div>
       <div class="simulator-name">Docker Sandbox</div>
       <div class="simulator-desc">Practice containerization and Docker workflows.</div>
-      <a href="#" class="simulator-btn">Launch Simulator</a>
+      <a href="#" class="simulator-btn" data-sim="docker">Launch Simulator</a>
     </div>
     <div class="simulator-card">
       <div class="simulator-icon"><iconify-icon icon="logos:kubernetes"></iconify-icon></div>
       <div class="simulator-name">K8s Simulator</div>
       <div class="simulator-desc">Deploy and manage Kubernetes clusters hands-on.</div>
-      <a href="#" class="simulator-btn">Launch Simulator</a>
+      <a href="#" class="simulator-btn" data-sim="kubernetes">Launch Simulator</a>
+    </div>
+    <div class="simulator-card">
+      <div class="simulator-icon"><iconify-icon icon="logos:aws"></iconify-icon></div>
+      <div class="simulator-name">AWS Cloud Lab</div>
+      <div class="simulator-desc">Hands-on AWS CLI sandbox for EC2, S3, Lambda, IAM, and more.</div>
+      <a href="#" class="simulator-btn" data-sim="aws">Launch Simulator</a>
+    </div>
+    <div class="simulator-card">
+      <div class="simulator-icon"><iconify-icon icon="logos:microsoft-azure"></iconify-icon></div>
+      <div class="simulator-name">Azure Sandbox</div>
+      <div class="simulator-desc">Practice Azure CLI commands for VMs, App Services, and storage.</div>
+      <a href="#" class="simulator-btn" data-sim="azure">Launch Simulator</a>
+    </div>
+    <div class="simulator-card">
+      <div class="simulator-icon"><iconify-icon icon="logos:google-cloud"></iconify-icon></div>
+      <div class="simulator-name">GCP Cloud Shell</div>
+      <div class="simulator-desc">Explore Google Cloud with simulated gcloud, gsutil, and GKE commands.</div>
+      <a href="#" class="simulator-btn" data-sim="gcp">Launch Simulator</a>
+    </div>
+    <div class="simulator-card">
+      <div class="simulator-icon"><iconify-icon icon="logos:terraform-icon"></iconify-icon></div>
+      <div class="simulator-name">Terraform Lab</div>
+      <div class="simulator-desc">Write and simulate infrastructure-as-code with Terraform HCL.</div>
+      <a href="#" class="simulator-btn" data-sim="terraform">Launch Simulator</a>
+    </div>
+    <div class="simulator-card">
+      <div class="simulator-icon"><iconify-icon icon="devicon:bash"></iconify-icon></div>
+      <div class="simulator-name">Bash Terminal</div>
+      <div class="simulator-desc">Practice shell scripting and Linux commands in a safe environment.</div>
+      <a href="#" class="simulator-btn" data-sim="bash">Launch Simulator</a>
+    </div>
+    <div class="simulator-card">
+      <div class="simulator-icon"><iconify-icon icon="logos:github-actions"></iconify-icon></div>
+      <div class="simulator-name">CI/CD Pipeline Lab</div>
+      <div class="simulator-desc">Simulate GitHub Actions and CI/CD pipeline configurations end-to-end.</div>
+      <a href="#" class="simulator-btn" data-sim="cicd">Launch Simulator</a>
     </div>
   </div>
 </section>
