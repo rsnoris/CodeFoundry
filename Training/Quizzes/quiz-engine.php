@@ -21,6 +21,84 @@ $tiers_json = json_encode(array_values($quiz_tiers), JSON_HEX_TAG | JSON_HEX_AMP
 $slug_js    = json_encode($quiz_slug);
 $title_js   = json_encode($quiz_title);
 
+/* ── Sidebar quiz navigation ─────────────────────────────────────── */
+$quiz_nav = [
+  ['label' => 'Web Fundamentals', 'quizzes' => [
+    ['title' => 'Intro to Programming',  'slug' => 'intro-programming',       'file' => 'intro-programming.php'],
+    ['title' => 'Intro to HTML & CSS',   'slug' => 'intro-html-css',          'file' => 'intro-html-css.php'],
+    ['title' => 'HTML',                  'slug' => 'html',                    'file' => 'html.php'],
+    ['title' => 'CSS',                   'slug' => 'css',                     'file' => 'css.php'],
+    ['title' => 'XML',                   'slug' => 'xml',                     'file' => 'xml.php'],
+  ]],
+  ['label' => 'JavaScript', 'quizzes' => [
+    ['title' => 'JS Fundamentals',       'slug' => 'javascript-fundamentals', 'file' => 'javascript-fundamentals.php'],
+    ['title' => 'JavaScript',            'slug' => 'javascript',              'file' => 'javascript.php'],
+    ['title' => 'TypeScript',            'slug' => 'typescript',              'file' => 'typescript.php'],
+    ['title' => 'jQuery',                'slug' => 'jquery',                  'file' => 'jquery.php'],
+  ]],
+  ['label' => 'Frontend Frameworks', 'quizzes' => [
+    ['title' => 'React',                 'slug' => 'react',                   'file' => 'react.php'],
+    ['title' => 'React & Modern Web',    'slug' => 'react-modern-web',        'file' => 'react-modern-web.php'],
+    ['title' => 'Angular',               'slug' => 'angular',                 'file' => 'angular.php'],
+    ['title' => 'AngularJS',             'slug' => 'angularjs',               'file' => 'angularjs.php'],
+    ['title' => 'Vue.js',                'slug' => 'vuejs',                   'file' => 'vuejs.php'],
+    ['title' => 'Svelte',                'slug' => 'svelte',                  'file' => 'svelte.php'],
+    ['title' => 'Bootstrap',             'slug' => 'bootstrap',               'file' => 'bootstrap.php'],
+    ['title' => 'SASS/SCSS',             'slug' => 'sass',                    'file' => 'sass.php'],
+  ]],
+  ['label' => 'Backend', 'quizzes' => [
+    ['title' => 'Node.js',               'slug' => 'nodejs',                  'file' => 'nodejs.php'],
+    ['title' => 'PHP',                   'slug' => 'php-quiz',                'file' => 'php-quiz.php'],
+    ['title' => 'Django',                'slug' => 'django',                  'file' => 'django.php'],
+    ['title' => 'ASP',                   'slug' => 'asp',                     'file' => 'asp.php'],
+    ['title' => 'GraphQL',               'slug' => 'graphql',                 'file' => 'graphql.php'],
+    ['title' => 'Backend & API',         'slug' => 'backend-api',             'file' => 'backend-api.php'],
+  ]],
+  ['label' => 'Languages', 'quizzes' => [
+    ['title' => 'Python',                'slug' => 'python',                  'file' => 'python.php'],
+    ['title' => 'Java',                  'slug' => 'java',                    'file' => 'java.php'],
+    ['title' => 'C',                     'slug' => 'c-lang',                  'file' => 'c-lang.php'],
+    ['title' => 'C++',                   'slug' => 'cpp',                     'file' => 'cpp.php'],
+    ['title' => 'C#',                    'slug' => 'csharp',                  'file' => 'csharp.php'],
+    ['title' => 'Go',                    'slug' => 'golang',                  'file' => 'golang.php'],
+    ['title' => 'Kotlin',                'slug' => 'kotlin',                  'file' => 'kotlin.php'],
+    ['title' => 'Ruby',                  'slug' => 'ruby',                    'file' => 'ruby.php'],
+    ['title' => 'Rust',                  'slug' => 'rust',                    'file' => 'rust.php'],
+    ['title' => 'Swift',                 'slug' => 'swift',                   'file' => 'swift.php'],
+    ['title' => 'Bash',                  'slug' => 'bash',                    'file' => 'bash.php'],
+    ['title' => 'R',                     'slug' => 'r-lang',                  'file' => 'r-lang.php'],
+    ['title' => 'Flutter',               'slug' => 'flutter',                 'file' => 'flutter.php'],
+  ]],
+  ['label' => 'Data & Databases', 'quizzes' => [
+    ['title' => 'SQL',                   'slug' => 'sql',                     'file' => 'sql.php'],
+    ['title' => 'MySQL',                 'slug' => 'mysql',                   'file' => 'mysql.php'],
+    ['title' => 'PostgreSQL',            'slug' => 'postgresql',              'file' => 'postgresql.php'],
+    ['title' => 'MongoDB',               'slug' => 'mongodb',                 'file' => 'mongodb.php'],
+    ['title' => 'Redis',                 'slug' => 'redis',                   'file' => 'redis.php'],
+    ['title' => 'DSA',                   'slug' => 'dsa',                     'file' => 'dsa.php'],
+    ['title' => 'Excel',                 'slug' => 'excel',                   'file' => 'excel.php'],
+  ]],
+  ['label' => 'DevOps & Cloud', 'quizzes' => [
+    ['title' => 'Git',                   'slug' => 'git',                     'file' => 'git.php'],
+    ['title' => 'Docker',                'slug' => 'docker',                  'file' => 'docker.php'],
+    ['title' => 'AWS',                   'slug' => 'aws',                     'file' => 'aws.php'],
+    ['title' => 'Cloud & DevOps',        'slug' => 'cloud-devops',            'file' => 'cloud-devops.php'],
+  ]],
+  ['label' => 'AI & Data Science', 'quizzes' => [
+    ['title' => 'AI',                    'slug' => 'ai',                      'file' => 'ai.php'],
+    ['title' => 'Generative AI',         'slug' => 'genai',                   'file' => 'genai.php'],
+    ['title' => 'AI Tool Development',   'slug' => 'ai-tools',                'file' => 'ai-tools.php'],
+    ['title' => 'Machine Learning',      'slug' => 'machine-learning',        'file' => 'machine-learning.php'],
+    ['title' => 'Data Science',          'slug' => 'data-science',            'file' => 'data-science.php'],
+    ['title' => 'NumPy',                 'slug' => 'numpy',                   'file' => 'numpy.php'],
+    ['title' => 'Pandas',                'slug' => 'pandas',                  'file' => 'pandas.php'],
+    ['title' => 'SciPy',                 'slug' => 'scipy',                   'file' => 'scipy.php'],
+  ]],
+  ['label' => 'Security', 'quizzes' => [
+    ['title' => 'Security Practices',    'slug' => 'security-practices',      'file' => 'security-practices.php'],
+  ]],
+];
+
 $page_styles = <<<'PAGECSS'
 :root {
   --navy: #0e1828;
@@ -534,17 +612,193 @@ header {
 @media (max-width: 480px) {
   .level-grid { grid-template-columns: repeat(4, 1fr); }
 }
+
+/* ── Quiz page sidebar layout ───────────────────────────────────── */
+.quiz-page-wrap {
+  display: flex;
+  min-height: calc(100vh - var(--header-height));
+  position: relative;
+  align-items: flex-start;
+}
+.quiz-sidebar {
+  width: 240px;
+  min-width: 240px;
+  flex-shrink: 0;
+  background: var(--navy);
+  border-right: 1px solid var(--border-color);
+  position: sticky;
+  top: var(--header-height);
+  height: calc(100vh - var(--header-height));
+  overflow-y: auto;
+  z-index: 100;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+.quiz-sidebar::-webkit-scrollbar { width: 4px; }
+.quiz-sidebar::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+.quiz-main {
+  flex: 1;
+  min-width: 0;
+}
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  background: var(--navy);
+  z-index: 1;
+}
+.sidebar-title {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.sidebar-close-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color .15s;
+}
+.sidebar-close-btn:hover { color: var(--text); }
+.sidebar-back {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+.sidebar-back-link {
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color .2s;
+}
+.sidebar-back-link:hover { color: var(--primary-hover); }
+.sidebar-nav { padding: 4px 0 16px; }
+.sidebar-category { padding: 10px 0 2px; }
+.sidebar-category-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  color: var(--text-subtle);
+  padding: 0 16px;
+  margin-bottom: 2px;
+}
+.sidebar-quiz-link {
+  display: block;
+  padding: 6px 16px 6px 22px;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: color .15s, background .15s, border-color .15s;
+  line-height: 1.4;
+}
+.sidebar-quiz-link:hover {
+  color: var(--text);
+  background: rgba(255,255,255,.04);
+}
+.sidebar-quiz-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(24,179,255,.07);
+  font-weight: 600;
+}
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 1400;
+  backdrop-filter: blur(3px);
+}
+.sidebar-backdrop.active { display: block; }
+.sidebar-toggle-btn {
+  display: none;
+  align-items: center;
+  gap: 7px;
+  background: var(--navy);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color .2s, border-color .2s;
+  margin: 20px 24px 0;
+}
+.sidebar-toggle-btn:hover { color: var(--text); border-color: var(--primary); }
+@media (max-width: 900px) {
+  .quiz-page-wrap { display: block; }
+  .quiz-sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    width: 260px;
+    min-width: 260px;
+    height: 100vh;
+    z-index: 1500;
+    transition: left .25s ease;
+    box-shadow: 4px 0 24px rgba(0,0,0,.4);
+  }
+  .quiz-sidebar.open { left: 0; }
+  .sidebar-close-btn { display: block; }
+  .sidebar-toggle-btn { display: flex; }
+  body.sidebar-open { overflow: hidden; }
+}
 PAGECSS;
 
 $page_scripts = '';
 require_once __DIR__ . '/../../includes/header.php';
 ?>
-<div class="quiz-container">
-  <div class="quiz-header">
-    <a href="/Training/" class="back-link">← Back to Training</a>
-    <h1><?= htmlspecialchars($quiz_title, ENT_QUOTES, 'UTF-8') ?> Quiz</h1>
-  </div>
-  <div class="quiz-content" id="quizContent"></div>
+<div class="quiz-page-wrap">
+  <aside class="quiz-sidebar" id="quizSidebar" aria-label="Quiz navigation">
+    <div class="sidebar-header">
+      <span class="sidebar-title">All Quizzes</span>
+      <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close navigation">✕</button>
+    </div>
+    <div class="sidebar-back">
+      <a href="/Training/" class="sidebar-back-link">← Back to Training</a>
+    </div>
+    <nav class="sidebar-nav">
+      <?php foreach ($quiz_nav as $cat): ?>
+        <div class="sidebar-category">
+          <div class="sidebar-category-label"><?= htmlspecialchars($cat['label'], ENT_QUOTES, 'UTF-8') ?></div>
+          <?php foreach ($cat['quizzes'] as $q): ?>
+            <a href="/Training/Quizzes/<?= htmlspecialchars($q['file'], ENT_QUOTES, 'UTF-8') ?>"
+               class="sidebar-quiz-link<?= $q['slug'] === $quiz_slug ? ' active' : '' ?>">
+              <?= htmlspecialchars($q['title'], ENT_QUOTES, 'UTF-8') ?>
+            </a>
+          <?php endforeach; ?>
+        </div>
+      <?php endforeach; ?>
+    </nav>
+  </aside>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <main class="quiz-main">
+    <button class="sidebar-toggle-btn" id="sidebarToggleBtn" aria-label="Open quiz navigation">
+      ☰ All Quizzes
+    </button>
+    <div class="quiz-container">
+      <div class="quiz-header">
+        <h1><?= htmlspecialchars($quiz_title, ENT_QUOTES, 'UTF-8') ?> Quiz</h1>
+      </div>
+      <div class="quiz-content" id="quizContent"></div>
+    </div>
+  </main>
 </div>
 
 <!-- Certificate Modal -->
@@ -940,6 +1194,30 @@ require_once __DIR__ . '/../../includes/header.php';
   mobileMenuBtn?.addEventListener('click', () => mobileNav.classList.add('active'));
   closeMobileNav?.addEventListener('click', () => mobileNav.classList.remove('active'));
   mobileNav?.addEventListener('click', e => { if (e.target === mobileNav) mobileNav.classList.remove('active'); });
+
+  /* ── Sidebar navigation ─────────────────────────────────────── */
+  const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+  const sidebarCloseBtn  = document.getElementById('sidebarCloseBtn');
+  const quizSidebar      = document.getElementById('quizSidebar');
+  const sidebarBackdrop  = document.getElementById('sidebarBackdrop');
+
+  function openSidebar() {
+    quizSidebar.classList.add('open');
+    sidebarBackdrop.classList.add('active');
+    document.body.classList.add('sidebar-open');
+  }
+  function closeSidebarNav() {
+    quizSidebar.classList.remove('open');
+    sidebarBackdrop.classList.remove('active');
+    document.body.classList.remove('sidebar-open');
+  }
+  sidebarToggleBtn?.addEventListener('click', openSidebar);
+  sidebarCloseBtn?.addEventListener('click', closeSidebarNav);
+  sidebarBackdrop?.addEventListener('click', closeSidebarNav);
+
+  // Auto-scroll active link into view on page load
+  const activeLink = quizSidebar?.querySelector('.sidebar-quiz-link.active');
+  if (activeLink) requestAnimationFrame(() => activeLink.scrollIntoView({ block: 'center', behavior: 'instant' }));
 
   /* ── Boot ───────────────────────────────────────────────────── */
   window.showLevelSelector();
