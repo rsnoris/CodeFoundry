@@ -511,7 +511,7 @@ header {
 
 @media print {
   body > *:not(#certPrintArea) { display: none !important; }
-  #certPrintArea { display: flex !important; position: fixed; inset: 0; background: rgba(0,0,0,.0); z-index: 9999; align-items: center; justify-content: center; }
+  #certPrintArea { display: flex !important; position: fixed; inset: 0; background: rgba(0,0,0,0); z-index: 9999; align-items: center; justify-content: center; }
   #certPrintArea .cert-modal { max-height: none; overflow: visible; border: none; background: #fff; }
   #certPrintArea .cert-close-btn,
   #certPrintArea h3,
