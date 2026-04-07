@@ -2,73 +2,8 @@
 $page_title  = 'Contact CodeFoundry';
 $active_page = 'contact';
 $page_styles = <<<'PAGECSS'
-:root {
-      --navy: #0e1828;
-      --navy-2: #121c2b;
-      --navy-3: #161f2f;
-      --primary: #18b3ff;
-      --primary-hover: #009de0;
-      --text: #fff;
-      --text-muted: #92a3bb;
-      --border-color: #1a2942;
-      --card-radius: 12px;
-      --maxwidth: 1200px;
-    }
-    html, body {
-      background: var(--navy-2);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: var(--navy);
-      color: var(--text);
-      padding: 0;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      border-bottom: 1px solid #192746;
-    }
-    .nav {
-      max-width: var(--maxwidth);
-      margin: 0 auto;
-      padding: 0 40px;
-      min-height: 68px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      font-weight: 800;
-      font-size: 22px;
-      gap: 12px;
-      letter-spacing: -0.5px;
-    }
-    .brand svg {
-      width: 28px; height: 28px; background: var(--primary); border-radius: 6px; color: #092340; padding: 4px; margin-right: 4px; box-sizing: border-box;
-    }
-    .nav-menu { display: flex; gap: 28px; align-items: center;}
-    .nav-link { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 15px; transition: color .2s;}
-    .nav-link:hover, .nav-link.active { color: var(--text);}
-    .nav-actions { display: flex; align-items: center; gap: 16px;}
-    .nav-btn { font-family: inherit; font-size: 15px; font-weight: 700; border: 0; border-radius: 8px; padding: 10px 18px; background: var(--navy-3); color: var(--text); outline: 0; cursor: pointer; transition: background .2s, color .2s;}
-    .nav-btn.primary { background: var(--primary); color: var(--navy-2); font-weight: 700; }
-    .nav-btn.secondary { background: #fff; color: var(--navy);}
-    .mobile-hamburger { display: none; background: none; border: none; color: var(--text); font-size: 29px; padding: 5px 10px; margin-left: 10px; cursor: pointer; }
-    .mobile-nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
-    .mobile-nav-overlay.open { opacity: 1; visibility: visible; }
-    .mobile-nav-panel { position: absolute; right: 0; top: 0; height: 100%; width: 300px; max-width: 85%; background: var(--navy); padding: 30px 20px; display: flex; flex-direction: column; gap: 30px; transform: translateX(100%); transition: transform 0.3s; }
-    .mobile-nav-overlay.open .mobile-nav-panel { transform: translateX(0); }
-    .mobile-menu-close { align-self: flex-end; background: none; border: none; color: var(--text); font-size: 28px; cursor: pointer; padding: 0; line-height: 1; }
-    .mobile-menu-links { display: flex; flex-direction: column; gap: 20px; }
-    .mobile-menu-links .nav-link { font-size: 18px; font-weight: 600; }
-    .mobile-menu-actions { display: flex; flex-direction: column; gap: 12px; }
-    .mobile-menu-actions .nav-btn { width: 100%; text-align: center; }
     .main-content { max-width: 600px; background: var(--navy-3); border-radius: var(--card-radius); border:1px solid var(--border-color); margin: 44px auto 40px auto; padding: 40px 26px; }
-    @media (max-width: 700px) { .main-content { margin: 28px 6px 28px 6px; padding: 18px 6px;} .nav {padding: 0 6px;} .nav-menu, .nav-actions { display: none; } .mobile-hamburger { display: block; } }
+    @media (max-width: 700px) { .main-content { margin: 28px 6px 28px 6px; padding: 18px 6px;} }
     .section-heading { text-align: center; margin-bottom: 34px;}
     .section-title { font-size: 2rem; font-weight: 800; margin-bottom: 7px; letter-spacing: -1.2px;}
     .section-desc { color: var(--text-muted);}
@@ -81,25 +16,6 @@ $page_styles = <<<'PAGECSS'
     .form-message { margin-top: 16px; padding: 12px 16px; border-radius: 8px; font-weight: 600; text-align: center; }
     .form-message.success { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; }
     .form-message.error { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
-    .footer-section {
-      background: var(--navy);
-      color: var(--text-muted);
-      padding: 70px 0 22px 0;
-      margin-top: 48px;
-    }
-    .footer-row { max-width: var(--maxwidth); margin: 0 auto; display: flex; gap: 44px; flex-wrap: wrap; border-bottom: 1px solid #1a2942; padding-bottom: 38px;}
-    .footer-brand { flex: 1 1 260px; display: flex; flex-direction: column; gap: 10px;}
-    .footer-logo {display:flex;align-items:center;gap:10px;font-weight:800;font-size:21px;color:#fff;}
-    .footer-logo svg{width:28px;height:28px;background:var(--primary);border-radius:6px;color:#011c2f;padding:4px;}
-    .footer-link-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:7px;}
-    .footer-col{flex:1 1 140px;}
-    .footer-col-title{font-weight:700;color:#fff;font-size:15.5px;margin-bottom:11px;}
-    .footer-link{color:var(--text-muted);font-size:15px;text-decoration:none;font-weight:500;}
-    .footer-link:hover{color:var(--primary);}
-    .footer-social{display:flex;gap:14px;margin-top:6px;}
-    .footer-social a{color:var(--primary);background:var(--navy-3);border-radius:5px;padding:6px 9px;display:flex;align-items:center;}
-    .footer-social a:hover{background:var(--primary);color:var(--navy);}
-    .footer-legal{max-width:1200px;margin:0 auto;font-size:13.2px;color:#6e7b97;padding-top:23px;display:flex;gap:19px;flex-wrap:wrap;justify-content:space-between;}
 PAGECSS;
 $page_scripts = <<<'PAGEJS'
 // Contact form handling
