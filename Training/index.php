@@ -2276,7 +2276,7 @@ resource "aws_security_group" "web_sg" {
 # Practice shell scripting and Linux commands
 
 # Variables
-NAME="CloudFoundry"
+NAME="BashLab"
 echo "Welcome to $NAME!"
 
 # Arithmetic
@@ -3046,12 +3046,15 @@ jobs:
     for (const line of lines) {
       const trimmed = line.trim();
       if (!trimmed || trimmed.startsWith('#') || /^\w+\s*\(\)\s*\{/.test(trimmed) || /^function\s+\w+/.test(trimmed) || trimmed === '}') continue;
-      if (/^(if|fi|for|do|done|then|else|\[\[|shebang)/.test(trimmed) || trimmed === 'do' || trimmed === 'done') continue;
+      if (/^(if|fi|for|do|done|then|else|\[\[)/.test(trimmed)) continue;
       const varMatch = trimmed.match(/^([A-Z_][A-Z0-9_]*)=(.+)$/);
       if (varMatch) {
         let val = varMatch[2].replace(/^["']|["']$/g, '');
         val = val.replace(/\$\(\(([^)]+)\)\)/g, (_, expr) => {
-          try { return String(Function('"use strict";return (' + expr + ')')()) } catch(_) { return '0'; }
+          if (/^[\d\s+\-*/()%]+$/.test(expr)) {
+            try { return String(Function('"use strict";return (' + expr + ')')()) } catch(_) { return '0'; }
+          }
+          return '0';
         });
         vars[varMatch[1]] = val;
         continue;
@@ -3095,14 +3098,14 @@ jobs:
     const branch = code.match(/branches:\s*\[\s*([\w,\s/]+)\]/)?.[1]?.split(',')[0]?.trim() || 'main';
     const runId = Math.floor(Math.random() * 9000) + 1000;
     const output = [];
-    output.push('\uD83D\uDE80 Running: ' + wfName);
+    output.push('🚀 Running: ' + wfName);
     output.push('   Trigger: push to ' + branch);
     output.push('   Run ID: #' + runId);
     output.push('');
-    const icons = { test: '\uD83E\uDDEA', build: '\uD83D\uDD28', deploy: '\uD83D\uDE80' };
+    const icons = { test: '🧪', build: '🔨', deploy: '🚀' };
     const durations = { test: '1m 24s', build: '2m 07s', deploy: '45s' };
     jobs.forEach((job, i) => {
-      const icon = icons[job] || '\u2699\uFE0F';
+      const icon = icons[job] || '⚙️';
       const duration = durations[job] || (Math.floor(Math.random() * 60) + 20) + 's';
       output.push(icon + ' Job: ' + job);
       output.push('   Runner: ubuntu-latest');
@@ -3114,18 +3117,18 @@ jobs:
       let sm;
       while ((sm = stepRe.exec(jobBody)) !== null) steps.push(sm[1].trim());
       if (steps.length) {
-        steps.forEach(s => output.push('   \u2713 ' + s));
+        steps.forEach(s => output.push('   ✓ ' + s));
       } else {
-        output.push('   \u2713 Steps completed');
+        output.push('   ✓ Steps completed');
       }
-      output.push('   \u23F1 Duration: ' + duration);
-      output.push('   \u2705 ' + job + ' \u2014 Passed');
+      output.push('   ⏱ Duration: ' + duration);
+      output.push('   ✅ ' + job + ' — Passed');
       output.push('');
     });
-    output.push('\u2501'.repeat(34));
-    output.push('\u2705 Pipeline completed successfully');
+    output.push('━'.repeat(34));
+    output.push('✅ Pipeline completed successfully');
     output.push('   Total jobs: ' + jobs.length + ' | All passed');
-    output.push('\n\u2713 CI/CD simulation complete');
+    output.push('\n✓ CI/CD simulation complete');
     return output.join('\n');
   }
 
