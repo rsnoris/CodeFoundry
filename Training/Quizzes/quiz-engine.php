@@ -620,7 +620,9 @@ require_once __DIR__ . '/../../includes/header.php';
   }
 
   /* ── Screen: Level Selector ────────────────────────────────── */
-  function showLevelSelector() {
+  window.setLearningMode = function (checked) { learningMode = checked; };
+
+  window.showLevelSelector = function () {
     loadCompleted();
     const el = document.getElementById('quizContent');
     let html = '<h2 style="font-size:1.25rem;font-weight:700;margin:0 0 24px 0;">Select a Level</h2>';
@@ -629,7 +631,7 @@ require_once __DIR__ . '/../../includes/header.php';
       <div class="learning-mode-toggle">
         <label class="lm-label">
           <input type="checkbox" id="learningModeCheck" ${learningMode ? 'checked' : ''}
-                 onchange="learningMode = this.checked">
+                 onchange="setLearningMode(this.checked)">
           <span class="lm-icon">📚</span>
           <div>
             <div class="lm-title">Learning Mode</div>
@@ -940,7 +942,7 @@ require_once __DIR__ . '/../../includes/header.php';
   mobileNav?.addEventListener('click', e => { if (e.target === mobileNav) mobileNav.classList.remove('active'); });
 
   /* ── Boot ───────────────────────────────────────────────────── */
-  showLevelSelector();
+  window.showLevelSelector();
 }());
 </script>
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>
