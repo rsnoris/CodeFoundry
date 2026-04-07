@@ -1,660 +1,173 @@
 <?php
-$page_title  = 'Cloud Architecture & DevOps Quiz - CodeFoundry';
+$page_title = 'Cloud Architecture & DevOps Quiz – 100 Levels – CodeFoundry';
 $active_page = 'training';
-$page_styles = <<<'PAGECSS'
-:root {
-      --navy: #0e1828;
-      --navy-2: #121c2b;
-      --navy-3: #161f2f;
-      --primary: #18b3ff;
-      --primary-hover: #009de0;
-      --text: #fff;
-      --text-muted: #92a3bb;
-      --text-subtle: #627193;
-      --border-color: #1a2942;
-      --button-outline: #ffffff22;
-      --button-radius: 8px;
-      --maxwidth: 1200px;
-      --card-radius: 12px;
-      --header-height: 68px;
-      --mobile-menu-bg: #0e1828f9;
-    }
-    html, body {
-      background: var(--navy-2);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    body { min-height: 100vh; }
-    a { color: inherit; text-decoration: none; }
-
-    header {
-      background: var(--navy);
-      color: var(--text);
-      padding: 0;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      border-bottom: 1px solid #192746;
-    }
-    .nav {
-      max-width: var(--maxwidth);
-      margin: 0 auto;
-      padding: 0 40px;
-      min-height: var(--header-height);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      font-weight: 800;
-      font-size: 22px;
-      gap: 12px;
-      letter-spacing: -0.5px;
-    }
-    .brand svg {
-      width: 28px;
-      height: 28px;
-      background: var(--primary);
-      border-radius: 6px;
-      color: #092340;
-      padding: 4px;
-      margin-right: 4px;
-      box-sizing: border-box;
-    }
-    .nav-menu {
-      display: flex;
-      gap: 28px;
-      align-items: center;
-    }
-    .nav-link {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 15px;
-      transition: color .2s;
-    }
-    .nav-link:hover,
-    .nav-link.active {
-      color: var(--text);
-    }
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .nav-btn {
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 700;
-      border: 0;
-      border-radius: var(--button-radius);
-      padding: 10px 18px;
-      background: var(--navy-3);
-      cursor: pointer;
-      color: var(--text);
-      transition: background .2s, color .2s;
-    }
-    .nav-btn.primary {
-      background: var(--primary);
-      color: var(--navy);
-    }
-    .nav-btn.secondary {
-      background: transparent;
-      border: 1px solid var(--button-outline);
-    }
-    .nav-btn:hover {
-      background: var(--primary-hover);
-      color: var(--navy);
-    }
-    .mobile-hamburger {
-      display: none;
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-size: 28px;
-      cursor: pointer;
-      padding: 0;
-      width: 32px;
-      height: 32px;
-      align-items: center;
-      justify-content: center;
-    }
-    .mobile-nav-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--mobile-menu-bg);
-      z-index: 2000;
-      backdrop-filter: blur(10px);
-    }
-    .mobile-nav-overlay.active {
-      display: block;
-    }
-    .mobile-nav-panel {
-      background: var(--navy);
-      height: 100%;
-      width: 300px;
-      max-width: 85%;
-      margin-left: auto;
-      display: flex;
-      flex-direction: column;
-      border-left: 1px solid var(--border-color);
-    }
-    .mobile-menu-close {
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-size: 28px;
-      cursor: pointer;
-      padding: 20px;
-      width: fit-content;
-      margin-left: auto;
-      display: flex;
-    }
-    .mobile-menu-links {
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      gap: 8px;
-    }
-    .mobile-menu-links .nav-link {
-      padding: 12px 16px;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-    .mobile-menu-links .nav-link:hover {
-      background: var(--navy-3);
-    }
-    .mobile-menu-actions {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: auto;
-    }
-    .mobile-menu-actions .nav-btn {
-      width: 100%;
-      text-align: center;
-    }
-
-    .quiz-container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-    .quiz-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    .quiz-header h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin: 0 0 16px 0;
-    }
-    .quiz-header .back-link {
-      color: var(--primary);
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: color 0.2s;
-      margin-bottom: 20px;
-    }
-    .quiz-header .back-link:hover {
-      color: var(--primary-hover);
-    }
-    .quiz-content {
-      background: var(--navy);
-      border: 1px solid var(--border-color);
-      border-radius: var(--card-radius);
-      padding: 40px;
-    }
-    .quiz-progress {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      padding: 12px 16px;
-      background: var(--navy-3);
-      border-radius: 8px;
-    }
-    .quiz-question {
-      margin-bottom: 24px;
-    }
-    .quiz-question-text {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 24px;
-      line-height: 1.5;
-    }
-    .quiz-options {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .quiz-option {
-      background: var(--navy-3);
-      border: 2px solid var(--border-color);
-      border-radius: 8px;
-      padding: 18px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 1rem;
-    }
-    .quiz-option:hover {
-      border-color: var(--primary);
-      background: var(--navy-2);
-    }
-    .quiz-option.selected {
-      border-color: var(--primary);
-      background: rgba(24, 179, 255, 0.1);
-    }
-    .quiz-navigation {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 30px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border-color);
-    }
-    .simulator-btn-primary {
-      background: var(--primary);
-      color: var(--navy-2);
-      border: none;
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s;
-      font-size: 15px;
-    }
-    .simulator-btn-primary:hover:not(:disabled) {
-      background: var(--primary-hover);
-    }
-    .simulator-btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .simulator-btn-secondary {
-      background: var(--navy-3);
-      color: var(--text);
-      border: 1px solid var(--border-color);
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 15px;
-    }
-    .simulator-btn-secondary:hover:not(:disabled) {
-      border-color: var(--primary);
-      background: var(--navy-2);
-    }
-    .simulator-btn-secondary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .quiz-results {
-      text-align: center;
-      padding: 40px 20px;
-    }
-    .quiz-results h2 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 0 0 20px 0;
-    }
-    .quiz-score {
-      font-size: 4rem;
-      font-weight: 800;
-      color: var(--primary);
-      margin: 20px 0;
-    }
-    .quiz-result-details {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 16px;
-      margin: 30px 0;
-    }
-    .quiz-result-stat {
-      background: var(--navy-3);
-      padding: 24px;
-      border-radius: 8px;
-    }
-    .quiz-result-stat-value {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--primary);
-    }
-    .quiz-result-stat-label {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-top: 8px;
-    }
-
-    /* Level selector */
-    .quiz-level-selector {
-      padding: 8px 0;
-    }
-    .quiz-level-selector h3 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin: 0 0 8px 0;
-    }
-    .quiz-level-selector p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      margin: 0 0 20px 0;
-    }
-    .level-options {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .level-option {
-      background: var(--navy-3);
-      border: 2px solid var(--border-color);
-      border-radius: 10px;
-      padding: 18px 20px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .level-option:hover {
-      border-color: var(--primary);
-      background: rgba(24, 179, 255, 0.05);
-    }
-    .level-option-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 4px;
-    }
-    .level-badge {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 3px 10px;
-      border-radius: 20px;
-      text-transform: uppercase;
-    }
-    .level-badge.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
-    .level-badge.intermediate { background: rgba(245,158,11,0.15);  color: #f59e0b; }
-    .level-badge.advanced     { background: rgba(239,68,68,0.15);   color: #ef4444; }
-    .level-option-name {
-      font-weight: 700;
-      font-size: 1rem;
-    }
-    .level-option-desc {
-      color: var(--text-muted);
-      font-size: 0.875rem;
-    }
-    .quiz-level-pill {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 2px 9px;
-      border-radius: 20px;
-      text-transform: uppercase;
-    }
-    .quiz-level-pill.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
-    .quiz-level-pill.intermediate { background: rgba(245,158,11,0.15);  color: #f59e0b; }
-    .quiz-level-pill.advanced     { background: rgba(239,68,68,0.15);   color: #ef4444; }
-
-    @media (max-width: 768px) {
-      .nav-menu,
-      .nav-actions {
-        display: none;
-      }
-      .mobile-hamburger {
-        display: flex;
-      }
-      .quiz-content {
-        padding: 24px;
-      }
-      .quiz-header h1 {
-        font-size: 2rem;
-      }
-      .quiz-question-text {
-        font-size: 1.1rem;
-      }
-      .quiz-score {
-        font-size: 3rem;
-      }
-    }
-PAGECSS;
-$page_scripts = '';
-require_once __DIR__ . '/../../includes/header.php';
-?>
-<div class="quiz-container">
-    <div class="quiz-header">
-      <a href="/Training/" class="back-link">← Back to Training</a>
-      <h1>Cloud Architecture & DevOps Quiz</h1>
-    </div>
-    <div class="quiz-content" id="quizContent"></div>
-  </div>
-
-  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-  <script>
-    // Mobile menu functionality
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mobileNav = document.getElementById('mobileNav');
-    const closeMobileNav = document.getElementById('closeMobileNav');
-
-    mobileMenuBtn?.addEventListener('click', () => {
-      mobileNav.classList.add('active');
-    });
-
-    closeMobileNav?.addEventListener('click', () => {
-      mobileNav.classList.remove('active');
-    });
-
-    mobileNav?.addEventListener('click', (e) => {
-      if (e.target === mobileNav) {
-        mobileNav.classList.remove('active');
-      }
-    });
-
-    // Quiz Data
-    const quizData = {
-      title: 'Cloud Architecture & DevOps',
-      levels: {
-        beginner: {
-          label: 'Beginner',
-          description: 'CI/CD, Docker, Kubernetes, and cloud basics',
-          questions: [
-            { question: 'What does CI/CD stand for?', options: ['Continuous Integration/Continuous Deployment', 'Cloud Integration/Cloud Deployment', 'Code Integration/Code Development', 'Container Integration/Container Delivery'], correct: 0 },
-            { question: 'What is Docker used for?', options: ['Version control', 'Containerization', 'Database management', 'UI design'], correct: 1 },
-            { question: 'What is Kubernetes?', options: ['A programming language', 'A container orchestration platform', 'A database', 'A web server'], correct: 1 },
-            { question: 'Which AWS service is used for object storage?', options: ['EC2', 'S3', 'Lambda', 'RDS'], correct: 1 },
-            { question: 'What is Infrastructure as Code (IaC)?', options: ['Writing infrastructure configurations in code', 'Building infrastructure manually', 'A cloud provider', 'A deployment strategy'], correct: 0 },
-            { question: 'What is a container image?', options: ['A screenshot of a container', 'A read-only template used to create containers', 'A virtual machine snapshot', 'A Docker configuration file'], correct: 1 },
-            { question: 'What is AWS EC2?', options: ['A storage service', 'A virtual compute server in the cloud', 'A database service', 'A content delivery network'], correct: 1 },
-            { question: 'What is the purpose of a Dockerfile?', options: ['To configure a web server', 'To define instructions for building a Docker image', 'To manage container networking', 'To deploy to Kubernetes'], correct: 1 },
-            { question: 'What is DevOps?', options: ['A programming language', 'A culture and practice combining development and operations', 'A cloud provider', 'A monitoring tool'], correct: 1 },
-            { question: 'Which cloud provider offers Azure services?', options: ['Amazon', 'Google', 'Microsoft', 'IBM'], correct: 2 }
-          ]
-        },
-        intermediate: {
-          label: 'Intermediate',
-          description: 'Volumes, namespaces, scaling, and deployments',
-          questions: [
-            { question: 'What is a Docker volume?', options: ['A Docker network mode', "Persistent storage that exists outside a container's lifecycle", 'A base image layer', 'A container restart policy'], correct: 1 },
-            { question: 'What is a Kubernetes namespace?', options: ['A DNS record', 'A virtual cluster used to isolate and organize resources', 'A storage class', 'A container image tag'], correct: 1 },
-            { question: 'What is blue-green deployment?', options: ['A color-coded branching strategy', 'Running two identical production environments to enable instant traffic switching', 'A Kubernetes scheduling policy', 'A Docker networking mode'], correct: 1 },
-            { question: 'What does a load balancer do?', options: ['Compresses static assets', 'Distributes incoming traffic across multiple servers', 'Manages database connections', 'Scans for vulnerabilities'], correct: 1 },
-            { question: 'What is serverless computing?', options: ['Running code without any servers', 'Executing code without managing or provisioning servers', 'A bare-metal hosting model', 'A Kubernetes node type'], correct: 1 },
-            { question: 'What is a Kubernetes Pod?', options: ['A Docker image', 'The smallest deployable unit in Kubernetes containing one or more containers', 'A persistent storage volume', 'A network namespace'], correct: 1 },
-            { question: 'What is canary deployment?', options: ['A deployment to canary testing servers only', 'Gradually rolling out a new version to a small subset of users', 'A blue-green variant for databases', 'A rollback strategy'], correct: 1 },
-            { question: 'What is auto-scaling in cloud computing?', options: ['Automatically updating software', 'Automatically adjusting compute resources based on demand', 'Scaling database schemas', 'Resizing container images'], correct: 1 },
-            { question: 'What is a VPC (Virtual Private Cloud)?', options: ['A virtual programming container', 'An isolated network within a cloud provider', 'A version control platform', 'A CI/CD pipeline tool'], correct: 1 },
-            { question: 'What does Terraform do?', options: ['Monitors cloud resources', 'Provisions and manages infrastructure using code', 'Builds container images', 'Manages Kubernetes pods'], correct: 1 }
-          ]
-        },
-        advanced: {
-          label: 'Advanced',
-          description: 'Service mesh, Helm, GitOps, and chaos engineering',
-          questions: [
-            { question: 'What is a service mesh?', options: ['A Docker network', 'Infrastructure layer managing service-to-service communication in microservices', 'A Kubernetes Ingress type', 'A load-balancing algorithm'], correct: 1 },
-            { question: 'What is Helm in Kubernetes?', options: ['A monitoring tool', 'A package manager for Kubernetes applications', 'A secret manager', 'A network policy engine'], correct: 1 },
-            { question: 'What is GitOps?', options: ['A Git branching strategy', 'Using Git as the single source of truth for declarative infrastructure and application delivery', 'A CI/CD provider', 'A container registry'], correct: 1 },
-            { question: 'What is the difference between vertical and horizontal scaling?', options: ['They are the same', 'Vertical adds more power to existing nodes; horizontal adds more nodes', 'Horizontal adds power; vertical adds nodes', 'Only horizontal scaling is supported in cloud'], correct: 1 },
-            { question: 'What is chaos engineering?', options: ['Writing poorly structured code', 'Intentionally introducing failures into production to test system resilience', 'Random deployment strategies', 'Uncontrolled infrastructure changes'], correct: 1 },
-            { question: 'What is Istio?', options: ['A container registry', 'An open-source service mesh platform for Kubernetes', 'A Helm chart repository', 'A GitOps tool'], correct: 1 },
-            { question: 'What is eBPF in cloud-native observability?', options: ['A container format', 'A kernel technology that allows programs to run in the OS kernel safely', 'A GitOps workflow', 'A cloud database protocol'], correct: 1 },
-            { question: 'What is the purpose of a Kubernetes StatefulSet?', options: ['Running stateless applications', 'Managing stateful applications that require stable network identities and persistent storage', 'Auto-scaling deployments', 'Load balancing pods'], correct: 1 },
-            { question: 'What is multi-tenancy in cloud architecture?', options: ['Using multiple cloud providers', 'Allowing multiple customers to share the same infrastructure while keeping data isolated', 'Running multiple services per container', 'Deploying to multiple regions simultaneously'], correct: 1 },
-            { question: 'What does FinOps refer to?', options: ['Financial software development', 'A practice for managing and optimizing cloud costs across teams', 'A cloud security framework', 'A DevOps pipeline for finance companies'], correct: 1 }
-          ]
-        }
-      }
-    };
-    // Quiz State
-    let currentLevel = null;
-    let currentQuestionIndex = 0;
-    let userAnswers = [];
-
-    function showLevelSelector() {
-      const levels = Object.keys(quizData.levels);
-      document.getElementById('quizContent').innerHTML = `
-        <div class="quiz-level-selector">
-          <h3>Choose Your Difficulty Level</h3>
-          <p>Select the level that best matches your experience</p>
-          <div class="level-options">
-            ${levels.map(key => {
-              const lvl = quizData.levels[key];
-              return `
-                <div class="level-option" onclick="selectLevel('${key}')">
-                  <div class="level-option-header">
-                    <span class="level-badge ${key}">${lvl.label}</span>
-                    <span class="level-option-name">${lvl.label} — ${lvl.questions.length} Questions</span>
-                  </div>
-                  <div class="level-option-desc">${lvl.description}</div>
-                </div>`;
-            }).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    function selectLevel(level) {
-      currentLevel = level;
-      currentQuestionIndex = 0;
-      userAnswers = new Array(quizData.levels[level].questions.length).fill(null);
-      showQuestion();
-    }
-
-    function showQuestion() {
-      const levelData = quizData.levels[currentLevel];
-      const question = levelData.questions[currentQuestionIndex];
-      const totalQuestions = levelData.questions.length;
-      const quizContent = document.getElementById('quizContent');
-
-      quizContent.innerHTML = `
-        <div class="quiz-progress">
-          <span>Question ${currentQuestionIndex + 1} of ${totalQuestions}</span>
-          <span style="display:flex;align-items:center;gap:8px;">
-            <span class="quiz-level-pill ${currentLevel}">${levelData.label}</span>
-            ${Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)}% Complete
-          </span>
-        </div>
-        <div class="quiz-question">
-          <div class="quiz-question-text">${question.question}</div>
-          <div class="quiz-options">
-            ${question.options.map((option, index) => `
-              <div class="quiz-option ${userAnswers[currentQuestionIndex] === index ? 'selected' : ''}"
-                   onclick="selectAnswer(${index})">
-                ${option}
-              </div>
-            `).join('')}
-          </div>
-        </div>
-        <div class="quiz-navigation">
-          <button class="simulator-btn-secondary" onclick="previousQuestion()"
-                  ${currentQuestionIndex === 0 ? 'disabled' : ''}>
-            Previous
-          </button>
-          <button class="simulator-btn-primary" onclick="${currentQuestionIndex === totalQuestions - 1 ? 'finishQuiz()' : 'nextQuestion()'}">
-            ${currentQuestionIndex === totalQuestions - 1 ? 'Finish Quiz' : 'Next'}
-          </button>
-        </div>
-      `;
-    }
-
-    function selectAnswer(answerIndex) {
-      userAnswers[currentQuestionIndex] = answerIndex;
-      showQuestion();
-    }
-
-    function nextQuestion() {
-      const total = quizData.levels[currentLevel].questions.length;
-      if (currentQuestionIndex < total - 1) {
-        currentQuestionIndex++;
-        showQuestion();
-      }
-    }
-
-    function previousQuestion() {
-      if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        showQuestion();
-      }
-    }
-
-    function finishQuiz() {
-      const levelData = quizData.levels[currentLevel];
-      let correct = 0;
-      levelData.questions.forEach((question, index) => {
-        if (userAnswers[index] === question.correct) correct++;
-      });
-
-      const total = levelData.questions.length;
-      const percentage = Math.round((correct / total) * 100);
-      const quizContent = document.getElementById('quizContent');
-
-      quizContent.innerHTML = `
-        <div class="quiz-results">
-          <h2>Quiz Complete!</h2>
-          <span class="quiz-level-pill ${currentLevel}" style="font-size:0.85rem;padding:4px 12px;">${levelData.label} Level</span>
-          <div class="quiz-score">${percentage}%</div>
-          <div class="quiz-result-details">
-            <div class="quiz-result-stat">
-              <div class="quiz-result-stat-value">${correct}</div>
-              <div class="quiz-result-stat-label">Correct</div>
-            </div>
-            <div class="quiz-result-stat">
-              <div class="quiz-result-stat-value">${total - correct}</div>
-              <div class="quiz-result-stat-label">Incorrect</div>
-            </div>
-            <div class="quiz-result-stat">
-              <div class="quiz-result-stat-value">${total}</div>
-              <div class="quiz-result-stat-label">Total</div>
-            </div>
-          </div>
-          <p style="margin-top:20px;color:var(--text-muted);font-size:1.1rem;">
-            ${percentage >= 80 ? 'Excellent work! You have a strong grasp of this level.' :
-              percentage >= 60 ? 'Good job! Review the topics you missed to improve.' :
-              'Keep learning! Study the material and try again.'}
-          </p>
-          <div style="margin-top:30px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-            <button class="simulator-btn-secondary" onclick="showLevelSelector()">
-              Change Level
-            </button>
-            <button class="simulator-btn-primary" onclick="selectLevel('${currentLevel}')">
-              Retake Quiz
-            </button>
-            <a href="/Training/" class="simulator-btn-secondary" style="display:inline-block;text-decoration:none;">
-              Back to Training
-            </a>
-          </div>
-        </div>
-      `;
-    }
-
-    // Start with level selector
-    showLevelSelector();
-  </script>
-<?php require_once __DIR__ . '/../../includes/footer.php'; ?>
+$quiz_title  = 'Cloud Architecture &amp; DevOps';
+$quiz_slug   = 'cloud-devops';
+$quiz_tiers  = [
+    [
+        'label' => 'Introduction',
+        'questions' => [
+            ['question' => 'What does CI/CD stand for?', 'options' => ['Continuous Integration / Continuous Delivery', 'Code Integration / Code Deployment', 'Continuous Inspection / Continuous Distribution', 'Component Integration / Component Deployment'], 'correct' => 0],
+            ['question' => 'What is Docker primarily used for?', 'options' => ['Virtual machine management', 'Containerising applications and their dependencies', 'Cloud storage management', 'Network configuration'], 'correct' => 1],
+            ['question' => 'What does IaC stand for in DevOps?', 'options' => ['Integration and Continuity', 'Infrastructure as Code', 'Immutable and Containerised', 'Internet and Cloud'], 'correct' => 1],
+            ['question' => 'What is Kubernetes?', 'options' => ['A container image format', 'A cloud storage service', 'An open-source container orchestration platform', 'A CI/CD pipeline tool'], 'correct' => 2],
+            ['question' => 'What does AWS stand for?', 'options' => ['Amazon Web Services', 'Automated Web Systems', 'Advanced Web Software', 'Amazon Worldwide Services'], 'correct' => 0],
+            ['question' => 'What is a container in computing?', 'options' => ['A virtual machine with a full OS', 'A lightweight portable unit packaging an application and its dependencies', 'A cloud storage bucket', 'A network firewall rule'], 'correct' => 1],
+            ['question' => 'What is the main difference between a container and a VM?', 'options' => ['Containers are slower than VMs', 'Containers share the host OS kernel; VMs run their own full OS', 'VMs are smaller than containers', 'Containers require more resources than VMs'], 'correct' => 1],
+            ['question' => 'What does DevOps combine?', 'options' => ['Development and Operations practices to accelerate delivery', 'Databases and Operations teams', 'Development and Security teams', 'Deployment and Optimisation'], 'correct' => 0],
+            ['question' => 'What are the three main cloud service models?', 'options' => ['Public, Private, Hybrid', 'Storage, Compute, Network', 'Development, Testing, Production', 'IaaS, PaaS, SaaS'], 'correct' => 3],
+            ['question' => 'What is a Docker image?', 'options' => ['A running container instance', 'A read-only template used to create containers', 'A cloud backup snapshot', 'A Kubernetes deployment file'], 'correct' => 1],
+            ['question' => 'What is a Dockerfile?', 'options' => ['A Kubernetes configuration file', 'A script with instructions for building a Docker image', 'A cloud provider configuration file', 'A CI/CD pipeline definition'], 'correct' => 1],
+            ['question' => 'What is continuous integration?', 'options' => ['Continuously running the application in production', 'Automatically building and testing code every time a developer commits changes', 'Continuously monitoring cloud costs', 'Integrating third-party APIs continuously'], 'correct' => 1],
+            ['question' => 'What is a cloud region?', 'options' => ['A virtual network segment', 'A geographic area containing one or more cloud data centres', 'A group of virtual machines', 'A cloud billing category'], 'correct' => 1],
+            ['question' => 'What is auto-scaling in cloud computing?', 'options' => ['Automatically patching servers', 'Automatically adjusting compute resources up or down based on demand', 'Automatically backing up data', 'Automatically deploying code changes'], 'correct' => 1],
+            ['question' => 'What is a load balancer?', 'options' => ['A tool for compressing data', 'A service that distributes incoming network traffic across multiple servers', 'A cloud storage service', 'A database optimisation tool'], 'correct' => 1],
+            ['question' => 'What is Amazon S3?', 'options' => ['Amazon\'s serverless compute service', 'Amazon\'s managed database service', 'Amazon Simple Storage Service for scalable object storage', 'Amazon\'s container registry service'], 'correct' => 2],
+            ['question' => 'What is serverless computing?', 'options' => ['Computing without any hardware', 'Running application code without managing underlying server infrastructure', 'Computing at a remote location', 'Running servers without an operating system'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes Pod?', 'options' => ['A Kubernetes cluster node', 'The smallest deployable unit in Kubernetes, hosting one or more containers', 'A Kubernetes configuration file', 'A type of cloud storage volume'], 'correct' => 1],
+            ['question' => 'What does GCP stand for?', 'options' => ['Google Cloud Platform', 'Global Cloud Provider', 'Google Compute Power', 'General Cloud Platform'], 'correct' => 0],
+            ['question' => 'What is Terraform?', 'options' => ['A container runtime', 'A cloud monitoring tool', 'An open-source Infrastructure as Code tool for provisioning and managing infrastructure', 'A CI/CD pipeline platform'], 'correct' => 2],
+            ['question' => 'What is a cloud availability zone?', 'options' => ['A geographic region', 'An isolated data centre or group of data centres within a region providing fault isolation', 'A virtual network', 'A cloud billing zone'], 'correct' => 1],
+            ['question' => 'What is a container registry?', 'options' => ['A list of running containers', 'A service for storing and distributing container images', 'A Kubernetes namespace', 'A cloud DNS service'], 'correct' => 1],
+            ['question' => 'What is Ansible?', 'options' => ['A container orchestration tool', 'An agentless IT automation and configuration management tool', 'A cloud provider service', 'A CI/CD pipeline platform'], 'correct' => 1],
+            ['question' => 'What is monitoring in DevOps?', 'options' => ['Writing automated tests', 'Continuously tracking system health, performance, and behaviour to detect issues', 'Managing cloud costs', 'Reviewing code changes'], 'correct' => 1],
+            ['question' => 'What is a Helm chart?', 'options' => ['A Kubernetes performance graph', 'A package of pre-configured Kubernetes resource definitions', 'A Docker Compose file', 'A Terraform module'], 'correct' => 1],
+            ['question' => 'What is GitOps?', 'options' => ['A Git branching strategy', 'Using Git as the single source of truth for declarative infrastructure and application configuration', 'Automated Git code reviews', 'A CI/CD tool built on Git'], 'correct' => 1],
+            ['question' => 'What does Azure refer to?', 'options' => ['A Linux distribution', 'Amazon\'s cloud platform', 'Microsoft\'s cloud computing platform', 'Google\'s cloud platform'], 'correct' => 2],
+            ['question' => 'What is continuous delivery?', 'options' => ['Continuously delivering features to users verbally', 'Automatically deploying every tested code change to staging or production environments', 'Continuously monitoring delivery metrics', 'Delivering containers to the registry'], 'correct' => 1],
+        ],
+    ],
+    [
+        'label' => 'Beginner',
+        'questions' => [
+            ['question' => 'What is a Kubernetes Deployment?', 'options' => ['A Kubernetes cluster installation', 'A controller managing the desired state and rolling updates of pod replicas', 'A Helm chart template', 'A Kubernetes storage class'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes Service?', 'options' => ['A containerised microservice', 'A stable network abstraction exposing a set of pods as a network endpoint', 'A Kubernetes node type', 'A cloud provider service'], 'correct' => 1],
+            ['question' => 'What is Docker Compose used for?', 'options' => ['Building Docker images from source', 'Defining and running multi-container applications with a YAML configuration file', 'Pushing images to a registry', 'Monitoring container performance'], 'correct' => 1],
+            ['question' => 'What is Prometheus?', 'options' => ['A container registry', 'A cloud cost optimisation tool', 'An open-source monitoring and alerting toolkit that scrapes metrics', 'A CI/CD platform'], 'correct' => 2],
+            ['question' => 'What is Grafana used for?', 'options' => ['Container image scanning', 'Visualising metrics and logs with dashboards connected to data sources like Prometheus', 'Cloud cost tracking', 'Secret management'], 'correct' => 1],
+            ['question' => 'What is a blue-green deployment?', 'options' => ['Deploying to two cloud providers simultaneously', 'Maintaining two identical environments and switching traffic from the old version to the new one', 'A Kubernetes rolling update strategy', 'A Terraform workspace strategy'], 'correct' => 1],
+            ['question' => 'What is a canary release?', 'options' => ['Deploying to a canary test cluster only', 'Gradually routing a small percentage of production traffic to a new version to validate it before full rollout', 'A release only for internal employees', 'A Docker image tag strategy'], 'correct' => 1],
+            ['question' => 'What is the ELK stack?', 'options' => ['Elasticsearch, Linux, Kubernetes', 'Elasticsearch, Logstash, Kibana – used for centralised log aggregation and analysis', 'Envoy, Linkerd, Kubernetes', 'Event, Log, Kubernetes'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes Namespace?', 'options' => ['A cluster node type', 'A virtual cluster within a Kubernetes cluster used to isolate resources between teams or environments', 'A Kubernetes network policy', 'A container runtime sandbox'], 'correct' => 1],
+            ['question' => 'What is AWS IAM?', 'options' => ['AWS Infrastructure Automation Module', 'AWS Identity and Access Management – controls who can access AWS resources', 'AWS Instance and Machine management', 'AWS Integrated Application Monitoring'], 'correct' => 1],
+            ['question' => 'What is a VPC in cloud computing?', 'options' => ['Virtual Private Container', 'A Virtual Private Cloud – an isolated private network environment within a cloud provider', 'Virtual Processing Cluster', 'Volume Provisioning Controller'], 'correct' => 1],
+            ['question' => 'What is a rolling deployment in Kubernetes?', 'options' => ['Deleting all pods at once then recreating them', 'Incrementally replacing old pod instances with new ones to ensure zero downtime', 'Rolling back to the previous release', 'A batch update of all nodes simultaneously'], 'correct' => 1],
+            ['question' => 'What is a Docker volume?', 'options' => ['A Docker image layer', 'A mechanism providing persistent storage for containers that survives container restarts', 'A compressed Docker image', 'A Docker network type'], 'correct' => 1],
+            ['question' => 'What is Kubernetes Ingress?', 'options' => ['A type of Kubernetes pod', 'An API object defining rules for routing external HTTP/HTTPS traffic to internal services', 'A cluster node component', 'A Kubernetes storage resource'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes ConfigMap?', 'options' => ['A Kubernetes network map', 'An API object storing non-sensitive configuration data as key-value pairs consumed by pods', 'A Helm chart configuration file', 'A Kubernetes cluster diagram'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes Secret?', 'options' => ['An encrypted cluster backup', 'An API object for storing sensitive data such as passwords, tokens, and keys for use by pods', 'A hidden Kubernetes namespace', 'A private container registry credential'], 'correct' => 1],
+            ['question' => 'What does terraform init do?', 'options' => ['Applies infrastructure changes', 'Destroys existing infrastructure', 'Initialises the working directory and downloads required provider plugins', 'Shows a plan of changes to be made'], 'correct' => 2],
+            ['question' => 'What does terraform plan do?', 'options' => ['Applies the planned infrastructure changes', 'Shows a preview of what changes Terraform will make without applying them', 'Initialises Terraform providers', 'Destroys all managed resources'], 'correct' => 1],
+            ['question' => 'What is an AWS EC2 instance?', 'options' => ['An Amazon storage bucket', 'A virtual server in the AWS cloud', 'An Amazon container service', 'An Amazon serverless function'], 'correct' => 1],
+            ['question' => 'What is AWS Lambda?', 'options' => ['AWS\'s container orchestration service', 'AWS\'s managed Kubernetes service', 'AWS\'s serverless function service that runs code in response to events', 'AWS\'s object storage service'], 'correct' => 2],
+            ['question' => 'What is a Kubernetes liveness probe?', 'options' => ['A check determining if a container is ready to receive traffic', 'A check determining if a container is still running; if it fails, the container is restarted', 'A resource usage monitor for containers', 'A startup health check for containers'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes readiness probe?', 'options' => ['A check determining if a container is still alive', 'A check determining if a container is ready to receive traffic from a Service', 'A startup speed benchmark for containers', 'A memory leak detection probe'], 'correct' => 1],
+            ['question' => 'What is an Ansible playbook?', 'options' => ['A Docker Compose file', 'A YAML file containing Ansible tasks to automate configuration and deployment', 'A Kubernetes configuration manifest', 'A Terraform module'], 'correct' => 1],
+            ['question' => 'What is a CDN?', 'options' => ['A cloud database network', 'A Content Delivery Network distributing content from edge servers closer to end users', 'A container distribution network', 'A cloud DNS provider'], 'correct' => 1],
+            ['question' => 'What does SLA stand for in cloud services?', 'options' => ['System Level Assessment', 'Service Level Agreement – a contract defining guaranteed service uptime and performance', 'Software Lifecycle Architecture', 'Service Log Aggregation'], 'correct' => 1],
+            ['question' => 'What is immutable infrastructure?', 'options' => ['Infrastructure that cannot be destroyed', 'A practice where servers are never modified after deployment; changes require replacing them with new instances', 'Infrastructure that auto-scales', 'Infrastructure managed without Terraform'], 'correct' => 1],
+            ['question' => 'What is a Docker layer?', 'options' => ['A container network interface', 'A read-only filesystem change in a Docker image created by each instruction in the Dockerfile', 'A Docker volume partition', 'A Docker Compose service level'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes node?', 'options' => ['A Kubernetes deployment unit', 'A worker machine (physical or virtual) in a Kubernetes cluster that runs pods', 'A Kubernetes namespace partition', 'A Helm chart component'], 'correct' => 1],
+        ],
+    ],
+    [
+        'label' => 'Intermediate',
+        'questions' => [
+            ['question' => 'What is a Kubernetes StatefulSet?', 'options' => ['A Kubernetes deployment with auto-scaling', 'A controller managing stateful applications with stable network identities and persistent storage', 'A Kubernetes configuration for stateless services', 'A Helm chart for databases'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes DaemonSet?', 'options' => ['A set of pods for background jobs', 'A controller that ensures a copy of a specific pod runs on every (or selected) node in the cluster', 'A Kubernetes autoscaler', 'A set of persistent volumes'], 'correct' => 1],
+            ['question' => 'What is a service mesh like Istio?', 'options' => ['A Kubernetes networking plugin', 'An infrastructure layer managing service-to-service communication with observability, traffic control, and security', 'A DNS-based service discovery tool', 'A cloud load balancer service'], 'correct' => 1],
+            ['question' => 'What is Terraform state?', 'options' => ['Terraform\'s execution status', 'A file tracking the current state of infrastructure resources managed by Terraform', 'A Terraform environment variable', 'A backup of Terraform configurations'], 'correct' => 1],
+            ['question' => 'What distinguishes GitOps from traditional CI/CD?', 'options' => ['GitOps does not use CI pipelines', 'GitOps uses Git as the single source of truth with pull-based deployment via an in-cluster agent', 'GitOps only works with Kubernetes', 'GitOps eliminates the need for version control'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes Horizontal Pod Autoscaler (HPA)?', 'options' => ['A controller that increases node count', 'A controller that automatically scales the number of pod replicas based on CPU, memory, or custom metrics', 'A controller that increases pod resource limits', 'A network traffic scaler'], 'correct' => 1],
+            ['question' => 'What is the ELK stack primarily used for?', 'options' => ['Container orchestration', 'Centralised log aggregation, search, and visualisation', 'Cloud cost management', 'Infrastructure provisioning'], 'correct' => 1],
+            ['question' => 'What is a sidecar container pattern?', 'options' => ['A backup container for the main container', 'Running a helper container alongside the main container in the same pod to handle cross-cutting concerns', 'A container managing pod networking', 'A container monitoring resource usage'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes PersistentVolume (PV)?', 'options' => ['A temporary in-memory storage volume', 'A cluster-level storage resource provisioned by an admin or dynamically by a StorageClass', 'A Kubernetes Secret storing volume credentials', 'A volume mounted from a ConfigMap'], 'correct' => 1],
+            ['question' => 'What is AWS CloudFormation?', 'options' => ['AWS\'s container orchestration service', 'AWS\'s native Infrastructure as Code service for provisioning resources via templates', 'AWS\'s monitoring and alerting service', 'AWS\'s CI/CD pipeline service'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes Operator?', 'options' => ['A Kubernetes administrator user', 'A custom controller that extends Kubernetes to manage complex stateful applications using custom resources', 'A Helm chart post-install hook', 'A Kubernetes audit log component'], 'correct' => 1],
+            ['question' => 'What is a Docker multi-stage build?', 'options' => ['Building images across multiple Docker hosts', 'Using multiple FROM instructions in one Dockerfile to produce a minimal final image, discarding build-time dependencies', 'Building multiple images with one command', 'A parallel build process for Docker layers'], 'correct' => 1],
+            ['question' => 'What does terraform apply do?', 'options' => ['Shows the planned changes', 'Executes the planned changes to provision or update infrastructure to match the desired state', 'Destroys managed resources', 'Initialises the Terraform working directory'], 'correct' => 1],
+            ['question' => 'What is the difference between Kubernetes resource requests and limits?', 'options' => ['They are identical', 'Requests are the guaranteed minimum resources; limits are the maximum a container may consume', 'Limits are the minimum; requests are the maximum', 'Requests apply to nodes; limits apply to pods'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes Custom Resource Definition (CRD)?', 'options' => ['A custom Helm chart', 'An extension that adds new resource types to the Kubernetes API without modifying the core code', 'A custom container runtime', 'A custom network policy'], 'correct' => 1],
+            ['question' => 'What is the difference between declarative and imperative IaC?', 'options' => ['Declarative specifies steps to execute; imperative describes the desired final state', 'Declarative describes the desired final state; imperative specifies the exact steps to reach it', 'They are identical approaches', 'Declarative is only for Ansible; imperative is only for Terraform'], 'correct' => 1],
+            ['question' => 'What is AWS RDS?', 'options' => ['AWS Resource Delivery Service', 'AWS Relational Database Service – a managed service for relational databases like MySQL, PostgreSQL, and Aurora', 'AWS Real-time Data Stream', 'AWS Remote Deployment Service'], 'correct' => 1],
+            ['question' => 'What is Kubernetes taint and toleration?', 'options' => ['Taints encrypt nodes; tolerations decrypt pods', 'Taints mark nodes to repel pods; tolerations are pod properties that allow scheduling on tainted nodes', 'Taints monitor nodes; tolerations alert on issues', 'Taints limit CPU; tolerations override limits'], 'correct' => 1],
+            ['question' => 'What is chaos engineering?', 'options' => ['Deploying randomly to test pipelines', 'Intentionally injecting controlled failures into a system to build confidence in its resilience', 'Randomly scaling clusters', 'Unstructured performance testing'], 'correct' => 1],
+            ['question' => 'What is AWS CloudWatch?', 'options' => ['A CI/CD pipeline service', 'AWS\'s monitoring and observability service for metrics, logs, alarms, and dashboards', 'A cloud cost management tool', 'An infrastructure provisioning service'], 'correct' => 1],
+            ['question' => 'What is a Terraform workspace?', 'options' => ['A Terraform GUI application', 'A named instance of Terraform state enabling the same configuration to manage multiple separate environments', 'A Terraform module registry', 'A collaborative Terraform editing session'], 'correct' => 1],
+            ['question' => 'What is log aggregation in DevOps?', 'options' => ['Compressing log files to save space', 'Collecting and centralising logs from multiple services and systems into a single platform for analysis', 'Deleting old log files automatically', 'Encrypting log data at rest'], 'correct' => 1],
+            ['question' => 'What is a canary analysis in progressive delivery?', 'options' => ['Deploying to a staging environment only', 'Automatically comparing metrics and error rates between the canary release and the stable version to decide whether to proceed', 'A manual code review of the new release', 'A load test of the new version'], 'correct' => 1],
+            ['question' => 'What is AWS Auto Scaling Group (ASG)?', 'options' => ['A group of IAM policies', 'A service that automatically manages a fleet of EC2 instances, scaling in or out based on demand or schedules', 'A Kubernetes node pool', 'A load balancer configuration'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes Ingress controller?', 'options' => ['A Kubernetes network plugin', 'A component that fulfils Ingress rules, typically acting as an HTTP load balancer routing traffic to services', 'A Kubernetes storage driver', 'A cluster authentication gateway'], 'correct' => 1],
+            ['question' => 'What is Prometheus scraping?', 'options' => ['Removing unused metrics from storage', 'Prometheus periodically pulling (scraping) metrics from instrumented targets at configured intervals', 'Extracting logs from containers', 'Compressing metrics data'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes PodDisruptionBudget (PDB)?', 'options' => ['A resource limiting pod CPU and memory', 'A policy specifying the minimum number of pods that must be available during voluntary disruptions like rolling updates', 'A pod network bandwidth limit', 'A cluster-level cost budget'], 'correct' => 1],
+            ['question' => 'What is Helm\'s role beyond Kubernetes templating?', 'options' => ['Building container images', 'Managing the full lifecycle of Kubernetes applications including packaging, versioning, installation, upgrades, and rollbacks', 'Monitoring Kubernetes resources', 'Provisioning cloud infrastructure'], 'correct' => 1],
+        ],
+    ],
+    [
+        'label' => 'Advanced',
+        'questions' => [
+            ['question' => 'What is progressive delivery?', 'options' => ['Deploying all changes to production at once', 'A technique controlling the risk of releasing new software by gradually exposing it to users through feature flags or traffic splitting', 'A CI/CD pipeline optimisation strategy', 'A Kubernetes multi-cluster deployment pattern'], 'correct' => 1],
+            ['question' => 'What is a Service Level Objective (SLO)?', 'options' => ['A customer service contract', 'A target value or range for a service level indicator (SLI) that defines the desired reliability goal', 'A service dependency map', 'A cloud cost limit'], 'correct' => 1],
+            ['question' => 'What is an error budget in SRE?', 'options' => ['Budget allocated for fixing bugs', 'The allowable amount of unreliability before an SLO is breached, guiding decisions on releasing new features vs. improving stability', 'The maximum number of deployment errors per release', 'A cloud spending limit for error handling'], 'correct' => 1],
+            ['question' => 'What is multi-tenancy in Kubernetes?', 'options' => ['Running multiple Kubernetes versions simultaneously', 'Sharing a single Kubernetes cluster among multiple teams, projects, or customers with appropriate isolation', 'Multiple container runtimes on one cluster', 'Running workloads across multiple clouds'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes admission controller?', 'options' => ['A component controlling cluster access permissions', 'A webhook that intercepts API server requests to validate or mutate Kubernetes objects before they are persisted', 'A Kubernetes RBAC role', 'A container runtime security layer'], 'correct' => 1],
+            ['question' => 'What is the difference between push-based and pull-based GitOps?', 'options' => ['They are identical approaches', 'Push-based: the CI pipeline pushes changes directly to the cluster; Pull-based: an in-cluster agent pulls desired state from Git', 'Pull-based only works with ArgoCD; push-based only with Flux', 'Push-based uses Terraform; pull-based uses Ansible'], 'correct' => 1],
+            ['question' => 'What is distributed tracing and which tools support it?', 'options' => ['Log aggregation with ELK; only ELK supports it', 'Tracking a request\'s path through distributed services using trace/span IDs; tools include Jaeger, Zipkin, and Tempo', 'Network packet tracing with Wireshark', 'Database query tracing with EXPLAIN'], 'correct' => 1],
+            ['question' => 'What is Kubernetes node affinity?', 'options' => ['A node performance metric', 'Rules specifying which nodes a pod prefers or is required to be scheduled on based on node labels', 'A node networking configuration', 'A node resource quota'], 'correct' => 1],
+            ['question' => 'What is the difference between RPO and RTO in disaster recovery?', 'options' => ['They are identical metrics', 'RPO (Recovery Point Objective) is the maximum acceptable data loss; RTO (Recovery Time Objective) is the maximum acceptable downtime', 'RPO measures downtime; RTO measures data loss', 'RPO is for databases only; RTO is for applications only'], 'correct' => 1],
+            ['question' => 'What is mTLS in a service mesh?', 'options' => ['Multi-tenant load balancing', 'Mutual TLS where both the client and server services authenticate each other with certificates for encrypted communication', 'Multi-threaded TLS processing', 'A token-based service authentication scheme'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes network policy?', 'options' => ['A cluster network bandwidth limit', 'A resource specifying rules for allowing or denying pod-to-pod and pod-to-external network traffic', 'A DNS configuration for services', 'A node firewall rule'], 'correct' => 1],
+            ['question' => 'What is AWS EKS?', 'options' => ['Amazon Elastic Key Storage', 'Amazon Elastic Kubernetes Service – a managed Kubernetes control plane service', 'Amazon Event Kafka Service', 'Amazon Encrypted Key Service'], 'correct' => 1],
+            ['question' => 'What is the shift-left security (DevSecOps) approach?', 'options' => ['Moving security teams to the left side of the office', 'Integrating security testing and practices early in the development pipeline rather than at the end', 'Shifting security responsibility to developers only', 'Moving security controls to the perimeter network only'], 'correct' => 1],
+            ['question' => 'What is a Kubernetes Vertical Pod Autoscaler (VPA)?', 'options' => ['A controller scaling the number of pod replicas', 'A controller that automatically adjusts the CPU and memory resource requests and limits of containers based on actual usage', 'A controller scaling node count', 'A controller managing pod network bandwidth'], 'correct' => 1],
+            ['question' => 'What is a Terraform module?', 'options' => ['A Terraform provider plugin', 'A reusable, self-contained package of Terraform configurations that can be called with input variables', 'A Terraform state file segment', 'A Terraform workspace'], 'correct' => 1],
+            ['question' => 'What is eBPF and its DevOps application?', 'options' => ['An enhanced firewall rule language', 'A Linux kernel technology allowing safe custom programs to run in kernel space, enabling advanced observability and networking without code changes', 'An embedded build platform', 'An encrypted backup protocol'], 'correct' => 1],
+            ['question' => 'What is container image signing and verification?', 'options' => ['Adding a digital watermark to images', 'Using cryptographic signatures to verify that a container image is from a trusted source and has not been tampered with', 'Scanning images for malware', 'Compressing images before pushing to a registry'], 'correct' => 1],
+            ['question' => 'What is a multi-region deployment strategy?', 'options' => ['Using multiple cloud providers simultaneously', 'Running application workloads across multiple geographic regions for lower latency and higher availability', 'Deploying different versions per region', 'A DNS round-robin configuration'], 'correct' => 1],
+            ['question' => 'What is a serverless cold start?', 'options' => ['A serverless function timeout error', 'The latency incurred when a serverless function is invoked for the first time or after being idle, as the runtime must initialise', 'A serverless function memory limit', 'Starting a serverless function in a cold data centre'], 'correct' => 1],
+            ['question' => 'What is AWS Transit Gateway?', 'options' => ['An AWS DNS routing service', 'A network transit hub connecting multiple VPCs and on-premises networks through a central gateway', 'A cloud CDN service', 'An API gateway for transit applications'], 'correct' => 1],
+            ['question' => 'What is cloud cost optimisation?', 'options' => ['Migrating all workloads to the cheapest cloud provider', 'Strategies to reduce cloud spending including right-sizing, reserved instances, spot instances, and eliminating unused resources', 'Disabling monitoring to reduce overhead costs', 'Using only open-source software in the cloud'], 'correct' => 1],
+            ['question' => 'What is the Kubernetes cluster autoscaler?', 'options' => ['A tool scaling pod replicas automatically', 'A component that automatically adjusts the number of nodes in a cluster based on pending pods and underutilisation', 'A tool scaling Kubernetes API server capacity', 'A network bandwidth autoscaler'], 'correct' => 1],
+            ['question' => 'What is a GitOps reconciliation loop?', 'options' => ['A Git merge conflict resolution process', 'An agent continuously comparing the desired state in Git with the actual cluster state and applying corrections', 'A CI/CD build retry mechanism', 'A Git repository backup process'], 'correct' => 1],
+            ['question' => 'What is the AWS Well-Architected Framework?', 'options' => ['A set of AWS CLI commands for best-practice setup', 'A framework with five pillars (Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimisation) guiding cloud architecture decisions', 'A mandatory compliance framework for AWS accounts', 'An AWS certification programme'], 'correct' => 1],
+            ['question' => 'What is a service level indicator (SLI)?', 'options' => ['A contract metric in an SLA', 'A quantitative measurement of a service aspect such as availability, latency, or error rate used to evaluate service health', 'A server performance indicator from CloudWatch', 'A Kubernetes pod health metric'], 'correct' => 1],
+            ['question' => 'What is the purpose of a Kubernetes ResourceQuota?', 'options' => ['Limiting a pod\'s CPU usage', 'Setting aggregate resource consumption limits (CPU, memory, object counts) for a namespace', 'Controlling node resource allocation', 'Defining pod scheduling priorities'], 'correct' => 1],
+            ['question' => 'What is blue-green deployment\'s main operational risk?', 'options' => ['Increased deployment complexity', 'Requiring double the production infrastructure during the transition period and database schema compatibility challenges', 'Slower deployment pipelines', 'Incompatibility with container orchestration'], 'correct' => 1],
+            ['question' => 'What is a Helm release?', 'options' => ['A new Helm version published to GitHub', 'A named instance of a Helm chart deployed to a Kubernetes cluster, with its own versioned history', 'A Helm chart published to a registry', 'A Helm template rendering result'], 'correct' => 1],
+        ],
+    ],
+    [
+        'label' => 'Expert',
+        'questions' => [
+            ['question' => 'What is the control plane vs data plane separation in Kubernetes?', 'options' => ['Control plane stores data; data plane controls scheduling', 'The control plane manages cluster state and scheduling decisions; the data plane consists of nodes running the actual workloads and handling traffic', 'They are the same component with different names', 'Control plane is for stateful apps; data plane is for stateless apps'], 'correct' => 1],
+            ['question' => 'What is etcd in Kubernetes and why is it critical?', 'options' => ['A Kubernetes container runtime', 'A distributed key-value store that persists all Kubernetes cluster state; its loss or corruption renders the cluster inoperable', 'A Kubernetes network plugin', 'A Kubernetes logging backend'], 'correct' => 1],
+            ['question' => 'What is FinOps?', 'options' => ['Financial operations for a startup', 'A cloud financial management practice combining financial accountability with engineering and business to optimise cloud spending', 'AWS Cost Explorer features', 'A cloud billing audit tool'], 'correct' => 1],
+            ['question' => 'What is the purpose of a service mesh control plane?', 'options' => ['Running application workloads', 'Distributing configuration, certificates, and policies to data plane sidecar proxies and providing observability aggregation', 'Managing cloud network routing', 'Executing CI/CD pipeline steps'], 'correct' => 1],
+            ['question' => 'What is the DORA metrics framework?', 'options' => ['A Docker registry audit framework', 'A set of four key metrics (deployment frequency, lead time for changes, change failure rate, mean time to restore) measuring software delivery performance', 'A DevOps toolchain assessment', 'A disaster recovery audit framework'], 'correct' => 1],
+            ['question' => 'What is GitOps with Open Policy Agent (OPA)?', 'options' => ['A Git access control policy', 'Using OPA to enforce governance policies on infrastructure changes submitted via GitOps workflows before they are applied', 'An open-source GitOps controller', 'A Kubernetes audit log policy'], 'correct' => 1],
+            ['question' => 'What is AWS IAM Roles for Service Accounts (IRSA)?', 'options' => ['An IAM role granting admin access to Kubernetes', 'A mechanism associating IAM roles with Kubernetes service accounts, giving pods fine-grained AWS API permissions without static credentials', 'An IAM policy for cross-account access', 'An AWS service for auditing Kubernetes RBAC'], 'correct' => 1],
+            ['question' => 'What is Thanos in the Prometheus ecosystem?', 'options' => ['A Prometheus alternative', 'A highly available Prometheus setup with long-term object storage and global querying across multiple Prometheus instances', 'A Grafana datasource plugin', 'A Prometheus exporter for Kubernetes'], 'correct' => 1],
+            ['question' => 'What is platform engineering?', 'options' => ['Building physical server infrastructure', 'Building and maintaining internal developer platforms (IDPs) that abstract infrastructure complexity and improve developer experience', 'Engineering cloud provider services', 'Automating Kubernetes cluster provisioning only'], 'correct' => 1],
+            ['question' => 'What is the difference between Istio and Linkerd service meshes?', 'options' => ['They are identical service meshes', 'Istio is more feature-rich with complex configuration; Linkerd is simpler, lighter, and uses a Rust-based proxy (Linkerd2-proxy) for lower resource overhead', 'Istio is for Kubernetes only; Linkerd works anywhere', 'Linkerd requires Envoy; Istio does not'], 'correct' => 1],
+            ['question' => 'What is supply chain security in DevOps (SLSA framework)?', 'options' => ['Securing physical hardware supply chains', 'A framework of standards and controls ensuring the integrity of software artefacts through the build and release pipeline to prevent tampering', 'Managing cloud provider vendor contracts', 'Auditing open-source licences'], 'correct' => 1],
+            ['question' => 'What is an SBOM (Software Bill of Materials)?', 'options' => ['A cloud services billing breakdown', 'A machine-readable inventory of all software components, libraries, and their dependencies used in an application', 'A security bill for penetration testing', 'A software development roadmap'], 'correct' => 1],
+            ['question' => 'What is GitOps drift detection?', 'options' => ['Detecting uncommitted changes in a Git repository', 'Identifying differences between the desired state declared in Git and the actual live state of the cluster and alerting or remediating automatically', 'Monitoring Git repository performance', 'Detecting slow CI/CD pipeline builds'], 'correct' => 1],
+            ['question' => 'What is the difference between observability and monitoring?', 'options' => ['They are synonymous terms', 'Monitoring tracks known, predefined metrics against thresholds; observability measures a system\'s ability to understand its internal state from external outputs to debug unknown failures', 'Observability is only for cloud; monitoring is for on-premises', 'Monitoring uses metrics; observability uses logs only'], 'correct' => 1],
+            ['question' => 'What is AWS Service Control Policy (SCP)?', 'options' => ['An EC2 instance security group policy', 'An AWS Organisations feature allowing administrators to restrict what AWS services and actions are available across member accounts', 'A CloudFormation deployment policy', 'An IAM permission boundary'], 'correct' => 1],
+            ['question' => 'What is the Kubernetes admission webhook validation flow?', 'options' => ['Webhooks are called after objects are stored in etcd', 'The API server calls validating webhooks before persisting objects and mutating webhooks even earlier to modify them; a rejection from any webhook blocks the operation', 'Webhooks only validate RBAC permissions', 'Webhooks run asynchronously after object creation'], 'correct' => 1],
+            ['question' => 'What is HashiCorp Vault used for?', 'options' => ['Container image storage', 'Centralised secrets management providing dynamic secrets, encryption as a service, and secure storage for sensitive data', 'Terraform state storage', 'Cloud cost management'], 'correct' => 1],
+            ['question' => 'What is progressive delivery with feature flags?', 'options' => ['Deploying features in alphabetical order', 'Controlling feature exposure at the application level by toggling functionality for specific users, cohorts, or percentages independent of deployments', 'Progressive code linting during delivery', 'A feature branch deployment strategy'], 'correct' => 1],
+            ['question' => 'What is a multi-cluster Kubernetes strategy and when is it used?', 'options' => ['Running duplicate workloads for testing', 'Using multiple separate clusters for isolation (per team, environment, or region), blast radius reduction, compliance boundaries, or multi-region availability', 'A Kubernetes upgrade strategy', 'Running different Kubernetes versions for compatibility testing'], 'correct' => 1],
+            ['question' => 'What is container image layer caching in CI pipelines?', 'options' => ['Caching images in a CDN', 'Reusing previously built Docker image layers that have not changed to dramatically speed up CI build times', 'Caching built images in the container registry', 'A Kubernetes image pull policy'], 'correct' => 1],
+            ['question' => 'What is the Kubernetes API server\'s role in the cluster?', 'options' => ['Running application containers', 'The central management component serving the Kubernetes API, validating and persisting resource state to etcd, and acting as the front end for the control plane', 'Managing container networking', 'Scheduling pods to nodes'], 'correct' => 1],
+            ['question' => 'What is chaos engineering at production scale?', 'options' => ['Randomly restarting production services without a plan', 'Systematically running controlled experiments injecting real failure conditions (instance termination, network partitions, latency) in production to discover system weaknesses proactively', 'Load testing production with synthetic traffic', 'Deploying buggy code intentionally to test error handling'], 'correct' => 1],
+            ['question' => 'What is AWS Landing Zone / AWS Control Tower?', 'options' => ['A physical data centre landing location', 'An automated, multi-account AWS environment based on best practices for security, governance, and compliance, managed centrally', 'An EC2 instance deployment zone', 'An AWS CloudFormation stack set'], 'correct' => 1],
+            ['question' => 'What is eBPF-based networking in Kubernetes (e.g., Cilium)?', 'options' => ['An enhanced BGP routing protocol', 'Using eBPF kernel programs to implement high-performance networking, network policy enforcement, and observability without relying on iptables', 'An encrypted pod network plugin', 'A bandwidth management tool for Kubernetes'], 'correct' => 1],
+            ['question' => 'What is the purpose of OpenCost in Kubernetes?', 'options' => ['Open-source Kubernetes security scanning', 'An open-source, vendor-neutral cost monitoring and allocation tool for Kubernetes workloads', 'Open-source Kubernetes RBAC management', 'A cloud cost comparison tool'], 'correct' => 1],
+            ['question' => 'What is Kubernetes RBAC and how does it work?', 'options' => ['Role-Based Access Control limiting container CPU', 'Role-Based Access Control regulating access to Kubernetes API resources through Roles/ClusterRoles defining permissions and RoleBindings associating them with subjects', 'Resource-Based Auto Configuration for cluster scaling', 'Registry-Based Access Control for container images'], 'correct' => 1],
+            ['question' => 'What is the purpose of ArgoCD in GitOps?', 'options' => ['A Helm chart repository', 'A declarative GitOps controller for Kubernetes that continuously syncs cluster state with Git-defined desired state and provides a visualisation UI', 'A container build tool', 'A Kubernetes network policy manager'], 'correct' => 1],
+            ['question' => 'What is AWS Nitro System?', 'options' => ['A high-speed AWS storage system', 'A combination of dedicated hardware and lightweight hypervisor that offloads virtualisation functions to purpose-built hardware for improved performance, security, and isolation of EC2 instances', 'AWS\'s GPU computing platform', 'An AWS networking accelerator card'], 'correct' => 1],
+        ],
+    ],
+];
+require_once __DIR__ . '/quiz-engine.php';
