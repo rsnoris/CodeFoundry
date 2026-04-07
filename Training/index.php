@@ -411,6 +411,92 @@ $page_styles = <<<'PAGECSS'
       background: var(--primary-hover);
     }
 
+    /* TUTORIALS SECTION */
+    .tutorials-grid {
+      max-width: var(--maxwidth);
+      margin: 0 auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .tutorial-card {
+      background: var(--navy-3);
+      border: 1px solid var(--border-color);
+      border-radius: var(--card-radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .tutorial-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .tutorial-cat-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: rgba(24,179,255,.12);
+      color: var(--primary);
+      width: fit-content;
+    }
+    .tutorial-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(24,179,255,.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: var(--primary);
+    }
+    .tutorial-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0;
+    }
+    .tutorial-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      flex: 1;
+    }
+    .tutorial-meta {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .tutorial-meta span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.8rem;
+      color: var(--text-subtle);
+    }
+    .tutorial-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary);
+      color: var(--navy-2);
+      font-weight: 700;
+      font-size: 14px;
+      padding: 10px 18px;
+      border-radius: var(--button-radius);
+      transition: background 0.2s;
+      width: fit-content;
+      margin-top: auto;
+    }
+    .tutorial-btn:hover { background: var(--primary-hover); }
+
     /* GUIDES SECTION */
     .guides-grid {
       max-width: var(--maxwidth);
@@ -4307,6 +4393,128 @@ require_once __DIR__ . '/../includes/header.php';
       <div class="card-desc">Assess your Flutter expertise from widgets and state management to rendering pipeline, Isolates, testing, and production build optimization.</div>
       <a href="Quizzes/flutter.php" class="quiz-btn">Start Quiz</a>
     </div>
+  </div>
+</section>
+
+<!-- TUTORIALS -->
+<section id="tutorials">
+  <div class="section-heading">
+    <span class="section-badge">CONCEPT-ORIENTED LEARNING</span>
+    <h2 class="section-title">Tutorials</h2>
+    <p class="section-desc">Progressive, concept-oriented tutorials across 5 levels — from Introduction to Expert — for every topic in our curriculum.</p>
+  </div>
+  <div class="tutorials-grid">
+
+    <!-- Web Fundamentals -->
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Web Fundamentals</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:code"></iconify-icon></div>
+      <div class="tutorial-title">Intro to Programming</div>
+      <div class="tutorial-desc">From variables and control flow to OOP, design patterns, and concurrency — the complete programming foundations tutorial.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/intro-programming.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Web Fundamentals</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:layout"></iconify-icon></div>
+      <div class="tutorial-title">Intro to HTML &amp; CSS</div>
+      <div class="tutorial-desc">Master the twin foundations of the web — from basic tags and selectors to Flexbox, Grid, animations, and Container Queries.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/intro-html-css.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Web Fundamentals</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:file-code"></iconify-icon></div>
+      <div class="tutorial-title">HTML</div>
+      <div class="tutorial-desc">Deep-dive into HTML — from document structure and semantic elements to Web Components, Service Workers, and the WHATWG Living Standard.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/html.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Web Fundamentals</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:paintbrush"></iconify-icon></div>
+      <div class="tutorial-title">CSS</div>
+      <div class="tutorial-desc">Comprehensive CSS coverage from the box model and specificity through Flexbox, Grid, animations, and cutting-edge @layer and :has() features.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/css.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Web Fundamentals</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:file-xml"></iconify-icon></div>
+      <div class="tutorial-title">XML</div>
+      <div class="tutorial-desc">From well-formed documents and XML Schema validation to XPath, XSLT transformations, SOAP web services, and XQuery.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/xml.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <!-- JavaScript -->
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">JavaScript</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:braces"></iconify-icon></div>
+      <div class="tutorial-title">JS Fundamentals</div>
+      <div class="tutorial-desc">The essentials of JavaScript — variables, functions, arrays, async/await, closures, modules, and V8 runtime internals.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/javascript-fundamentals.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">JavaScript</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:zap"></iconify-icon></div>
+      <div class="tutorial-title">JavaScript</div>
+      <div class="tutorial-desc">In-depth JavaScript — from ECMAScript internals and the event loop through advanced closures, Proxy/Reflect, and reactive state engines.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/javascript.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">JavaScript</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:shield-check"></iconify-icon></div>
+      <div class="tutorial-title">TypeScript</div>
+      <div class="tutorial-desc">Static typing for JavaScript — type annotations, generics, utility types, conditional mapped types, and compiler performance at scale.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/typescript.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">JavaScript</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:dollar-sign"></iconify-icon></div>
+      <div class="tutorial-title">jQuery</div>
+      <div class="tutorial-desc">jQuery from selectors and DOM manipulation to Ajax, plugins, animations, and a guide to migrating to modern native APIs.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/jquery.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
   </div>
 </section>
 
