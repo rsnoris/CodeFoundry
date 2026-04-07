@@ -470,7 +470,12 @@ require_once __DIR__ . '/../../includes/header.php';
             { question: 'Which HTTP method is used to update a resource?', options: ['GET', 'POST', 'PUT', 'DELETE'], correct: 2 },
             { question: 'What is GraphQL?', options: ['A database', 'A query language for APIs', 'A programming language', 'A web framework'], correct: 1 },
             { question: 'What is JWT used for?', options: ['Database queries', 'Authentication and authorization', 'Styling', 'Routing'], correct: 1 },
-            { question: 'Which status code indicates a successful GET request?', options: ['200', '201', '204', '404'], correct: 0 }
+            { question: 'Which status code indicates a successful GET request?', options: ['200', '201', '204', '404'], correct: 0 },
+            { question: 'Which HTTP method is used to retrieve data without modifying it?', options: ['POST', 'PUT', 'GET', 'DELETE'], correct: 2 },
+            { question: 'What does HTTP status code 404 mean?', options: ['Server error', 'Resource not found', 'Unauthorized', 'Bad request'], correct: 1 },
+            { question: 'What is an API endpoint?', options: ['A database table', 'A URL where an API can be accessed', 'A server configuration file', 'A programming language'], correct: 1 },
+            { question: 'Which HTTP method is used to create a new resource?', options: ['GET', 'POST', 'DELETE', 'HEAD'], correct: 1 },
+            { question: 'What does JSON stand for?', options: ['JavaScript Object Notation', 'Java Standard Object Naming', 'JavaScript Online Notation', 'JSON Serialized Object Namespace'], correct: 0 }
           ]
         },
         intermediate: {
@@ -481,7 +486,12 @@ require_once __DIR__ . '/../../includes/header.php';
             { question: 'What is the difference between PUT and PATCH?', options: ['They are identical', 'PUT replaces the entire resource; PATCH partially updates it', 'PATCH replaces the entire resource; PUT partially updates it', 'PUT creates; PATCH deletes'], correct: 1 },
             { question: 'What does idempotent mean for HTTP methods?', options: ['The method is encrypted', 'Multiple identical requests produce the same result as one', 'The method requires authentication', 'The response is always cached'], correct: 1 },
             { question: 'What is rate limiting used for?', options: ['Compressing responses', 'Controlling the number of requests a client can make in a time window', 'Caching data', 'Balancing load'], correct: 1 },
-            { question: 'What is CORS?', options: ['A database protocol', 'A policy controlling cross-origin HTTP requests', 'An authentication standard', 'A data format'], correct: 1 }
+            { question: 'What is CORS?', options: ['A database protocol', 'A policy controlling cross-origin HTTP requests', 'An authentication standard', 'A data format'], correct: 1 },
+            { question: 'What is OAuth 2.0 primarily used for?', options: ['Encrypting data', 'Delegated authorization to access resources on behalf of a user', 'Compressing API responses', 'Managing database connections'], correct: 1 },
+            { question: 'What is API versioning used for?', options: ['Caching responses', 'Allowing changes without breaking existing clients', 'Improving database performance', 'Encrypting endpoints'], correct: 1 },
+            { question: 'What does HTTP status code 401 indicate?', options: ['Not found', 'Server error', 'Unauthorized — authentication required', 'Forbidden'], correct: 2 },
+            { question: 'What is pagination in APIs?', options: ['Splitting API documentation into pages', 'Returning data in chunks to avoid sending too much at once', 'Versioning API endpoints', 'Caching API responses'], correct: 1 },
+            { question: 'What is a webhook?', options: ['A type of API key', 'An HTTP callback triggered when an event occurs', 'A load balancing technique', 'A query language extension'], correct: 1 }
           ]
         },
         advanced: {
@@ -492,7 +502,12 @@ require_once __DIR__ . '/../../includes/header.php';
             { question: 'What is the N+1 query problem?', options: ['Using N database indices', 'Executing N additional queries for each item in a result set', 'Having N API versions', 'Sending N duplicate requests'], correct: 1 },
             { question: 'What is event sourcing?', options: ['Logging HTTP events', 'Storing state changes as an immutable sequence of events', 'Event-driven CSS', 'DOM event capture'], correct: 1 },
             { question: 'What is CQRS?', options: ['A CSS framework', 'Command Query Responsibility Segregation — separating read and write models', 'A container registry', 'A CI/CD strategy'], correct: 1 },
-            { question: 'What does an API gateway provide?', options: ['Database migrations', 'A single entry point for clients to access microservices', 'CSS optimization', 'Static file serving'], correct: 1 }
+            { question: 'What does an API gateway provide?', options: ['Database migrations', 'A single entry point for clients to access microservices', 'CSS optimization', 'Static file serving'], correct: 1 },
+            { question: 'What is the difference between REST and GraphQL?', options: ['They are identical', 'REST uses fixed endpoints; GraphQL lets clients specify exact data needs', 'GraphQL uses fixed endpoints; REST is flexible', 'REST is newer than GraphQL'], correct: 1 },
+            { question: 'What is circuit breaker pattern?', options: ['A network security tool', 'A pattern that stops calls to a failing service to prevent cascade failures', 'A load balancing algorithm', 'An authentication strategy'], correct: 1 },
+            { question: 'What is the purpose of an ETag in HTTP?', options: ['Encrypting responses', 'Versioning resources for cache validation', 'Compressing payloads', 'Routing requests'], correct: 1 },
+            { question: 'What is a saga pattern in microservices?', options: ['A documentation format', 'Managing distributed transactions as a sequence of local transactions', 'A service discovery mechanism', 'An API testing strategy'], correct: 1 },
+            { question: 'What is service discovery in microservices?', options: ['Finding API bugs', 'Automatically detecting available service instances in a network', 'Documenting service endpoints', 'Monitoring service health'], correct: 1 }
           ]
         }
       }
