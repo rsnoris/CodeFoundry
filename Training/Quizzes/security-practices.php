@@ -1,660 +1,173 @@
 <?php
-$page_title  = 'Security Best Practices Quiz - CodeFoundry';
+$page_title = 'Security Best Practices Quiz – 100 Levels – CodeFoundry';
 $active_page = 'training';
-$page_styles = <<<'PAGECSS'
-:root {
-      --navy: #0e1828;
-      --navy-2: #121c2b;
-      --navy-3: #161f2f;
-      --primary: #18b3ff;
-      --primary-hover: #009de0;
-      --text: #fff;
-      --text-muted: #92a3bb;
-      --text-subtle: #627193;
-      --border-color: #1a2942;
-      --button-outline: #ffffff22;
-      --button-radius: 8px;
-      --maxwidth: 1200px;
-      --card-radius: 12px;
-      --header-height: 68px;
-      --mobile-menu-bg: #0e1828f9;
-    }
-    html, body {
-      background: var(--navy-2);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    body { min-height: 100vh; }
-    a { color: inherit; text-decoration: none; }
-
-    header {
-      background: var(--navy);
-      color: var(--text);
-      padding: 0;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      border-bottom: 1px solid #192746;
-    }
-    .nav {
-      max-width: var(--maxwidth);
-      margin: 0 auto;
-      padding: 0 40px;
-      min-height: var(--header-height);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      font-weight: 800;
-      font-size: 22px;
-      gap: 12px;
-      letter-spacing: -0.5px;
-    }
-    .brand svg {
-      width: 28px;
-      height: 28px;
-      background: var(--primary);
-      border-radius: 6px;
-      color: #092340;
-      padding: 4px;
-      margin-right: 4px;
-      box-sizing: border-box;
-    }
-    .nav-menu {
-      display: flex;
-      gap: 28px;
-      align-items: center;
-    }
-    .nav-link {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 15px;
-      transition: color .2s;
-    }
-    .nav-link:hover,
-    .nav-link.active {
-      color: var(--text);
-    }
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .nav-btn {
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 700;
-      border: 0;
-      border-radius: var(--button-radius);
-      padding: 10px 18px;
-      background: var(--navy-3);
-      cursor: pointer;
-      color: var(--text);
-      transition: background .2s, color .2s;
-    }
-    .nav-btn.primary {
-      background: var(--primary);
-      color: var(--navy);
-    }
-    .nav-btn.secondary {
-      background: transparent;
-      border: 1px solid var(--button-outline);
-    }
-    .nav-btn:hover {
-      background: var(--primary-hover);
-      color: var(--navy);
-    }
-    .mobile-hamburger {
-      display: none;
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-size: 28px;
-      cursor: pointer;
-      padding: 0;
-      width: 32px;
-      height: 32px;
-      align-items: center;
-      justify-content: center;
-    }
-    .mobile-nav-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--mobile-menu-bg);
-      z-index: 2000;
-      backdrop-filter: blur(10px);
-    }
-    .mobile-nav-overlay.active {
-      display: block;
-    }
-    .mobile-nav-panel {
-      background: var(--navy);
-      height: 100%;
-      width: 300px;
-      max-width: 85%;
-      margin-left: auto;
-      display: flex;
-      flex-direction: column;
-      border-left: 1px solid var(--border-color);
-    }
-    .mobile-menu-close {
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-size: 28px;
-      cursor: pointer;
-      padding: 20px;
-      width: fit-content;
-      margin-left: auto;
-      display: flex;
-    }
-    .mobile-menu-links {
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      gap: 8px;
-    }
-    .mobile-menu-links .nav-link {
-      padding: 12px 16px;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-    .mobile-menu-links .nav-link:hover {
-      background: var(--navy-3);
-    }
-    .mobile-menu-actions {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: auto;
-    }
-    .mobile-menu-actions .nav-btn {
-      width: 100%;
-      text-align: center;
-    }
-
-    .quiz-container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-    .quiz-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    .quiz-header h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin: 0 0 16px 0;
-    }
-    .quiz-header .back-link {
-      color: var(--primary);
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: color 0.2s;
-      margin-bottom: 20px;
-    }
-    .quiz-header .back-link:hover {
-      color: var(--primary-hover);
-    }
-    .quiz-content {
-      background: var(--navy);
-      border: 1px solid var(--border-color);
-      border-radius: var(--card-radius);
-      padding: 40px;
-    }
-    .quiz-progress {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      padding: 12px 16px;
-      background: var(--navy-3);
-      border-radius: 8px;
-    }
-    .quiz-question {
-      margin-bottom: 24px;
-    }
-    .quiz-question-text {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 24px;
-      line-height: 1.5;
-    }
-    .quiz-options {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .quiz-option {
-      background: var(--navy-3);
-      border: 2px solid var(--border-color);
-      border-radius: 8px;
-      padding: 18px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 1rem;
-    }
-    .quiz-option:hover {
-      border-color: var(--primary);
-      background: var(--navy-2);
-    }
-    .quiz-option.selected {
-      border-color: var(--primary);
-      background: rgba(24, 179, 255, 0.1);
-    }
-    .quiz-navigation {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 30px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border-color);
-    }
-    .simulator-btn-primary {
-      background: var(--primary);
-      color: var(--navy-2);
-      border: none;
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s;
-      font-size: 15px;
-    }
-    .simulator-btn-primary:hover:not(:disabled) {
-      background: var(--primary-hover);
-    }
-    .simulator-btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .simulator-btn-secondary {
-      background: var(--navy-3);
-      color: var(--text);
-      border: 1px solid var(--border-color);
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 15px;
-    }
-    .simulator-btn-secondary:hover:not(:disabled) {
-      border-color: var(--primary);
-      background: var(--navy-2);
-    }
-    .simulator-btn-secondary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .quiz-results {
-      text-align: center;
-      padding: 40px 20px;
-    }
-    .quiz-results h2 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 0 0 20px 0;
-    }
-    .quiz-score {
-      font-size: 4rem;
-      font-weight: 800;
-      color: var(--primary);
-      margin: 20px 0;
-    }
-    .quiz-result-details {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 16px;
-      margin: 30px 0;
-    }
-    .quiz-result-stat {
-      background: var(--navy-3);
-      padding: 24px;
-      border-radius: 8px;
-    }
-    .quiz-result-stat-value {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--primary);
-    }
-    .quiz-result-stat-label {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-top: 8px;
-    }
-
-    /* Level selector */
-    .quiz-level-selector {
-      padding: 8px 0;
-    }
-    .quiz-level-selector h3 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin: 0 0 8px 0;
-    }
-    .quiz-level-selector p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      margin: 0 0 20px 0;
-    }
-    .level-options {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .level-option {
-      background: var(--navy-3);
-      border: 2px solid var(--border-color);
-      border-radius: 10px;
-      padding: 18px 20px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .level-option:hover {
-      border-color: var(--primary);
-      background: rgba(24, 179, 255, 0.05);
-    }
-    .level-option-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 4px;
-    }
-    .level-badge {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 3px 10px;
-      border-radius: 20px;
-      text-transform: uppercase;
-    }
-    .level-badge.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
-    .level-badge.intermediate { background: rgba(245,158,11,0.15);  color: #f59e0b; }
-    .level-badge.advanced     { background: rgba(239,68,68,0.15);   color: #ef4444; }
-    .level-option-name {
-      font-weight: 700;
-      font-size: 1rem;
-    }
-    .level-option-desc {
-      color: var(--text-muted);
-      font-size: 0.875rem;
-    }
-    .quiz-level-pill {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 2px 9px;
-      border-radius: 20px;
-      text-transform: uppercase;
-    }
-    .quiz-level-pill.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
-    .quiz-level-pill.intermediate { background: rgba(245,158,11,0.15);  color: #f59e0b; }
-    .quiz-level-pill.advanced     { background: rgba(239,68,68,0.15);   color: #ef4444; }
-
-    @media (max-width: 768px) {
-      .nav-menu,
-      .nav-actions {
-        display: none;
-      }
-      .mobile-hamburger {
-        display: flex;
-      }
-      .quiz-content {
-        padding: 24px;
-      }
-      .quiz-header h1 {
-        font-size: 2rem;
-      }
-      .quiz-question-text {
-        font-size: 1.1rem;
-      }
-      .quiz-score {
-        font-size: 3rem;
-      }
-    }
-PAGECSS;
-$page_scripts = '';
-require_once __DIR__ . '/../../includes/header.php';
-?>
-<div class="quiz-container">
-    <div class="quiz-header">
-      <a href="/Training/" class="back-link">← Back to Training</a>
-      <h1>Security Best Practices Quiz</h1>
-    </div>
-    <div class="quiz-content" id="quizContent"></div>
-  </div>
-
-  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-  <script>
-    // Mobile menu functionality
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mobileNav = document.getElementById('mobileNav');
-    const closeMobileNav = document.getElementById('closeMobileNav');
-
-    mobileMenuBtn?.addEventListener('click', () => {
-      mobileNav.classList.add('active');
-    });
-
-    closeMobileNav?.addEventListener('click', () => {
-      mobileNav.classList.remove('active');
-    });
-
-    mobileNav?.addEventListener('click', (e) => {
-      if (e.target === mobileNav) {
-        mobileNav.classList.remove('active');
-      }
-    });
-
-    // Quiz Data
-    const quizData = {
-      title: 'Security Best Practices',
-      levels: {
-        beginner: {
-          label: 'Beginner',
-          description: 'Common vulnerabilities and secure fundamentals',
-          questions: [
-            { question: 'What does XSS stand for?', options: ['Extra Style Sheets', 'Cross-Site Scripting', 'XML Security Standard', 'Extended Server Security'], correct: 1 },
-            { question: 'What is SQL injection?', options: ['A database optimization technique', 'A security vulnerability where malicious SQL code is inserted', 'A data backup method', 'A query optimization tool'], correct: 1 },
-            { question: 'What is HTTPS?', options: ['HTTP with security', 'Hypertext Transfer Protocol Secure', 'High-level Transfer Protocol', 'Host Transfer Protocol System'], correct: 1 },
-            { question: 'What is the purpose of CORS?', options: ['To compress data', 'To control cross-origin resource sharing', 'To encrypt passwords', 'To manage cookies'], correct: 1 },
-            { question: 'What is hashing used for in security?', options: ['Compressing files', 'Storing passwords securely', 'Speeding up queries', 'Managing sessions'], correct: 1 },
-            { question: 'What does a firewall do?', options: ['Speeds up network traffic', 'Monitors and controls incoming and outgoing network traffic based on security rules', 'Encrypts all data', 'Manages user accounts'], correct: 1 },
-            { question: 'What is a brute-force attack?', options: ['A physical attack on hardware', 'Systematically trying all possible passwords or keys until the correct one is found', 'A DDoS flood attack', 'An SQL injection variant'], correct: 1 },
-            { question: 'What is the purpose of input validation in security?', options: ['To speed up form processing', 'To prevent malicious data from being processed by an application', 'To compress user input', 'To style form fields'], correct: 1 },
-            { question: 'What does SSL stand for?', options: ['Server-Side Language', 'Secure Sockets Layer', 'Static Security Layer', 'Software Security Library'], correct: 1 },
-            { question: 'What is a phishing attack?', options: ['Attacking a server with traffic', 'Tricking users into revealing sensitive information by impersonating a trusted entity', 'Injecting code into a database', 'Exploiting a zero-day vulnerability'], correct: 1 }
-          ]
-        },
-        intermediate: {
-          label: 'Intermediate',
-          description: 'OWASP, 2FA, penetration testing, and CSRF',
-          questions: [
-            { question: 'What is OWASP?', options: ['A programming language', 'The Open Web Application Security Project — a foundation for software security', 'An AWS service', 'A JavaScript framework'], correct: 1 },
-            { question: 'What is two-factor authentication (2FA)?', options: ['Using two different passwords', 'Requiring two distinct verification factors to prove identity', 'Hashing a password twice', 'A type of OAuth flow'], correct: 1 },
-            { question: 'What is a penetration test?', options: ['Performance benchmarking', 'An authorized simulated attack to identify security vulnerabilities', 'A database query test', 'A load balancing test'], correct: 1 },
-            { question: 'What is the principle of least privilege?', options: ['Giving administrators full access', 'Granting only the minimum permissions required to perform a task', 'Disabling all authentication', 'Using the shortest passwords'], correct: 1 },
-            { question: 'What is a CSRF attack?', options: ['Cross-Site Resource Sharing', 'Cross-Site Request Forgery — tricking a browser into making unauthorized requests', 'Cross-Server Resource Failure', 'Content Security Response Framework'], correct: 1 },
-            { question: 'What is the purpose of a Content Security Policy (CSP)?', options: ['To compress web content', 'To prevent XSS by specifying which content sources browsers are allowed to load', 'To encrypt cookies', 'To restrict HTTP methods'], correct: 1 },
-            { question: 'What is session hijacking?', options: ['Deleting a user session', 'Stealing or forging a session token to impersonate a user', 'Logging out all users', 'Expiring a session prematurely'], correct: 1 },
-            { question: 'What is a rainbow table attack?', options: ['A colorful brute-force method', 'Using precomputed hash values to crack password hashes quickly', 'A phishing technique using visual tricks', 'A DDoS variant'], correct: 1 },
-            { question: 'What is bcrypt used for?', options: ['Encrypting network traffic', 'Securely hashing passwords with an adaptive cost factor', 'Compressing data', 'Generating API keys'], correct: 1 },
-            { question: 'What is the difference between authentication and authorization?', options: ['They are the same', 'Authentication verifies identity; authorization determines what access is allowed', 'Authorization verifies identity; authentication grants access', 'Authentication is for APIs; authorization is for web apps'], correct: 1 }
-          ]
-        },
-        advanced: {
-          label: 'Advanced',
-          description: 'Zero-days, OAuth 2.0, timing attacks, and defense in depth',
-          questions: [
-            { question: 'What is a zero-day vulnerability?', options: ['A minor software bug', 'A security flaw unknown to the vendor with no available patch', 'An expired SSL certificate', 'A firewall misconfiguration'], correct: 1 },
-            { question: 'What is certificate pinning?', options: ['Permanently storing cookies', 'Associating a host with a specific expected certificate or public key', 'A JWT validation technique', 'An HTTPS redirect rule'], correct: 1 },
-            { question: 'What is OAuth 2.0?', options: ['An encryption algorithm', 'An authorization framework allowing third-party limited access to user resources', 'A password hashing scheme', 'A session storage standard'], correct: 1 },
-            { question: 'What is a timing attack?', options: ['A DDoS technique', 'Exploiting measurable time differences in cryptographic operations to infer secrets', 'A social engineering approach', 'An SQL injection variant'], correct: 1 },
-            { question: 'What is defense in depth?', options: ['Using the strongest firewall', 'Applying multiple independent layers of security controls', 'Encrypting only sensitive data', 'Single sign-on'], correct: 1 },
-            { question: 'What is a supply chain attack?', options: ['Attacking a logistics company', 'Compromising software or hardware in the development/distribution pipeline to target end users', 'An SQL injection via third-party APIs', 'A DDoS on a CDN'], correct: 1 },
-            { question: 'What is SSRF (Server-Side Request Forgery)?', options: ['An SQL injection variant', 'Tricking a server into making requests to internal or external resources on behalf of an attacker', 'A client-side scripting attack', 'A DNS poisoning technique'], correct: 1 },
-            { question: 'What is key stretching?', options: ['Extending an encryption key length', 'Making a password-based key derivation computationally expensive to slow brute-force attacks', 'Duplicating encryption keys for redundancy', 'Compressing cryptographic keys'], correct: 1 },
-            { question: 'What is the purpose of HSTS (HTTP Strict Transport Security)?', options: ['Caching HTTP responses', 'Forcing browsers to use HTTPS for all future requests to a domain', 'Blocking cross-origin requests', 'Validating SSL certificates'], correct: 1 },
-            { question: 'What is threat modeling?', options: ['Predicting future cyberattacks', 'A structured process to identify, prioritize, and address security threats in a system', 'Creating security test cases', 'Monitoring system logs for anomalies'], correct: 1 }
-          ]
-        }
-      }
-    };
-    // Quiz State
-    let currentLevel = null;
-    let currentQuestionIndex = 0;
-    let userAnswers = [];
-
-    function showLevelSelector() {
-      const levels = Object.keys(quizData.levels);
-      document.getElementById('quizContent').innerHTML = `
-        <div class="quiz-level-selector">
-          <h3>Choose Your Difficulty Level</h3>
-          <p>Select the level that best matches your experience</p>
-          <div class="level-options">
-            ${levels.map(key => {
-              const lvl = quizData.levels[key];
-              return `
-                <div class="level-option" onclick="selectLevel('${key}')">
-                  <div class="level-option-header">
-                    <span class="level-badge ${key}">${lvl.label}</span>
-                    <span class="level-option-name">${lvl.label} — ${lvl.questions.length} Questions</span>
-                  </div>
-                  <div class="level-option-desc">${lvl.description}</div>
-                </div>`;
-            }).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    function selectLevel(level) {
-      currentLevel = level;
-      currentQuestionIndex = 0;
-      userAnswers = new Array(quizData.levels[level].questions.length).fill(null);
-      showQuestion();
-    }
-
-    function showQuestion() {
-      const levelData = quizData.levels[currentLevel];
-      const question = levelData.questions[currentQuestionIndex];
-      const totalQuestions = levelData.questions.length;
-      const quizContent = document.getElementById('quizContent');
-
-      quizContent.innerHTML = `
-        <div class="quiz-progress">
-          <span>Question ${currentQuestionIndex + 1} of ${totalQuestions}</span>
-          <span style="display:flex;align-items:center;gap:8px;">
-            <span class="quiz-level-pill ${currentLevel}">${levelData.label}</span>
-            ${Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)}% Complete
-          </span>
-        </div>
-        <div class="quiz-question">
-          <div class="quiz-question-text">${question.question}</div>
-          <div class="quiz-options">
-            ${question.options.map((option, index) => `
-              <div class="quiz-option ${userAnswers[currentQuestionIndex] === index ? 'selected' : ''}"
-                   onclick="selectAnswer(${index})">
-                ${option}
-              </div>
-            `).join('')}
-          </div>
-        </div>
-        <div class="quiz-navigation">
-          <button class="simulator-btn-secondary" onclick="previousQuestion()"
-                  ${currentQuestionIndex === 0 ? 'disabled' : ''}>
-            Previous
-          </button>
-          <button class="simulator-btn-primary" onclick="${currentQuestionIndex === totalQuestions - 1 ? 'finishQuiz()' : 'nextQuestion()'}">
-            ${currentQuestionIndex === totalQuestions - 1 ? 'Finish Quiz' : 'Next'}
-          </button>
-        </div>
-      `;
-    }
-
-    function selectAnswer(answerIndex) {
-      userAnswers[currentQuestionIndex] = answerIndex;
-      showQuestion();
-    }
-
-    function nextQuestion() {
-      const total = quizData.levels[currentLevel].questions.length;
-      if (currentQuestionIndex < total - 1) {
-        currentQuestionIndex++;
-        showQuestion();
-      }
-    }
-
-    function previousQuestion() {
-      if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        showQuestion();
-      }
-    }
-
-    function finishQuiz() {
-      const levelData = quizData.levels[currentLevel];
-      let correct = 0;
-      levelData.questions.forEach((question, index) => {
-        if (userAnswers[index] === question.correct) correct++;
-      });
-
-      const total = levelData.questions.length;
-      const percentage = Math.round((correct / total) * 100);
-      const quizContent = document.getElementById('quizContent');
-
-      quizContent.innerHTML = `
-        <div class="quiz-results">
-          <h2>Quiz Complete!</h2>
-          <span class="quiz-level-pill ${currentLevel}" style="font-size:0.85rem;padding:4px 12px;">${levelData.label} Level</span>
-          <div class="quiz-score">${percentage}%</div>
-          <div class="quiz-result-details">
-            <div class="quiz-result-stat">
-              <div class="quiz-result-stat-value">${correct}</div>
-              <div class="quiz-result-stat-label">Correct</div>
-            </div>
-            <div class="quiz-result-stat">
-              <div class="quiz-result-stat-value">${total - correct}</div>
-              <div class="quiz-result-stat-label">Incorrect</div>
-            </div>
-            <div class="quiz-result-stat">
-              <div class="quiz-result-stat-value">${total}</div>
-              <div class="quiz-result-stat-label">Total</div>
-            </div>
-          </div>
-          <p style="margin-top:20px;color:var(--text-muted);font-size:1.1rem;">
-            ${percentage >= 80 ? 'Excellent work! You have a strong grasp of this level.' :
-              percentage >= 60 ? 'Good job! Review the topics you missed to improve.' :
-              'Keep learning! Study the material and try again.'}
-          </p>
-          <div style="margin-top:30px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-            <button class="simulator-btn-secondary" onclick="showLevelSelector()">
-              Change Level
-            </button>
-            <button class="simulator-btn-primary" onclick="selectLevel('${currentLevel}')">
-              Retake Quiz
-            </button>
-            <a href="/Training/" class="simulator-btn-secondary" style="display:inline-block;text-decoration:none;">
-              Back to Training
-            </a>
-          </div>
-        </div>
-      `;
-    }
-
-    // Start with level selector
-    showLevelSelector();
-  </script>
-<?php require_once __DIR__ . '/../../includes/footer.php'; ?>
+$quiz_title  = 'Security Best Practices';
+$quiz_slug   = 'security-practices';
+$quiz_tiers  = [
+    [
+        'label' => 'Introduction',
+        'questions' => [
+            ['question' => 'What does OWASP stand for?', 'options' => ['Open Web Authentication Security Project', 'Official Web Application Security Protocol', 'Open Web Application Security Project', 'Online Web Access Security Platform'], 'correct' => 2],
+            ['question' => 'What is SQL injection?', 'options' => ['A technique that inserts malicious SQL code into queries to manipulate a database', 'A way to optimise SQL queries', 'An SQL database installation method', 'A SQL backup technique'], 'correct' => 0],
+            ['question' => 'What does XSS stand for?', 'options' => ['Cross-Server Scripting', 'Cross-Site Scripting', 'Cross-Service Security', 'Cross-System Script'], 'correct' => 1],
+            ['question' => 'What does CSRF stand for?', 'options' => ['Cross-Site Redirect Forgery', 'Cross-Server Request Fraud', 'Cross-Service Resource Fetch', 'Cross-Site Request Forgery'], 'correct' => 3],
+            ['question' => 'What does TLS stand for?', 'options' => ['Transfer Layer Service', 'Transport Level Security', 'Transport Layer Security', 'Transfer Level System'], 'correct' => 2],
+            ['question' => 'What is a firewall?', 'options' => ['A network security system that monitors and controls incoming and outgoing network traffic based on rules', 'A physical server protection device', 'A software tool for encrypting data', 'A system for managing passwords'], 'correct' => 0],
+            ['question' => 'What does HTTPS ensure over plain HTTP?', 'options' => ['Faster page loading speeds', 'Encrypted communication between the browser and server', 'Automatic server-side caching', 'Stronger database security'], 'correct' => 1],
+            ['question' => 'What is authentication?', 'options' => ['Determining what actions a user is allowed to perform', 'Encrypting user data at rest', 'Verifying the identity of a user or system', 'Auditing user activity logs'], 'correct' => 2],
+            ['question' => 'What is authorisation in security?', 'options' => ['Verifying who a user is', 'Encrypting communication channels', 'Logging all user activity', 'Determining what resources and actions an authenticated user is permitted to access'], 'correct' => 3],
+            ['question' => 'What is a password hash?', 'options' => ['A one-way cryptographic transformation of a password so the original cannot be recovered', 'An encrypted password that can be decrypted', 'A compressed representation of a password', 'A password stored in a database column'], 'correct' => 0],
+            ['question' => 'What is two-factor authentication (2FA)?', 'options' => ['Using two different passwords', 'Requiring two separate verification factors to authenticate a user', 'Logging in from two different devices simultaneously', 'A double encryption scheme'], 'correct' => 1],
+            ['question' => 'What is phishing?', 'options' => ['A network port scanning technique', 'A social engineering attack that tricks users into revealing credentials or sensitive information via deceptive messages', 'A method for testing password strength', 'A type of firewall bypass'], 'correct' => 1],
+            ['question' => 'What is a security vulnerability?', 'options' => ['A slow network connection', 'A weak password policy', 'A weakness in a system that can be exploited by an attacker to gain unauthorised access or cause damage', 'An outdated user interface'], 'correct' => 2],
+            ['question' => 'What is the principle of least privilege?', 'options' => ['Giving all users administrator rights by default', 'Users should have the minimum permissions necessary to perform their required tasks', 'Only privileged users should use software', 'Least-used features should be removed'], 'correct' => 1],
+            ['question' => 'What is encryption?', 'options' => ['Deleting sensitive data securely', 'Converting plaintext data into an unreadable ciphertext format using an algorithm and key', 'Compressing data to save storage space', 'Backing up data to a secure location'], 'correct' => 1],
+            ['question' => 'What does the CIA triad stand for?', 'options' => ['Confidentiality, Integrity, Availability', 'Control, Identity, Access', 'Cyber Intelligence Agency', 'Credentials, Infrastructure, Authentication'], 'correct' => 0],
+            ['question' => 'What is a Certificate Authority (CA)?', 'options' => ['A government cybersecurity body', 'A trusted entity that issues digital certificates verifying the identity of websites and organisations', 'A cloud security service', 'A password management organisation'], 'correct' => 1],
+            ['question' => 'What is social engineering?', 'options' => ['Building secure social media platforms', 'Manipulating people into divulging confidential information or performing actions that compromise security', 'Engineering social features in applications', 'A network intrusion technique'], 'correct' => 1],
+            ['question' => 'What is a brute force attack?', 'options' => ['A physical attack on server hardware', 'Overwhelming a server with traffic', 'Systematically trying every possible combination of credentials until the correct one is found', 'Injecting malicious code into a database'], 'correct' => 2],
+            ['question' => 'What does GDPR stand for?', 'options' => ['General Data Privacy Rights', 'Global Data Protection Regulation', 'Government Data Privacy Rules', 'General Data Protection Regulation'], 'correct' => 3],
+            ['question' => 'What is input validation?', 'options' => ['Logging all user inputs', 'Encrypting form submissions', 'Verifying that user input meets expected format, type, and range before processing it', 'Caching user input for performance'], 'correct' => 2],
+            ['question' => 'What is a public key in asymmetric cryptography?', 'options' => ['A key kept secret by its owner', 'A cryptographic key that can be freely shared and is used to encrypt data or verify signatures', 'A master key for all users', 'A key stored in a database'], 'correct' => 1],
+            ['question' => 'What is a private key in asymmetric cryptography?', 'options' => ['A key that can be shared publicly', 'A key owned by an organisation only', 'A key kept strictly secret by its owner, used for decryption or signing', 'A key generated from a password'], 'correct' => 2],
+            ['question' => 'What is a DDoS attack?', 'options' => ['Direct Database Object Scripting', 'Data-Driven Operations Security', 'Distributed Denial of Service – overwhelming a target with traffic from many sources to make it unavailable', 'Dynamic DNS Overwrite Script'], 'correct' => 2],
+            ['question' => 'What is malware?', 'options' => ['Poorly written software code', 'Slow-performing software', 'Software intentionally designed to disrupt, damage, or gain unauthorised access to computer systems', 'A software licensing violation'], 'correct' => 2],
+            ['question' => 'What is a security patch?', 'options' => ['A software performance update', 'An update that fixes a known security vulnerability in software or a system', 'A network configuration change', 'A backup of system files'], 'correct' => 1],
+            ['question' => 'What does RBAC stand for?', 'options' => ['Resource-Based Access Control', 'Role-Based Access Control', 'Registry-Based Authentication Control', 'Rule-Based Account Control'], 'correct' => 1],
+            ['question' => 'What is an SSL/TLS certificate?', 'options' => ['A software licence for web servers', 'A digital document binding a public key to an entity\'s identity, enabling encrypted HTTPS connections', 'A server configuration file', 'A network routing certificate'], 'correct' => 1],
+        ],
+    ],
+    [
+        'label' => 'Beginner',
+        'questions' => [
+            ['question' => 'What is bcrypt used for in security?', 'options' => ['Encrypting network traffic', 'Securely hashing passwords with a built-in salt and configurable cost factor', 'Generating API tokens', 'Signing digital certificates'], 'correct' => 1],
+            ['question' => 'What is the OWASP Top 10?', 'options' => ['The ten strongest encryption algorithms', 'Ten recommended security tools', 'A regularly updated list of the ten most critical web application security risks', 'Ten mandatory security certifications'], 'correct' => 2],
+            ['question' => 'What is stored XSS?', 'options' => ['XSS via a URL parameter that is reflected immediately', 'A script injected via the browser DOM', 'Malicious script permanently stored on the server and executed when users load the affected page', 'An XSS variant targeting mobile apps'], 'correct' => 2],
+            ['question' => 'What is reflected XSS?', 'options' => ['Malicious script stored in the database', 'XSS where the malicious script is included in a request and immediately reflected back in the response, executed in the victim\'s browser', 'A DOM-based XSS variant', 'Server-side script injection'], 'correct' => 1],
+            ['question' => 'What is the Content Security Policy (CSP) HTTP header?', 'options' => ['A header controlling response compression', 'A header defining which content sources the browser is allowed to load, preventing XSS attacks', 'A header for API rate limiting', 'A header for cache control'], 'correct' => 1],
+            ['question' => 'What is the X-Frame-Options HTTP header used for?', 'options' => ['Controlling cross-origin requests', 'Preventing clickjacking by controlling whether the page can be embedded in iframes', 'Encrypting HTTP frames', 'Restricting JavaScript execution'], 'correct' => 1],
+            ['question' => 'What is clickjacking?', 'options' => ['Hijacking DNS click events', 'Tricking a user into clicking a hidden or disguised element, often via a transparent iframe overlay', 'Intercepting mouse click events in the browser', 'Stealing session cookies via malicious links'], 'correct' => 1],
+            ['question' => 'What does the HTTP Strict-Transport-Security (HSTS) header do?', 'options' => ['Restricts which content types are served', 'Forces browsers to communicate with the site exclusively over HTTPS, preventing protocol downgrade attacks', 'Controls HTTP request rate', 'Validates SSL certificate pinning'], 'correct' => 1],
+            ['question' => 'How is SQL injection primarily prevented?', 'options' => ['Using a web application firewall only', 'Hiding database schema information', 'Using parameterised queries or prepared statements so user input is never treated as SQL', 'Disabling all database error messages'], 'correct' => 2],
+            ['question' => 'What is the primary defence against XSS?', 'options' => ['Using HTTPS exclusively', 'Encoding and escaping all user-supplied output in HTML contexts combined with a strict CSP', 'Disabling JavaScript in the browser', 'Storing all input in a database'], 'correct' => 1],
+            ['question' => 'What is CSRF prevention relying on?', 'options' => ['Disabling POST requests', 'CSRF tokens (synchroniser token pattern) or the SameSite cookie attribute to ensure requests originate from the legitimate site', 'Only allowing GET requests', 'Requiring HTTPS for all forms'], 'correct' => 1],
+            ['question' => 'What is a zero-day vulnerability?', 'options' => ['A vulnerability with a patch available immediately', 'A vulnerability that is publicly known and widely exploited', 'A vulnerability unknown to the vendor for which no patch exists', 'A vulnerability that takes zero days to exploit'], 'correct' => 2],
+            ['question' => 'What is encryption at rest?', 'options' => ['Encrypting data during transmission over a network', 'Encrypting data stored on disk or in a database to protect it if physical media is compromised', 'Pausing encryption during system rest periods', 'Encrypting only backup data'], 'correct' => 1],
+            ['question' => 'What is encryption in transit?', 'options' => ['Encrypting data while it is stored on disk', 'Encrypting data as it travels over a network to prevent interception', 'Encrypting backups during transfer to the cloud', 'A TLS certificate type'], 'correct' => 1],
+            ['question' => 'What is AES?', 'options' => ['An asymmetric encryption algorithm using key pairs', 'Advanced Encryption Standard – a widely used symmetric block cipher', 'An email authentication standard', 'An algorithm for hashing passwords'], 'correct' => 1],
+            ['question' => 'What is RSA?', 'options' => ['A symmetric encryption algorithm', 'Random Salt Algorithm for password hashing', 'Rivest–Shamir–Adleman – a widely used asymmetric public-key cryptosystem for encryption and digital signatures', 'A network packet encryption protocol'], 'correct' => 2],
+            ['question' => 'What is a man-in-the-middle (MitM) attack?', 'options' => ['An attacker sending malicious emails', 'An attacker secretly intercepting and potentially altering communication between two parties who believe they are communicating directly', 'Injecting code into a middle-tier server', 'A brute force attack targeting middleware'], 'correct' => 1],
+            ['question' => 'What does the X-Content-Type-Options: nosniff header do?', 'options' => ['Prevents cross-origin requests', 'Prevents browsers from MIME-sniffing a response away from the declared content type, reducing certain injection attacks', 'Restricts content length', 'Disables browser caching of content'], 'correct' => 1],
+            ['question' => 'What is responsible disclosure?', 'options' => ['Disclosing all software bugs publicly immediately', 'Reporting discovered security vulnerabilities to the affected vendor and giving them reasonable time to release a fix before public disclosure', 'Disclosing security incidents to regulators only', 'A mandatory breach notification process'], 'correct' => 1],
+            ['question' => 'What is penetration testing?', 'options' => ['Automated vulnerability scanning with tools', 'A simulated cyberattack performed by ethical hackers to identify and exploit security vulnerabilities in a system', 'Writing security unit tests', 'Testing application performance under load'], 'correct' => 1],
+            ['question' => 'What is the purpose of HTTPS?', 'options' => ['Speeding up web page load times', 'Encrypting communication between the client and server using TLS to protect data integrity and confidentiality', 'Compressing HTTP responses', 'Caching web resources at the browser'], 'correct' => 1],
+            ['question' => 'What is access control in security?', 'options' => ['Controlling server resource usage', 'Restricting who can access which resources and what actions they can perform', 'Managing network bandwidth allocation', 'Auditing all access log entries'], 'correct' => 1],
+            ['question' => 'What is a security audit?', 'options' => ['A performance review of the security team', 'A systematic evaluation of a system\'s security posture to identify weaknesses, verify controls, and ensure compliance', 'An automated vulnerability scan', 'A government inspection of security certificates'], 'correct' => 1],
+            ['question' => 'What is the Referrer-Policy HTTP header?', 'options' => ['Blocking referral traffic from external sites', 'Controlling how much referrer information the browser includes in requests, reducing data leakage to third parties', 'Preventing hotlinking of images', 'A header for tracking marketing campaigns'], 'correct' => 1],
+            ['question' => 'What is key stretching in password security?', 'options' => ['Increasing the length of encryption keys', 'Applying a hash function many times to a password to make brute force attacks computationally expensive', 'Generating multiple keys from one password', 'Extending the expiry time of cryptographic keys'], 'correct' => 1],
+            ['question' => 'What is multi-factor authentication (MFA)?', 'options' => ['Using multiple passwords', 'Requiring verification from two or more independent factors (something you know, have, or are) before granting access', 'Authenticating from multiple devices', 'A cascading login retry mechanism'], 'correct' => 1],
+            ['question' => 'What is a security policy?', 'options' => ['A list of approved software', 'A set of rules, guidelines, and practices defining how an organisation protects its information assets', 'A firewall rule configuration', 'An automated compliance checker'], 'correct' => 1],
+            ['question' => 'What is the principle of defence in depth?', 'options' => ['Using one very strong security control', 'Applying multiple independent layers of security controls so that if one fails, others still protect the system', 'Defending the network perimeter only', 'Keeping security measures secret from attackers'], 'correct' => 1],
+        ],
+    ],
+    [
+        'label' => 'Intermediate',
+        'questions' => [
+            ['question' => 'What is a SQL UNION-based injection attack?', 'options' => ['Injecting UNION statements to crash the database', 'Appending UNION SELECT statements to retrieve data from other tables in the database', 'Combining multiple SQL injection payloads', 'Using UNION to bypass authentication'], 'correct' => 1],
+            ['question' => 'What is DOM-based XSS?', 'options' => ['XSS stored in the server database', 'XSS where the vulnerability exists in client-side JavaScript that writes attacker-controlled data to the DOM without server involvement', 'XSS reflected via the server response', 'XSS targeting HTML form elements'], 'correct' => 1],
+            ['question' => 'What does the SameSite cookie attribute do?', 'options' => ['Restricts cookies to HTTPS connections only', 'Controls whether cookies are sent with cross-site requests, helping prevent CSRF attacks', 'Marks cookies as inaccessible to JavaScript', 'Limits cookie lifetime to the current session'], 'correct' => 1],
+            ['question' => 'What is the OWASP Broken Access Control risk?', 'options' => ['Broken encryption algorithms in access tokens', 'Users being able to act outside their intended permissions, such as accessing other users\' data or admin functionality', 'Broken OAuth flows allowing unauthorised login', 'Misconfigured API authentication'], 'correct' => 1],
+            ['question' => 'What is the JWT "alg:none" vulnerability?', 'options' => ['A weak algorithm being used', 'An attacker modifying the JWT header to set alg to none, bypassing signature verification on servers that accept unsigned tokens', 'A null pointer in JWT parsing', 'A JWT with no expiry claim'], 'correct' => 1],
+            ['question' => 'What is a timing attack?', 'options' => ['An attack launched at a specific time of day', 'Exploiting measurable differences in response time to infer secret information such as valid usernames or cryptographic key bits', 'A DDoS attack synchronized to peak traffic', 'A race condition exploit in session handling'], 'correct' => 1],
+            ['question' => 'What is PBKDF2?', 'options' => ['A symmetric encryption standard', 'Password-Based Key Derivation Function 2 – a key stretching algorithm applying a pseudorandom function with a salt and many iterations', 'A public-key infrastructure standard', 'A protocol for password-based authentication'], 'correct' => 1],
+            ['question' => 'What is certificate pinning?', 'options' => ['Marking a certificate as trusted in a browser', 'Hardcoding an expected server certificate or public key in a client application to prevent accepting fraudulent certificates from rogue CAs', 'Automatically renewing SSL certificates', 'Pinning a certificate to a specific IP address'], 'correct' => 1],
+            ['question' => 'What is a rainbow table attack?', 'options' => ['An attack using colourful phishing pages', 'Using a precomputed table of hash-to-password mappings to quickly reverse unsalted password hashes', 'A multi-vector attack combining SQL injection and XSS', 'A brute force attack using GPU clusters'], 'correct' => 1],
+            ['question' => 'What is the purpose of a salt in password hashing?', 'options' => ['To increase the encryption key length', 'A unique random value added to a password before hashing to prevent rainbow table attacks and ensure identical passwords have different hashes', 'To speed up the hashing process', 'To compress the password before hashing'], 'correct' => 1],
+            ['question' => 'What is privilege escalation?', 'options' => ['Assigning admin roles to developers', 'An attack where a user gains higher-level permissions than those originally granted, either vertically (to admin) or horizontally (to another user\'s resources)', 'Escalating a security incident to management', 'Increasing API rate limits for privileged users'], 'correct' => 1],
+            ['question' => 'What is an Insecure Direct Object Reference (IDOR) vulnerability?', 'options' => ['Referencing insecure external JavaScript libraries', 'A flaw allowing attackers to access objects by manipulating user-supplied identifiers without proper authorisation checks', 'Using insecure HTTP links to internal resources', 'Exposing internal object IDs in API error messages'], 'correct' => 1],
+            ['question' => 'What is SSRF (Server-Side Request Forgery)?', 'options' => ['A client-side request manipulation attack', 'An attack causing the server to make HTTP requests to unintended internal or external targets, potentially exposing internal services', 'Server-side rendering with forged credentials', 'SQL injection via server-side APIs'], 'correct' => 1],
+            ['question' => 'What is XXE (XML External Entity) injection?', 'options' => ['Cross-site scripting via XML', 'An attack exploiting XML parsers that process external entity declarations, allowing file disclosure, SSRF, or denial of service', 'Extra XSS via XML attributes', 'XML encoding bypass in user input'], 'correct' => 1],
+            ['question' => 'What is the OAuth 2.0 implicit flow\'s main security weakness?', 'options' => ['It does not use HTTPS', 'Access tokens are returned in URL fragments, making them vulnerable to leakage via browser history, logs, and referrer headers', 'It does not support mobile applications', 'Refresh tokens are not issued'], 'correct' => 1],
+            ['question' => 'What is a subdomain takeover?', 'options' => ['A DDoS attack targeting subdomains', 'Claiming a dangling DNS subdomain that points to an unclaimed or deleted service, allowing an attacker to serve content on the victim\'s subdomain', 'Hijacking a subdomain\'s SSL certificate', 'A DNS cache poisoning attack'], 'correct' => 1],
+            ['question' => 'What is a TLS downgrade attack?', 'options' => ['Slowing down TLS handshakes', 'Forcing a connection to use a weaker, older TLS protocol version or cipher suite that has known vulnerabilities', 'Downgrading an HTTPS site to HTTP', 'A certificate chain manipulation attack'], 'correct' => 1],
+            ['question' => 'What are the HttpOnly and Secure cookie flags?', 'options' => ['HttpOnly allows JavaScript access; Secure disables HTTPS', 'HttpOnly prevents JavaScript from accessing the cookie; Secure ensures the cookie is only sent over HTTPS connections', 'Both prevent cross-site cookie sharing', 'HttpOnly is for authentication cookies; Secure is for session cookies'], 'correct' => 1],
+            ['question' => 'What is rate limiting\'s primary security role?', 'options' => ['Improving API performance', 'Preventing brute force and credential stuffing attacks by limiting the number of attempts a client can make in a time window', 'Reducing cloud compute costs', 'Prioritising requests from paying customers'], 'correct' => 1],
+            ['question' => 'What is secret scanning in CI/CD?', 'options' => ['Scanning container images for vulnerabilities', 'Automatically detecting hardcoded secrets such as API keys, passwords, and tokens committed to source code repositories', 'Encrypting CI/CD pipeline variables', 'Scanning for insecure dependencies'], 'correct' => 1],
+            ['question' => 'What is a Host header injection attack?', 'options' => ['Injecting malicious HTML via HTTP Host header', 'Manipulating the HTTP Host header to conduct password reset poisoning, cache poisoning, or SSRF attacks', 'Setting a malicious hostname in DNS', 'A header injection variant of XSS'], 'correct' => 1],
+            ['question' => 'What is OWASP\'s Cryptographic Failures risk?', 'options' => ['Using non-FIPS-approved algorithms', 'Failure to adequately protect sensitive data through proper encryption, resulting in exposure of passwords, credit card data, or personal information', 'Cryptographic library licensing issues', 'Using expired certificates'], 'correct' => 1],
+            ['question' => 'What is ABAC (Attribute-Based Access Control)?', 'options' => ['Access control based on alphabetical user ordering', 'Access control decisions based on attributes of the user, resource, action, and environment rather than just roles', 'A blockchain-based access control model', 'Access control limited to administrators'], 'correct' => 1],
+            ['question' => 'What is a SIEM (Security Information and Event Management) system?', 'options' => ['A single sign-on management system', 'A platform aggregating and correlating security logs and events from across an organisation to detect threats and support incident response', 'A software inventory management tool', 'A security team communication platform'], 'correct' => 1],
+            ['question' => 'What is the purpose of the Permissions-Policy header?', 'options' => ['Granting users elevated permissions via HTTP', 'Controlling which browser features and APIs (camera, geolocation, microphone) can be used by the page or embedded iframes', 'Setting RBAC policies for API endpoints', 'A replacement for Content Security Policy'], 'correct' => 1],
+            ['question' => 'What is security misconfiguration according to OWASP?', 'options' => ['Using the wrong security library', 'Insecurely configured security settings such as default credentials, open cloud storage, unnecessary features enabled, or verbose error messages', 'Writing incorrect firewall rules', 'Misconfiguring authentication protocols'], 'correct' => 1],
+            ['question' => 'What is envelope encryption?', 'options' => ['Wrapping messages in multiple encryption layers', 'Encrypting a data key with a key encryption key (KEK), then using the data key to encrypt the actual data – used in cloud KMS services', 'Encrypting data before sending it in an email', 'A nested SSL/TLS encryption scheme'], 'correct' => 1],
+            ['question' => 'What is the Secure attribute on cookies?', 'options' => ['Marks a cookie as containing sensitive data', 'Ensures the cookie is only transmitted over encrypted HTTPS connections, preventing it from being sent over plain HTTP', 'Prevents the cookie from being modified by the client', 'Enables server-side cookie encryption'], 'correct' => 1],
+        ],
+    ],
+    [
+        'label' => 'Advanced',
+        'questions' => [
+            ['question' => 'What is path traversal (directory traversal) attack?', 'options' => ['Mapping all application URL paths', 'Using sequences like ../ to navigate outside the intended directory and access arbitrary files on the server', 'Traversing database table relationships', 'Exploiting symbolic links in application code'], 'correct' => 1],
+            ['question' => 'What is insecure deserialisation?', 'options' => ['A bug in JSON parsing libraries', 'An attack where an application deserialises untrusted data, allowing attackers to manipulate objects to achieve remote code execution or other attacks', 'Storing serialised objects insecurely in a database', 'Incorrect use of the Serializable interface'], 'correct' => 1],
+            ['question' => 'What is certificate transparency (CT)?', 'options' => ['Making all TLS certificates public by default', 'A public logging framework requiring CAs to log all issued certificates, enabling detection of misissued or fraudulent certificates', 'A certificate revocation standard', 'An open-source certificate authority'], 'correct' => 1],
+            ['question' => 'What is a WAF (Web Application Firewall)?', 'options' => ['A network-level firewall for cloud providers', 'A security control that filters and monitors HTTP traffic to and from a web application, blocking attacks like SQLi, XSS, and CSRF', 'A hardware firewall for data centres', 'A software tool for scanning web code'], 'correct' => 1],
+            ['question' => 'What is threat modelling?', 'options' => ['Building 3D models of attacker profiles', 'A structured process of systematically identifying, categorising, and prioritising potential threats to a system to guide security design decisions', 'Modelling network traffic patterns for anomaly detection', 'Creating threat intelligence reports'], 'correct' => 1],
+            ['question' => 'What is the zero trust security model?', 'options' => ['Trusting all traffic inside the corporate network perimeter', 'A security philosophy of never implicitly trusting any user or device regardless of network location, requiring continuous verification of every access request', 'A model where only verified users trust the security team', 'A model with zero tolerance for security incidents'], 'correct' => 1],
+            ['question' => 'What is FIDO2 / WebAuthn?', 'options' => ['A two-factor SMS authentication standard', 'Open standards for strong passwordless or multi-factor authentication using public-key cryptography and hardware authenticators', 'A biometric database standard', 'A federated identity management protocol'], 'correct' => 1],
+            ['question' => 'What is credential stuffing?', 'options' => ['Brute forcing passwords with a dictionary', 'Using large lists of username/password pairs obtained from data breaches to attempt login on other services where users reuse credentials', 'Intercepting credentials in transit', 'Harvesting credentials from phishing pages'], 'correct' => 1],
+            ['question' => 'What is lateral movement in a cyberattack?', 'options' => ['Moving attack traffic through multiple ISPs', 'Techniques used by an attacker to progressively move through a network after initial compromise to reach higher-value targets or data', 'Transferring exfiltrated data sideways to avoid detection', 'Rotating attacker IP addresses'], 'correct' => 1],
+            ['question' => 'What is DAST (Dynamic Application Security Testing)?', 'options' => ['Analysing source code without running it', 'Testing a running application by simulating attacks from the outside to identify exploitable vulnerabilities in a live environment', 'Scanning dependencies for known CVEs', 'Automated penetration testing of cloud infrastructure'], 'correct' => 1],
+            ['question' => 'What is SAST (Static Application Security Testing)?', 'options' => ['Testing an application by running it in a staging environment', 'Analysing application source code, bytecode, or binaries for security vulnerabilities without executing the program', 'Scanning running containers for threats', 'Automated review of cloud security configurations'], 'correct' => 1],
+            ['question' => 'What is a supply chain attack?', 'options' => ['Physically stealing hardware from a supplier', 'Compromising a trusted software dependency, build tool, or vendor to distribute malicious code to downstream customers', 'A DDoS attack on e-commerce supply chain systems', 'Intercepting software updates in transit'], 'correct' => 1],
+            ['question' => 'What is HSTS preloading?', 'options' => ['Preloading SSL certificates into browsers', 'Submitting a domain to a browser-maintained hardcoded list of HSTS-only sites, ensuring HTTPS is enforced before any HTTP connection is ever made', 'Automatically renewing HSTS headers', 'Preloading HSTS configuration on the server'], 'correct' => 1],
+            ['question' => 'What is a side-channel attack?', 'options' => ['Attacking a secondary server in the infrastructure', 'Exploiting information leaked by the physical implementation of a system such as timing, power consumption, or electromagnetic radiation rather than flaws in the algorithm', 'A lateral movement technique', 'An out-of-band data exfiltration method'], 'correct' => 1],
+            ['question' => 'What is the Diffie-Hellman key exchange?', 'options' => ['An asymmetric encryption algorithm for data', 'A cryptographic protocol allowing two parties to establish a shared secret key over an insecure channel without transmitting the key itself', 'A password hashing scheme', 'A digital signature algorithm'], 'correct' => 1],
+            ['question' => 'What is perfect forward secrecy (PFS)?', 'options' => ['A cipher with no known weaknesses', 'A TLS property ensuring that compromise of a long-term private key does not expose past session keys, since each session uses an ephemeral key', 'Encryption that cannot be broken by quantum computers', 'A FIPS-approved key exchange standard'], 'correct' => 1],
+            ['question' => 'What is the JWT algorithm confusion attack?', 'options' => ['Using a weak HMAC secret in JWT', 'Tricking a server expecting an asymmetric algorithm (RS256) into accepting a symmetrically signed token (HS256) using the public key as the HMAC secret', 'Injecting claims into an unsigned JWT', 'Forging a JWT with a null algorithm'], 'correct' => 1],
+            ['question' => 'What is the difference between input sanitisation and input validation?', 'options' => ['They are the same concept', 'Validation checks whether input conforms to expected rules; sanitisation modifies or removes potentially harmful characters from input', 'Sanitisation is only for SQL; validation is only for HTML', 'Validation happens client-side; sanitisation happens server-side only'], 'correct' => 1],
+            ['question' => 'What is data exfiltration?', 'options' => ['Filtering out sensitive data in logs', 'The unauthorised transfer of data from an organisation\'s systems to an external location controlled by an attacker', 'Exporting data from a database for backup', 'Filtering external network traffic'], 'correct' => 1],
+            ['question' => 'What is OWASP\'s Vulnerable and Outdated Components risk?', 'options' => ['Using components with low test coverage', 'Using libraries, frameworks, or other software components with known security vulnerabilities, increasing the application\'s attack surface', 'Outdated SSL certificates in production', 'Deprecated API versions still in use'], 'correct' => 1],
+            ['question' => 'What is HTTP parameter pollution (HPP)?', 'options' => ['Filling HTTP headers with excessive parameters', 'Submitting multiple HTTP parameters with the same name to confuse server-side parsing, potentially bypassing security controls or causing unexpected behaviour', 'Injecting parameters into HTTP URLs', 'Polluting browser query string caches'], 'correct' => 1],
+            ['question' => 'What is OAuth 2.0 mix-up attack?', 'options' => ['Using multiple OAuth providers simultaneously', 'An attack where the OAuth client is confused about which authorisation server it is communicating with, causing it to send auth codes or tokens to an attacker', 'Mixing OAuth and SAML in the same flow', 'Reusing authorisation codes across different OAuth flows'], 'correct' => 1],
+            ['question' => 'What is a security token service (STS)?', 'options' => ['A hardware token device', 'A service that validates credentials and issues temporary, limited-privilege security tokens for accessing protected resources', 'A software licence token service', 'A service managing TLS certificate rotation'], 'correct' => 1],
+            ['question' => 'What is container image security scanning?', 'options' => ['Monitoring container runtime behaviour', 'Analysing container images for known CVEs in OS packages and application dependencies before deployment', 'Scanning container network traffic', 'Auditing Kubernetes RBAC policies'], 'correct' => 1],
+            ['question' => 'What is OWASP\'s Security Logging and Monitoring Failures risk?', 'options' => ['Log files consuming too much storage', 'Insufficient logging and monitoring of security events allowing attacks to go undetected, without timely incident response', 'Logging sensitive data such as passwords', 'Monitoring tools consuming excessive resources'], 'correct' => 1],
+            ['question' => 'What is a mass assignment vulnerability?', 'options' => ['Assigning roles to too many users at once', 'An attack where an attacker binds additional object properties from user-controlled input that the developer did not intend to be modifiable', 'Bulk assignment of permissions via an API', 'SQL injection via batch INSERT statements'], 'correct' => 1],
+            ['question' => 'What is the purpose of dependency vulnerability scanning (SCA)?', 'options' => ['Scanning application source code for bugs', 'Software Composition Analysis – identifying open-source libraries with known CVEs in an application\'s dependency tree', 'Monitoring dependencies at runtime for anomalous behaviour', 'Checking software licensing compliance only'], 'correct' => 1],
+            ['question' => 'What is stored procedure injection?', 'options' => ['XSS via stored database values', 'SQL injection exploiting stored procedures that dynamically build and execute SQL from user input without parameterisation', 'Injecting malicious code into application procedures', 'An LDAP injection variant'], 'correct' => 1],
+        ],
+    ],
+    [
+        'label' => 'Expert',
+        'questions' => [
+            ['question' => 'What is the difference between CVE and CVSS?', 'options' => ['CVE scores vulnerabilities; CVSS identifies them', 'CVE is a unique identifier for a specific vulnerability; CVSS is a numerical scoring system measuring the severity of that vulnerability', 'They are identical standards', 'CVE is for software; CVSS is for hardware'], 'correct' => 1],
+            ['question' => 'What is an Advanced Persistent Threat (APT)?', 'options' => ['An advanced firewall configuration', 'A sophisticated, long-term targeted cyberattack typically by a nation-state or well-resourced group aiming for persistent access and intelligence gathering', 'A particularly severe vulnerability', 'An automated persistent scanning tool'], 'correct' => 1],
+            ['question' => 'What is the Cyber Kill Chain?', 'options' => ['A supply chain security framework', 'A framework describing the stages of a targeted cyberattack: Reconnaissance, Weaponization, Delivery, Exploitation, Installation, Command &amp; Control, Actions on Objectives', 'A kill switch for compromised systems', 'A network intrusion detection model'], 'correct' => 1],
+            ['question' => 'What is GDPR\'s right to erasure (right to be forgotten)?', 'options' => ['The right to correct inaccurate personal data', 'The right of individuals to request the deletion of their personal data under certain conditions', 'The right to opt out of data processing', 'The right to access a copy of personal data'], 'correct' => 1],
+            ['question' => 'What is SOC 2 Type II certification?', 'options' => ['A one-time point-in-time security assessment', 'An independent auditor\'s attestation that a service organisation\'s security controls were effective over a defined period (typically 6-12 months)', 'A mandatory government security certification', 'A technical vulnerability assessment report'], 'correct' => 1],
+            ['question' => 'What is a red team vs blue team security exercise?', 'options' => ['Development team vs operations team', 'Red team simulates adversaries attacking systems; blue team defends, detects, and responds to those attacks', 'Junior vs senior security engineers', 'Internal vs external security auditors'], 'correct' => 1],
+            ['question' => 'What is a Hardware Security Module (HSM)?', 'options' => ['A hardware-accelerated firewall', 'A dedicated physical device that generates, stores, and manages cryptographic keys in tamper-resistant hardware', 'A hardware-based intrusion detection system', 'A physical token for multi-factor authentication'], 'correct' => 1],
+            ['question' => 'What is post-quantum cryptography?', 'options' => ['Cryptography for quantum computers to use', 'Cryptographic algorithms designed to be secure against attacks from both classical and quantum computers', 'Encryption that uses quantum key distribution', 'Improved classical cryptography developed after 2020'], 'correct' => 1],
+            ['question' => 'What is differential privacy?', 'options' => ['Encrypting the difference between datasets', 'A mathematical framework for releasing statistical information about datasets while providing provable guarantees that individual records cannot be identified', 'A privacy policy comparing different user groups', 'Differential encryption for varying security levels'], 'correct' => 1],
+            ['question' => 'What is homomorphic encryption?', 'options' => ['Encryption that looks the same to all parties', 'A form of encryption allowing computations to be performed directly on ciphertext, producing encrypted results that match those of operations on plaintext', 'Symmetric encryption using homogeneous keys', 'A key exchange protocol'], 'correct' => 1],
+            ['question' => 'What is the MITRE ATT&amp;CK framework?', 'options' => ['A penetration testing methodology', 'A comprehensive knowledge base of adversary tactics, techniques, and procedures (TTPs) based on real-world observations, used for threat detection and defence', 'A vulnerability scoring system', 'A security compliance framework'], 'correct' => 1],
+            ['question' => 'What is a Trusted Platform Module (TPM)?', 'options' => ['A trusted third-party authentication module', 'A dedicated microcontroller embedded in hardware providing cryptographic functions including secure key generation, storage, and platform integrity measurement', 'A trusted certificate authority module', 'A hardware password manager'], 'correct' => 1],
+            ['question' => 'What is code signing?', 'options' => ['Adding comments to explain code security decisions', 'Applying a cryptographic digital signature to software to verify its authenticity and confirm it has not been modified since signing', 'Signing security audit reports', 'Reviewing code for security compliance'], 'correct' => 1],
+            ['question' => 'What is a zero-knowledge proof?', 'options' => ['Proving a system has zero vulnerabilities', 'A cryptographic method allowing one party to prove to another that a statement is true without revealing any information beyond the truth of that statement', 'Authentication without storing any user knowledge', 'A testing technique for unknown vulnerabilities'], 'correct' => 1],
+            ['question' => 'What does the STRIDE threat model stand for?', 'options' => ['Storage, Transfer, Routing, Integrity, Detection, Encryption', 'Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege', 'System, Threat, Risk, Impact, Detection, Escalation', 'Security, Trust, Resilience, Identity, Data, Exposure'], 'correct' => 1],
+            ['question' => 'What is secure multiparty computation (MPC)?', 'options' => ['Multiple parties sharing a secure computing cluster', 'A cryptographic technique enabling multiple parties to jointly compute a function over their private inputs without any party revealing their input to the others', 'Running computations inside a secure enclave', 'Distributed computing with encrypted channels'], 'correct' => 1],
+            ['question' => 'What are canary tokens used for in security?', 'options' => ['Testing canary deployments securely', 'Decoy resources (fake files, URLs, credentials) that generate an alert when accessed, providing early warning of an intrusion or data exfiltration', 'A canary release security testing pattern', 'Honeypot server tokens'], 'correct' => 1],
+            ['question' => 'What is mandatory access control (MAC)?', 'options' => ['Requiring all users to accept an access policy', 'An operating system-enforced access control model based on security labels, where the OS – not the owner – determines access permissions', 'A network access control standard for MAC addresses', 'A multi-factor authentication mandate'], 'correct' => 1],
+            ['question' => 'What is the security principle of complete mediation?', 'options' => ['Using a security mediator between all services', 'Every access to every resource must be checked for authorisation every time – no bypasses, cached decisions, or trusted paths that skip access control', 'Mediating all network traffic through a proxy', 'Complete end-to-end encryption of all communications'], 'correct' => 1],
+            ['question' => 'What is a key derivation function (KDF)?', 'options' => ['A function deriving public keys from private keys', 'A function that derives one or more cryptographic keys from a secret value (password or master key) using a hash function, making brute force computationally expensive', 'A function generating random session keys', 'A function converting between different key formats'], 'correct' => 1],
+            ['question' => 'What is the purpose of DKIM in email security?', 'options' => ['Domain Key Issuance Management', 'DomainKeys Identified Mail – a standard allowing an organisation to cryptographically sign outgoing emails so receivers can verify the message was not forged or altered', 'Dynamic Key Infrastructure Management', 'Dual-Key Identity Management'], 'correct' => 1],
+            ['question' => 'What is NIST Cybersecurity Framework (CSF)?', 'options' => ['A mandatory US government security standard', 'A voluntary framework providing standards, guidelines, and best practices for managing cybersecurity risk, organised around Identify, Protect, Detect, Respond, and Recover functions', 'A network security configuration standard', 'A certification programme for cybersecurity professionals'], 'correct' => 1],
+            ['question' => 'What is memory-safe programming\'s security benefit?', 'options' => ['Faster application performance', 'Eliminating entire classes of vulnerabilities such as buffer overflows, use-after-free, and out-of-bounds memory access that are leading causes of security exploits', 'Reducing memory usage of applications', 'Preventing logical errors in business logic'], 'correct' => 1],
+            ['question' => 'What is the OAuth 2.0 Rich Authorization Requests (RAR) extension?', 'options' => ['A way to request richer user profile data', 'A standard allowing OAuth clients to request fine-grained, structured authorisation details in the authorisation request beyond simple scopes', 'A verbose logging extension for OAuth flows', 'An extension for requesting longer token lifetimes'], 'correct' => 1],
+            ['question' => 'What is secure enclave technology (e.g., Intel SGX, Apple Secure Enclave)?', 'options' => ['An encrypted database storage technology', 'A hardware-isolated trusted execution environment (TEE) protecting sensitive computations and keys from the OS, hypervisor, and other software even if they are compromised', 'A secure VPN tunnel technology', 'A hardware-backed password manager'], 'correct' => 1],
+            ['question' => 'What is the principle of separation of duties in security?', 'options' => ['Having separate security and development teams', 'Dividing critical tasks and privileges among multiple people so no single individual can perform a sensitive operation alone, reducing fraud and error risk', 'Separating production from development environments', 'Using separate accounts for different applications'], 'correct' => 1],
+            ['question' => 'What is security chaos engineering?', 'options' => ['Randomly disabling security controls for testing', 'Intentionally testing security controls and incident response under controlled failure conditions to build confidence in security resilience', 'Chaos testing that ignores security implications', 'Stress-testing authentication systems'], 'correct' => 1],
+            ['question' => 'What is the difference between SOC 2 Type I and Type II?', 'options' => ['Type I covers more security controls than Type II', 'Type I assesses whether controls are suitably designed at a single point in time; Type II assesses whether controls operated effectively over a period of time', 'Type I is for SaaS; Type II is for IaaS', 'Type II is a higher level of certification than Type I with additional controls'], 'correct' => 1],
+        ],
+    ],
+];
+require_once __DIR__ . '/quiz-engine.php';

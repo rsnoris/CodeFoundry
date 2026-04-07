@@ -1,660 +1,173 @@
 <?php
-$page_title  = 'Backend & API Development Quiz - CodeFoundry';
+$page_title = 'Backend & API Development Quiz – 100 Levels – CodeFoundry';
 $active_page = 'training';
-$page_styles = <<<'PAGECSS'
-:root {
-      --navy: #0e1828;
-      --navy-2: #121c2b;
-      --navy-3: #161f2f;
-      --primary: #18b3ff;
-      --primary-hover: #009de0;
-      --text: #fff;
-      --text-muted: #92a3bb;
-      --text-subtle: #627193;
-      --border-color: #1a2942;
-      --button-outline: #ffffff22;
-      --button-radius: 8px;
-      --maxwidth: 1200px;
-      --card-radius: 12px;
-      --header-height: 68px;
-      --mobile-menu-bg: #0e1828f9;
-    }
-    html, body {
-      background: var(--navy-2);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    body { min-height: 100vh; }
-    a { color: inherit; text-decoration: none; }
-
-    header {
-      background: var(--navy);
-      color: var(--text);
-      padding: 0;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      border-bottom: 1px solid #192746;
-    }
-    .nav {
-      max-width: var(--maxwidth);
-      margin: 0 auto;
-      padding: 0 40px;
-      min-height: var(--header-height);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      font-weight: 800;
-      font-size: 22px;
-      gap: 12px;
-      letter-spacing: -0.5px;
-    }
-    .brand svg {
-      width: 28px;
-      height: 28px;
-      background: var(--primary);
-      border-radius: 6px;
-      color: #092340;
-      padding: 4px;
-      margin-right: 4px;
-      box-sizing: border-box;
-    }
-    .nav-menu {
-      display: flex;
-      gap: 28px;
-      align-items: center;
-    }
-    .nav-link {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 15px;
-      transition: color .2s;
-    }
-    .nav-link:hover,
-    .nav-link.active {
-      color: var(--text);
-    }
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .nav-btn {
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 700;
-      border: 0;
-      border-radius: var(--button-radius);
-      padding: 10px 18px;
-      background: var(--navy-3);
-      cursor: pointer;
-      color: var(--text);
-      transition: background .2s, color .2s;
-    }
-    .nav-btn.primary {
-      background: var(--primary);
-      color: var(--navy);
-    }
-    .nav-btn.secondary {
-      background: transparent;
-      border: 1px solid var(--button-outline);
-    }
-    .nav-btn:hover {
-      background: var(--primary-hover);
-      color: var(--navy);
-    }
-    .mobile-hamburger {
-      display: none;
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-size: 28px;
-      cursor: pointer;
-      padding: 0;
-      width: 32px;
-      height: 32px;
-      align-items: center;
-      justify-content: center;
-    }
-    .mobile-nav-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--mobile-menu-bg);
-      z-index: 2000;
-      backdrop-filter: blur(10px);
-    }
-    .mobile-nav-overlay.active {
-      display: block;
-    }
-    .mobile-nav-panel {
-      background: var(--navy);
-      height: 100%;
-      width: 300px;
-      max-width: 85%;
-      margin-left: auto;
-      display: flex;
-      flex-direction: column;
-      border-left: 1px solid var(--border-color);
-    }
-    .mobile-menu-close {
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-size: 28px;
-      cursor: pointer;
-      padding: 20px;
-      width: fit-content;
-      margin-left: auto;
-      display: flex;
-    }
-    .mobile-menu-links {
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      gap: 8px;
-    }
-    .mobile-menu-links .nav-link {
-      padding: 12px 16px;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-    .mobile-menu-links .nav-link:hover {
-      background: var(--navy-3);
-    }
-    .mobile-menu-actions {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: auto;
-    }
-    .mobile-menu-actions .nav-btn {
-      width: 100%;
-      text-align: center;
-    }
-
-    .quiz-container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-    .quiz-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    .quiz-header h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin: 0 0 16px 0;
-    }
-    .quiz-header .back-link {
-      color: var(--primary);
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: color 0.2s;
-      margin-bottom: 20px;
-    }
-    .quiz-header .back-link:hover {
-      color: var(--primary-hover);
-    }
-    .quiz-content {
-      background: var(--navy);
-      border: 1px solid var(--border-color);
-      border-radius: var(--card-radius);
-      padding: 40px;
-    }
-    .quiz-progress {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      padding: 12px 16px;
-      background: var(--navy-3);
-      border-radius: 8px;
-    }
-    .quiz-question {
-      margin-bottom: 24px;
-    }
-    .quiz-question-text {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 24px;
-      line-height: 1.5;
-    }
-    .quiz-options {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .quiz-option {
-      background: var(--navy-3);
-      border: 2px solid var(--border-color);
-      border-radius: 8px;
-      padding: 18px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 1rem;
-    }
-    .quiz-option:hover {
-      border-color: var(--primary);
-      background: var(--navy-2);
-    }
-    .quiz-option.selected {
-      border-color: var(--primary);
-      background: rgba(24, 179, 255, 0.1);
-    }
-    .quiz-navigation {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 30px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border-color);
-    }
-    .simulator-btn-primary {
-      background: var(--primary);
-      color: var(--navy-2);
-      border: none;
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s;
-      font-size: 15px;
-    }
-    .simulator-btn-primary:hover:not(:disabled) {
-      background: var(--primary-hover);
-    }
-    .simulator-btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .simulator-btn-secondary {
-      background: var(--navy-3);
-      color: var(--text);
-      border: 1px solid var(--border-color);
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 15px;
-    }
-    .simulator-btn-secondary:hover:not(:disabled) {
-      border-color: var(--primary);
-      background: var(--navy-2);
-    }
-    .simulator-btn-secondary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .quiz-results {
-      text-align: center;
-      padding: 40px 20px;
-    }
-    .quiz-results h2 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 0 0 20px 0;
-    }
-    .quiz-score {
-      font-size: 4rem;
-      font-weight: 800;
-      color: var(--primary);
-      margin: 20px 0;
-    }
-    .quiz-result-details {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 16px;
-      margin: 30px 0;
-    }
-    .quiz-result-stat {
-      background: var(--navy-3);
-      padding: 24px;
-      border-radius: 8px;
-    }
-    .quiz-result-stat-value {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--primary);
-    }
-    .quiz-result-stat-label {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-top: 8px;
-    }
-
-    /* Level selector */
-    .quiz-level-selector {
-      padding: 8px 0;
-    }
-    .quiz-level-selector h3 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin: 0 0 8px 0;
-    }
-    .quiz-level-selector p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      margin: 0 0 20px 0;
-    }
-    .level-options {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .level-option {
-      background: var(--navy-3);
-      border: 2px solid var(--border-color);
-      border-radius: 10px;
-      padding: 18px 20px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .level-option:hover {
-      border-color: var(--primary);
-      background: rgba(24, 179, 255, 0.05);
-    }
-    .level-option-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 4px;
-    }
-    .level-badge {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 3px 10px;
-      border-radius: 20px;
-      text-transform: uppercase;
-    }
-    .level-badge.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
-    .level-badge.intermediate { background: rgba(245,158,11,0.15);  color: #f59e0b; }
-    .level-badge.advanced     { background: rgba(239,68,68,0.15);   color: #ef4444; }
-    .level-option-name {
-      font-weight: 700;
-      font-size: 1rem;
-    }
-    .level-option-desc {
-      color: var(--text-muted);
-      font-size: 0.875rem;
-    }
-    .quiz-level-pill {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 2px 9px;
-      border-radius: 20px;
-      text-transform: uppercase;
-    }
-    .quiz-level-pill.beginner     { background: rgba(16,185,129,0.15); color: #10b981; }
-    .quiz-level-pill.intermediate { background: rgba(245,158,11,0.15);  color: #f59e0b; }
-    .quiz-level-pill.advanced     { background: rgba(239,68,68,0.15);   color: #ef4444; }
-
-    @media (max-width: 768px) {
-      .nav-menu,
-      .nav-actions {
-        display: none;
-      }
-      .mobile-hamburger {
-        display: flex;
-      }
-      .quiz-content {
-        padding: 24px;
-      }
-      .quiz-header h1 {
-        font-size: 2rem;
-      }
-      .quiz-question-text {
-        font-size: 1.1rem;
-      }
-      .quiz-score {
-        font-size: 3rem;
-      }
-    }
-PAGECSS;
-$page_scripts = '';
-require_once __DIR__ . '/../../includes/header.php';
-?>
-<div class="quiz-container">
-    <div class="quiz-header">
-      <a href="/Training/" class="back-link">← Back to Training</a>
-      <h1>Backend & API Development Quiz</h1>
-    </div>
-    <div class="quiz-content" id="quizContent"></div>
-  </div>
-
-  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-  <script>
-    // Mobile menu functionality
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mobileNav = document.getElementById('mobileNav');
-    const closeMobileNav = document.getElementById('closeMobileNav');
-
-    mobileMenuBtn?.addEventListener('click', () => {
-      mobileNav.classList.add('active');
-    });
-
-    closeMobileNav?.addEventListener('click', () => {
-      mobileNav.classList.remove('active');
-    });
-
-    mobileNav?.addEventListener('click', (e) => {
-      if (e.target === mobileNav) {
-        mobileNav.classList.remove('active');
-      }
-    });
-
-    // Quiz Data
-    const quizData = {
-      title: 'Backend & API Development',
-      levels: {
-        beginner: {
-          label: 'Beginner',
-          description: 'REST, HTTP methods, and API fundamentals',
-          questions: [
-            { question: 'What does REST stand for?', options: ['Representational State Transfer', 'Remote Execution Service Technology', 'Rapid Enterprise System Transfer', 'Reliable Endpoint Service Technology'], correct: 0 },
-            { question: 'Which HTTP method is used to update a resource?', options: ['GET', 'POST', 'PUT', 'DELETE'], correct: 2 },
-            { question: 'What is GraphQL?', options: ['A database', 'A query language for APIs', 'A programming language', 'A web framework'], correct: 1 },
-            { question: 'What is JWT used for?', options: ['Database queries', 'Authentication and authorization', 'Styling', 'Routing'], correct: 1 },
-            { question: 'Which status code indicates a successful GET request?', options: ['200', '201', '204', '404'], correct: 0 },
-            { question: 'Which HTTP method is used to retrieve data without modifying it?', options: ['POST', 'PUT', 'GET', 'DELETE'], correct: 2 },
-            { question: 'What does HTTP status code 404 mean?', options: ['Server error', 'Resource not found', 'Unauthorized', 'Bad request'], correct: 1 },
-            { question: 'What is an API endpoint?', options: ['A database table', 'A URL where an API can be accessed', 'A server configuration file', 'A programming language'], correct: 1 },
-            { question: 'Which HTTP method is used to create a new resource?', options: ['GET', 'POST', 'DELETE', 'HEAD'], correct: 1 },
-            { question: 'What does JSON stand for?', options: ['JavaScript Object Notation', 'Java Standard Object Naming', 'JavaScript Online Notation', 'JSON Serialized Object Namespace'], correct: 0 }
-          ]
-        },
-        intermediate: {
-          label: 'Intermediate',
-          description: 'Middleware, idempotency, and security',
-          questions: [
-            { question: 'What is middleware in Express.js?', options: ['A database connector', 'Functions that execute during the request-response cycle', 'A routing algorithm', 'A templating engine'], correct: 1 },
-            { question: 'What is the difference between PUT and PATCH?', options: ['They are identical', 'PUT replaces the entire resource; PATCH partially updates it', 'PATCH replaces the entire resource; PUT partially updates it', 'PUT creates; PATCH deletes'], correct: 1 },
-            { question: 'What does idempotent mean for HTTP methods?', options: ['The method is encrypted', 'Multiple identical requests produce the same result as one', 'The method requires authentication', 'The response is always cached'], correct: 1 },
-            { question: 'What is rate limiting used for?', options: ['Compressing responses', 'Controlling the number of requests a client can make in a time window', 'Caching data', 'Balancing load'], correct: 1 },
-            { question: 'What is CORS?', options: ['A database protocol', 'A policy controlling cross-origin HTTP requests', 'An authentication standard', 'A data format'], correct: 1 },
-            { question: 'What is OAuth 2.0 primarily used for?', options: ['Encrypting data', 'Delegated authorization to access resources on behalf of a user', 'Compressing API responses', 'Managing database connections'], correct: 1 },
-            { question: 'What is API versioning used for?', options: ['Caching responses', 'Allowing changes without breaking existing clients', 'Improving database performance', 'Encrypting endpoints'], correct: 1 },
-            { question: 'What does HTTP status code 401 indicate?', options: ['Not found', 'Server error', 'Unauthorized — authentication required', 'Forbidden'], correct: 2 },
-            { question: 'What is pagination in APIs?', options: ['Splitting API documentation into pages', 'Returning data in chunks to avoid sending too much at once', 'Versioning API endpoints', 'Caching API responses'], correct: 1 },
-            { question: 'What is a webhook?', options: ['A type of API key', 'An HTTP callback triggered when an event occurs', 'A load balancing technique', 'A query language extension'], correct: 1 }
-          ]
-        },
-        advanced: {
-          label: 'Advanced',
-          description: 'gRPC, event sourcing, CQRS, and API gateways',
-          questions: [
-            { question: 'What is gRPC?', options: ['A caching system', 'A high-performance RPC framework using Protocol Buffers', 'A GraphQL variant', 'A REST extension'], correct: 1 },
-            { question: 'What is the N+1 query problem?', options: ['Using N database indices', 'Executing N additional queries for each item in a result set', 'Having N API versions', 'Sending N duplicate requests'], correct: 1 },
-            { question: 'What is event sourcing?', options: ['Logging HTTP events', 'Storing state changes as an immutable sequence of events', 'Event-driven CSS', 'DOM event capture'], correct: 1 },
-            { question: 'What is CQRS?', options: ['A CSS framework', 'Command Query Responsibility Segregation — separating read and write models', 'A container registry', 'A CI/CD strategy'], correct: 1 },
-            { question: 'What does an API gateway provide?', options: ['Database migrations', 'A single entry point for clients to access microservices', 'CSS optimization', 'Static file serving'], correct: 1 },
-            { question: 'What is the difference between REST and GraphQL?', options: ['They are identical', 'REST uses fixed endpoints; GraphQL lets clients specify exact data needs', 'GraphQL uses fixed endpoints; REST is flexible', 'REST is newer than GraphQL'], correct: 1 },
-            { question: 'What is circuit breaker pattern?', options: ['A network security tool', 'A pattern that stops calls to a failing service to prevent cascade failures', 'A load balancing algorithm', 'An authentication strategy'], correct: 1 },
-            { question: 'What is the purpose of an ETag in HTTP?', options: ['Encrypting responses', 'Versioning resources for cache validation', 'Compressing payloads', 'Routing requests'], correct: 1 },
-            { question: 'What is a saga pattern in microservices?', options: ['A documentation format', 'Managing distributed transactions as a sequence of local transactions', 'A service discovery mechanism', 'An API testing strategy'], correct: 1 },
-            { question: 'What is service discovery in microservices?', options: ['Finding API bugs', 'Automatically detecting available service instances in a network', 'Documenting service endpoints', 'Monitoring service health'], correct: 1 }
-          ]
-        }
-      }
-    };
-    // Quiz State
-    let currentLevel = null;
-    let currentQuestionIndex = 0;
-    let userAnswers = [];
-
-    function showLevelSelector() {
-      const levels = Object.keys(quizData.levels);
-      document.getElementById('quizContent').innerHTML = `
-        <div class="quiz-level-selector">
-          <h3>Choose Your Difficulty Level</h3>
-          <p>Select the level that best matches your experience</p>
-          <div class="level-options">
-            ${levels.map(key => {
-              const lvl = quizData.levels[key];
-              return `
-                <div class="level-option" onclick="selectLevel('${key}')">
-                  <div class="level-option-header">
-                    <span class="level-badge ${key}">${lvl.label}</span>
-                    <span class="level-option-name">${lvl.label} — ${lvl.questions.length} Questions</span>
-                  </div>
-                  <div class="level-option-desc">${lvl.description}</div>
-                </div>`;
-            }).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    function selectLevel(level) {
-      currentLevel = level;
-      currentQuestionIndex = 0;
-      userAnswers = new Array(quizData.levels[level].questions.length).fill(null);
-      showQuestion();
-    }
-
-    function showQuestion() {
-      const levelData = quizData.levels[currentLevel];
-      const question = levelData.questions[currentQuestionIndex];
-      const totalQuestions = levelData.questions.length;
-      const quizContent = document.getElementById('quizContent');
-
-      quizContent.innerHTML = `
-        <div class="quiz-progress">
-          <span>Question ${currentQuestionIndex + 1} of ${totalQuestions}</span>
-          <span style="display:flex;align-items:center;gap:8px;">
-            <span class="quiz-level-pill ${currentLevel}">${levelData.label}</span>
-            ${Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)}% Complete
-          </span>
-        </div>
-        <div class="quiz-question">
-          <div class="quiz-question-text">${question.question}</div>
-          <div class="quiz-options">
-            ${question.options.map((option, index) => `
-              <div class="quiz-option ${userAnswers[currentQuestionIndex] === index ? 'selected' : ''}"
-                   onclick="selectAnswer(${index})">
-                ${option}
-              </div>
-            `).join('')}
-          </div>
-        </div>
-        <div class="quiz-navigation">
-          <button class="simulator-btn-secondary" onclick="previousQuestion()"
-                  ${currentQuestionIndex === 0 ? 'disabled' : ''}>
-            Previous
-          </button>
-          <button class="simulator-btn-primary" onclick="${currentQuestionIndex === totalQuestions - 1 ? 'finishQuiz()' : 'nextQuestion()'}">
-            ${currentQuestionIndex === totalQuestions - 1 ? 'Finish Quiz' : 'Next'}
-          </button>
-        </div>
-      `;
-    }
-
-    function selectAnswer(answerIndex) {
-      userAnswers[currentQuestionIndex] = answerIndex;
-      showQuestion();
-    }
-
-    function nextQuestion() {
-      const total = quizData.levels[currentLevel].questions.length;
-      if (currentQuestionIndex < total - 1) {
-        currentQuestionIndex++;
-        showQuestion();
-      }
-    }
-
-    function previousQuestion() {
-      if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        showQuestion();
-      }
-    }
-
-    function finishQuiz() {
-      const levelData = quizData.levels[currentLevel];
-      let correct = 0;
-      levelData.questions.forEach((question, index) => {
-        if (userAnswers[index] === question.correct) correct++;
-      });
-
-      const total = levelData.questions.length;
-      const percentage = Math.round((correct / total) * 100);
-      const quizContent = document.getElementById('quizContent');
-
-      quizContent.innerHTML = `
-        <div class="quiz-results">
-          <h2>Quiz Complete!</h2>
-          <span class="quiz-level-pill ${currentLevel}" style="font-size:0.85rem;padding:4px 12px;">${levelData.label} Level</span>
-          <div class="quiz-score">${percentage}%</div>
-          <div class="quiz-result-details">
-            <div class="quiz-result-stat">
-              <div class="quiz-result-stat-value">${correct}</div>
-              <div class="quiz-result-stat-label">Correct</div>
-            </div>
-            <div class="quiz-result-stat">
-              <div class="quiz-result-stat-value">${total - correct}</div>
-              <div class="quiz-result-stat-label">Incorrect</div>
-            </div>
-            <div class="quiz-result-stat">
-              <div class="quiz-result-stat-value">${total}</div>
-              <div class="quiz-result-stat-label">Total</div>
-            </div>
-          </div>
-          <p style="margin-top:20px;color:var(--text-muted);font-size:1.1rem;">
-            ${percentage >= 80 ? 'Excellent work! You have a strong grasp of this level.' :
-              percentage >= 60 ? 'Good job! Review the topics you missed to improve.' :
-              'Keep learning! Study the material and try again.'}
-          </p>
-          <div style="margin-top:30px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-            <button class="simulator-btn-secondary" onclick="showLevelSelector()">
-              Change Level
-            </button>
-            <button class="simulator-btn-primary" onclick="selectLevel('${currentLevel}')">
-              Retake Quiz
-            </button>
-            <a href="/Training/" class="simulator-btn-secondary" style="display:inline-block;text-decoration:none;">
-              Back to Training
-            </a>
-          </div>
-        </div>
-      `;
-    }
-
-    // Start with level selector
-    showLevelSelector();
-  </script>
-<?php require_once __DIR__ . '/../../includes/footer.php'; ?>
+$quiz_title  = 'Backend &amp; API Development';
+$quiz_slug   = 'backend-api';
+$quiz_tiers  = [
+    [
+        'label' => 'Introduction',
+        'questions' => [
+            ['question' => 'What does REST stand for?', 'options' => ['Rapid Execution State Transfer', 'Representational State Transfer', 'Remote Execution Service Technology', 'Request-based Service Transfer'], 'correct' => 1],
+            ['question' => 'Which HTTP method retrieves data without modifying it?', 'options' => ['GET', 'POST', 'PUT', 'DELETE'], 'correct' => 0],
+            ['question' => 'What does API stand for?', 'options' => ['Automated Programming Interface', 'Application Protocol Integration', 'Application Programming Interface', 'Advanced Programming Interface'], 'correct' => 2],
+            ['question' => 'Which HTTP status code indicates a successful request?', 'options' => ['200', '201', '404', '500'], 'correct' => 0],
+            ['question' => 'What does JSON stand for?', 'options' => ['Java Standard Object Notation', 'JavaScript Object Notation', 'JavaScript Online Notation', 'Java Serialized Object Notation'], 'correct' => 1],
+            ['question' => 'Which HTTP method is typically used to create a new resource?', 'options' => ['GET', 'PUT', 'POST', 'DELETE'], 'correct' => 2],
+            ['question' => 'What does URL stand for?', 'options' => ['Uniform Resource Locator', 'Universal Reference Link', 'Unified Resource Layer', 'Uniform Routing Language'], 'correct' => 0],
+            ['question' => 'Which HTTP status code indicates a resource was not found?', 'options' => ['400', '401', '403', '404'], 'correct' => 3],
+            ['question' => 'In a REST API, what is an endpoint?', 'options' => ['A database connection string', 'A specific URL where an API can be accessed', 'A server configuration file', 'A type of HTTP method'], 'correct' => 1],
+            ['question' => 'Which HTTP method fully replaces an existing resource?', 'options' => ['PUT', 'GET', 'PATCH', 'HEAD'], 'correct' => 0],
+            ['question' => 'What does HTTP stand for?', 'options' => ['HyperText Transfer Program', 'High Transfer Text Protocol', 'HyperText Transfer Protocol', 'Hyperlink Text Transfer Protocol'], 'correct' => 2],
+            ['question' => 'Which HTTP status code indicates an internal server error?', 'options' => ['400', '500', '503', '404'], 'correct' => 1],
+            ['question' => 'What is an HTTP request header?', 'options' => ['The main data payload of a request', 'A URL path segment', 'A query string value', 'Metadata sent alongside a request'], 'correct' => 3],
+            ['question' => 'Which HTTP method deletes a resource?', 'options' => ['DELETE', 'REMOVE', 'PURGE', 'DROP'], 'correct' => 0],
+            ['question' => 'What does CRUD stand for?', 'options' => ['Create, Retrieve, Upload, Delete', 'Connect, Read, Update, Deploy', 'Create, Read, Update, Delete', 'Control, Read, Upload, Drop'], 'correct' => 2],
+            ['question' => 'Which HTTP status code means a resource was successfully created?', 'options' => ['200', '201', '204', '202'], 'correct' => 1],
+            ['question' => 'What is a query parameter in a URL?', 'options' => ['A path segment like /users/123', 'A request header value', 'A key-value pair appended after ? in the URL', 'A JSON field in the request body'], 'correct' => 2],
+            ['question' => 'What does XML stand for?', 'options' => ['Extensible Markup Language', 'Extra Markup Language', 'Extended Module Language', 'Executable Markup Language'], 'correct' => 0],
+            ['question' => 'Which HTTP status code means the user is not authenticated?', 'options' => ['400', '403', '401', '404'], 'correct' => 2],
+            ['question' => 'What is the primary purpose of a REST API?', 'options' => ['To directly access a database', 'To allow communication between software systems over HTTP', 'To compile and run code remotely', 'To render HTML pages server-side'], 'correct' => 1],
+            ['question' => 'What port does HTTPS use by default?', 'options' => ['443', '80', '8080', '3000'], 'correct' => 0],
+            ['question' => 'What is an HTTP response body?', 'options' => ['The URL of the request', 'The HTTP method used', 'The status code returned', 'The data returned from the server to the client'], 'correct' => 3],
+            ['question' => 'Which HTTP status code means the request was malformed?', 'options' => ['500', '400', '401', '403'], 'correct' => 1],
+            ['question' => 'What does HTTPS add over plain HTTP?', 'options' => ['Faster transfer speeds', 'Database connectivity', 'Encryption and security via TLS', 'Automatic response caching'], 'correct' => 2],
+            ['question' => 'What is an API key primarily used for?', 'options' => ['Encrypting the request payload', 'Identifying and authenticating API clients', 'Versioning the API', 'Compressing API responses'], 'correct' => 1],
+            ['question' => 'Which HTTP status code means the user is authenticated but lacks permission?', 'options' => ['401', '404', '403', '400'], 'correct' => 2],
+            ['question' => 'What data format is most common in modern REST APIs?', 'options' => ['XML', 'JSON', 'CSV', 'HTML'], 'correct' => 1],
+            ['question' => 'What port does HTTP use by default?', 'options' => ['443', '8080', '3000', '80'], 'correct' => 3],
+        ],
+    ],
+    [
+        'label' => 'Beginner',
+        'questions' => [
+            ['question' => 'What does JWT stand for?', 'options' => ['JSON Web Token', 'JavaScript Web Transfer', 'JSON Web Transfer', 'Java Web Token'], 'correct' => 0],
+            ['question' => 'Which HTTP method applies partial updates to an existing resource?', 'options' => ['PUT', 'UPDATE', 'PATCH', 'POST'], 'correct' => 2],
+            ['question' => 'What is CORS?', 'options' => ['A caching mechanism for APIs', 'Cross-Origin Resource Sharing', 'A compression algorithm', 'Client-Object Response System'], 'correct' => 1],
+            ['question' => 'Which part of a JWT contains the user claims?', 'options' => ['Header', 'Signature', 'Payload', 'Footer'], 'correct' => 2],
+            ['question' => 'What does HTTP status code 429 mean?', 'options' => ['Resource Conflict', 'Service Unavailable', 'Gateway Timeout', 'Too Many Requests'], 'correct' => 3],
+            ['question' => 'What is API rate limiting?', 'options' => ['Restricting the size of API responses', 'Limiting how many requests a client can make in a given time period', 'Limiting the number of API versions supported', 'Compressing API payloads'], 'correct' => 1],
+            ['question' => 'What is pagination in APIs?', 'options' => ['Versioning API responses', 'Caching repeated requests', 'Breaking large datasets into smaller manageable pages', 'Encrypting large payloads'], 'correct' => 2],
+            ['question' => 'What does OAuth stand for?', 'options' => ['Object Authentication Handler', 'Open Authentication', 'Open Authorization', 'Optional Authorization Header'], 'correct' => 2],
+            ['question' => 'What is middleware in a web API context?', 'options' => ['The API documentation layer', 'Software that processes requests between the client and route handlers', 'The database connection layer', 'A frontend rendering engine'], 'correct' => 1],
+            ['question' => 'What is the main purpose of HTTP caching?', 'options' => ['To secure API endpoints', 'To compress payloads', 'To store responses temporarily and reduce redundant server requests', 'To validate request schemas'], 'correct' => 2],
+            ['question' => 'Which HTTP header specifies the media type of the request body?', 'options' => ['Accept', 'Content-Type', 'Authorization', 'Cache-Control'], 'correct' => 1],
+            ['question' => 'What is a webhook?', 'options' => ['A type of API authentication', 'A server-side caching technique', 'A user-defined HTTP callback triggered when an event occurs', 'A method for API versioning'], 'correct' => 2],
+            ['question' => 'What does it mean for an HTTP method to be idempotent?', 'options' => ['It requires authentication on every call', 'Making the same request multiple times produces the same result as making it once', 'It compresses the response automatically', 'It caches the result by default'], 'correct' => 1],
+            ['question' => 'Which HTTP methods are considered safe (no side effects)?', 'options' => ['GET and HEAD', 'POST and PUT', 'DELETE and PATCH', 'PUT and DELETE'], 'correct' => 0],
+            ['question' => 'What is an API Gateway?', 'options' => ['A type of relational database', 'A server acting as an entry point that routes, authenticates, and manages API requests', 'A frontend JavaScript framework', 'A load balancing algorithm'], 'correct' => 1],
+            ['question' => 'What is the HTTP Authorization header used for?', 'options' => ['Specifying the response content type', 'Passing authentication credentials with a request', 'Setting cache duration', 'Defining accepted languages'], 'correct' => 1],
+            ['question' => 'What does the HTTP Accept header specify?', 'options' => ['The content type the client can process in the response', 'The encoding algorithm used', 'The preferred authentication method', 'The API version requested'], 'correct' => 0],
+            ['question' => 'What is REST\'s stateless constraint?', 'options' => ['Each request must include a session cookie', 'The server does not store client session state between requests', 'The client caches all responses locally', 'The API only uses static data'], 'correct' => 1],
+            ['question' => 'What is GraphQL?', 'options' => ['A relational database query language', 'A graph database query language', 'A query language for APIs allowing clients to request exactly the data they need', 'A binary messaging protocol'], 'correct' => 2],
+            ['question' => 'What is microservice architecture?', 'options' => ['An application built as a single deployable unit', 'An application composed of small, independently deployable services', 'A micro-optimised monolithic application', 'A mobile-first backend architecture'], 'correct' => 1],
+            ['question' => 'What is a Bearer token?', 'options' => ['A token stored in a cookie', 'An API key embedded in the URL', 'An access token passed in the HTTP Authorization header', 'A CSRF protection token'], 'correct' => 2],
+            ['question' => 'What is the key difference between PUT and PATCH?', 'options' => ['PUT is faster than PATCH', 'PUT replaces the entire resource; PATCH applies partial updates', 'PATCH is idempotent but PUT is not', 'They are identical in behaviour'], 'correct' => 1],
+            ['question' => 'What does HTTP status code 204 mean?', 'options' => ['No Content – the request succeeded but there is no response body', 'Bad Request', 'Not Modified', 'Partial Content'], 'correct' => 0],
+            ['question' => 'What is the OpenAPI Specification (formerly Swagger)?', 'options' => ['A testing framework for APIs', 'A standard for describing REST APIs in a machine-readable format', 'An authentication protocol', 'A query language for APIs'], 'correct' => 1],
+            ['question' => 'What does HTTP status code 503 mean?', 'options' => ['Bad Gateway', 'Service Unavailable', 'Gateway Timeout', 'Internal Server Error'], 'correct' => 1],
+            ['question' => 'What is the purpose of the ETag HTTP response header?', 'options' => ['Encrypting the response body', 'Validating authentication tokens', 'An identifier for a specific version of a resource used for caching validation', 'Setting a response timeout'], 'correct' => 2],
+            ['question' => 'What does HTTP status code 302 indicate?', 'options' => ['Resource Created', 'Temporary Redirect', 'Permanent Redirect', 'Not Modified'], 'correct' => 1],
+            ['question' => 'What is API throttling?', 'options' => ['Compressing API payloads', 'Controlling the rate of API requests to prevent server overload', 'Encrypting API traffic end-to-end', 'Caching all API responses automatically'], 'correct' => 1],
+        ],
+    ],
+    [
+        'label' => 'Intermediate',
+        'questions' => [
+            ['question' => 'What is the purpose of OAuth 2.0 scopes?', 'options' => ['To define the token expiry time', 'To specify the token encryption format', 'To define which resources and actions a token grants access to', 'To set the token signing algorithm'], 'correct' => 2],
+            ['question' => 'What is a JWT signature used for?', 'options' => ['Verifying the token has not been tampered with', 'Encrypting the payload claims', 'Compressing the token', 'Storing additional user metadata'], 'correct' => 0],
+            ['question' => 'What is the Circuit Breaker pattern in microservices?', 'options' => ['A load balancing strategy', 'A pattern that temporarily stops calling a failing service to prevent cascading failures', 'A database connection pool manager', 'A JWT key rotation mechanism'], 'correct' => 1],
+            ['question' => 'What does HATEOAS stand for in REST?', 'options' => ['Hypermedia as the Engine of Application State', 'HTTP Authenticated Token Exchange Over Authorized Services', 'Hyperlink Accessible Transfer Engine of Application State', 'HTTP API Transfer Exchange Over Authenticated Sessions'], 'correct' => 0],
+            ['question' => 'What serialization format does gRPC use by default?', 'options' => ['JSON', 'XML', 'MessagePack', 'Protocol Buffers'], 'correct' => 3],
+            ['question' => 'What is the N+1 query problem in APIs?', 'options' => ['Making N redundant API calls in sequence', 'Executing one query to get N items then issuing one additional query per item for related data', 'An off-by-one error in API pagination', 'Paginating queries into N+1 pages'], 'correct' => 1],
+            ['question' => 'What is an idempotency key in payment or mutation APIs?', 'options' => ['A key used to encrypt requests', 'A unique identifier sent with a request to prevent duplicate processing on retry', 'A cache invalidation key', 'An API versioning identifier'], 'correct' => 1],
+            ['question' => 'What is a message queue used for in microservices?', 'options' => ['Synchronous communication between services', 'Asynchronous, decoupled communication between services', 'Load balancing service requests', 'Service discovery and registration'], 'correct' => 1],
+            ['question' => 'What is the difference between horizontal and vertical scaling?', 'options' => ['Horizontal scales by adding more powerful servers; vertical adds more instances', 'Horizontal adds more server instances; vertical increases resources on existing servers', 'They describe the same concept', 'Horizontal is for databases only; vertical is for APIs'], 'correct' => 1],
+            ['question' => 'What is the main GraphQL advantage over REST for data fetching?', 'options' => ['GraphQL is always faster than REST', 'Clients can request exactly the data they need, eliminating over- and under-fetching', 'GraphQL requires no schema definition', 'GraphQL automatically caches all queries'], 'correct' => 1],
+            ['question' => 'What is mTLS?', 'options' => ['A multi-threaded TLS implementation', 'Both the client and server authenticate each other using certificates', 'TLS with multiple cipher suites', 'A token-based TLS extension'], 'correct' => 1],
+            ['question' => 'What is long polling in real-time API patterns?', 'options' => ['Sending short requests at fixed polling intervals', 'The client sends a request and the server holds it open until data is available or a timeout occurs', 'A WebSocket sub-protocol variant', 'Batching multiple requests into one'], 'correct' => 1],
+            ['question' => 'What are Server-Sent Events (SSE)?', 'options' => ['Bidirectional communication over WebSocket', 'The server pushing updates to the client over a persistent one-way HTTP connection', 'A webhook implementation standard', 'RPC calls initiated from the server to the client'], 'correct' => 1],
+            ['question' => 'What is a dead letter queue (DLQ)?', 'options' => ['A queue for high-priority messages', 'A queue holding messages that failed processing after reaching the maximum retry count', 'A read-only queue used for logging', 'A queue for archiving old messages'], 'correct' => 1],
+            ['question' => 'What is eventual consistency in distributed systems?', 'options' => ['Data is always consistent across all nodes immediately', 'Data inconsistency is permanent in distributed systems', 'Given enough time without new updates, all replicas converge to the same value', 'Transactions are automatically rolled back when inconsistencies are detected'], 'correct' => 2],
+            ['question' => 'What is HTTP content negotiation?', 'options' => ['Compressing HTTP responses automatically', 'Selecting the best response format based on client Accept headers', 'Negotiating authentication methods', 'Agreeing on TLS cipher suites'], 'correct' => 1],
+            ['question' => 'What does HTTP status 304 Not Modified signify?', 'options' => ['The resource was permanently moved', 'The request was malformed', 'The client\'s cached version is still valid; no new content is returned', 'The resource has been deleted'], 'correct' => 2],
+            ['question' => 'What is back pressure in stream processing?', 'options' => ['Network latency in streaming APIs', 'A flow control mechanism to slow the producer when the consumer cannot keep up', 'Retry logic for failed stream messages', 'Reverse proxying of stream data'], 'correct' => 1],
+            ['question' => 'What is the Strangler Fig migration pattern?', 'options' => ['Deprecating all legacy APIs at once', 'Gradually routing traffic from a legacy system to a new system until the old system can be removed', 'A caching strategy for legacy APIs', 'Wrapping all legacy code in a microservice facade'], 'correct' => 1],
+            ['question' => 'What does the OWASP API Security Top 10 address?', 'options' => ['Performance optimisation tips for REST APIs', 'The ten most critical API security risks and vulnerabilities', 'API documentation standards', 'OAuth 2.0 implementation guidelines'], 'correct' => 1],
+            ['question' => 'What is a service mesh?', 'options' => ['A network topology for databases', 'An infrastructure layer managing service-to-service communication including observability, security, and traffic management', 'A type of API gateway', 'A message queue topology'], 'correct' => 1],
+            ['question' => 'What is a correlation ID in distributed systems?', 'options' => ['A cryptographic key for inter-service requests', 'A unique identifier attached to a request to trace it consistently across multiple services', 'A field matching database records with API responses', 'An identifier for API versions'], 'correct' => 1],
+            ['question' => 'What does WebSocket enable over a standard HTTP connection?', 'options' => ['Server push via HTTP/2', 'Full-duplex bidirectional communication over a single persistent TCP connection', 'UDP datagrams with low latency', 'Long polling over HTTP/1.1'], 'correct' => 1],
+            ['question' => 'What is API composition in microservices?', 'options' => ['Combining multiple microservices into a monolith', 'An API gateway aggregating multiple downstream service calls into a single client response', 'Writing APIs in multiple programming languages', 'A load balancing technique'], 'correct' => 1],
+            ['question' => 'What is the purpose of the Cache-Control HTTP header?', 'options' => ['Authenticating cached requests', 'Directing caching behaviour for both requests and responses', 'Specifying compression algorithms', 'Setting rate limiting rules'], 'correct' => 1],
+            ['question' => 'What is a fan-out pattern in event-driven messaging?', 'options' => ['Distributing load across multiple API servers', 'Publishing a single message that is delivered to multiple subscribers simultaneously', 'Routing API requests to the geographically closest server', 'Partitioning messages by a key'], 'correct' => 1],
+            ['question' => 'What does the Richardson Maturity Model describe?', 'options' => ['A security model for REST APIs', 'Levels of REST API maturity from Level 0 (HTTP tunnel) to Level 3 (HATEOAS)', 'A framework for API performance testing', 'A versioning strategy for REST APIs'], 'correct' => 1],
+            ['question' => 'What is URL path versioning in REST APIs?', 'options' => ['Including the version in the Accept header', 'Embedding the version directly in the URL, for example /api/v1/users', 'Using a custom X-API-Version header', 'Adding ?version=1 as a query parameter'], 'correct' => 1],
+        ],
+    ],
+    [
+        'label' => 'Advanced',
+        'questions' => [
+            ['question' => 'What is the SAGA pattern in distributed transactions?', 'options' => ['A synchronous two-phase commit across services', 'A sequence of local transactions where each step publishes an event and has a compensating transaction for rollback', 'A read-only transaction pattern', 'A database replication strategy'], 'correct' => 1],
+            ['question' => 'What is CQRS?', 'options' => ['A caching strategy for read-heavy APIs', 'Command Query Responsibility Segregation – separating read and write operations into distinct models', 'A cross-service REST standard', 'A container query routing system'], 'correct' => 1],
+            ['question' => 'What is event sourcing?', 'options' => ['Logging API requests to a file', 'Storing only the current state snapshot of entities', 'Persisting entity state as a sequence of immutable ordered events', 'Subscribing to third-party event streams'], 'correct' => 2],
+            ['question' => 'What are the four gRPC communication modes?', 'options' => ['REST, GraphQL, WebSocket, Polling', 'Unary, server streaming, client streaming, and bidirectional streaming', 'Push, pull, pub/sub, and queue', 'Sync, async, batch, and stream'], 'correct' => 1],
+            ['question' => 'What is the key difference between OAuth 2.0 and OpenID Connect (OIDC)?', 'options' => ['OIDC replaces OAuth 2.0 completely', 'OAuth 2.0 handles authorisation; OIDC adds an identity layer for authentication on top of OAuth 2.0', 'They are the same protocol with different names', 'OIDC is only for mobile applications'], 'correct' => 1],
+            ['question' => 'What is the Outbox Pattern in microservices?', 'options' => ['Logging failed API requests for later replay', 'Atomically writing events to a database outbox table alongside business data, then publishing them asynchronously', 'A pattern for handling outbound webhooks', 'A dead letter queue implementation'], 'correct' => 1],
+            ['question' => 'What does the CAP theorem state?', 'options' => ['A distributed system can guarantee Consistency, Availability, and Partition tolerance simultaneously', 'A distributed system can guarantee at most two of: Consistency, Availability, Partition tolerance', 'Cache, API, and Processing cannot be optimised simultaneously', 'Client, Application, and Persistence must always be separated'], 'correct' => 1],
+            ['question' => 'What is distributed tracing?', 'options' => ['Network packet inspection across multiple servers', 'Tracking a request\'s flow through multiple distributed services using trace and span identifiers', 'Monitoring CPU usage across all service instances', 'A debugging technique specific to distributed databases'], 'correct' => 1],
+            ['question' => 'What is the Bulkhead pattern?', 'options' => ['Encrypting all inter-service traffic', 'Isolating components so a failure in one does not cascade to others, analogous to watertight ship bulkheads', 'Batching requests to reduce overhead', 'A retry strategy with exponential backoff'], 'correct' => 1],
+            ['question' => 'What is consistent hashing used for in API systems?', 'options' => ['Ensuring JWT signatures remain consistent', 'Distributing requests across nodes so that adding or removing a node minimises key remapping', 'Hashing API payloads for integrity checks', 'Producing consistent formats across API versions'], 'correct' => 1],
+            ['question' => 'What is the thundering herd problem?', 'options' => ['A type of DDoS attack pattern', 'Many clients simultaneously retrying after a service outage, overwhelming it upon recovery', 'Rapid cache population causing CPU spikes', 'A database deadlock scenario'], 'correct' => 1],
+            ['question' => 'What is a cache stampede (dogpile effect)?', 'options' => ['A cache eviction policy', 'Multiple concurrent requests simultaneously regenerating a recently expired cache entry', 'A distributed cache synchronisation issue', 'A cache poisoning attack'], 'correct' => 1],
+            ['question' => 'What is GraphQL federation?', 'options' => ['Using GraphQL across multiple cloud providers', 'A specification for composing multiple GraphQL service schemas into one unified supergraph', 'GraphQL-based load balancing', 'Multi-version GraphQL schema management'], 'correct' => 1],
+            ['question' => 'What is the distinction between Choreography and Orchestration in microservices?', 'options' => ['They are synonymous terms', 'Choreography: services react to events autonomously; Orchestration: a central controller directs all service interactions', 'Orchestration uses events; Choreography uses direct HTTP calls', 'Choreography is synchronous; Orchestration is asynchronous'], 'correct' => 1],
+            ['question' => 'What is the write-behind (write-back) caching strategy?', 'options' => ['Writing to the database first, then updating the cache', 'Writing to the cache immediately and asynchronously persisting to the database later', 'Writing to both cache and database simultaneously in a transaction', 'Invalidating the cache entry after every write'], 'correct' => 1],
+            ['question' => 'What is exponential backoff with jitter?', 'options' => ['A load balancing algorithm', 'A retry strategy using exponentially increasing delays with randomness to prevent synchronised retry storms', 'A payload compression algorithm', 'A circuit breaker configuration parameter'], 'correct' => 1],
+            ['question' => 'What is a distributed lock used for?', 'options' => ['Encrypting shared data across nodes', 'Ensuring only one node in a distributed system executes a critical section at a time', 'Locking database schemas during migrations', 'Preventing unauthenticated API access'], 'correct' => 1],
+            ['question' => 'What is the difference between push and pull in event streaming?', 'options' => ['They are identical delivery models', 'Push: the broker delivers messages to consumers; Pull: consumers request messages from the broker at their own pace', 'Pull uses REST; Push uses WebSockets exclusively', 'Push uses TCP; Pull uses UDP'], 'correct' => 1],
+            ['question' => 'What is service discovery in microservices?', 'options' => ['Auto-generating API documentation from code', 'The mechanism by which services automatically locate and communicate with each other in a dynamic environment', 'Monitoring individual service health endpoints', 'Authenticating service-to-service requests'], 'correct' => 1],
+            ['question' => 'What is the token bucket algorithm in API rate limiting?', 'options' => ['Rotating JWT signing keys on a schedule', 'Allowing burst traffic while enforcing average rate limits using a bucket that refills at a constant rate', 'Distributing tokens for client authentication', 'Allocating memory for API response caches'], 'correct' => 1],
+            ['question' => 'What are exactly-once delivery semantics in messaging?', 'options' => ['Delivering messages as fast as possible without acknowledgment', 'Guaranteeing each message is processed exactly once even if delivered multiple times by the broker', 'Sending messages in strict FIFO order', 'Delivering messages only once with no retry on failure'], 'correct' => 1],
+            ['question' => 'What is a two-phase commit (2PC)?', 'options' => ['A two-step user authentication process', 'A protocol where a coordinator ensures all participants either all commit or all roll back a distributed transaction', 'A two-step API deployment strategy', 'A dual-write caching pattern'], 'correct' => 1],
+            ['question' => 'What is OpenTelemetry?', 'options' => ['A proprietary cloud provider SDK', 'A vendor-neutral observability framework providing APIs and SDKs for traces, metrics, and logs', 'An API load testing tool', 'A service mesh implementation'], 'correct' => 1],
+            ['question' => 'What is a reverse proxy?', 'options' => ['A client-side caching mechanism', 'A server that receives client requests and forwards them to backend servers, abstracting backend topology', 'A database query optimisation layer', 'A type of API key authentication service'], 'correct' => 1],
+            ['question' => 'What is request hedging?', 'options' => ['Encrypting redundant requests for security', 'Sending a duplicate request to a secondary server if the primary does not respond within a latency threshold', 'Rate limiting by hedging excess requests', 'Splitting a request across multiple services in parallel'], 'correct' => 1],
+            ['question' => 'What is the significance of Protocol Buffers field numbers?', 'options' => ['Ordering fields alphabetically in JSON output', 'Uniquely identifying fields in binary encoding to enable backward-compatible schema evolution', 'Specifying the data type of each field', 'Encrypting individual fields in the message'], 'correct' => 1],
+            ['question' => 'What is the best practice for verifying webhook payload authenticity?', 'options' => ['Using HTTP Basic Auth on the webhook endpoint', 'Validating an HMAC signature computed with a shared secret and included in a request header', 'Checking the sender\'s IP address exclusively', 'Embedding the API key in the webhook URL'], 'correct' => 1],
+            ['question' => 'What is API schema evolution?', 'options' => ['Rewriting the API from scratch for each new version', 'Managing schema changes in a backward- and forward-compatible manner to avoid breaking existing clients', 'Migrating from REST to GraphQL incrementally', 'Auto-generating schemas from database tables'], 'correct' => 1],
+        ],
+    ],
+    [
+        'label' => 'Expert',
+        'questions' => [
+            ['question' => 'What is PKCE in OAuth 2.0 and what attack does it mitigate?', 'options' => ['It prevents token replay attacks in confidential clients', 'It prevents authorization code interception in public clients using a code verifier and challenge pair', 'It prevents CSRF attacks in all OAuth flows', 'It prevents SQL injection via OAuth parameters'], 'correct' => 1],
+            ['question' => 'What are GraphQL persisted queries and why are they used?', 'options' => ['Queries stored in the database for faster execution', 'Pre-registered query hashes sent instead of full query text to reduce payload size and prevent arbitrary query execution', 'Cached query result sets stored on the server', 'GraphQL query templates with named parameters'], 'correct' => 1],
+            ['question' => 'What transport protocol does HTTP/3 use and what problem does it solve?', 'options' => ['TCP with multiplexing improvements', 'UDP via the QUIC protocol, eliminating head-of-line blocking and reducing connection establishment overhead', 'WebSocket-based transport for bidirectional use', 'SCTP for guaranteed reliability'], 'correct' => 1],
+            ['question' => 'What is the difference between optimistic and pessimistic concurrency control?', 'options' => ['Optimistic uses database locks; pessimistic uses ETags', 'Pessimistic acquires locks before reading; optimistic allows concurrent access and validates via version checks before committing', 'They are interchangeable strategies', 'Optimistic applies only to reads; pessimistic applies only to writes'], 'correct' => 1],
+            ['question' => 'What is the RFC 7662 token introspection endpoint?', 'options' => ['An endpoint to refresh expired access tokens', 'An endpoint allowing resource servers to query the authorisation server about a token\'s validity, expiry, and metadata', 'An endpoint to revoke active tokens', 'An endpoint listing all currently active tokens'], 'correct' => 1],
+            ['question' => 'What does the Reactive Manifesto describe for API system design?', 'options' => ['The four REST architectural constraints', 'System properties – responsive, resilient, elastic, message-driven – for building robust distributed systems', 'OAuth 2.0 grant flow specifications', 'Microservice deployment topology standards'], 'correct' => 1],
+            ['question' => 'What is gRPC deadline propagation?', 'options' => ['Setting token expiry values in gRPC metadata', 'Propagating the original request deadline across all downstream gRPC calls so the entire chain respects a single timeout budget', 'A retry mechanism built into gRPC channels', 'A flow control mechanism for bidirectional streams'], 'correct' => 1],
+            ['question' => 'What is the difference between an API mesh and a service mesh?', 'options' => ['They describe the same infrastructure layer', 'An API mesh manages external-facing cross-organisation API communication; a service mesh manages internal service-to-service communication', 'An API mesh is for GraphQL only; a service mesh is for REST only', 'A service mesh always includes an API mesh as a subset'], 'correct' => 1],
+            ['question' => 'What are HTTP Trailers?', 'options' => ['Request routing rules for reverse proxies', 'Header fields sent after the message body in chunked transfer encoding, useful for checksums computed during streaming', 'Directives specifying acceptable compression algorithms', 'Cache invalidation rules for downstream caches'], 'correct' => 1],
+            ['question' => 'What is contract-first API design?', 'options' => ['Generating API contracts from existing code automatically', 'Defining the OpenAPI or Protobuf contract before writing implementation code, enabling parallel development and clear expectations', 'A legal contract between API provider and consumer', 'A code review process focused on API endpoints'], 'correct' => 1],
+            ['question' => 'What is the Actor model\'s relevance to concurrent API systems?', 'options' => ['A UI component model used in API documentation tools', 'A computational model where actors process messages asynchronously, enabling highly concurrent systems without shared mutable state', 'An authentication pattern defining API actor roles', 'A microservice deployment topology'], 'correct' => 1],
+            ['question' => 'What is the expand-contract (parallel change) pattern in zero-downtime migrations?', 'options' => ['Migrating databases only during planned maintenance windows', 'Adding new schema elements before removing old ones so both old and new API versions can run simultaneously', 'Automatic database failover handled by the cloud provider', 'Blue-green database environment switching'], 'correct' => 1],
+            ['question' => 'What is the Dual Write problem and how is it resolved?', 'options' => ['Writing to two caches simultaneously', 'The risk of inconsistency when writing to a database and a message broker in separate non-atomic operations, resolved by the Outbox pattern or Change Data Capture', 'A database replication technique', 'Writing to a primary and replica database in the same transaction'], 'correct' => 1],
+            ['question' => 'What is Change Data Capture (CDC)?', 'options' => ['A code change tracking system for APIs', 'Capturing row-level database change events and streaming them to enable event-driven architectures without dual-write problems', 'A version control strategy for API schemas', 'A cache invalidation technique based on database changes'], 'correct' => 1],
+            ['question' => 'What constitutes a breaking change in API versioning?', 'options' => ['Only adding new optional fields to responses', 'Removing, renaming, or changing the type of existing fields, requiring a major version increment and consumer migration strategy', 'All API changes regardless of impact', 'Only changes to HTTP status codes'], 'correct' => 1],
+            ['question' => 'What is a Content Security Policy header\'s role in API-served responses?', 'options' => ['Compressing API response payloads', 'Restricting which scripts and resources the browser may load, preventing XSS attacks on pages rendered with API data', 'Specifying API rate limit policies', 'Authenticating API consumers via the browser'], 'correct' => 1],
+            ['question' => 'What is Envoy Proxy\'s role in a service mesh?', 'options' => ['A centralised API gateway deployed once per cluster', 'A high-performance sidecar proxy handling service discovery, load balancing, TLS termination, observability, and circuit breaking per service instance', 'A message queue broker implementation', 'A container orchestration scheduling component'], 'correct' => 1],
+            ['question' => 'What is connection draining in load balancers?', 'options' => ['Closing all connections immediately during a deployment', 'Allowing in-flight requests to complete before removing a backend instance from rotation during deployments or maintenance', 'Emptying the connection pool periodically', 'Closing idle connections after a timeout'], 'correct' => 1],
+            ['question' => 'What is the purpose of a GraphQL DataLoader?', 'options' => ['Loading GraphQL schema definition files at startup', 'Batching and deduplicating data fetches within a single request to solve the N+1 query problem', 'A GraphQL client-side state management library', 'Loading persisted queries from a remote store'], 'correct' => 1],
+            ['question' => 'What does Postel\'s Law mean for API design?', 'options' => ['APIs should strictly reject any unexpected input fields', 'Be conservative in what you send and liberal in what you accept – produce precise output but tolerate varied input gracefully', 'API clients must send only minimal required data', 'Strict schema validation must be enforced on all inputs and outputs'], 'correct' => 1],
+            ['question' => 'What HTTP headers communicate API deprecation?', 'options' => ['Immediately returning 410 Gone for deprecated endpoints', 'The Deprecation and Sunset response headers signalling end-of-life dates and giving consumers time to migrate', 'Only documenting deprecation in the OpenAPI spec', 'Using X-Deprecated: true custom headers only'], 'correct' => 1],
+            ['question' => 'What is the purpose of an Idempotency-Key header in payment APIs?', 'options' => ['Cryptographically signing payment requests for non-repudiation', 'Ensuring retried payment requests are not processed multiple times by keying operations with a client-generated unique identifier', 'Encrypting sensitive payment card data in transit', 'Rate limiting payment API calls per customer'], 'correct' => 1],
+            ['question' => 'What is the Sidecar pattern in microservices?', 'options' => ['A backup microservice that handles failover', 'Deploying a helper process alongside each service instance to handle cross-cutting concerns like mTLS, circuit breaking, and observability', 'A frontend caching layer deployed beside the API', 'A database connection proxy pattern'], 'correct' => 1],
+            ['question' => 'What is the difference between at-least-once and at-most-once message delivery?', 'options' => ['They are identical guarantees', 'At-least-once may deliver duplicates but never loses messages; at-most-once may lose messages but never delivers duplicates', 'At-most-once always delivers duplicates; at-least-once never does', 'These terms apply only to HTTP retries, not messaging systems'], 'correct' => 1],
+            ['question' => 'What is the token introspection caching trade-off in OAuth 2.0?', 'options' => ['Caching introspection results reduces latency but risks serving stale revocation status for revoked tokens', 'Token introspection results should never be cached under any circumstances', 'Caching introspection results is required by RFC 7662', 'Introspection results are immutable and always safe to cache indefinitely'], 'correct' => 0],
+            ['question' => 'What is the HTTP Prefer header used for?', 'options' => ['Setting client authentication preferences', 'Allowing clients to indicate preferences for server behaviour such as return=representation vs return=minimal without altering endpoint semantics', 'Specifying language preferences for error messages', 'Setting client-side cache preferences'], 'correct' => 1],
+            ['question' => 'What is API governance at organisational scale?', 'options' => ['Monitoring API performance metrics only', 'Establishing standards, policies, and review processes ensuring APIs are consistent, secure, and maintainable across all teams', 'Managing API billing and usage quotas exclusively', 'Enforcing rate limits consistently across all services'], 'correct' => 1],
+            ['question' => 'What is long-term API version support (LTS)?', 'options' => ['Keeping all historical API versions running forever without deprecation', 'Maintaining specific major API versions for extended periods with security backports, governed by explicit end-of-life policies communicated via Sunset headers', 'Applying automatic API version upgrades silently to all consumers', 'Rolling upgrades applied without incrementing API version numbers'], 'correct' => 1],
+        ],
+    ],
+];
+require_once __DIR__ . '/quiz-engine.php';
