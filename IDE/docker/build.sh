@@ -29,6 +29,9 @@ else
     build typescript
     build kotlin
     build lua
+    build verilog
+    build vhdl
+    build tcl
 fi
 
 echo ""

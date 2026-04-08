@@ -177,6 +177,50 @@ const LANG_CONFIG = [
         'compile'  => null,
         'run'      => 'scala-cli run main.scala',
     ],
+
+    // ── Mobile Apps ──────────────────────────────────────────────────────────
+    'dart'       => [
+        'image'    => 'dart:stable',
+        'filename' => 'main.dart',
+        'compile'  => null,
+        'run'      => 'dart run main.dart',
+    ],
+
+    // ── Electrical & Engineering ──────────────────────────────────────────────
+    'octave'     => [
+        'image'    => 'gnuoctave/octave:9.2.0',
+        'filename' => 'main.m',
+        'compile'  => null,
+        'run'      => 'octave --no-gui main.m',
+    ],
+    'fortran'    => [
+        'image'    => 'gcc:13',
+        'filename' => 'main.f90',
+        'compile'  => 'gfortran -O2 -o main main.f90',
+        'run'      => './main',
+    ],
+
+    // ── Semiconductor & Electronics ───────────────────────────────────────────
+    'verilog'    => [
+        'image'    => 'codefoundry/verilog:latest',
+        'filename' => 'main.v',
+        'compile'  => 'iverilog -o main.out main.v',
+        'run'      => 'vvp main.out',
+    ],
+    'vhdl'       => [
+        'image'    => 'codefoundry/vhdl:latest',
+        'filename' => 'main.vhd',
+        'compile'  => 'ghdl -a --std=08 main.vhd && ghdl -e --std=08 main',
+        'run'      => 'ghdl -r --std=08 main',
+    ],
+
+    // ── Design Automation / EDA ───────────────────────────────────────────────
+    'tcl'        => [
+        'image'    => 'codefoundry/tcl:latest',
+        'filename' => 'main.tcl',
+        'compile'  => null,
+        'run'      => 'tclsh main.tcl',
+    ],
 ];
 
 if (!is_string($language) || !array_key_exists($language, LANG_CONFIG)) {
