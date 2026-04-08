@@ -36,15 +36,18 @@ program finishes.
 ## One-time image setup
 
 Most languages use **official Docker Hub images** that are pulled automatically
-on first use.  Three languages require custom images that must be built once:
+on first use.  Six languages require custom images that must be built once:
 
 | Language   | Image                          | Dockerfile |
 |------------|--------------------------------|------------|
 | TypeScript | `codefoundry/typescript:latest`| `typescript/Dockerfile` |
 | Kotlin     | `codefoundry/kotlin:latest`    | `kotlin/Dockerfile` |
 | Lua        | `codefoundry/lua:latest`       | `lua/Dockerfile` |
+| Verilog    | `codefoundry/verilog:latest`   | `verilog/Dockerfile` |
+| VHDL       | `codefoundry/vhdl:latest`      | `vhdl/Dockerfile` |
+| Tcl        | `codefoundry/tcl:latest`       | `tcl/Dockerfile` |
 
-Build all three at once:
+Build all six at once:
 
 ```bash
 cd /path/to/CodeFoundry
@@ -78,33 +81,41 @@ docker pull bash:5.2
 docker pull perl:5.38-slim
 docker pull haskell:9.8
 docker pull virtuslab/scala-cli:latest
+docker pull dart:stable
+docker pull gnuoctave/octave:9.2.0
 ```
 
 ---
 
 ## Language → Docker image mapping
 
-| Language   | Image | Execution model |
-|------------|-------|-----------------|
-| Python     | `python:3.12-slim` | Interpreted |
-| JavaScript | `node:20-slim` | Interpreted |
-| TypeScript | `codefoundry/typescript:latest` | Interpreted via ts-node |
-| Java       | `eclipse-temurin:21-jdk-alpine` | Compile (`javac`) then run (`java`) |
-| C          | `gcc:13` | Compile (`gcc -O2`) then run |
-| C++        | `gcc:13` | Compile (`g++ -O2`) then run |
-| C#         | `mcr.microsoft.com/dotnet/sdk:8.0` | Compile (`dotnet build`) then run |
-| Go         | `golang:1.22-alpine` | Interpreted via `go run` |
-| Rust       | `rust:slim` | Compile (`rustc -O`) then run |
-| PHP        | `php:8.3-cli` | Interpreted |
-| Ruby       | `ruby:3.3-slim` | Interpreted |
-| Swift      | `swift:5.10-slim` | Interpreted via `swift` runner |
-| Kotlin     | `codefoundry/kotlin:latest` | Compile (`kotlinc`) then run (`java -jar`) |
-| R          | `r-base:4.4` | Interpreted via `Rscript` |
-| Bash       | `bash:5.2` | Interpreted |
-| Lua        | `codefoundry/lua:latest` | Interpreted |
-| Perl       | `perl:5.38-slim` | Interpreted |
-| Haskell    | `haskell:9.8` | Compile (`ghc -O`) then run |
-| Scala      | `virtuslab/scala-cli:latest` | Interpreted via `scala-cli run` |
+| Language   | Image | Execution model | Domain |
+|------------|-------|-----------------|--------|
+| Python     | `python:3.12-slim` | Interpreted | General Purpose |
+| JavaScript | `node:20-slim` | Interpreted | General Purpose |
+| TypeScript | `codefoundry/typescript:latest` | Interpreted via ts-node | General Purpose |
+| Java       | `eclipse-temurin:21-jdk-alpine` | Compile (`javac`) then run (`java`) | General Purpose |
+| C          | `gcc:13` | Compile (`gcc -O2`) then run | General Purpose |
+| C++        | `gcc:13` | Compile (`g++ -O2`) then run | General Purpose |
+| C#         | `mcr.microsoft.com/dotnet/sdk:8.0` | Compile (`dotnet build`) then run | General Purpose |
+| Go         | `golang:1.22-alpine` | Interpreted via `go run` | General Purpose |
+| Rust       | `rust:slim` | Compile (`rustc -O`) then run | General Purpose |
+| PHP        | `php:8.3-cli` | Interpreted | General Purpose |
+| Ruby       | `ruby:3.3-slim` | Interpreted | General Purpose |
+| Bash       | `bash:5.2` | Interpreted | General Purpose |
+| Lua        | `codefoundry/lua:latest` | Interpreted | General Purpose |
+| Perl       | `perl:5.38-slim` | Interpreted | General Purpose |
+| Haskell    | `haskell:9.8` | Compile (`ghc -O`) then run | General Purpose |
+| Scala      | `virtuslab/scala-cli:latest` | Interpreted via `scala-cli run` | General Purpose |
+| R          | `r-base:4.4` | Interpreted via `Rscript` | General Purpose |
+| Swift      | `swift:5.10-slim` | Interpreted via `swift` runner | Mobile Apps |
+| Kotlin     | `codefoundry/kotlin:latest` | Compile (`kotlinc`) then run (`java -jar`) | Mobile Apps |
+| Dart       | `dart:stable` | Interpreted via `dart run` | Mobile Apps |
+| Octave     | `gnuoctave/octave:9.2.0` | Interpreted via `octave` | Electrical & Engineering |
+| Fortran    | `gcc:13` | Compile (`gfortran -O2`) then run | Electrical & Engineering |
+| Verilog    | `codefoundry/verilog:latest` | Compile (`iverilog`) then simulate (`vvp`) | Semiconductor & Electronics |
+| VHDL       | `codefoundry/vhdl:latest` | Compile+elaborate (`ghdl`) then simulate | Semiconductor & Electronics |
+| Tcl        | `codefoundry/tcl:latest` | Interpreted via `tclsh` | Design Automation / EDA |
 
 ---
 

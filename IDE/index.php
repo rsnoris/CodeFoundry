@@ -327,25 +327,41 @@ require_once dirname(__DIR__) . '/includes/header.php';
     <!-- Language selector -->
     <div class="lang-select-wrapper">
       <select id="langSelect" class="lang-select" aria-label="Programming language">
-        <option value="python">Python</option>
-        <option value="javascript">JavaScript</option>
-        <option value="typescript">TypeScript</option>
-        <option value="java">Java</option>
-        <option value="c">C</option>
-        <option value="c++">C++</option>
-        <option value="csharp">C#</option>
-        <option value="go">Go</option>
-        <option value="rust">Rust</option>
-        <option value="php">PHP</option>
-        <option value="ruby">Ruby</option>
-        <option value="swift">Swift</option>
-        <option value="kotlin">Kotlin</option>
-        <option value="r">R</option>
-        <option value="bash">Bash</option>
-        <option value="lua">Lua</option>
-        <option value="perl">Perl</option>
-        <option value="haskell">Haskell</option>
-        <option value="scala">Scala</option>
+        <optgroup label="General Purpose">
+          <option value="python">Python</option>
+          <option value="javascript">JavaScript</option>
+          <option value="typescript">TypeScript</option>
+          <option value="java">Java</option>
+          <option value="c">C</option>
+          <option value="c++">C++</option>
+          <option value="csharp">C#</option>
+          <option value="go">Go</option>
+          <option value="rust">Rust</option>
+          <option value="php">PHP</option>
+          <option value="ruby">Ruby</option>
+          <option value="bash">Bash</option>
+          <option value="lua">Lua</option>
+          <option value="perl">Perl</option>
+          <option value="haskell">Haskell</option>
+          <option value="scala">Scala</option>
+          <option value="r">R</option>
+        </optgroup>
+        <optgroup label="Mobile Apps">
+          <option value="swift">Swift</option>
+          <option value="kotlin">Kotlin</option>
+          <option value="dart">Dart</option>
+        </optgroup>
+        <optgroup label="Electrical &amp; Engineering">
+          <option value="octave">Octave / MATLAB</option>
+          <option value="fortran">Fortran</option>
+        </optgroup>
+        <optgroup label="Semiconductor &amp; Electronics">
+          <option value="verilog">Verilog</option>
+          <option value="vhdl">VHDL</option>
+        </optgroup>
+        <optgroup label="Design Automation / EDA">
+          <option value="tcl">Tcl</option>
+        </optgroup>
       </select>
       <span class="lang-select-arrow" aria-hidden="true">▾</span>
     </div>
@@ -512,6 +528,39 @@ const LANGUAGES = {
   scala: {
     monaco: 'scala', ext: 'scala',
     starter: 'object Main extends App {\n  println("Hello, World!")\n}\n',
+  },
+
+  // ── Mobile Apps ──────────────────────────────────────────────────────────
+  dart: {
+    monaco: 'dart', ext: 'dart',
+    starter: '// Dart\nvoid main() {\n  print(\'Hello, World!\');\n}\n',
+  },
+
+  // ── Electrical & Engineering ─────────────────────────────────────────────
+  octave: {
+    monaco: 'plaintext', ext: 'm',
+    starter: '% Octave / MATLAB\ndisp(\'Hello, World!\')\n',
+  },
+  fortran: {
+    monaco: 'plaintext', ext: 'f90',
+    starter: '! Fortran\nprogram main\n  print *, \'Hello, World!\'\nend program main\n',
+  },
+
+  // ── Semiconductor & Electronics ──────────────────────────────────────────
+  verilog: {
+    monaco: 'systemverilog', ext: 'v',
+    starter: '// Verilog\nmodule main;\n  initial begin\n    $display("Hello, World!");\n    $finish;\n  end\nendmodule\n',
+  },
+  vhdl: {
+    monaco: 'plaintext', ext: 'vhd',
+    // Top-level entity must be named 'main' for the GHDL runner.
+    starter: '-- VHDL\n-- The top-level entity must be named \'main\'.\nlibrary ieee;\nuse ieee.std_logic_1164.all;\n\nentity main is\nend entity main;\n\narchitecture sim of main is\nbegin\n  process\n  begin\n    report "Hello, World!";\n    wait;\n  end process;\nend architecture sim;\n',
+  },
+
+  // ── Design Automation / EDA ──────────────────────────────────────────────
+  tcl: {
+    monaco: 'tcl', ext: 'tcl',
+    starter: '# Tcl\nputs "Hello, World!"\n',
   },
 };
 
