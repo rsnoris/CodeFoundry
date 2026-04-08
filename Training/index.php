@@ -4515,6 +4515,577 @@ require_once __DIR__ . '/../includes/header.php';
       <a href="Tutorials/jquery.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
     </div>
 
+    <!-- Frontend Frameworks -->
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Frontend Frameworks</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:atom"></iconify-icon></div>
+      <div class="tutorial-title">React</div>
+      <div class="tutorial-desc">From JSX and component state through Hooks, Context, Suspense, Server Components, and React 19 Actions — a complete React tutorial.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/react.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Frontend Frameworks</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:globe"></iconify-icon></div>
+      <div class="tutorial-title">React &amp; Modern Web</div>
+      <div class="tutorial-desc">Next.js, React Query, Zustand, Remix, Vite, and the modern React ecosystem — beyond the basics to production architecture.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/react-modern-web.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Frontend Frameworks</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:shield"></iconify-icon></div>
+      <div class="tutorial-title">Angular</div>
+      <div class="tutorial-desc">Components, Signals, RxJS, standalone APIs, NgRx, and the Angular 17+ renaissance — a thorough guide to the full Angular platform.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/angular.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Frontend Frameworks</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:circle"></iconify-icon></div>
+      <div class="tutorial-title">AngularJS</div>
+      <div class="tutorial-desc">The original Angular — directives, scopes, services, dependency injection, and a migration guide to modern Angular.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/angularjs.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Frontend Frameworks</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:leaf"></iconify-icon></div>
+      <div class="tutorial-title">Vue.js</div>
+      <div class="tutorial-desc">Vue 3 Composition API, Pinia, Vue Router, Nuxt, and performance optimisation — from beginner to production Vue engineering.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/vuejs.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Frontend Frameworks</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:flame"></iconify-icon></div>
+      <div class="tutorial-title">Svelte</div>
+      <div class="tutorial-desc">Svelte's compiler-first approach — reactive declarations, stores, SvelteKit, Runes, and server-side rendering without a virtual DOM.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/svelte.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Frontend Frameworks</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:layout-grid"></iconify-icon></div>
+      <div class="tutorial-title">Bootstrap</div>
+      <div class="tutorial-desc">Bootstrap 5 grid, utilities, components, dark mode, and customisation with Sass variables — rapid responsive UI development.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/bootstrap.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Frontend Frameworks</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:palette"></iconify-icon></div>
+      <div class="tutorial-title">SASS / SCSS</div>
+      <div class="tutorial-desc">Sass nesting, variables, mixins, functions, @use modules, and the Dart Sass modern compiler — supercharged CSS authoring.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/sass.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <!-- Backend -->
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Backend</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:server"></iconify-icon></div>
+      <div class="tutorial-title">Node.js</div>
+      <div class="tutorial-desc">Event loop, streams, worker threads, Express/Fastify, NestJS, and production Node.js architecture — server-side JavaScript mastery.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/nodejs.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Backend</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:elephant"></iconify-icon></div>
+      <div class="tutorial-title">PHP</div>
+      <div class="tutorial-desc">Modern PHP 8 — types, fibers, attributes, Composer, Laravel, Symfony, and best practices for professional PHP development.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/php.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Backend</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:tree-pine"></iconify-icon></div>
+      <div class="tutorial-title">Django</div>
+      <div class="tutorial-desc">Django's MTV architecture, ORM, class-based views, REST Framework, Channels, and production deployment — Python's batteries-included web framework.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/django.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Backend</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:cog"></iconify-icon></div>
+      <div class="tutorial-title">ASP.NET</div>
+      <div class="tutorial-desc">ASP.NET Core, Minimal APIs, Blazor, SignalR, microservices, and production deployment — Microsoft's high-performance web framework.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/asp.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Backend</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:git-branch"></iconify-icon></div>
+      <div class="tutorial-title">GraphQL</div>
+      <div class="tutorial-desc">Schema design, resolvers, N+1 problem, subscriptions, federation, and persisted queries — the complete GraphQL engineering guide.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/graphql.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Backend</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:plug"></iconify-icon></div>
+      <div class="tutorial-title">Backend &amp; API</div>
+      <div class="tutorial-desc">REST design, authentication patterns, caching, rate limiting, API gateway, and building scalable backend systems from first principles.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/backend-api.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <!-- Languages -->
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Languages</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:snake"></iconify-icon></div>
+      <div class="tutorial-title">Python</div>
+      <div class="tutorial-desc">Python from basics through OOP, decorators, async/await, type hints, and CPython internals — the language of data science and automation.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/python.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Languages</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:coffee"></iconify-icon></div>
+      <div class="tutorial-title">Java</div>
+      <div class="tutorial-desc">Java from OOP foundations through generics, streams, concurrency, the module system, virtual threads, and JVM internals.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/java.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Languages</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:terminal"></iconify-icon></div>
+      <div class="tutorial-title">C</div>
+      <div class="tutorial-desc">The C programming language — pointers, memory management, systems programming, and writing portable, efficient C code.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/c-lang.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Languages</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:cpu"></iconify-icon></div>
+      <div class="tutorial-title">C++</div>
+      <div class="tutorial-desc">Modern C++20/23 — RAII, templates, move semantics, coroutines, ranges, and high-performance systems programming.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/cpp.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Languages</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:hash"></iconify-icon></div>
+      <div class="tutorial-title">C#</div>
+      <div class="tutorial-desc">C# and .NET — LINQ, async/await, records, pattern matching, source generators, and the modern .NET ecosystem.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/csharp.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Languages</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:wind"></iconify-icon></div>
+      <div class="tutorial-title">Go</div>
+      <div class="tutorial-desc">Go from goroutines and channels through interfaces, generics, and the standard library — systems programming with simplicity.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/golang.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Languages</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:smartphone"></iconify-icon></div>
+      <div class="tutorial-title">Kotlin</div>
+      <div class="tutorial-desc">Kotlin for Android and backend — null safety, coroutines, Jetpack Compose, and Kotlin Multiplatform for cross-platform development.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/kotlin.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Languages</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:gem"></iconify-icon></div>
+      <div class="tutorial-title">Ruby</div>
+      <div class="tutorial-desc">Ruby's elegant syntax, metaprogramming, blocks/procs/lambdas, Rails, and performance tuning — the language that made developer happiness a priority.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/ruby.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Languages</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:shield-alert"></iconify-icon></div>
+      <div class="tutorial-title">Rust</div>
+      <div class="tutorial-desc">Rust ownership, borrowing, lifetimes, traits, async/await, and systems programming without garbage collection or data races.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/rust.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Languages</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:apple"></iconify-icon></div>
+      <div class="tutorial-title">Swift</div>
+      <div class="tutorial-desc">Swift for iOS and macOS — optionals, protocols, SwiftUI, Swift concurrency, and shipping to the App Store.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/swift.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Languages</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:square-terminal"></iconify-icon></div>
+      <div class="tutorial-title">Bash</div>
+      <div class="tutorial-desc">Shell scripting from variables and pipelines through robust error handling, parallel execution, and ShellCheck-clean production scripts.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/bash.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Languages</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:bar-chart-2"></iconify-icon></div>
+      <div class="tutorial-title">R</div>
+      <div class="tutorial-desc">R for statistical computing — vectors, Tidyverse, ggplot2, linear models, tidymodels, and Rcpp for high-performance scientific work.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/r-lang.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Languages</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:tablet-smartphone"></iconify-icon></div>
+      <div class="tutorial-title">Flutter</div>
+      <div class="tutorial-desc">Flutter and Dart — StatelessWidget, Riverpod, custom animations, platform channels, and shipping apps to iOS, Android, Web, and Desktop.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/flutter.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <!-- Data & Databases -->
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Data &amp; Databases</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:table-2"></iconify-icon></div>
+      <div class="tutorial-title">SQL</div>
+      <div class="tutorial-desc">SQL from SELECT and JOINs through window functions, CTEs, indexing, query optimisation, and row-level security in relational databases.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/sql.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Data &amp; Databases</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:database"></iconify-icon></div>
+      <div class="tutorial-title">MySQL</div>
+      <div class="tutorial-desc">MySQL from table creation through InnoDB internals, FULLTEXT search, replication, and InnoDB Cluster high-availability architecture.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/mysql.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Data &amp; Databases</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:hard-drive"></iconify-icon></div>
+      <div class="tutorial-title">PostgreSQL</div>
+      <div class="tutorial-desc">PostgreSQL from JSONB and UPSERT through full-text search, RLS, logical replication, and pgBouncer connection pooling in production.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/postgresql.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Data &amp; Databases</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:leaf"></iconify-icon></div>
+      <div class="tutorial-title">MongoDB</div>
+      <div class="tutorial-desc">MongoDB document model, aggregation pipeline, Atlas Search, replica sets, sharding, and Change Streams for real-time CDC pipelines.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/mongodb.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Data &amp; Databases</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:zap"></iconify-icon></div>
+      <div class="tutorial-title">Redis</div>
+      <div class="tutorial-desc">Redis data structures, caching patterns, rate limiting, Streams, Sentinel, Cluster, and RediSearch for full-text and vector similarity search.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/redis.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Data &amp; Databases</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:network"></iconify-icon></div>
+      <div class="tutorial-title">DSA</div>
+      <div class="tutorial-desc">Data Structures &amp; Algorithms — Big-O, linked lists, trees, graphs, dynamic programming, Dijkstra, KMP, and competitive programming patterns.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/dsa.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Data &amp; Databases</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:file-spreadsheet"></iconify-icon></div>
+      <div class="tutorial-title">Excel</div>
+      <div class="tutorial-desc">Excel from formulas and PivotTables through dynamic arrays, Power Query, DAX measures, and VBA automation for business data work.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/excel.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <!-- DevOps & Cloud -->
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">DevOps &amp; Cloud</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:git-merge"></iconify-icon></div>
+      <div class="tutorial-title">Git</div>
+      <div class="tutorial-desc">Git from daily workflow through interactive rebase, the object model, reflog recovery, signed commits, and sparse checkout for monorepos.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/git.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">DevOps &amp; Cloud</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:box"></iconify-icon></div>
+      <div class="tutorial-title">Docker</div>
+      <div class="tutorial-desc">Docker containers, multi-stage Dockerfiles, Docker Compose, BuildKit cache mounts, security hardening, and multi-platform image builds.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/docker.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">DevOps &amp; Cloud</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:cloud"></iconify-icon></div>
+      <div class="tutorial-title">AWS</div>
+      <div class="tutorial-desc">AWS from EC2 and S3 through Lambda, SAM, ECS, CloudFormation, SQS, and multi-account organisations with the Well-Architected Framework.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/aws.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">DevOps &amp; Cloud</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:infinity"></iconify-icon></div>
+      <div class="tutorial-title">Cloud &amp; DevOps</div>
+      <div class="tutorial-desc">CI/CD, Terraform, Kubernetes, Helm, Prometheus, GitOps with Argo CD, SLOs, and platform engineering with internal developer platforms.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/cloud-devops.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <!-- AI & Data Science -->
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">AI &amp; Data Science</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:brain"></iconify-icon></div>
+      <div class="tutorial-title">Artificial Intelligence</div>
+      <div class="tutorial-desc">AI fundamentals — ML/DL paradigms, scikit-learn, PyTorch training loops, Transformers fine-tuning, and production ML lifecycle management.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/ai.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">AI &amp; Data Science</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:sparkles"></iconify-icon></div>
+      <div class="tutorial-title">Generative AI</div>
+      <div class="tutorial-desc">LLMs, prompt engineering, structured output, RAG pipelines, LangChain agents, fine-tuning with LoRA, and vLLM for production serving.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/gen-ai.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">AI &amp; Data Science</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:wrench"></iconify-icon></div>
+      <div class="tutorial-title">AI Tool Development</div>
+      <div class="tutorial-desc">Building production AI tools — streaming, conversation memory, evaluation, semantic caching, LangGraph agents, and enterprise AI governance.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/ai-tools.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">AI &amp; Data Science</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:trending-up"></iconify-icon></div>
+      <div class="tutorial-title">Machine Learning</div>
+      <div class="tutorial-desc">scikit-learn pipelines, Random Forest, XGBoost, Optuna, SHAP, MLflow, feature stores, and production ML with monitoring and retraining.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/machine-learning.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">AI &amp; Data Science</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:chart-pie"></iconify-icon></div>
+      <div class="tutorial-title">Data Science</div>
+      <div class="tutorial-desc">EDA with pandas, A/B testing, Streamlit dashboards, Polars for big data, and Bayesian inference for rigorous data-driven decisions.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/data-science.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">AI &amp; Data Science</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:grid-3x3"></iconify-icon></div>
+      <div class="tutorial-title">NumPy</div>
+      <div class="tutorial-desc">NumPy ndarrays, broadcasting, fancy indexing, FFT, Numba JIT compilation, and CuPy for GPU-accelerated array computing.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/numpy.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">AI &amp; Data Science</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:table"></iconify-icon></div>
+      <div class="tutorial-title">Pandas</div>
+      <div class="tutorial-desc">pandas Series and DataFrames, groupby, merges, time series, memory optimisation with ArrowDtype, and custom extension types.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/pandas.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">AI &amp; Data Science</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:function-square"></iconify-icon></div>
+      <div class="tutorial-title">SciPy</div>
+      <div class="tutorial-desc">SciPy for scientific computing — statistical distributions, optimisation, ODE solving, signal processing, sparse matrices, and LAPACK access.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/scipy.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
+    <!-- Security -->
+    <div class="tutorial-card">
+      <div class="tutorial-cat-badge">Security</div>
+      <div class="tutorial-icon"><iconify-icon icon="lucide:lock"></iconify-icon></div>
+      <div class="tutorial-title">Security Practices</div>
+      <div class="tutorial-desc">OWASP Top 10, SQL injection, secure authentication, XSS/CSRF, cryptography with AES-GCM, zero-trust, and enterprise security programmes.</div>
+      <div class="tutorial-meta">
+        <span><iconify-icon icon="lucide:layers"></iconify-icon>5 Tiers</span>
+        <span><iconify-icon icon="lucide:book-open"></iconify-icon>Concept-based</span>
+      </div>
+      <a href="Tutorials/security.php" class="tutorial-btn"><iconify-icon icon="lucide:play"></iconify-icon>Start Tutorial</a>
+    </div>
+
   </div>
 </section>
 
