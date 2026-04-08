@@ -201,12 +201,15 @@ if (!is_string($stdin) || strlen($stdin) > 10240) { // 10 KB stdin cap
 // Execution sandbox constants
 // ---------------------------------------------------------------------------
 
-const MEMORY_LIMIT     = '256m'; // per-container memory cap
-const CPU_LIMIT        = '0.5';  // fraction of one CPU core
-const PIDS_LIMIT       = '64';   // prevents fork-bomb escalation
-const RUN_TIMEOUT      = 10;     // seconds: maximum run time
-const COMPILE_TIMEOUT  = 30;     // seconds: maximum compile time
-const MAX_OUTPUT_BYTES = 524288; // 512 KB per stream (stdout / stderr)
+const MEMORY_LIMIT              = '256m'; // per-container memory cap
+const CPU_LIMIT                 = '0.5';  // fraction of one CPU core
+const PIDS_LIMIT                = '64';   // prevents fork-bomb escalation
+const RUN_TIMEOUT               = 10;     // seconds: maximum run time
+const COMPILE_TIMEOUT           = 30;     // seconds: maximum compile time
+const MAX_OUTPUT_BYTES          = 524288; // 512 KB per stream (stdout / stderr)
+const PIPE_READ_BUFFER_SIZE     = 8192;   // bytes read per fread() call
+const STREAM_SELECT_TIMEOUT_USEC = 100000; // 100 ms poll interval for stream_select
+const STREAM_DRAIN_GRACE_PERIOD = 4;      // extra seconds to drain pipes after container timeout
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -295,7 +298,7 @@ function dockerRun(
 
     $stdout   = '';
     $stderr   = '';
-    $deadline = microtime(true) + $timeout + 4; // grace period after container timeout
+    $deadline = microtime(true) + $timeout + STREAM_DRAIN_GRACE_PERIOD;
 
     while (microtime(true) < $deadline) {
         $read   = [];
@@ -311,14 +314,14 @@ function dockerRun(
 
         $write  = null;
         $except = null;
-        $n      = stream_select($read, $write, $except, 0, 100000); // 100 ms
+        $n      = stream_select($read, $write, $except, 0, STREAM_SELECT_TIMEOUT_USEC);
 
         if ($n === false) {
             break;
         }
 
         foreach ($read as $pipe) {
-            $chunk = fread($pipe, 8192);
+            $chunk = fread($pipe, PIPE_READ_BUFFER_SIZE);
             if ($chunk === false || $chunk === '') {
                 continue;
             }
@@ -358,7 +361,8 @@ function removeDir(string $dir): void
     if (!is_dir($dir)) {
         return;
     }
-    foreach ((array) glob($dir . '/*') as $item) {
+    $items = glob($dir . '/*');
+    foreach (($items !== false ? $items : []) as $item) {
         is_dir($item) ? removeDir($item) : unlink($item);
     }
     rmdir($dir);
