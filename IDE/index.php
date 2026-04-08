@@ -668,7 +668,7 @@ async function runCode() {
     const data = await res.json();
 
     if (!res.ok) {
-      showOutput(null, null, null, data.error || 'Execution failed.');
+      showOutput(null, null, null, data.error || data.message || 'Execution failed.');
       return;
     }
 

@@ -100,5 +100,17 @@ if ($response === false) {
     exit;
 }
 
+// If Piston returned a non-2xx status, normalise the error payload so the
+// frontend always receives an {"error": "..."} field it can display.
+if ($httpCode < 200 || $httpCode >= 300) {
+    $pistonBody = json_decode($response, true);
+    $message    = (is_array($pistonBody) && !empty($pistonBody['message']))
+                    ? $pistonBody['message']
+                    : 'Execution service returned an error (HTTP ' . (int)$httpCode . ').';
+    http_response_code(502);
+    echo json_encode(['error' => $message]);
+    exit;
+}
+
 http_response_code($httpCode);
 echo $response;
