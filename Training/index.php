@@ -1859,6 +1859,8 @@ const resolvers = {
   const simulatorTemplates = {
     'javascript': {
       name: 'JavaScript Playground',
+      openUrl: 'https://jsfiddle.net/',
+      openLabel: 'JSFiddle',
       defaultCode: `// Welcome to JavaScript Playground!
 // Write your JavaScript code here and click Run
 
@@ -1886,6 +1888,8 @@ fetchData().then(data => console.log(data));`
     },
     'python': {
       name: 'Python Lab',
+      openUrl: 'https://www.online-python.com/',
+      openLabel: 'Online Python',
       defaultCode: `# Welcome to Python Lab!
 # Note: This is a simulated Python environment
 
@@ -1912,6 +1916,8 @@ print("Python Lab is ready for learning!")`
     },
     'react': {
       name: 'React Builder',
+      openUrl: 'https://stackblitz.com/fork/react',
+      openLabel: 'StackBlitz',
       defaultCode: `// Welcome to React Builder!
 // Write React component code here
 
@@ -1948,6 +1954,8 @@ export default App;
     },
     'nodejs': {
       name: 'Node.js Studio',
+      openUrl: 'https://runkit.com/home',
+      openLabel: 'RunKit',
       defaultCode: `// Welcome to Node.js Studio!
 // Build backend services here
 
@@ -1985,6 +1993,8 @@ console.log('POST /api/users - Create user');`
     },
     'java': {
       name: 'Java Workshop',
+      openUrl: 'https://www.onlinegdb.com/online_java_compiler',
+      openLabel: 'OnlineGDB',
       defaultCode: `// Welcome to Java Workshop!
 // Practice Java programming here
 
@@ -2028,6 +2038,8 @@ class Person {
     },
     'typescript': {
       name: 'TypeScript Arena',
+      openUrl: 'https://www.typescriptlang.org/play',
+      openLabel: 'TS Playground',
       defaultCode: `// Welcome to TypeScript Arena!
 // Write type-safe code here
 
@@ -2082,6 +2094,8 @@ if (user) {
     },
     'docker': {
       name: 'Docker Sandbox',
+      openUrl: 'https://labs.play-with-docker.com/',
+      openLabel: 'Play with Docker',
       defaultCode: `# Welcome to Docker Sandbox!
 # Learn containerization concepts
 
@@ -2132,6 +2146,8 @@ CMD ["npm", "start"]
     },
     'kubernetes': {
       name: 'K8s Simulator',
+      openUrl: 'https://killercoda.com/playgrounds/scenario/kubernetes',
+      openLabel: 'Killercoda',
       defaultCode: `# Welcome to Kubernetes Simulator!
 # Learn container orchestration
 
@@ -2189,6 +2205,8 @@ spec:
     },
     'aws': {
       name: 'AWS Cloud Lab',
+      openUrl: 'https://aws.amazon.com/free/',
+      openLabel: 'AWS Free Tier',
       defaultCode: `# AWS CLI Simulator — Hands-on Cloud Lab
 # Practice AWS commands without incurring real costs
 
@@ -2222,6 +2240,8 @@ aws cloudformation describe-stacks --stack-name my-stack
     },
     'azure': {
       name: 'Azure Sandbox',
+      openUrl: 'https://shell.azure.com/',
+      openLabel: 'Azure Cloud Shell',
       defaultCode: `# Azure CLI Simulator — Cloud Sandbox
 # Practice Azure commands in a safe environment
 
@@ -2260,6 +2280,8 @@ az webapp create \\
     },
     'gcp': {
       name: 'GCP Cloud Shell',
+      openUrl: 'https://shell.cloud.google.com/',
+      openLabel: 'Google Cloud Shell',
       defaultCode: `# GCP Cloud Shell Simulator
 # Practice Google Cloud Platform commands
 
@@ -2301,6 +2323,8 @@ gcloud functions deploy my-function \\
     },
     'terraform': {
       name: 'Terraform Lab',
+      openUrl: 'https://developer.hashicorp.com/terraform/tutorials/aws-get-started/infrastructure-as-code',
+      openLabel: 'HashiCorp Learn',
       defaultCode: `# Terraform Infrastructure-as-Code Lab
 # Write HCL configurations and simulate plan/apply
 
@@ -2357,6 +2381,8 @@ resource "aws_security_group" "web_sg" {
     },
     'bash': {
       name: 'Bash Terminal',
+      openUrl: 'https://www.webminal.org/',
+      openLabel: 'Webminal',
       defaultCode: `#!/bin/bash
 # Bash Terminal Simulator
 # Practice shell scripting and Linux commands
@@ -2402,6 +2428,8 @@ echo "  Memory: 4 GB"
     },
     'cicd': {
       name: 'CI/CD Pipeline Lab',
+      openUrl: 'https://github.com/features/actions',
+      openLabel: 'GitHub Actions',
       defaultCode: `# GitHub Actions CI/CD Pipeline
 # Simulate your deployment pipeline
 
@@ -2696,6 +2724,7 @@ jobs:
             <div class="simulator-toolbar">
               <span style="font-weight:600;">Code Editor</span>
               <div class="simulator-actions">
+                ${simulator.openUrl ? `<a href="${simulator.openUrl}" target="_blank" rel="noopener noreferrer" class="simulator-btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;"><iconify-icon icon="lucide:external-link"></iconify-icon> Open in ${simulator.openLabel}</a>` : ''}
                 <button class="simulator-btn-secondary" onclick="resetSimulator('${simKey}')">Reset</button>
                 <button class="simulator-btn-primary" id="runBtn" onclick="runSimulator()">
                   <iconify-icon icon="lucide:play"></iconify-icon> Run Code
@@ -5319,6 +5348,11 @@ require_once __DIR__ . '/../includes/header.php';
     </div>
   </div>
 </section>
+
+<!-- MODAL OVERLAY -->
+<div id="modalOverlay" class="modal-overlay">
+  <div id="modalContent" class="modal-content"></div>
+</div>
 
 <!-- FOOTER -->
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
