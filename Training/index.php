@@ -2520,7 +2520,7 @@ jobs:
     const levelKeys = Object.keys(currentQuiz.levels);
     modalContent.innerHTML = `
       <div class="modal-header">
-        <h2 class="modal-title">${currentQuiz.title}</h2>
+        <h2 class="modal-title" id="modalTitle">${currentQuiz.title}</h2>
         <button class="modal-close" onclick="closeModal()">
           <iconify-icon icon="lucide:x"></iconify-icon>
         </button>
@@ -2564,7 +2564,7 @@ jobs:
 
     modalContent.innerHTML = `
       <div class="modal-header">
-        <h2 class="modal-title">${currentQuiz.title}</h2>
+        <h2 class="modal-title" id="modalTitle">${currentQuiz.title}</h2>
         <button class="modal-close" onclick="closeModal()">
           <iconify-icon icon="lucide:x"></iconify-icon>
         </button>
@@ -2633,7 +2633,7 @@ jobs:
 
     modalContent.innerHTML = `
       <div class="modal-header">
-        <h2 class="modal-title">Quiz Results</h2>
+        <h2 class="modal-title" id="modalTitle">Quiz Results</h2>
         <button class="modal-close" onclick="closeModal()">
           <iconify-icon icon="lucide:x"></iconify-icon>
         </button>
@@ -2690,7 +2690,7 @@ jobs:
     
     modalContent.innerHTML = `
       <div class="modal-header">
-        <h2 class="modal-title">${guide.title}</h2>
+        <h2 class="modal-title" id="modalTitle">${guide.title}</h2>
         <button class="modal-close" onclick="closeModal()">
           <iconify-icon icon="lucide:x"></iconify-icon>
         </button>
@@ -2713,7 +2713,7 @@ jobs:
 
     modalContent.innerHTML = `
       <div class="modal-header">
-        <h2 class="modal-title">${simulator.name}</h2>
+        <h2 class="modal-title" id="modalTitle">${simulator.name}</h2>
         <button class="modal-close" onclick="closeModal()">
           <iconify-icon icon="lucide:x"></iconify-icon>
         </button>
@@ -5350,7 +5350,7 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <!-- MODAL OVERLAY -->
-<div id="modalOverlay" class="modal-overlay">
+<div id="modalOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div id="modalContent" class="modal-content"></div>
 </div>
 
