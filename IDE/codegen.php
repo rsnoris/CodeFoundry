@@ -104,7 +104,13 @@ if (isset($result['error'])) {
     exit;
 }
 
-$code = $result['choices'][0]['message']['content'] ?? '';
+if (empty($result['choices']) || !isset($result['choices'][0]['message']['content'])) {
+    http_response_code(502);
+    echo json_encode(['error' => 'Unexpected response from OpenAI API.']);
+    exit;
+}
+
+$code = $result['choices'][0]['message']['content'];
 
 // Strip accidental markdown fences if the model added them anyway
 $code = preg_replace('/^```[a-zA-Z]*\n?/', '', $code);

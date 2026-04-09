@@ -1007,7 +1007,7 @@ function setRunning(on) {
       const data = await res.json();
 
       if (!res.ok) {
-        alert('CodeGen error: ' + (data.error || 'Unknown error'));
+        alert(`CodeGen error: ${data.error || 'Unknown error'}`);
         return;
       }
 
@@ -1018,7 +1018,7 @@ function setRunning(on) {
 
       closeModal();
     } catch (err) {
-      alert('Network error: ' + err.message);
+      alert(`Network error: ${err.message}`);
     } finally {
       submitBtn.disabled = false;
       submitBtn.innerHTML = '<iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon> Generate';
