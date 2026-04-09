@@ -1143,6 +1143,15 @@ function setRunning(on) {
 
 /* ── CodeGen / Improve / Explain / Fix ─────────────────────────── */
 (function () {
+  /* ── Shared helper ─────────────────────────────────────────────── */
+  function requireEditorCode(action) {
+    const code = editor ? editor.getValue().trim() : '';
+    if (!code) {
+      alert('The editor is empty. Please add code to ' + action + '.');
+      return null;
+    }
+    return code;
+  }
   /* ── CodeGen & Improve modal ───────────────────────────────────── */
   const overlay     = document.getElementById('codegenOverlay');
   const promptTA    = document.getElementById('codegenPrompt');
@@ -1227,12 +1236,9 @@ function setRunning(on) {
     const text = promptTA.value.trim();
     if (!text) { promptTA.focus(); return; }
 
-    const code = editor ? editor.getValue() : '';
-
-    if (currentMode === 'improve' && !code.trim()) {
-      alert('There is no code in the editor to improve.');
-      return;
-    }
+    // For improve mode, current editor code is required
+    const code = (currentMode === 'improve') ? requireEditorCode('improve') : null;
+    if (currentMode === 'improve' && code === null) return;
 
     submitBtn.disabled  = true;
     const originalLabel = submitBtn.innerHTML;
@@ -1307,20 +1313,22 @@ function setRunning(on) {
   }
 
   explainBtnEl.addEventListener('click', async function () {
-    const code = editor ? editor.getValue().trim() : '';
-    if (!code) {
-      alert('There is no code in the editor to explain.');
-      return;
-    }
+    const code = requireEditorCode('explain');
+    if (code === null) return;
 
     explainBody.innerHTML = '<div class="explain-loading"><span class="spinner"></span> Generating explanation…</div>';
     explainOverlay.classList.add('open');
 
     try {
+      const body = {
+        action:      'explain',
+        language:    currentLang,
+        currentCode: code,
+      };
       const res  = await fetch('/IDE/codegen.php', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ action: 'explain', language: currentLang, currentCode: code }),
+        body:    JSON.stringify(body),
       });
       const data = await res.json();
 
@@ -1349,14 +1357,12 @@ function setRunning(on) {
   const fixBtn = document.getElementById('fixBtn');
 
   fixBtn.addEventListener('click', async function () {
-    const code = editor ? editor.getValue().trim() : '';
-    if (!code) {
-      alert('There is no code in the editor to fix.');
-      return;
-    }
+    const code = requireEditorCode('fix');
+    if (code === null) return;
 
-    const outputPanel = document.getElementById('outputPanel');
-    const errorText   = outputPanel ? outputPanel.textContent : '';
+    const outputPanel    = document.getElementById('outputPanel');
+    const errorTextRaw   = outputPanel ? outputPanel.textContent : '';
+    const errorText      = errorTextRaw.trim();
 
     fixBtn.disabled  = true;
     const origLabel  = fixBtn.innerHTML;
@@ -1368,9 +1374,8 @@ function setRunning(on) {
         language:    currentLang,
         currentCode: code,
       };
-      if (errorText && errorText.trim() !== '' &&
-          !outputPanel.classList.contains('empty')) {
-        body.errorOutput = errorText.trim();
+      if (errorText !== '' && !outputPanel.classList.contains('empty')) {
+        body.errorOutput = errorText;
       }
 
       const res  = await fetch('/IDE/codegen.php', {

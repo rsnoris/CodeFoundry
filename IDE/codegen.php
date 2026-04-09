@@ -90,6 +90,10 @@ if (function_exists('apcu_fetch')) {
     apcu_store($cacheKey, 1, 3); // 3-second window
 }
 
+// ── Token limits ──────────────────────────────────────────────────────────
+const MAX_TOKENS_EXPLAIN = 1024;
+const MAX_TOKENS_CODE    = 2048;
+
 // ── Call OpenAI Chat Completions ──────────────────────────────────────────
 
 // Build messages based on action
@@ -144,7 +148,7 @@ if ($action === 'generate') {
     ];
 }
 
-$maxTokens = ($action === 'explain') ? 1024 : 2048;
+$maxTokens = ($action === 'explain') ? MAX_TOKENS_EXPLAIN : MAX_TOKENS_CODE;
 
 $payload = json_encode([
     'model'       => 'gpt-4o-mini',
