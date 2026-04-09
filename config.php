@@ -29,6 +29,13 @@ define('CF_SITE_ADDR',  '156 Foundry Ave., Suite 502, New York, NY, USA');
 define('CF_COPYRIGHT',  '&copy; 2024 CodeFoundry. All rights reserved.');
 
 // ---------------------------------------------------------------------------
+// AI / CodeGen
+// ---------------------------------------------------------------------------
+
+/** OpenAI API key for the CodeGen feature. Set via environment or replace the empty string. */
+define('CF_OPENAI_KEY', getenv('OPENAI_API_KEY') ?: '');
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 

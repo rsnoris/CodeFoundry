@@ -314,6 +314,95 @@ kbd {
 
   .toolbar-hint { display: none; }
 }
+
+/* ── CodeGen modal ───────────────────────────────────────────── */
+.codegen-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.codegen-overlay.open {
+  display: flex;
+}
+
+.codegen-modal {
+  background: var(--navy-2);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  width: min(560px, 95vw);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+
+.codegen-modal h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.codegen-modal h2 iconify-icon {
+  color: var(--primary);
+}
+
+.codegen-prompt {
+  width: 100%;
+  background: #0d1117;
+  color: var(--text);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  resize: vertical;
+  min-height: 90px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color .2s;
+}
+
+.codegen-prompt:focus {
+  border-color: var(--primary);
+}
+
+.codegen-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ide-btn.primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.ide-btn.primary:hover:not(:disabled) {
+  background: #0ea5e9;
+}
+
+.ide-btn.primary:disabled {
+  background: #1e3a4a;
+  color: #38bdf866;
+  cursor: not-allowed;
+}
+
+.codegen-hint {
+  font-size: 12px;
+  color: var(--text-subtle);
+  margin: 0;
+}
 PAGECSS;
 
 require_once dirname(__DIR__) . '/includes/header.php';
@@ -370,6 +459,12 @@ require_once dirname(__DIR__) . '/includes/header.php';
     <button id="runBtn" class="ide-btn run" aria-label="Run code">
       <iconify-icon icon="lucide:play" aria-hidden="true"></iconify-icon>
       Run
+    </button>
+
+    <!-- Generate -->
+    <button id="codegenBtn" class="ide-btn ghost" title="Generate code with AI">
+      <iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon>
+      Generate
     </button>
 
     <div class="toolbar-sep" aria-hidden="true"></div>
@@ -439,6 +534,28 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
     </div><!-- /io-pane -->
   </div><!-- /workspace -->
+
+<!-- ── CodeGen modal ────────────────────────────────────────────── -->
+<div id="codegenOverlay" class="codegen-overlay" role="dialog"
+     aria-modal="true" aria-labelledby="codegenTitle">
+  <div class="codegen-modal">
+    <h2 id="codegenTitle">
+      <iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon>
+      Generate Code with AI
+    </h2>
+    <textarea id="codegenPrompt" class="codegen-prompt"
+              placeholder="Describe the code you want to generate…&#10;e.g. "Write a function that sorts a list of dictionaries by a given key.""
+              rows="4" aria-label="Code generation prompt"></textarea>
+    <p class="codegen-hint">The generated code will replace the current editor content.</p>
+    <div class="codegen-actions">
+      <button id="codegenCancelBtn" class="ide-btn ghost">Cancel</button>
+      <button id="codegenSubmitBtn" class="ide-btn primary">
+        <iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon>
+        Generate
+      </button>
+    </div>
+  </div>
+</div>
 
 </div><!-- /ide-wrapper -->
 
@@ -842,6 +959,81 @@ function setRunning(on) {
     btn.innerHTML = '<iconify-icon icon="lucide:play" aria-hidden="true"></iconify-icon> Run';
   }
 }
+
+/* ── CodeGen ────────────────────────────────────────────── */
+(function () {
+  const overlay    = document.getElementById('codegenOverlay');
+  const prompt     = document.getElementById('codegenPrompt');
+  const submitBtn  = document.getElementById('codegenSubmitBtn');
+  const cancelBtn  = document.getElementById('codegenCancelBtn');
+  const codegenBtn = document.getElementById('codegenBtn');
+
+  function openModal() {
+    prompt.value = '';
+    overlay.classList.add('open');
+    prompt.focus();
+  }
+
+  function closeModal() {
+    overlay.classList.remove('open');
+    codegenBtn.focus();
+  }
+
+  codegenBtn.addEventListener('click', openModal);
+  cancelBtn.addEventListener('click', closeModal);
+
+  overlay.addEventListener('click', function (e) {
+    if (e.target === overlay) closeModal();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+  });
+
+  async function generateCode() {
+    const text = prompt.value.trim();
+    if (!text) { prompt.focus(); return; }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner"></span> Generating…';
+
+    try {
+      const res = await fetch('/IDE/codegen.php', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ prompt: text, language: currentLang }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert('CodeGen error: ' + (data.error || 'Unknown error'));
+        return;
+      }
+
+      if (editor) {
+        editor.setValue(data.code);
+        editor.focus();
+      }
+
+      closeModal();
+    } catch (err) {
+      alert('Network error: ' + err.message);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon> Generate';
+    }
+  }
+
+  submitBtn.addEventListener('click', generateCode);
+
+  prompt.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      generateCode();
+    }
+  });
+}());
 
 /* ── Resizable divider ──────────────────────────────────── */
 (function () {
