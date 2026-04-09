@@ -403,6 +403,118 @@ kbd {
   color: var(--text-subtle);
   margin: 0;
 }
+
+/* ── Explain modal ─────────────────────────────────────────────── */
+.explain-modal {
+  background: var(--navy-2);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  width: min(680px, 95vw);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+
+.explain-modal h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.explain-modal h2 iconify-icon {
+  color: #a78bfa;
+}
+
+.explain-body {
+  flex: 1;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 0;
+}
+
+.explain-loading {
+  color: var(--text-subtle);
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── CodeGen mode tabs ─────────────────────────────────────────── */
+.codegen-tabs {
+  display: flex;
+  gap: 4px;
+  background: #0d1117;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.codegen-tab {
+  flex: 1;
+  padding: 6px 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  white-space: nowrap;
+}
+
+.codegen-tab.active {
+  background: var(--navy-3);
+  color: var(--text);
+}
+
+.codegen-tab:hover:not(.active) {
+  color: var(--text);
+}
+
+/* ── Fix button in output pane ─────────────────────────────────── */
+.fix-ai-btn {
+  display: none;
+}
+
+.fix-ai-btn.visible {
+  display: inline-flex;
+}
+
+/* ── Insert mode selector ──────────────────────────────────────── */
+.codegen-insert-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.codegen-insert-row label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.codegen-insert-row input[type="radio"] {
+  accent-color: var(--primary);
+  cursor: pointer;
+}
 PAGECSS;
 
 require_once dirname(__DIR__) . '/includes/header.php';
@@ -467,6 +579,18 @@ require_once dirname(__DIR__) . '/includes/header.php';
       Generate
     </button>
 
+    <!-- Improve -->
+    <button id="improveBtn" class="ide-btn ghost" title="Improve existing code with AI">
+      <iconify-icon icon="lucide:wand-2" aria-hidden="true"></iconify-icon>
+      Improve
+    </button>
+
+    <!-- Explain -->
+    <button id="explainBtn" class="ide-btn ghost" title="Explain the current code with AI">
+      <iconify-icon icon="lucide:book-open" aria-hidden="true"></iconify-icon>
+      Explain
+    </button>
+
     <div class="toolbar-sep" aria-hidden="true"></div>
 
     <!-- Copy -->
@@ -522,6 +646,11 @@ require_once dirname(__DIR__) . '/includes/header.php';
           <span>Output</span>
           <div class="pane-header-right">
             <span id="statusBadge" class="pane-badge" style="display:none;" aria-live="polite"></span>
+            <button id="fixBtn" class="ide-btn ghost pane-clear-btn fix-ai-btn"
+                    aria-label="Fix errors with AI" title="Fix errors with AI">
+              <iconify-icon icon="lucide:wrench" aria-hidden="true"></iconify-icon>
+              Fix with AI
+            </button>
             <button class="ide-btn ghost pane-clear-btn" id="clearOutputBtn"
                     aria-label="Clear output">Clear</button>
           </div>
@@ -543,16 +672,62 @@ require_once dirname(__DIR__) . '/includes/header.php';
       <iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon>
       Generate Code with AI
     </h2>
-    <textarea id="codegenPrompt" class="codegen-prompt"
-              placeholder="Describe the code you want to generate…&#10;e.g. "Write a function that sorts a list of dictionaries by a given key.""
-              rows="4" aria-label="Code generation prompt"></textarea>
-    <p class="codegen-hint">The generated code will replace the current editor content.</p>
+    <!-- Mode tabs: Generate / Improve -->
+    <div class="codegen-tabs" role="tablist">
+      <button class="codegen-tab active" id="tabGenerate" role="tab"
+              aria-selected="true" aria-controls="codegenTabPanel">
+        <iconify-icon icon="lucide:sparkles" width="13" aria-hidden="true"></iconify-icon>
+        Generate new
+      </button>
+      <button class="codegen-tab" id="tabImprove" role="tab"
+              aria-selected="false" aria-controls="codegenTabPanel">
+        <iconify-icon icon="lucide:wand-2" width="13" aria-hidden="true"></iconify-icon>
+        Improve existing
+      </button>
+    </div>
+    <div id="codegenTabPanel">
+      <textarea id="codegenPrompt" class="codegen-prompt"
+                placeholder="Describe the code you want to generate…&#10;e.g. "Write a function that sorts a list of dictionaries by a given key.""
+                rows="4" aria-label="Code generation prompt"></textarea>
+    </div>
+    <!-- Insert mode -->
+    <div class="codegen-insert-row" id="insertModeRow">
+      <span>Insert:</span>
+      <label>
+        <input type="radio" name="insertMode" value="replace" checked>
+        Replace all
+      </label>
+      <label>
+        <input type="radio" name="insertMode" value="cursor">
+        At cursor
+      </label>
+    </div>
+    <p class="codegen-hint" id="codegenHint">The generated code will replace the current editor content.</p>
     <div class="codegen-actions">
       <button id="codegenCancelBtn" class="ide-btn ghost">Cancel</button>
       <button id="codegenSubmitBtn" class="ide-btn primary">
         <iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon>
         Generate
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Explain modal ────────────────────────────────────────────── -->
+<div id="explainOverlay" class="codegen-overlay" role="dialog"
+     aria-modal="true" aria-labelledby="explainTitle">
+  <div class="explain-modal">
+    <h2 id="explainTitle">
+      <iconify-icon icon="lucide:book-open" aria-hidden="true"></iconify-icon>
+      Code Explanation
+    </h2>
+    <div id="explainBody" class="explain-body">
+      <div class="explain-loading">
+        <span class="spinner"></span> Generating explanation…
+      </div>
+    </div>
+    <div class="codegen-actions">
+      <button id="explainCloseBtn" class="ide-btn ghost">Close</button>
     </div>
   </div>
 </div>
@@ -873,11 +1048,15 @@ function showOutput(stdout, stderr, exitCode, errorMsg) {
     el.textContent = '⚠ ' + errorMsg;
     panel.appendChild(el);
     badge.style.display = 'none';
+    document.getElementById('fixBtn').classList.add('visible');
     return;
   }
 
   const hasOut = stdout && stdout.length > 0;
   const hasErr = stderr && stderr.length > 0;
+
+  // Show "Fix with AI" button when there is stderr
+  document.getElementById('fixBtn').classList.toggle('visible', hasErr);
 
   if (!hasOut && !hasErr) {
     const el = document.createElement('span');
@@ -936,6 +1115,8 @@ function clearOutput() {
   const badge = document.getElementById('statusBadge');
   badge.style.display = 'none';
   badge.className     = 'pane-badge';
+
+  document.getElementById('fixBtn').classList.remove('visible');
 }
 
 function setRunning(on) {
@@ -960,26 +1141,78 @@ function setRunning(on) {
   }
 }
 
-/* ── CodeGen ────────────────────────────────────────────── */
+/* ── CodeGen / Improve / Explain / Fix ─────────────────────────── */
 (function () {
-  const overlay    = document.getElementById('codegenOverlay');
-  const prompt     = document.getElementById('codegenPrompt');
-  const submitBtn  = document.getElementById('codegenSubmitBtn');
-  const cancelBtn  = document.getElementById('codegenCancelBtn');
-  const codegenBtn = document.getElementById('codegenBtn');
+  /* ── CodeGen & Improve modal ───────────────────────────────────── */
+  const overlay     = document.getElementById('codegenOverlay');
+  const promptTA    = document.getElementById('codegenPrompt');
+  const submitBtn   = document.getElementById('codegenSubmitBtn');
+  const cancelBtn   = document.getElementById('codegenCancelBtn');
+  const codegenBtn  = document.getElementById('codegenBtn');
+  const improveBtn  = document.getElementById('improveBtn');
+  const tabGenerate = document.getElementById('tabGenerate');
+  const tabImprove  = document.getElementById('tabImprove');
+  const insertRow   = document.getElementById('insertModeRow');
+  const hintEl      = document.getElementById('codegenHint');
 
-  function openModal() {
-    prompt.value = '';
+  let currentMode = 'generate'; // 'generate' | 'improve'
+
+  function getInsertMode() {
+    const checked = document.querySelector('input[name="insertMode"]:checked');
+    return checked ? checked.value : 'replace';
+  }
+
+  function setMode(mode) {
+    currentMode = mode;
+    if (mode === 'generate') {
+      tabGenerate.classList.add('active');
+      tabGenerate.setAttribute('aria-selected', 'true');
+      tabImprove.classList.remove('active');
+      tabImprove.setAttribute('aria-selected', 'false');
+      promptTA.placeholder = 'Describe the code you want to generate…\ne.g. "Write a function that sorts a list of dictionaries by a given key."';
+      submitBtn.innerHTML  = '<iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon> Generate';
+      insertRow.style.display = '';
+      updateHint();
+    } else {
+      tabImprove.classList.add('active');
+      tabImprove.setAttribute('aria-selected', 'true');
+      tabGenerate.classList.remove('active');
+      tabGenerate.setAttribute('aria-selected', 'false');
+      promptTA.placeholder = 'Describe how you want to improve the code…\ne.g. "Add error handling and input validation."';
+      submitBtn.innerHTML  = '<iconify-icon icon="lucide:wand-2" aria-hidden="true"></iconify-icon> Improve';
+      insertRow.style.display = 'none';
+      hintEl.textContent      = 'The improved code will replace the current editor content.';
+    }
+  }
+
+  function updateHint() {
+    const mode = getInsertMode();
+    hintEl.textContent = mode === 'cursor'
+      ? 'The generated code will be inserted at the cursor position.'
+      : 'The generated code will replace the current editor content.';
+  }
+
+  document.querySelectorAll('input[name="insertMode"]').forEach(function (radio) {
+    radio.addEventListener('change', updateHint);
+  });
+
+  tabGenerate.addEventListener('click', function () { setMode('generate'); promptTA.focus(); });
+  tabImprove.addEventListener('click',  function () { setMode('improve');  promptTA.focus(); });
+
+  function openModal(mode) {
+    setMode(mode || 'generate');
+    promptTA.value = '';
     overlay.classList.add('open');
-    prompt.focus();
+    promptTA.focus();
   }
 
   function closeModal() {
     overlay.classList.remove('open');
-    codegenBtn.focus();
+    (currentMode === 'improve' ? improveBtn : codegenBtn).focus();
   }
 
-  codegenBtn.addEventListener('click', openModal);
+  codegenBtn.addEventListener('click',  function () { openModal('generate'); });
+  improveBtn.addEventListener('click',  function () { openModal('improve');  });
   cancelBtn.addEventListener('click', closeModal);
 
   overlay.addEventListener('click', function (e) {
@@ -990,24 +1223,165 @@ function setRunning(on) {
     if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
   });
 
-  async function generateCode() {
-    const text = prompt.value.trim();
-    if (!text) { prompt.focus(); return; }
+  async function submitCodegen() {
+    const text = promptTA.value.trim();
+    if (!text) { promptTA.focus(); return; }
 
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="spinner"></span> Generating…';
+    const code = editor ? editor.getValue() : '';
+
+    if (currentMode === 'improve' && !code.trim()) {
+      alert('There is no code in the editor to improve.');
+      return;
+    }
+
+    submitBtn.disabled  = true;
+    const originalLabel = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span class="spinner"></span> ' +
+      (currentMode === 'improve' ? 'Improving…' : 'Generating…');
 
     try {
-      const res = await fetch('/IDE/codegen.php', {
+      const body = {
+        action:   currentMode,
+        prompt:   text,
+        language: currentLang,
+      };
+      if (currentMode === 'improve') {
+        body.currentCode = code;
+      }
+
+      const res  = await fetch('/IDE/codegen.php', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ prompt: text, language: currentLang }),
+        body:    JSON.stringify(body),
       });
-
       const data = await res.json();
 
       if (!res.ok) {
-        alert(`CodeGen error: ${data.error || 'Unknown error'}`);
+        alert('CodeGen error: ' + (data.error || 'Unknown error'));
+        return;
+      }
+
+      if (editor) {
+        if (currentMode === 'generate' && getInsertMode() === 'cursor') {
+          const position = editor.getPosition();
+          editor.executeEdits('codegen', [{
+            range: new monaco.Range(
+              position.lineNumber, position.column,
+              position.lineNumber, position.column
+            ),
+            text: data.code,
+          }]);
+        } else {
+          editor.setValue(data.code);
+        }
+        editor.focus();
+      }
+
+      closeModal();
+    } catch (err) {
+      alert('Network error: ' + err.message);
+    } finally {
+      submitBtn.disabled  = false;
+      submitBtn.innerHTML = originalLabel;
+    }
+  }
+
+  submitBtn.addEventListener('click', submitCodegen);
+
+  promptTA.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      submitCodegen();
+    }
+  });
+
+  /* ── Explain modal ─────────────────────────────────────────────── */
+  const explainOverlay   = document.getElementById('explainOverlay');
+  const explainBody      = document.getElementById('explainBody');
+  const explainCloseBtn  = document.getElementById('explainCloseBtn');
+  const explainBtnEl     = document.getElementById('explainBtn');
+
+  function closeExplain() {
+    explainOverlay.classList.remove('open');
+    explainBtnEl.focus();
+  }
+
+  explainBtnEl.addEventListener('click', async function () {
+    const code = editor ? editor.getValue().trim() : '';
+    if (!code) {
+      alert('There is no code in the editor to explain.');
+      return;
+    }
+
+    explainBody.innerHTML = '<div class="explain-loading"><span class="spinner"></span> Generating explanation…</div>';
+    explainOverlay.classList.add('open');
+
+    try {
+      const res  = await fetch('/IDE/codegen.php', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ action: 'explain', language: currentLang, currentCode: code }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        explainBody.textContent = 'Error: ' + (data.error || 'Unknown error');
+        return;
+      }
+
+      explainBody.textContent = data.explanation || '(No explanation returned.)';
+    } catch (err) {
+      explainBody.textContent = 'Network error: ' + err.message;
+    }
+  });
+
+  explainCloseBtn.addEventListener('click', closeExplain);
+
+  explainOverlay.addEventListener('click', function (e) {
+    if (e.target === explainOverlay) closeExplain();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && explainOverlay.classList.contains('open')) closeExplain();
+  });
+
+  /* ── Fix with AI ───────────────────────────────────────────────── */
+  const fixBtn = document.getElementById('fixBtn');
+
+  fixBtn.addEventListener('click', async function () {
+    const code = editor ? editor.getValue().trim() : '';
+    if (!code) {
+      alert('There is no code in the editor to fix.');
+      return;
+    }
+
+    const outputPanel = document.getElementById('outputPanel');
+    const errorText   = outputPanel ? outputPanel.textContent : '';
+
+    fixBtn.disabled  = true;
+    const origLabel  = fixBtn.innerHTML;
+    fixBtn.innerHTML = '<span class="spinner"></span> Fixing…';
+
+    try {
+      const body = {
+        action:      'fix',
+        language:    currentLang,
+        currentCode: code,
+      };
+      if (errorText && errorText.trim() !== '' &&
+          !outputPanel.classList.contains('empty')) {
+        body.errorOutput = errorText.trim();
+      }
+
+      const res  = await fetch('/IDE/codegen.php', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(body),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert('Fix error: ' + (data.error || 'Unknown error'));
         return;
       }
 
@@ -1015,22 +1389,11 @@ function setRunning(on) {
         editor.setValue(data.code);
         editor.focus();
       }
-
-      closeModal();
     } catch (err) {
-      alert(`Network error: ${err.message}`);
+      alert('Network error: ' + err.message);
     } finally {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = '<iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon> Generate';
-    }
-  }
-
-  submitBtn.addEventListener('click', generateCode);
-
-  prompt.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault();
-      generateCode();
+      fixBtn.disabled  = false;
+      fixBtn.innerHTML = origLabel;
     }
   });
 }());
