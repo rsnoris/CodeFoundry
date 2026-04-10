@@ -203,4 +203,12 @@ if ($action === 'push') {
     exit;
 }
 
+// ── disconnect ────────────────────────────────────────────────────────────────
+
+if ($action === 'disconnect') {
+    UserStore::updateUser($username, ['github_token' => '', 'github_username' => '']);
+    echo json_encode(['ok' => true]);
+    exit;
+}
+
 gh_api_error('Unknown action.');

@@ -1090,7 +1090,6 @@ $page_scripts .= <<<'PAGEJS'
 
       lastGeneratedCode = data.code || '';
       codeOutput.textContent = lastGeneratedCode;
-      window._cfLastGeneratedCode = lastGeneratedCode;
       resultEl.classList.add('visible');
       resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     } catch (err) {
@@ -1368,9 +1367,7 @@ $page_scripts .= <<<'GHJS'
   /* ── Push ────────────────────────────────────────────────── */
   ghPushBtn.addEventListener('click', function () {
     clearPushMessages();
-    var code = (window._cfLastGeneratedCode !== undefined)
-      ? window._cfLastGeneratedCode
-      : (document.getElementById('genCodeOutput') || {}).textContent || '';
+    var code = (document.getElementById('genCodeOutput') || {}).textContent || '';
     if (!code) { showPushError('No generated code to push.'); return; }
 
     var filePath = ghFilePath.value.trim();

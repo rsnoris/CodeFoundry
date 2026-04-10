@@ -39,7 +39,10 @@ $code          = $_GET['code']  ?? '';
 
 unset($_SESSION['gh_repo_state']);
 
-if ($savedState === '' || !hash_equals($savedState, $returnedState) || $code === '') {
+if ($savedState === '') {
+    gh_cb_fail('Missing OAuth state token.');
+}
+if (!hash_equals($savedState, $returnedState) || $code === '') {
     gh_cb_fail('Invalid OAuth state or missing code.');
 }
 
