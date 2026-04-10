@@ -3,11 +3,18 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/lib/CodeGenProvider.php';
 
+// Determine if the current user is on a free plan.
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+$_cf_session_user = $_SESSION['cf_user'] ?? null;
+$_cf_is_free_plan = ($_cf_session_user['plan'] ?? 'free') === 'free';
+
 // Build a minimal provider/model list for the client-side selector.
-// Only include providers that are "available" (have an API key or are local).
+// Free-plan / unauthenticated users only see free-tier providers.
+// Paid users see all available providers.
 $_cf_providers_js = [];
 foreach (CodeGenProvider::all() as $pid => $pdata) {
     if (!$pdata['available']) continue;
+    if ($_cf_is_free_plan && empty($pdata['free_tier'])) continue;
     $models = [];
     foreach ($pdata['models'] as $m) {
         $models[] = ['id' => $m['id'], 'label' => $m['label']];

@@ -94,6 +94,29 @@ class CodeGenProvider
     }
 
     /**
+     * Return the default free-tier provider id (first provider with free_tier = true),
+     * or '' if none is configured.
+     */
+    public static function defaultFreeProviderId(): string
+    {
+        foreach (CF_CODEGEN_PROVIDERS as $id => $cfg) {
+            if (!empty($cfg['free_tier']) && self::isAvailable($cfg)) {
+                return $id;
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Return true when the given provider is marked as free_tier.
+     */
+    public static function isFreeTierProvider(string $providerId): bool
+    {
+        $providers = CF_CODEGEN_PROVIDERS;
+        return !empty($providers[$providerId]['free_tier']);
+    }
+
+    /**
      * Call the specified provider/model with a chat-completions request.
      *
      * @param  string  $providerId  One of the keys in CF_CODEGEN_PROVIDERS
@@ -122,10 +145,11 @@ class CodeGenProvider
         }
 
         // Build request headers
-        $headers = [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . self::resolveApiKey($cfg),
-        ];
+        $headers = ['Content-Type: application/json'];
+        $apiKey  = self::resolveApiKey($cfg);
+        if ($apiKey !== '') {
+            $headers[] = 'Authorization: Bearer ' . $apiKey;
+        }
         if (!empty($cfg['extra_headers'])) {
             foreach ($cfg['extra_headers'] as $h) {
                 $headers[] = $h;
@@ -219,10 +243,10 @@ class CodeGenProvider
         return '';
     }
 
-    /** Return true when the provider has a usable API key or is local. */
+    /** Return true when the provider has a usable API key, is local, or requires no key. */
     private static function isAvailable(array $cfg): bool
     {
-        if (!empty($cfg['local'])) {
+        if (!empty($cfg['local']) || !empty($cfg['no_key_required'])) {
             return true;
         }
         return self::resolveApiKey($cfg) !== '';
