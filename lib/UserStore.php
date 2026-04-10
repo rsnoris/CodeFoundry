@@ -150,8 +150,7 @@ class UserStore
         string $display,
         string $email
     ): array {
-        // Derive a unique username
-        $base     = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $display) ?: $provider);
+        // Derive a unique username from provider + provider user ID
         $username = $provider . '_' . $providerId;
 
         // Fallback to base_N if the derived name is taken

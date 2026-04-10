@@ -102,7 +102,7 @@ if ($provider === 'github') {
 
     // Fetch verified primary email if not public
     $email = $profile['email'] ?? '';
-    if ($email === '' || $email === null) {
+    if ($email === '') {
         $emailsResp = cf_http_request('GET', 'https://api.github.com/user/emails', [
             'Authorization: Bearer ' . $accessToken,
             'Accept: application/vnd.github+json',

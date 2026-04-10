@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = 'Please enter a valid email address.';
         }
 
-        if (strlen($password) < 8) {
+        if (mb_strlen($password) < 8) {
             $errors[] = 'Password must be at least 8 characters.';
         } elseif ($password !== $password2) {
             $errors[] = 'Passwords do not match.';
