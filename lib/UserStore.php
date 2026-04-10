@@ -19,8 +19,9 @@ class UserStore
 
     /**
      * Return a single user by username.
-     * Merges CF_USERS (authoritative for credentials/role) with any extra
-     * fields stored in data/users.json (plan, tokens_used, email, etc.).
+     * Checks CF_USERS first (authoritative for credentials/role), merging extra
+     * fields from data/users.json; falls back to self-registered users stored
+     * only in data/users.json.
      */
     public static function findUser(string $username): ?array
     {
@@ -34,21 +35,32 @@ class UserStore
                 break;
             }
         }
-        if ($base === null) {
-            return null;
-        }
 
-        // Merge in any runtime state from data/users.json
         $stored = self::allUsers();
-        foreach ($stored as $row) {
-            if (($row['username'] ?? '') === $username) {
-                // runtime fields override defaults; credentials come from CF_USERS unless overridden
-                $base = array_merge($base, $row);
-                // Prefer data/users.json password_hash if present, otherwise keep CF_USERS hash
-                if (empty($row['password_hash'])) {
-                    $base['password_hash'] = $basePassword;
+
+        if ($base !== null) {
+            // Merge in any runtime state from data/users.json
+            foreach ($stored as $row) {
+                if (($row['username'] ?? '') === $username) {
+                    // runtime fields override defaults; credentials come from CF_USERS unless overridden
+                    $base = array_merge($base, $row);
+                    // Prefer data/users.json password_hash if present, otherwise keep CF_USERS hash
+                    if (empty($row['password_hash'])) {
+                        $base['password_hash'] = $basePassword;
+                    }
+                    break;
                 }
-                break;
+            }
+        } else {
+            // Fall back to self-registered users stored only in data/users.json
+            foreach ($stored as $row) {
+                if (($row['username'] ?? '') === $username && !empty($row['self_registered'])) {
+                    $base = $row;
+                    break;
+                }
+            }
+            if ($base === null) {
+                return null;
             }
         }
 
@@ -58,6 +70,116 @@ class UserStore
         $base['email']       = $base['email']       ?? '';
 
         return $base;
+    }
+
+    /**
+     * Return true if a username is already taken (checks CF_USERS and data/users.json).
+     */
+    public static function usernameExists(string $username): bool
+    {
+        foreach (CF_USERS as $u) {
+            if (($u['username'] ?? '') === $username) {
+                return true;
+            }
+        }
+        foreach (self::allUsers() as $row) {
+            if (($row['username'] ?? '') === $username) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Create a new self-registered user in data/users.json.
+     * Returns false if the username is already taken.
+     */
+    public static function createUser(
+        string $username,
+        string $display,
+        string $email,
+        string $passwordHash
+    ): bool {
+        if (self::usernameExists($username)) {
+            return false;
+        }
+        $users   = self::allUsers();
+        $users[] = [
+            'username'        => $username,
+            'display'         => $display,
+            'email'           => $email,
+            'password_hash'   => $passwordHash,
+            'role'            => 'user',
+            'plan'            => 'free',
+            'tokens_used'     => 0,
+            'self_registered' => true,
+            'created_at'      => date('c'),
+        ];
+        self::saveUsers($users);
+        return true;
+    }
+
+    /**
+     * Find a user by OAuth provider + provider user ID.
+     * Returns the user array or null.
+     */
+    public static function findUserByOAuth(string $provider, string $providerId): ?array
+    {
+        foreach (self::allUsers() as $row) {
+            if (
+                ($row['oauth_provider'] ?? '') === $provider &&
+                ($row['oauth_id']       ?? '') === $providerId
+            ) {
+                $row['plan']        = $row['plan']        ?? 'free';
+                $row['tokens_used'] = $row['tokens_used'] ?? 0;
+                $row['email']       = $row['email']       ?? '';
+                return $row;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Create a new user authenticated via a social OAuth provider.
+     * The username is derived from the provider (e.g. "github_12345") and is
+     * guaranteed unique.  Returns the created user array.
+     */
+    public static function createOAuthUser(
+        string $provider,
+        string $providerId,
+        string $display,
+        string $email
+    ): array {
+        // Derive a unique username
+        $base     = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', $display) ?: $provider);
+        $username = $provider . '_' . $providerId;
+
+        // Fallback to base_N if the derived name is taken
+        if (self::usernameExists($username)) {
+            $suffix   = 2;
+            $original = $username;
+            while (self::usernameExists($username)) {
+                $username = $original . '_' . $suffix++;
+            }
+        }
+
+        $user    = [
+            'username'        => $username,
+            'display'         => $display ?: $email,
+            'email'           => $email,
+            'password_hash'   => '',          // no password for OAuth users
+            'role'            => 'user',
+            'plan'            => 'free',
+            'tokens_used'     => 0,
+            'oauth_provider'  => $provider,
+            'oauth_id'        => $providerId,
+            'self_registered' => true,
+            'created_at'      => date('c'),
+        ];
+        $users   = self::allUsers();
+        $users[] = $user;
+        self::saveUsers($users);
+        return $user;
     }
 
     /** Persist all user records to data/users.json. */
