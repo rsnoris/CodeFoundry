@@ -52,6 +52,12 @@ define('CF_USERS', [
         'display'       => 'Admin',
         'role'          => 'admin',
     ],
+    [
+        'username'      => 'roshnori',
+        'password_hash' => '$2y$10$NxR.XtTCgg.yTwu6hNbaKeh4T/YWaLyxYxVh3giFUi8I8iBudAsxS',
+        'display'       => 'roshnori',
+        'role'          => 'admin',
+    ],
 ]);
 
 // ---------------------------------------------------------------------------
