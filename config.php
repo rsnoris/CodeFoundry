@@ -29,6 +29,29 @@ define('CF_SITE_ADDR',  '156 Foundry Ave., Suite 502, New York, NY, USA');
 define('CF_COPYRIGHT',  '&copy; 2024 CodeFoundry. All rights reserved.');
 
 // ---------------------------------------------------------------------------
+// User Accounts
+// ---------------------------------------------------------------------------
+
+/**
+ * Array of user accounts.  Each entry requires:
+ *   username      – login handle (plain text)
+ *   password_hash – bcrypt hash produced by password_hash($plain, PASSWORD_BCRYPT)
+ *   display       – (optional) name shown in the UI
+ *   role          – (optional) 'admin' | 'user'
+ *
+ * To generate a hash in PHP:
+ *   php -r "echo password_hash('YOUR_PASSWORD', PASSWORD_BCRYPT);"
+ */
+define('CF_USERS', [
+    [
+        'username'      => 'admin',
+        'password_hash' => '$2y$12$YourHashHere',   // replace with a real bcrypt hash
+        'display'       => 'Admin',
+        'role'          => 'admin',
+    ],
+]);
+
+// ---------------------------------------------------------------------------
 // AI / CodeGen
 // ---------------------------------------------------------------------------
 

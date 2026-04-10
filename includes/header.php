@@ -13,6 +13,12 @@ $page_title  = $page_title  ?? 'CodeFoundry';
 $active_page = $active_page ?? '';
 $page_styles = $page_styles ?? '';
 
+// Start session once (guard against pages that already called session_start())
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$_cf_user = $_SESSION['cf_user'] ?? null;
+
 /**
  * Helper: return 'active' class string when $id matches $active_page.
  */
@@ -53,8 +59,30 @@ function cf_active(string $id): string {
       <a href="/Careers/"     class="nav-link<?= cf_active('careers') ?>">Careers</a>
     </nav>
     <div class="nav-actions">
-      <a href="/Contact/" class="nav-btn secondary<?= cf_active('contact') ?>" style="font-weight:800;">Contact Us</a>
-      <a href="/#services" class="nav-btn primary">Get Started</a>
+      <?php if ($_cf_user): ?>
+        <div class="nav-user-menu" id="navUserMenu">
+          <button class="nav-user-btn" id="navUserBtn" aria-haspopup="true" aria-expanded="false" aria-label="User menu">
+            <iconify-icon icon="lucide:user-circle-2"></iconify-icon>
+            <span class="nav-user-name"><?= htmlspecialchars($_cf_user['display'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></span>
+            <iconify-icon icon="lucide:chevron-down" class="nav-user-caret"></iconify-icon>
+          </button>
+          <div class="nav-user-dropdown" id="navUserDropdown" role="menu">
+            <div class="nav-user-info">
+              <div class="nav-user-display"><?= htmlspecialchars($_cf_user['display'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></div>
+              <div class="nav-user-role"><?= htmlspecialchars(ucfirst($_cf_user['role'] ?? 'user'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></div>
+            </div>
+            <a href="/Login/logout.php" class="nav-user-dropdown-item" role="menuitem">
+              <iconify-icon icon="lucide:log-out"></iconify-icon>
+              Sign Out
+            </a>
+          </div>
+        </div>
+      <?php else: ?>
+        <a href="/Login/" class="nav-login-btn<?= cf_active('login') ?>" aria-label="Login">
+          <iconify-icon icon="lucide:log-in"></iconify-icon>
+          <span>Login</span>
+        </a>
+      <?php endif; ?>
     </div>
     <button class="mobile-hamburger" id="mobileMenuBtn" aria-label="Open menu">
       <iconify-icon icon="lucide:menu"></iconify-icon>
@@ -77,8 +105,18 @@ function cf_active(string $id): string {
         <a href="/Careers/"     class="nav-link" onclick="closeMobileNav()">Careers</a>
       </div>
       <div class="mobile-menu-actions">
-        <a href="/Contact/"  class="nav-btn secondary" style="font-weight:800;">Contact Us</a>
-        <a href="/#services" class="nav-btn primary">Get Started</a>
+        <?php if ($_cf_user): ?>
+          <div class="mobile-user-info">
+            <iconify-icon icon="lucide:user-circle-2"></iconify-icon>
+            <span><?= htmlspecialchars($_cf_user['display'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></span>
+          </div>
+          <a href="/Login/logout.php" class="nav-btn secondary" onclick="closeMobileNav()">Sign Out</a>
+        <?php else: ?>
+          <a href="/Login/" class="nav-btn primary" onclick="closeMobileNav()">
+            <iconify-icon icon="lucide:log-in"></iconify-icon>
+            Login
+          </a>
+        <?php endif; ?>
       </div>
     </div>
   </div>
