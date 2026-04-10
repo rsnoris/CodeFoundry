@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once dirname(dirname(__DIR__)) . '/config.php';
 require_once dirname(dirname(__DIR__)) . '/lib/UserStore.php';
+require_once dirname(dirname(__DIR__)) . '/lib/ChatStore.php';
 require_once dirname(dirname(__DIR__)) . '/includes/auth.php';
 
 cf_require_login();
@@ -13,6 +14,7 @@ $plan         = CF_PLANS[$plan_key] ?? CF_PLANS['free'];
 $tokens_used  = (int)($user['tokens_used'] ?? 0);
 $tokens_limit = (int)$plan['tokens_limit'];
 $token_pct    = $tokens_limit > 0 ? min(100, round($tokens_used / $tokens_limit * 100, 1)) : 0;
+$unread_chat  = ChatStore::totalUnreadForUser($user['username']);
 
 $dash_active = 'resources';
 $page_title  = 'Resources – CodeFoundry';
@@ -149,6 +151,18 @@ $page_styles = <<<'CSS'
     text-decoration: none;
   }
   .btn-plan-upgrade:hover { background: var(--primary-hover); }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--primary);
+    color: var(--navy);
+    font-size: 10px;
+    font-weight: 800;
+    border-radius: 100px;
+    padding: 1px 6px;
+    min-width: 18px;
+    text-align: center;
+    line-height: 16px;
+  }
   @media (max-width: 900px) { .plans-grid { grid-template-columns: repeat(2,1fr); } }
   @media (max-width: 700px) {
     .dash-layout { flex-direction: column; padding: 0; }
@@ -180,6 +194,15 @@ require_once dirname(dirname(__DIR__)) . '/includes/header.php';
     </a>
     <a href="/Dashboard/payments/" class="dash-nav-item <?= $dash_active === 'payments' ? 'active' : '' ?>">
       <iconify-icon icon="lucide:credit-card"></iconify-icon> Payments
+    </a>
+    <a href="/Dashboard/chat/" class="dash-nav-item <?= $dash_active === 'chat' ? 'active' : '' ?>" id="sidebarChatLink">
+      <iconify-icon icon="lucide:message-circle"></iconify-icon>
+      Support Chat
+      <?php if ($unread_chat > 0): ?>
+        <span class="nav-badge" id="sidebarBadge"><?= (int)$unread_chat ?></span>
+      <?php else: ?>
+        <span class="nav-badge" id="sidebarBadge" style="display:none">0</span>
+      <?php endif; ?>
     </a>
   </aside>
 

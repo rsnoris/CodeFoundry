@@ -17,6 +17,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/lib/UserStore.php';
 require_once dirname(__DIR__) . '/lib/AuditStore.php';
+require_once dirname(__DIR__) . '/lib/ChatStore.php';
 require_once dirname(__DIR__) . '/includes/auth.php';
 
 cf_require_login();
@@ -108,6 +109,9 @@ foreach ($all_users as $u) {
 }
 $total_revenue = array_sum(array_column($all_payments_raw, 'amount'));
 
+// Chat
+$unread_admin_chat = ChatStore::totalUnreadForAdmin();
+
 // Active tab
 $active_tab = $_GET['tab'] ?? 'overview';
 
@@ -191,6 +195,42 @@ $page_styles = <<<'CSS'
   .top-pages-bar-count { font-size:11px; color:var(--text-subtle); width:36px; text-align:right; }
   select.filter-select { background:var(--navy-3); border:1px solid var(--border-color); border-radius:6px; padding:7px 12px; color:var(--text); font-size:12px; outline:none; cursor:pointer; }
   select.filter-select:focus { border-color:var(--primary); }
+  .nav-badge { margin-left:auto; background:var(--primary); color:var(--navy); font-size:10px; font-weight:800; border-radius:100px; padding:1px 6px; min-width:18px; text-align:center; line-height:16px; }
+  /* ── Chat styles ─── */
+  .chat-admin-layout { display:flex; gap:0; height:calc(100vh - var(--header-height) - 140px); min-height:460px; background:var(--navy); border:1px solid var(--border-color); border-radius:var(--card-radius); overflow:hidden; }
+  .chat-sessions-panel { width:260px; flex-shrink:0; border-right:1px solid var(--border-color); display:flex; flex-direction:column; }
+  .chat-sessions-header { padding:12px 14px; border-bottom:1px solid var(--border-color); flex-shrink:0; }
+  .chat-sessions-header h3 { font-size:12px; font-weight:700; margin:0; color:var(--text); }
+  .chat-sessions-list { flex:1; overflow-y:auto; }
+  .chat-session-item { display:flex; flex-direction:column; gap:3px; padding:10px 14px; cursor:pointer; border-bottom:1px solid rgba(26,41,66,.5); transition:background .15s; }
+  .chat-session-item:hover { background:var(--navy-3); }
+  .chat-session-item.active { background:rgba(24,179,255,.08); border-left:2px solid var(--primary); }
+  .chat-session-subject { font-size:12px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .chat-session-meta { font-size:10px; color:var(--text-subtle); display:flex; align-items:center; justify-content:space-between; }
+  .chat-session-unread { background:var(--primary); color:var(--navy); font-size:9px; font-weight:800; border-radius:100px; padding:1px 5px; }
+  .chat-main-panel { flex:1; display:flex; flex-direction:column; min-width:0; }
+  .chat-header { padding:12px 16px; border-bottom:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+  .chat-header-title { font-size:13px; font-weight:700; color:var(--text); margin:0; }
+  .chat-header-sub { font-size:10px; color:var(--text-muted); margin-top:2px; }
+  .chat-messages { flex:1; overflow-y:auto; padding:14px 16px; display:flex; flex-direction:column; gap:8px; }
+  .chat-bubble-wrap { display:flex; flex-direction:column; max-width:75%; }
+  .chat-bubble-wrap.from-me { align-self:flex-end; align-items:flex-end; }
+  .chat-bubble-wrap.from-them { align-self:flex-start; align-items:flex-start; }
+  .chat-bubble { padding:8px 12px; border-radius:14px; font-size:13px; line-height:1.5; word-break:break-word; }
+  .chat-bubble.from-me { background:rgba(24,179,255,.15); color:var(--text); border:1px solid rgba(24,179,255,.25); border-bottom-right-radius:3px; }
+  .chat-bubble.from-them { background:var(--navy-3); color:var(--text); border:1px solid var(--border-color); border-bottom-left-radius:3px; }
+  .chat-bubble-meta { font-size:9px; color:var(--text-subtle); margin-top:2px; padding:0 4px; }
+  .chat-input-area { padding:12px 16px; border-top:1px solid var(--border-color); display:flex; gap:8px; align-items:flex-end; flex-shrink:0; }
+  .chat-input { flex:1; background:var(--navy-3); border:1px solid var(--border-color); border-radius:8px; padding:8px 12px; color:var(--text); font-size:13px; resize:none; outline:none; min-height:36px; max-height:100px; font-family:inherit; line-height:1.4; transition:border-color .15s; }
+  .chat-input:focus { border-color:var(--primary); }
+  .chat-send-btn { display:flex; align-items:center; justify-content:center; gap:5px; padding:8px 14px; background:rgba(24,179,255,.15); color:var(--primary); font-weight:700; font-size:12px; border:1px solid rgba(24,179,255,.3); border-radius:8px; cursor:pointer; transition:background .2s; white-space:nowrap; flex-shrink:0; }
+  .chat-send-btn:hover { background:rgba(24,179,255,.25); }
+  .chat-send-btn:disabled { opacity:.5; cursor:not-allowed; }
+  .chat-empty-state { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text-subtle); gap:8px; }
+  .chat-empty-state iconify-icon { font-size:28px; }
+  .chat-empty-state p { margin:0; font-size:13px; }
+  .badge-status-open { color:#fbbf24; }
+  .badge-status-closed { color:var(--text-subtle); }
   @media(max-width:900px){ .stat-grid{grid-template-columns:repeat(2,1fr);} .arch-grid{grid-template-columns:1fr;} }
   @media(max-width:700px){ .adm-layout{flex-direction:column;padding:0;} .adm-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border-color);padding:12px 0;display:flex;overflow-x:auto;} .adm-sidebar-title{display:none;} .adm-main{padding:20px 14px 48px;} .stat-grid{grid-template-columns:repeat(2,1fr);} }
 CSS;
@@ -208,6 +248,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
         'audit'        => ['icon' => 'lucide:shield-check',     'label' => 'Audit Trail'],
         'users'        => ['icon' => 'lucide:users',             'label' => 'Users'],
         'support'      => ['icon' => 'lucide:life-buoy',         'label' => 'Support'],
+        'live_chat'    => ['icon' => 'lucide:message-circle',    'label' => 'Live Chat'],
         'analytics'    => ['icon' => 'lucide:bar-chart-2',       'label' => 'Analytics'],
         'architecture' => ['icon' => 'lucide:layout',            'label' => 'Architecture'],
         'workflows'    => ['icon' => 'lucide:git-pull-request',  'label' => 'Workflows'],
@@ -217,6 +258,11 @@ require_once dirname(__DIR__) . '/includes/header.php';
        class="adm-nav-item <?= $active_tab === $key ? 'active' : '' ?>">
       <iconify-icon icon="<?= cf_e($meta['icon']) ?>"></iconify-icon>
       <?= cf_e($meta['label']) ?>
+      <?php if ($key === 'live_chat' && $unread_admin_chat > 0): ?>
+        <span class="nav-badge" id="adminChatBadge"><?= (int)$unread_admin_chat ?></span>
+      <?php elseif ($key === 'live_chat'): ?>
+        <span class="nav-badge" id="adminChatBadge" style="display:none">0</span>
+      <?php endif; ?>
     </a>
     <?php endforeach; ?>
     <div style="margin-top:auto;padding:20px 16px 0;border-top:1px solid var(--border-color);margin-top:20px">
@@ -687,6 +733,33 @@ require_once dirname(__DIR__) . '/includes/header.php';
       </div>
     </div>
 
+    <?php elseif ($active_tab === 'live_chat'): ?>
+    <!-- ═══ LIVE CHAT ══════════════════════════════════════════════════════ -->
+    <div class="adm-header">
+      <h1><iconify-icon icon="lucide:message-circle" style="vertical-align:middle;margin-right:8px"></iconify-icon>Live Support Chat</h1>
+      <p>Real-time conversations with users. Respond to open chats below.</p>
+    </div>
+
+    <div class="chat-admin-layout">
+      <!-- Sessions list -->
+      <div class="chat-sessions-panel">
+        <div class="chat-sessions-header">
+          <h3>All Conversations <span id="adminSessionCount" style="color:var(--text-subtle);font-weight:400"></span></h3>
+        </div>
+        <div class="chat-sessions-list" id="adminSessionsList">
+          <div style="padding:16px;text-align:center;color:var(--text-subtle);font-size:12px">Loading…</div>
+        </div>
+      </div>
+
+      <!-- Messages panel -->
+      <div class="chat-main-panel" id="adminChatMainPanel">
+        <div class="chat-empty-state" id="adminChatEmptyState">
+          <iconify-icon icon="lucide:message-circle"></iconify-icon>
+          <p>Select a conversation to view messages and reply.</p>
+        </div>
+      </div>
+    </div>
+
     <?php elseif ($active_tab === 'analytics'): ?>
     <!-- ═══ ANALYTICS ══════════════════════════════════════════════════════ -->
     <div class="adm-header">
@@ -1049,6 +1122,256 @@ function filterTable(tblId, query, colFilter, colKey) {
     rows[i].style.display = visible ? '' : 'none';
   }
 }
+
+// ── Admin Live Chat ────────────────────────────────────────────────────────
+(function () {
+  // Only run on the live_chat tab
+  if (!document.getElementById('adminSessionsList')) return;
+
+  var currentSessionId = null;
+  var lastMessageId    = '';
+  var pollTimer        = null;
+  var sessions         = [];
+  var POLL_INTERVAL    = 4000;
+
+  function api(action, extra, cb) {
+    fetch('/Admin/chat_api.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(Object.assign({ action: action }, extra))
+    })
+    .then(function (r) { return r.json(); })
+    .then(cb)
+    .catch(function () {});
+  }
+
+  function fmtTime(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    var h = d.getHours(), m = d.getMinutes();
+    var ampm = h >= 12 ? 'pm' : 'am';
+    h = h % 12 || 12;
+    return h + ':' + (m < 10 ? '0' : '') + m + ' ' + ampm;
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[d.getMonth()] + ' ' + d.getDate();
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function loadSessions() {
+    api('sessions', {}, function (data) {
+      sessions = data.sessions || [];
+      renderSessionsList();
+      updateAdminBadge(data.unread_total || 0);
+    });
+  }
+
+  function renderSessionsList() {
+    var el = document.getElementById('adminSessionsList');
+    var countEl = document.getElementById('adminSessionCount');
+    if (countEl) countEl.textContent = '(' + sessions.length + ')';
+    if (!sessions.length) {
+      el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-subtle);font-size:11px">No conversations yet.</div>';
+      return;
+    }
+    var html = '';
+    sessions.forEach(function (s) {
+      var active = s.id === currentSessionId ? ' active' : '';
+      var statusIcon = s.status === 'closed'
+        ? '<span class="badge-status-closed">Closed</span>'
+        : '<span class="badge-status-open">Open</span>';
+      var unreadBadge = (s.unread_admin > 0)
+        ? '<span class="chat-session-unread">' + s.unread_admin + '</span>'
+        : '';
+      html += '<div class="chat-session-item' + active + '" onclick="adminSelectSession(\'' + escHtml(s.id) + '\')">'
+            + '<div class="chat-session-subject">' + escHtml(s.subject) + '</div>'
+            + '<div class="chat-session-meta">'
+            + '<span>' + escHtml(s.username) + ' · ' + statusIcon + '</span>'
+            + unreadBadge
+            + '</div>'
+            + '<div style="font-size:9px;color:var(--text-subtle);margin-top:1px">' + fmtDate(s.updated_at || s.created_at) + '</div>'
+            + '</div>';
+    });
+    el.innerHTML = html;
+  }
+
+  function updateAdminBadge(count) {
+    var badge = document.getElementById('adminChatBadge');
+    if (!badge) return;
+    if (count > 0) {
+      badge.textContent = count;
+      badge.style.display = '';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  window.adminSelectSession = function (sessionId) {
+    currentSessionId = sessionId;
+    lastMessageId    = '';
+    clearInterval(pollTimer);
+
+    var session = null;
+    for (var i = 0; i < sessions.length; i++) {
+      if (sessions[i].id === sessionId) { session = sessions[i]; break; }
+    }
+
+    renderAdminChatPanel(session);
+    adminPollMessages();
+    pollTimer = setInterval(adminPollMessages, POLL_INTERVAL);
+    renderSessionsList();
+  };
+
+  function renderAdminChatPanel(session) {
+    var panel = document.getElementById('adminChatMainPanel');
+    var isClosed = session && session.status === 'closed';
+
+    var headerHtml = session
+      ? '<div class="chat-header">'
+        + '<div><div class="chat-header-title">' + escHtml(session.subject) + '</div>'
+        + '<div class="chat-header-sub">User: ' + escHtml(session.username) + ' · Started ' + fmtDate(session.created_at)
+        + ' · ' + (isClosed ? '<span class="badge-status-closed">Closed</span>' : '<span class="badge-status-open">Open</span>')
+        + '</div></div>'
+        + (isClosed
+          ? '<button class="btn-sm" onclick="adminToggleSession(\'open\')" style="font-size:11px">Reopen</button>'
+          : '<button class="btn-sm" onclick="adminToggleSession(\'closed\')" style="font-size:11px">Close chat</button>')
+        + '</div>'
+      : '';
+
+    var inputHtml = !isClosed
+      ? '<div class="chat-input-area">'
+        + '<textarea id="adminChatInput" class="chat-input" rows="1" placeholder="Type a reply…" maxlength="4000" onkeydown="adminHandleKey(event)" oninput="adminAutoResize(this)"></textarea>'
+        + '<button class="chat-send-btn" id="adminSendBtn" onclick="adminSendMessage()">'
+        + '<iconify-icon icon="lucide:send" style="vertical-align:middle"></iconify-icon> Send</button>'
+        + '</div>'
+      : '<div style="padding:10px 16px;text-align:center;font-size:11px;color:var(--text-subtle);border-top:1px solid var(--border-color)">This conversation is closed.</div>';
+
+    panel.innerHTML = headerHtml
+      + '<div class="chat-messages" id="adminChatMessages"><div style="text-align:center;color:var(--text-subtle);font-size:12px;padding:16px">Loading…</div></div>'
+      + inputHtml;
+  }
+
+  function adminPollMessages() {
+    if (!currentSessionId) return;
+    api('poll', { session_id: currentSessionId, after_id: lastMessageId }, function (data) {
+      if (!data || data.error) return;
+
+      var msgs = data.messages || [];
+      if (msgs.length > 0) {
+        appendAdminMessages(msgs);
+        lastMessageId = msgs[msgs.length - 1].id;
+      }
+
+      if (data.session) {
+        for (var i = 0; i < sessions.length; i++) {
+          if (sessions[i].id === data.session.id) { sessions[i] = data.session; break; }
+        }
+        renderSessionsList();
+        updateAdminBadge(0);
+      }
+    });
+  }
+
+  function appendAdminMessages(msgs) {
+    var box = document.getElementById('adminChatMessages');
+    if (!box) return;
+
+    if (lastMessageId === '' && msgs.length > 0) {
+      box.innerHTML = '';
+    } else if (lastMessageId === '' && msgs.length === 0) {
+      box.innerHTML = '<div style="text-align:center;color:var(--text-subtle);font-size:12px;padding:16px">No messages yet.</div>';
+      return;
+    }
+
+    msgs.forEach(function (m) {
+      var isAdmin = m.sender_role === 'admin';
+      var wrap = document.createElement('div');
+      wrap.className = 'chat-bubble-wrap ' + (isAdmin ? 'from-me' : 'from-them');
+      wrap.innerHTML = '<div class="chat-bubble ' + (isAdmin ? 'from-me' : 'from-them') + '">' + escHtml(m.message).replace(/\n/g,'<br>') + '</div>'
+        + '<div class="chat-bubble-meta">' + (isAdmin ? 'Support · ' : escHtml(m.sender) + ' · ') + fmtTime(m.created_at) + '</div>';
+      box.appendChild(wrap);
+    });
+
+    box.scrollTop = box.scrollHeight;
+  }
+
+  window.adminSendMessage = function () {
+    var input = document.getElementById('adminChatInput');
+    if (!input) return;
+    var text = input.value.trim();
+    if (!text || !currentSessionId) return;
+
+    var btn = document.getElementById('adminSendBtn');
+    if (btn) btn.disabled = true;
+    input.disabled = true;
+
+    api('send', { session_id: currentSessionId, message: text }, function (data) {
+      if (btn) btn.disabled = false;
+      if (input) { input.disabled = false; input.style.height = ''; }
+      if (!data || data.error) { alert(data ? data.error : 'Failed to send.'); return; }
+      input.value = '';
+      adminPollMessages();
+    });
+  };
+
+  window.adminHandleKey = function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      window.adminSendMessage();
+    }
+  };
+
+  window.adminAutoResize = function (el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+  };
+
+  window.adminToggleSession = function (status) {
+    if (!currentSessionId) return;
+    api('update_status', { session_id: currentSessionId, status: status }, function (data) {
+      if (!data || data.error) { alert('Failed to update session.'); return; }
+      clearInterval(pollTimer);
+      currentSessionId = null;
+      loadSessions();
+      document.getElementById('adminChatMainPanel').innerHTML =
+        '<div class="chat-empty-state"><iconify-icon icon="lucide:check-circle" style="color:#4ade80"></iconify-icon><p>Session ' + status + '. Select another conversation.</p></div>';
+    });
+  };
+
+  loadSessions();
+  // Background session list refresh – skip when a session is actively being polled
+  setInterval(function () { if (!currentSessionId) loadSessions(); }, 10000);
+}());
+
+// Background badge refresh (runs on all admin tabs)
+(function () {
+  var badge = document.getElementById('adminChatBadge');
+  if (!badge) return;
+  // Only poll if we're NOT on the live_chat tab (the chat IIFE handles that case)
+  if (document.getElementById('adminSessionsList')) return;
+  function refreshBadge() {
+    fetch('/Admin/chat_api.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'sessions' })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      var count = data.unread_total || 0;
+      if (count > 0) { badge.textContent = count; badge.style.display = ''; }
+      else { badge.style.display = 'none'; }
+    })
+    .catch(function () {});
+  }
+  setInterval(refreshBadge, 15000);
+}());
 </script>
 
 <?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>

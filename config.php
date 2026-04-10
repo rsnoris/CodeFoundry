@@ -76,6 +76,8 @@ define('CF_DATA_PAYMENTS',        CF_ROOT . '/UserAccountData/payments.json');
 define('CF_DATA_AUDIT_LOG',       CF_ROOT . '/UserAccountData/audit_log.json');
 define('CF_DATA_PAGE_VIEWS',      CF_ROOT . '/UserAccountData/page_views.json');
 define('CF_DATA_SUPPORT_TICKETS', CF_ROOT . '/UserAccountData/support_tickets.json');
+define('CF_DATA_CHAT_SESSIONS',   CF_ROOT . '/UserAccountData/chat_sessions.json');
+define('CF_DATA_CHAT_MESSAGES',   CF_ROOT . '/UserAccountData/chat_messages.json');
 
 // ---------------------------------------------------------------------------
 // AI / CodeGen

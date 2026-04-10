@@ -2,12 +2,14 @@
 declare(strict_types=1);
 require_once dirname(dirname(__DIR__)) . '/config.php';
 require_once dirname(dirname(__DIR__)) . '/lib/UserStore.php';
+require_once dirname(dirname(__DIR__)) . '/lib/ChatStore.php';
 require_once dirname(dirname(__DIR__)) . '/includes/auth.php';
 
 cf_require_login();
 
 $user_session = cf_current_user();
 $username     = $user_session['username'];
+$unread_chat  = ChatStore::totalUnreadForUser($username);
 
 // Handle project delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['action'] ?? '') === 'delete_project') {
@@ -196,6 +198,18 @@ $page_styles = <<<'CSS'
     cursor: pointer; transition: background .15s;
   }
   .ch-copy-btn:hover { background: rgba(24,179,255,.1); color: var(--primary); }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--primary);
+    color: var(--navy);
+    font-size: 10px;
+    font-weight: 800;
+    border-radius: 100px;
+    padding: 1px 6px;
+    min-width: 18px;
+    text-align: center;
+    line-height: 16px;
+  }
   @media (max-width: 700px) {
     .dash-layout { flex-direction: column; padding: 0; }
     .dash-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); padding: 16px 0; display: flex; overflow-x: auto; }
@@ -226,6 +240,15 @@ require_once dirname(dirname(__DIR__)) . '/includes/header.php';
     </a>
     <a href="/Dashboard/payments/" class="dash-nav-item <?= $dash_active === 'payments' ? 'active' : '' ?>">
       <iconify-icon icon="lucide:credit-card"></iconify-icon> Payments
+    </a>
+    <a href="/Dashboard/chat/" class="dash-nav-item <?= $dash_active === 'chat' ? 'active' : '' ?>" id="sidebarChatLink">
+      <iconify-icon icon="lucide:message-circle"></iconify-icon>
+      Support Chat
+      <?php if ($unread_chat > 0): ?>
+        <span class="nav-badge" id="sidebarBadge"><?= (int)$unread_chat ?></span>
+      <?php else: ?>
+        <span class="nav-badge" id="sidebarBadge" style="display:none">0</span>
+      <?php endif; ?>
     </a>
   </aside>
 
