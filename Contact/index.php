@@ -2,6 +2,17 @@
 $page_title  = 'Contact CodeFoundry';
 $active_page = 'contact';
 $page_styles = <<<'PAGECSS'
+    :root {
+      --navy: #0e1828; --navy-2: #121c2b; --navy-3: #161f2f;
+      --primary: #18b3ff; --primary-hover: #009de0;
+      --text: #fff; --text-muted: #92a3bb; --text-subtle: #627193;
+      --border-color: #1a2942; --button-outline: #ffffff22;
+      --button-radius: 8px; --maxwidth: 1200px; --card-radius: 12px;
+      --header-height: 68px; --mobile-menu-bg: #0e1828f9;
+    }
+    html, body { background: var(--navy-2); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+    body { min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
     .main-content { max-width: 600px; background: var(--navy-3); border-radius: var(--card-radius); border:1px solid var(--border-color); margin: 44px auto 40px auto; padding: 40px 26px; }
     @media (max-width: 700px) { .main-content { margin: 28px 6px 28px 6px; padding: 18px 6px;} }
     .section-heading { text-align: center; margin-bottom: 34px;}

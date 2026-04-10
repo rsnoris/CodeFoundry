@@ -73,6 +73,25 @@ if ($provider === 'google') {
     exit;
 }
 
+if ($provider === 'linkedin') {
+    if (!defined('CF_OAUTH_LINKEDIN_CLIENT_ID') || CF_OAUTH_LINKEDIN_CLIENT_ID === '') {
+        http_response_code(503);
+        echo 'LinkedIn OAuth is not configured on this server.';
+        exit;
+    }
+    $params = http_build_query([
+        'response_type' => 'code',
+        'client_id'     => CF_OAUTH_LINKEDIN_CLIENT_ID,
+        'redirect_uri'  => (isset($_SERVER['HTTPS']) ? 'https' : 'http')
+            . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')
+            . '/Login/oauth_callback.php',
+        'scope'         => 'openid profile email',
+        'state'         => $state,
+    ]);
+    header('Location: https://www.linkedin.com/oauth/v2/authorization?' . $params);
+    exit;
+}
+
 // Unknown provider
 http_response_code(400);
 echo 'Unknown OAuth provider.';

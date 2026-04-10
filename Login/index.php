@@ -104,8 +104,9 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-$githubEnabled = defined('CF_OAUTH_GITHUB_CLIENT_ID') && CF_OAUTH_GITHUB_CLIENT_ID !== '';
-$googleEnabled = defined('CF_OAUTH_GOOGLE_CLIENT_ID') && CF_OAUTH_GOOGLE_CLIENT_ID !== '';
+$githubEnabled   = defined('CF_OAUTH_GITHUB_CLIENT_ID')   && CF_OAUTH_GITHUB_CLIENT_ID   !== '';
+$googleEnabled   = defined('CF_OAUTH_GOOGLE_CLIENT_ID')   && CF_OAUTH_GOOGLE_CLIENT_ID   !== '';
+$linkedinEnabled = defined('CF_OAUTH_LINKEDIN_CLIENT_ID') && CF_OAUTH_LINKEDIN_CLIENT_ID !== '';
 
 $page_title  = 'CodeFoundry - Login';
 $active_page = 'login';
@@ -291,7 +292,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
       </div>
     <?php endif; ?>
 
-    <?php if ($githubEnabled || $googleEnabled): ?>
+    <?php if ($githubEnabled || $googleEnabled || $linkedinEnabled): ?>
     <div class="social-btns">
       <?php if ($githubEnabled): ?>
       <a href="/Login/oauth.php?provider=github<?php
@@ -313,6 +314,17 @@ require_once dirname(__DIR__) . '/includes/header.php';
       ?>" class="btn-social">
         <iconify-icon icon="flat-color-icons:google"></iconify-icon>
         Continue with Google
+      </a>
+      <?php endif; ?>
+      <?php if ($linkedinEnabled): ?>
+      <a href="/Login/oauth.php?provider=linkedin<?php
+        $raw_redir = $_GET['redirect'] ?? '';
+        if (is_string($raw_redir) && preg_match('#^/[^/\\\\]#', $raw_redir)) {
+            echo '&redirect=' . urlencode($raw_redir);
+        }
+      ?>" class="btn-social">
+        <iconify-icon icon="mdi:linkedin" style="color:#0a66c2;"></iconify-icon>
+        Continue with LinkedIn
       </a>
       <?php endif; ?>
     </div>
