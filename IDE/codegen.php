@@ -198,6 +198,26 @@ if (empty($result['choices']) || !isset($result['choices'][0]['message']['conten
 
 $content = $result['choices'][0]['message']['content'];
 
+// ── Record token usage ────────────────────────────────────────────────────
+$tokensUsed = (int)($result['usage']['total_tokens'] ?? 0);
+if ($tokensUsed > 0) {
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
+    $sessionUser = $_SESSION['cf_user'] ?? null;
+    if ($sessionUser !== null) {
+        require_once dirname(__DIR__) . '/lib/UserStore.php';
+        $promptSnippet = mb_substr($prompt ?: $currentCode, 0, 80, 'UTF-8');
+        UserStore::appendTokenHistory([
+            'username'       => $sessionUser['username'],
+            'action'         => $action,
+            'language'       => $langLabel,
+            'prompt_snippet' => $promptSnippet,
+            'tokens_used'    => $tokensUsed,
+            'created_at'     => date('c'),
+        ]);
+        UserStore::addTokensUsed($sessionUser['username'], $tokensUsed);
+    }
+}
+
 if ($action === 'explain') {
     // Return the explanation as plain text
     http_response_code(200);

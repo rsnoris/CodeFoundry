@@ -28,14 +28,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($username === '' || $password === '') {
         $error = 'Please enter both username and password.';
     } else {
-        // Validate credentials against CF_USERS defined in config.php
+        // Validate credentials: check CF_USERS, but allow data/users.json to override password_hash
         $users = defined('CF_USERS') ? CF_USERS : [];
         $matched = false;
         foreach ($users as $user) {
-            if (
-                hash_equals($user['username'], $username) &&
-                password_verify($password, $user['password_hash'])
-            ) {
+            if (!hash_equals($user['username'], $username)) {
+                continue;
+            }
+            // Check data/users.json for a password_hash override
+            $effectiveHash = $user['password_hash'];
+            if (defined('CF_DATA_USERS') && file_exists(CF_DATA_USERS)) {
+                $storedJson = @file_get_contents(CF_DATA_USERS);
+                if ($storedJson !== false) {
+                    $storedUsers = json_decode($storedJson, true) ?? [];
+                    foreach ($storedUsers as $row) {
+                        if (($row['username'] ?? '') === $username && !empty($row['password_hash'])) {
+                            $effectiveHash = $row['password_hash'];
+                            break;
+                        }
+                    }
+                }
+            }
+            if (password_verify($password, $effectiveHash)) {
                 $matched = true;
                 $_SESSION['cf_user'] = [
                     'username'    => $user['username'],
@@ -52,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header('Location: ' . $safe_redirect);
                 exit;
             }
+            break; // username matched but password didn't – no need to continue
         }
         if (!$matched) {
             // Short delay to slow brute-force attempts

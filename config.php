@@ -52,6 +52,26 @@ define('CF_USERS', [
 ]);
 
 // ---------------------------------------------------------------------------
+// Plans
+// ---------------------------------------------------------------------------
+
+define('CF_PLANS', [
+    'free'       => ['label' => 'Free',       'tokens_limit' => 1000,   'price' => 0,   'price_label' => 'Free'],
+    'starter'    => ['label' => 'Starter',    'tokens_limit' => 10000,  'price' => 19,  'price_label' => '$19/mo'],
+    'pro'        => ['label' => 'Pro',        'tokens_limit' => 50000,  'price' => 49,  'price_label' => '$49/mo'],
+    'enterprise' => ['label' => 'Enterprise', 'tokens_limit' => 500000, 'price' => 199, 'price_label' => '$199/mo'],
+]);
+
+// ---------------------------------------------------------------------------
+// Data file paths
+// ---------------------------------------------------------------------------
+
+define('CF_DATA_USERS',         CF_ROOT . '/data/users.json');
+define('CF_DATA_TOKEN_HISTORY', CF_ROOT . '/data/token_history.json');
+define('CF_DATA_PROJECTS',      CF_ROOT . '/data/projects.json');
+define('CF_DATA_PAYMENTS',      CF_ROOT . '/data/payments.json');
+
+// ---------------------------------------------------------------------------
 // AI / CodeGen
 // ---------------------------------------------------------------------------
 

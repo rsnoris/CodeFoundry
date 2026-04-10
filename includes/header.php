@@ -71,6 +71,10 @@ function cf_active(string $id): string {
               <div class="nav-user-display"><?= htmlspecialchars($_cf_user['display'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></div>
               <div class="nav-user-role"><?= htmlspecialchars(ucfirst($_cf_user['role'] ?? 'user'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></div>
             </div>
+            <a href="/Dashboard/" class="nav-user-dropdown-item" role="menuitem">
+              <iconify-icon icon="lucide:layout-dashboard"></iconify-icon>
+              Dashboard
+            </a>
             <a href="/Login/logout.php" class="nav-user-dropdown-item" role="menuitem">
               <iconify-icon icon="lucide:log-out"></iconify-icon>
               Sign Out
