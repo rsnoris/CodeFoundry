@@ -312,10 +312,7 @@ $_cf_pro_url      = $_cf_is_logged_in ? '/Checkout/?plan=pro'                   
         <li><iconify-icon icon="lucide:check" class="check"></iconify-icon> Priority email support</li>
         <li class="muted"><iconify-icon icon="lucide:x" class="check"></iconify-icon> Custom integrations</li>
       </ul>
-      <a href="/Contact/" class="plan-cta">Contact Sales</a>
-    </div>
-
-    <!-- ── Enterprise ── -->
+      <a href="/Support/" class="plan-cta">Contact Sales</a>
     <div class="pricing-card">
       <div class="plan-icon">🏢</div>
       <div class="plan-name">Enterprise</div>
@@ -332,14 +329,14 @@ $_cf_pro_url      = $_cf_is_logged_in ? '/Checkout/?plan=pro'                   
         <li><iconify-icon icon="lucide:check" class="check"></iconify-icon> Dedicated account manager</li>
         <li><iconify-icon icon="lucide:check" class="check"></iconify-icon> 24/7 SLA &amp; phone support</li>
       </ul>
-      <a href="/Contact/" class="plan-cta">Contact Sales</a>
+      <a href="/Support/" class="plan-cta">Contact Sales</a>
     </div>
 
   </div>
 
   <div class="pricing-note">
     All plans include access to the CodeFoundry Online IDE. AI features require an active paid subscription.
-    Questions? <a href="/Contact/">Contact our team</a> — we're happy to help you find the right fit.
+    Questions? <a href="/Support/">Contact our team</a> — we're happy to help you find the right fit.
   </div>
 </main>
 

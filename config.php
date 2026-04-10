@@ -99,6 +99,23 @@ define('CF_OPENAI_KEY', getenv('OPENAI_API_KEY') ?: '');
  */
 define('CF_CODEGEN_PROVIDERS', [
 
+    // ── Free-tier provider (no API key required) ─────────────────────────────
+    // Pollinations.ai proxies OpenAI GPT models for free with no authentication.
+    // This provider is always available and is the default for free-plan users.
+    'pollinations' => [
+        'label'           => 'Pollinations AI (Free)',
+        'api_url'         => 'https://text.pollinations.ai/openai',
+        'no_key_required' => true,   // no Authorization header needed
+        'free_tier'       => true,   // available to free-plan / unauthenticated users
+        'models'          => [
+            ['id' => 'openai-fast', 'label' => 'GPT-4o Mini (Free)'],
+            ['id' => 'openai',      'label' => 'GPT-4o (Free)'],
+        ],
+        'default_model'   => 'openai-fast',
+        'opensource'      => false,
+        'local'           => false,
+    ],
+
     'groq' => [
         'label'         => 'Groq',
         'api_url'       => 'https://api.groq.com/openai/v1/chat/completions',

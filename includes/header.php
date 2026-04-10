@@ -56,7 +56,7 @@ function cf_active(string $id): string {
       <a href="/Training/"    class="nav-link<?= cf_active('training') ?>">Training</a>
       <a href="/Pricing/"     class="nav-link<?= cf_active('pricing') ?>">Pricing</a>
       <a href="/AboutUs/"     class="nav-link<?= cf_active('about') ?>">About</a>
-      <a href="/Careers/"     class="nav-link<?= cf_active('careers') ?>">Careers</a>
+
     </nav>
     <div class="nav-actions">
       <?php if ($_cf_user): ?>
@@ -106,7 +106,7 @@ function cf_active(string $id): string {
         <a href="/Training/"    class="nav-link" onclick="closeMobileNav()">Training</a>
         <a href="/Pricing/"     class="nav-link" onclick="closeMobileNav()">Pricing</a>
         <a href="/AboutUs/"     class="nav-link" onclick="closeMobileNav()">About</a>
-        <a href="/Careers/"     class="nav-link" onclick="closeMobileNav()">Careers</a>
+
       </div>
       <div class="mobile-menu-actions">
         <?php if ($_cf_user): ?>

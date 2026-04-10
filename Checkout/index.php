@@ -236,7 +236,7 @@ require_once CF_ROOT . '/includes/header.php';
           Please set the <code>STRIPE_PUBLISHABLE_KEY</code>, <code>STRIPE_SECRET_KEY</code>,
           and/or <code>PAYPAL_CLIENT_ID</code> / <code>PAYPAL_CLIENT_SECRET</code> environment
           variables on the server.<br><br>
-          <a href="/Contact/">Contact us</a> to set up your account manually.
+          <a href="/Support/">Contact us</a> to set up your account manually.
         </div>
       <?php else: ?>
 

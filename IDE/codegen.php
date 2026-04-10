@@ -33,6 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// ── Determine user plan (free vs paid) ────────────────────────────────────
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+$_sessionUser = $_SESSION['cf_user'] ?? null;
+$_userPlan    = $_sessionUser['plan'] ?? 'free';
+$_isFreePlan  = ($_userPlan === 'free');
+
 // ── Parse body ────────────────────────────────────────────────────────────
 $raw  = file_get_contents('php://input');
 $body = json_decode($raw ?: '', true);
@@ -75,8 +81,23 @@ if (in_array($action, ['improve', 'explain', 'fix'], true) && $currentCode === '
 $langLabel = preg_replace('/[^a-zA-Z0-9 \+\#\-]/', '', $language);
 
 // ── Resolve provider ──────────────────────────────────────────────────────
-if ($providerId === '') {
-    $providerId = CodeGenProvider::defaultProviderId();
+if ($_isFreePlan) {
+    // Free-plan users are restricted to free-tier providers (no API key required).
+    // If no provider is requested, default to the first available free-tier provider.
+    if ($providerId === '') {
+        $providerId = CodeGenProvider::defaultFreeProviderId();
+    } elseif (!CodeGenProvider::isFreeTierProvider($providerId)) {
+        http_response_code(403);
+        echo json_encode([
+            'error'      => 'Upgrade your plan to access premium AI providers.',
+            'error_code' => 'upgrade_required',
+        ]);
+        exit;
+    }
+} else {
+    if ($providerId === '') {
+        $providerId = CodeGenProvider::defaultProviderId();
+    }
 }
 
 if ($providerId === '') {
@@ -195,24 +216,20 @@ try {
 }
 
 // ── Record token usage ────────────────────────────────────────────────────
-if ($tokens > 0) {
-    if (session_status() === PHP_SESSION_NONE) { session_start(); }
-    $sessionUser = $_SESSION['cf_user'] ?? null;
-    if ($sessionUser !== null) {
-        require_once dirname(__DIR__) . '/lib/UserStore.php';
-        $promptSnippet = mb_substr($prompt ?: $currentCode, 0, 80, 'UTF-8');
-        UserStore::appendTokenHistory([
-            'username'       => $sessionUser['username'],
-            'action'         => $action,
-            'language'       => $langLabel,
-            'provider'       => $providerId,
-            'model'          => $model,
-            'prompt_snippet' => $promptSnippet,
-            'tokens_used'    => $tokens,
-            'created_at'     => date('c'),
-        ]);
-        UserStore::addTokensUsed($sessionUser['username'], $tokens);
-    }
+if ($tokens > 0 && $_sessionUser !== null) {
+    require_once dirname(__DIR__) . '/lib/UserStore.php';
+    $promptSnippet = mb_substr($prompt ?: $currentCode, 0, 80, 'UTF-8');
+    UserStore::appendTokenHistory([
+        'username'       => $_sessionUser['username'],
+        'action'         => $action,
+        'language'       => $langLabel,
+        'provider'       => $providerId,
+        'model'          => $model,
+        'prompt_snippet' => $promptSnippet,
+        'tokens_used'    => $tokens,
+        'created_at'     => date('c'),
+    ]);
+    UserStore::addTokensUsed($_sessionUser['username'], $tokens);
 }
 
 // ── Return result ─────────────────────────────────────────────────────────

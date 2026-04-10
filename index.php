@@ -837,7 +837,7 @@ require_once __DIR__ . '/includes/header.php';
       Let's discuss how CodeFoundry can accelerate your digital journey with cutting-edge technology solutions.
     </div>
     <div class="cta-actions">
-      <a href="https://CodeFoundry.cloud/Contact/" class="btn">Schedule Free Consultation</a>
+      <a href="https://CodeFoundry.cloud/Support/" class="btn">Schedule Free Consultation</a>
       <a href="https://CodeFoundry.cloud/CaseStudies/" class="btn secondary">View Case Studies</a>
     </div>
   </div>

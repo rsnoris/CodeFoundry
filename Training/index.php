@@ -5344,7 +5344,7 @@ require_once __DIR__ . '/../includes/header.php';
           <span class="cert-stat-label">For Pricing</span>
         </div>
       </div>
-      <a href="/Contact/" class="card-btn">Contact Us</a>
+      <a href="/Support/" class="card-btn">Contact Us</a>
     </div>
   </div>
 </section>

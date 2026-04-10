@@ -461,10 +461,8 @@ require_once __DIR__ . '/../includes/header.php';
       <a href="/#industries" class="nav-link" onclick="closeMobileNav()">Industries</a>
       <a href="/CaseStudies/" class="nav-link" onclick="closeMobileNav()">Case Studies</a>
       <a href="/AboutUs/" class="nav-link" onclick="closeMobileNav()">About</a>
-      <a href="/Careers/" class="nav-link" onclick="closeMobileNav()">Careers</a>
     </div>
     <div class="mobile-menu-actions">
-      <a href="/Contact/" class="nav-btn secondary" style="font-weight:800;">Contact Us</a>
       <a href="/#services" class="nav-btn primary">Get Started</a>
     </div>
   </div>
