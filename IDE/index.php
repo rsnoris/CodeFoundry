@@ -910,6 +910,22 @@ require(['vs/editor/editor.main'], function () {
     monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
     runCode,
   );
+
+  // ── Restore generated code from Generate page ──────────
+  (function () {
+    const savedCode = sessionStorage.getItem('cf_generated_code');
+    const savedLang = sessionStorage.getItem('cf_generated_language');
+    if (savedCode) {
+      sessionStorage.removeItem('cf_generated_code');
+      sessionStorage.removeItem('cf_generated_language');
+      if (savedLang && LANGUAGES[savedLang]) {
+        document.getElementById('langSelect').value = savedLang;
+        monaco.editor.setModelLanguage(editor.getModel(), LANGUAGES[savedLang].monaco);
+        currentLang = savedLang;
+      }
+      editor.setValue(savedCode);
+    }
+  })();
 });
 
 /* ── Language switch ────────────────────────────────────── */
@@ -1220,7 +1236,7 @@ function setRunning(on) {
     (currentMode === 'improve' ? improveBtn : codegenBtn).focus();
   }
 
-  codegenBtn.addEventListener('click',  function () { openModal('generate'); });
+  codegenBtn.addEventListener('click',  function () { window.location.href = '/Generate/'; });
   improveBtn.addEventListener('click',  function () { openModal('improve');  });
   cancelBtn.addEventListener('click', closeModal);
 
@@ -1263,6 +1279,10 @@ function setRunning(on) {
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.error_code === 'subscription_required') {
+          window.location.href = '/Pricing/';
+          return;
+        }
         alert('CodeGen error: ' + (data.error || 'Unknown error'));
         return;
       }
@@ -1333,6 +1353,10 @@ function setRunning(on) {
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.error_code === 'subscription_required') {
+          window.location.href = '/Pricing/';
+          return;
+        }
         explainBody.textContent = 'Error: ' + (data.error || 'Unknown error');
         return;
       }
@@ -1386,6 +1410,10 @@ function setRunning(on) {
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.error_code === 'subscription_required') {
+          window.location.href = '/Pricing/';
+          return;
+        }
         alert('Fix error: ' + (data.error || 'Unknown error'));
         return;
       }

@@ -47,6 +47,7 @@ $page_scripts = $page_scripts ?? '';
       <ul class="footer-link-list">
         <li><a href="/Blog/"          class="footer-link">Blog</a></li>
         <li><a href="/IDE/"           class="footer-link">Online IDE</a></li>
+        <li><a href="/Pricing/"       class="footer-link">Pricing</a></li>
         <li><a href="/Documentation/" class="footer-link">Documentation</a></li>
         <li><a href="/Training/"      class="footer-link">Training</a></li>
         <li><a href="/Support/"       class="footer-link">Support</a></li>
