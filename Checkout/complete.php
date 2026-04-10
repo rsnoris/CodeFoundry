@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/config.php';
 require_once CF_ROOT . '/lib/UserStore.php';
+require_once CF_ROOT . '/lib/AuditStore.php';
 require_once CF_ROOT . '/includes/auth.php';
 
 cf_require_login();
@@ -73,6 +74,12 @@ if ($method !== 'paypal') {
                             $piId,
                             'CodeFoundry ' . ($plans[$planKey]['label'] ?? ucfirst($planKey)) . ' Plan (' . ucfirst($billingKey) . ')'
                         );
+                        AuditStore::log('payment.completed', $username, [
+                            'method'  => 'stripe',
+                            'plan'    => $planKey,
+                            'amount'  => $amountPaid,
+                            'txn_id'  => $piId,
+                        ]);
                     }
                     $success = true;
                 } else {
@@ -94,6 +101,11 @@ if ($method !== 'paypal') {
     // PayPal path – plan already upgraded by capture_paypal.php
     if ($planData !== null && $planData['price'] > 0) {
         $success = true;
+        AuditStore::log('payment.completed', $user['username'], [
+            'method' => 'paypal',
+            'plan'   => $plan,
+            'amount' => (float)($planData['price'] ?? 0),
+        ]);
     } else {
         $errorMsg = 'Invalid plan.';
     }

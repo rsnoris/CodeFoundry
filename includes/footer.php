@@ -60,6 +60,39 @@ $page_scripts = $page_scripts ?? '';
   </div>
 </footer>
 <script src="/assets/js/site.js"></script>
+<script>
+(function () {
+  var _cfPageLoad = Date.now();
+  var _cfCurrentPage = window.location.pathname;
+
+  function _cfSendView(page, referrer, timeOnPage) {
+    try {
+      var payload = JSON.stringify({ page: page, referrer: referrer, time_on_page: timeOnPage });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/track.php', new Blob([payload], { type: 'application/json' }));
+      } else {
+        fetch('/track.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+          keepalive: true
+        });
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  // Record the current page view on load
+  _cfSendView(_cfCurrentPage, document.referrer ? new URL(document.referrer).pathname : '', 0);
+
+  // On unload, send the time spent on the current page
+  window.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') {
+      var spent = Math.round((Date.now() - _cfPageLoad) / 1000);
+      _cfSendView(_cfCurrentPage, '', spent);
+    }
+  });
+}());
+</script>
 <?php if ($page_scripts !== ''): ?>
 <script>
 <?= $page_scripts ?>

@@ -8,6 +8,7 @@
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/lib/UserStore.php';
+require_once dirname(__DIR__) . '/lib/AuditStore.php';
 
 session_start();
 
@@ -67,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $errors[] = 'That username is already taken.';
             } else {
                 // Auto-login the new user
+                AuditStore::log('user.signup', $username, ['email' => $email, 'display' => $display]);
                 session_regenerate_id(true);
                 $_SESSION['cf_user'] = [
                     'username' => $username,

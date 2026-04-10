@@ -75,6 +75,12 @@ function cf_active(string $id): string {
               <iconify-icon icon="lucide:layout-dashboard"></iconify-icon>
               Dashboard
             </a>
+            <?php if (($_cf_user['role'] ?? '') === 'admin'): ?>
+            <a href="/Admin/" class="nav-user-dropdown-item" role="menuitem">
+              <iconify-icon icon="lucide:shield-check"></iconify-icon>
+              Control Panel
+            </a>
+            <?php endif; ?>
             <a href="/Login/logout.php" class="nav-user-dropdown-item" role="menuitem">
               <iconify-icon icon="lucide:log-out"></iconify-icon>
               Sign Out

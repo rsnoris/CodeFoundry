@@ -219,6 +219,7 @@ try {
 // ── Record token usage ────────────────────────────────────────────────────
 if ($tokens > 0 && $_sessionUser !== null) {
     require_once dirname(__DIR__) . '/lib/UserStore.php';
+    require_once dirname(__DIR__) . '/lib/AuditStore.php';
     $promptSnippet = mb_substr($prompt ?: $currentCode, 0, 80, 'UTF-8');
     $codeOutput    = ($action !== 'explain') ? mb_substr(trim($content), 0, MAX_CODE_OUTPUT_LENGTH, 'UTF-8') : '';
     UserStore::appendTokenHistory([
@@ -233,6 +234,13 @@ if ($tokens > 0 && $_sessionUser !== null) {
         'created_at'     => date('c'),
     ]);
     UserStore::addTokensUsed($_sessionUser['username'], $tokens);
+    AuditStore::log('codegen.request', $_sessionUser['username'], [
+        'action'   => $action,
+        'language' => $langLabel,
+        'provider' => $providerId,
+        'model'    => $model,
+        'tokens'   => $tokens,
+    ]);
 }
 
 // ── Return result ─────────────────────────────────────────────────────────
