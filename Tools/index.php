@@ -1056,7 +1056,7 @@ function copyOutput(id, btn) {
     ta.style.cssText = 'position:fixed;opacity:0;';
     document.body.appendChild(ta);
     ta.select();
-    document.execCommand('copy');
+    document.execCommand('copy'); /* legacy fallback for older browsers */
     document.body.removeChild(ta);
   });
 }
@@ -1073,7 +1073,9 @@ function b64Encode() {
   var v = document.getElementById('b64-in').value;
   _setErr('b64-err', '', false);
   try {
-    document.getElementById('b64-out').textContent = btoa(unescape(encodeURIComponent(v)));
+    var bytes = new TextEncoder().encode(v);
+    var binary = String.fromCharCode.apply(null, bytes);
+    document.getElementById('b64-out').textContent = btoa(binary);
   } catch(e) {
     _setErr('b64-err', 'Error: ' + e.message, false);
   }
@@ -1082,7 +1084,9 @@ function b64Decode() {
   var v = document.getElementById('b64-in').value.trim();
   _setErr('b64-err', '', false);
   try {
-    document.getElementById('b64-out').textContent = decodeURIComponent(escape(atob(v)));
+    var binary = atob(v);
+    var bytes = Uint8Array.from(binary, function(c) { return c.charCodeAt(0); });
+    document.getElementById('b64-out').textContent = new TextDecoder().decode(bytes);
   } catch(e) {
     _setErr('b64-err', 'Invalid Base64 input.', false);
   }
