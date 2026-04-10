@@ -16,7 +16,7 @@ $token_pct    = $tokens_limit > 0 ? min(100, round($tokens_used / $tokens_limit 
 
 $history      = UserStore::tokenHistoryForUser($user['username'], 5);
 $projects     = UserStore::projectsForUser($user['username']);
-$project_count = count(UserStore::projectsForUser($user['username']));
+$project_count = count($projects);
 
 $dash_active  = 'dashboard';
 $page_title   = 'Dashboard – CodeFoundry';

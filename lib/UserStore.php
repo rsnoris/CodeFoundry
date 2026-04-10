@@ -226,15 +226,19 @@ class UserStore
         return is_array($decoded) ? $decoded : [];
     }
 
-    /** Atomic write using a sibling temp file + rename. */
+    /** Atomic write using temp file in sys_get_temp_dir() + rename. */
     private static function writeJson(string $path, array $data): void
     {
-        $dir     = dirname($path);
-        $tmpPath = $dir . '/' . basename($path) . '.' . bin2hex(random_bytes(6)) . '.tmp';
-        $json    = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        $tmpPath = tempnam(sys_get_temp_dir(), 'cf_store_');
+        if ($tmpPath === false) {
+            throw new \RuntimeException('UserStore: unable to create temporary file.');
+        }
 
         $fp = fopen($tmpPath, 'w');
         if ($fp === false) {
+            @unlink($tmpPath);
             throw new \RuntimeException("UserStore: cannot open temp file for writing: {$tmpPath}");
         }
         flock($fp, LOCK_EX);
@@ -243,7 +247,10 @@ class UserStore
         flock($fp, LOCK_UN);
         fclose($fp);
 
-        rename($tmpPath, $path);
+        if (!rename($tmpPath, $path)) {
+            @unlink($tmpPath);
+            throw new \RuntimeException("UserStore: failed to atomically replace {$path}.");
+        }
     }
 
     /** Return a UUID v4 formatted string. */

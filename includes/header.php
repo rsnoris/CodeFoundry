@@ -63,12 +63,12 @@ function cf_active(string $id): string {
         <div class="nav-user-menu" id="navUserMenu">
           <button class="nav-user-btn" id="navUserBtn" aria-haspopup="true" aria-expanded="false" aria-label="User menu">
             <iconify-icon icon="lucide:user-circle-2"></iconify-icon>
-            <span class="nav-user-name"><?= htmlspecialchars($_cf_user['display'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></span>
+            <span class="nav-user-name"><?= htmlspecialchars($_cf_user['display'] ?? $_cf_user['username'] ?? 'User', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></span>
             <iconify-icon icon="lucide:chevron-down" class="nav-user-caret"></iconify-icon>
           </button>
           <div class="nav-user-dropdown" id="navUserDropdown" role="menu">
             <div class="nav-user-info">
-              <div class="nav-user-display"><?= htmlspecialchars($_cf_user['display'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></div>
+              <div class="nav-user-display"><?= htmlspecialchars($_cf_user['display'] ?? $_cf_user['username'] ?? 'User', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></div>
               <div class="nav-user-role"><?= htmlspecialchars(ucfirst($_cf_user['role'] ?? 'user'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></div>
             </div>
             <a href="/Dashboard/" class="nav-user-dropdown-item" role="menuitem">
@@ -112,7 +112,7 @@ function cf_active(string $id): string {
         <?php if ($_cf_user): ?>
           <div class="mobile-user-info">
             <iconify-icon icon="lucide:user-circle-2"></iconify-icon>
-            <span><?= htmlspecialchars($_cf_user['display'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></span>
+            <span><?= htmlspecialchars($_cf_user['display'] ?? $_cf_user['username'] ?? 'User', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></span>
           </div>
           <a href="/Login/logout.php" class="nav-btn secondary" onclick="closeMobileNav()">Sign Out</a>
         <?php else: ?>

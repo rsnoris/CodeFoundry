@@ -45,7 +45,10 @@ define('CF_COPYRIGHT',  '&copy; 2024 CodeFoundry. All rights reserved.');
 define('CF_USERS', [
     [
         'username'      => 'admin',
-        'password_hash' => '$2y$12$YourHashHere',   // replace with a real bcrypt hash
+        // ⚠  REQUIRED: Replace this placeholder with a real bcrypt hash before deploying.
+        // Generate one with: php -r "echo password_hash('YOUR_PASSWORD', PASSWORD_BCRYPT);"
+        // Until this is replaced, login will fail for all users.
+        'password_hash' => '$2y$12$YourHashHere',
         'display'       => 'Admin',
         'role'          => 'admin',
     ],

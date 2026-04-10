@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $users = defined('CF_USERS') ? CF_USERS : [];
         $matched = false;
         foreach ($users as $user) {
-            if (!hash_equals($user['username'], $username)) {
+            if ($user['username'] !== $username) {
                 continue;
             }
             // Check data/users.json for a password_hash override
