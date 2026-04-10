@@ -115,12 +115,94 @@ $page_styles = <<<'CSS'
     cursor: pointer; transition: background .15s;
   }
   .btn-delete:hover { background: rgba(255,72,72,.2); }
+  .btn-view {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 12px; font-size: 12px; font-weight: 600;
+    background: rgba(24,179,255,.1); color: var(--primary);
+    border: 1px solid rgba(24,179,255,.25); border-radius: 6px;
+    cursor: pointer; transition: background .15s;
+  }
+  .btn-view:hover { background: rgba(24,179,255,.2); }
+  /* ── Code/Preview modal ────────────────────────────────── */
+  .ch-overlay {
+    display: none; position: fixed; inset: 0; z-index: 9000;
+    background: rgba(0,0,0,.65); backdrop-filter: blur(3px);
+    align-items: center; justify-content: center;
+  }
+  .ch-overlay.open { display: flex; }
+  .ch-modal {
+    background: var(--navy);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    width: min(960px, 96vw);
+    height: min(680px, 90vh);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 24px 64px rgba(0,0,0,.6);
+  }
+  .ch-modal-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 20px; border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+  }
+  .ch-modal-header h3 { margin: 0; font-size: 15px; font-weight: 700; flex: 1; }
+  .ch-modal-tabs {
+    display: flex; gap: 4px;
+  }
+  .ch-tab {
+    padding: 6px 14px; font-size: 13px; font-weight: 600;
+    border-radius: 6px; border: 1px solid var(--border-color);
+    background: transparent; color: var(--text-muted);
+    cursor: pointer; transition: background .15s, color .15s;
+  }
+  .ch-tab.active { background: rgba(24,179,255,.15); color: var(--primary); border-color: rgba(24,179,255,.3); }
+  .ch-tab:hover:not(.active) { background: var(--navy-3); color: var(--text); }
+  .ch-close {
+    padding: 6px 8px; background: transparent; border: none;
+    color: var(--text-muted); font-size: 20px; cursor: pointer; line-height: 1;
+    border-radius: 6px; transition: background .15s;
+  }
+  .ch-close:hover { background: var(--navy-3); color: var(--text); }
+  .ch-modal-body { flex: 1; overflow: hidden; position: relative; }
+  .ch-panel { display: none; height: 100%; }
+  .ch-panel.active { display: block; }
+  /* Code view panel */
+  .ch-code-wrap {
+    height: 100%; overflow: auto; padding: 20px;
+  }
+  .ch-code-wrap pre {
+    margin: 0; font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 13px; line-height: 1.6; color: #e2e8f0;
+    white-space: pre-wrap; overflow-wrap: break-word; word-break: break-word;
+  }
+  .ch-no-code {
+    display: flex; align-items: center; justify-content: center;
+    height: 100%; color: var(--text-subtle); font-size: 14px; font-style: italic;
+  }
+  /* Preview panel */
+  .ch-preview-frame {
+    width: 100%; height: 100%; border: none;
+    background: #fff;
+  }
+  .ch-copy-bar {
+    display: flex; justify-content: flex-end; padding: 8px 20px 0;
+    flex-shrink: 0; border-top: 1px solid var(--border-color);
+  }
+  .ch-copy-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 13px; font-size: 12px; font-weight: 600;
+    background: var(--navy-3); color: var(--text-muted);
+    border: 1px solid var(--border-color); border-radius: 6px;
+    cursor: pointer; transition: background .15s;
+  }
+  .ch-copy-btn:hover { background: rgba(24,179,255,.1); color: var(--primary); }
   @media (max-width: 700px) {
     .dash-layout { flex-direction: column; padding: 0; }
     .dash-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); padding: 16px 0; display: flex; overflow-x: auto; }
     .dash-sidebar-title { display: none; }
     .dash-main { padding: 24px 16px 48px; }
     .data-table th, .data-table td { padding: 10px 10px; }
+    .ch-modal { max-height: 95vh; }
   }
 CSS;
 
@@ -174,19 +256,38 @@ require_once dirname(dirname(__DIR__)) . '/includes/header.php';
                 <th>Language</th>
                 <th>Tokens</th>
                 <th>Prompt</th>
+                <th>View</th>
               </tr>
             </thead>
             <tbody>
-              <?php foreach ($history as $entry): ?>
+              <?php foreach ($history as $idx => $entry): ?>
+                <?php
+                  $lang      = $entry['language'] ?? '';
+                  $code      = $entry['code_output'] ?? '';
+                  $isWeb     = in_array(strtolower($lang), ['html', 'css', 'javascript', 'js'], true);
+                  $hasCode   = $code !== '';
+                ?>
                 <tr>
                   <td style="white-space:nowrap"><?= cf_e(date('M j, Y g:i a', strtotime($entry['created_at'] ?? 'now'))) ?></td>
                   <td style="color:var(--text)"><?= cf_e(ucfirst($entry['action'] ?? '')) ?></td>
-                  <td><span class="lang-badge"><?= cf_e($entry['language'] ?? '') ?></span></td>
+                  <td><span class="lang-badge"><?= cf_e($lang) ?></span></td>
                   <td style="color:var(--text);font-weight:600"><?= number_format((int)($entry['tokens_used'] ?? 0)) ?></td>
                   <td class="prompt-snippet"><?php
                     $snippet = $entry['prompt_snippet'] ?? '';
                     echo cf_e(mb_strlen($snippet) > 60 ? mb_substr($snippet, 0, 60) . '…' : $snippet);
                   ?></td>
+                  <td>
+                    <?php if ($hasCode): ?>
+                      <button class="btn-view ch-view-btn"
+                              data-lang="<?= cf_e($lang) ?>"
+                              data-isweb="<?= $isWeb ? '1' : '0' ?>"
+                              data-code="<?= htmlspecialchars($code, ENT_QUOTES, 'UTF-8') ?>">
+                        <iconify-icon icon="lucide:eye"></iconify-icon> View
+                      </button>
+                    <?php else: ?>
+                      <span style="color:var(--text-subtle);font-size:12px">—</span>
+                    <?php endif; ?>
+                  </td>
                 </tr>
               <?php endforeach; ?>
             </tbody>
@@ -241,5 +342,171 @@ require_once dirname(dirname(__DIR__)) . '/includes/header.php';
     </div>
   </main>
 </div>
+
+<!-- ── Code / Preview modal ───────────────────────────────────────────── -->
+<div id="chOverlay" class="ch-overlay" role="dialog" aria-modal="true" aria-labelledby="chModalTitle">
+  <div class="ch-modal">
+    <div class="ch-modal-header">
+      <h3 id="chModalTitle">Code Output</h3>
+      <div class="ch-modal-tabs" id="chTabs"></div>
+      <button class="ch-close" onclick="closeCodeModal()" aria-label="Close">&times;</button>
+    </div>
+    <div class="ch-modal-body" id="chBody">
+      <!-- panels injected by JS -->
+    </div>
+    <div class="ch-copy-bar">
+      <button class="ch-copy-btn" id="chCopyBtn" onclick="copyModalCode()">
+        <iconify-icon icon="lucide:copy"></iconify-icon> Copy code
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* Languages whose output can be previewed live in an iframe */
+  const WEB_LANGS = new Set(['html', 'css', 'javascript', 'js']);
+
+  let _currentCode = '';
+
+  function wrapForPreview(lang, code) {
+    lang = (lang || '').toLowerCase();
+    if (lang === 'css') {
+      return `<!DOCTYPE html><html><head><style>${code}</style></head><body>
+        <p style="font-family:sans-serif;color:#666;font-size:13px;padding:16px">
+          (CSS preview — no HTML body provided)</p></body></html>`;
+    }
+    if (lang === 'javascript' || lang === 'js') {
+      return `<!DOCTYPE html><html><head></head><body>
+        <script>${code}<\/script></body></html>`;
+    }
+    /* html or default */
+    return code;
+  }
+
+  window.openCodeModal = function (entry) {
+    _currentCode = entry.code || '';
+    const overlay = document.getElementById('chOverlay');
+    const title   = document.getElementById('chModalTitle');
+    const body    = document.getElementById('chBody');
+    const tabs    = document.getElementById('chTabs');
+
+    title.textContent = (entry.lang ? entry.lang.toUpperCase() + ' ' : '') + 'Code Output';
+
+    /* Build tab buttons */
+    tabs.innerHTML = '';
+    const codeTab = document.createElement('button');
+    codeTab.className = 'ch-tab active';
+    codeTab.textContent = 'Code';
+    codeTab.setAttribute('data-panel', 'code');
+    tabs.appendChild(codeTab);
+
+    if (entry.isWeb && _currentCode) {
+      const prevTab = document.createElement('button');
+      prevTab.className = 'ch-tab';
+      prevTab.textContent = '▶ Preview';
+      prevTab.setAttribute('data-panel', 'preview');
+      tabs.appendChild(prevTab);
+    }
+
+    tabs.addEventListener('click', function (e) {
+      const btn = e.target.closest('.ch-tab');
+      if (!btn) return;
+      Array.from(tabs.querySelectorAll('.ch-tab')).forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      showPanel(btn.getAttribute('data-panel'));
+    });
+
+    /* Build panels */
+    body.innerHTML = '';
+
+    /* Code panel */
+    const codePanel = document.createElement('div');
+    codePanel.className = 'ch-panel active';
+    codePanel.id = 'chPanelCode';
+    const wrap = document.createElement('div');
+    wrap.className = 'ch-code-wrap';
+    if (_currentCode) {
+      const pre = document.createElement('pre');
+      pre.textContent = _currentCode;
+      wrap.appendChild(pre);
+    } else {
+      const msg = document.createElement('div');
+      msg.className = 'ch-no-code';
+      msg.textContent = 'No code output was saved for this entry.';
+      wrap.appendChild(msg);
+    }
+    codePanel.appendChild(wrap);
+    body.appendChild(codePanel);
+
+    /* Preview panel (web only) */
+    if (entry.isWeb && _currentCode) {
+      const prevPanel = document.createElement('div');
+      prevPanel.className = 'ch-panel';
+      prevPanel.id = 'chPanelPreview';
+      prevPanel.style.height = '100%';
+
+      const frame = document.createElement('iframe');
+      frame.className = 'ch-preview-frame';
+      frame.setAttribute('sandbox', 'allow-scripts');
+      frame.setAttribute('title', 'UI Preview');
+      frame.srcdoc = wrapForPreview(entry.lang, _currentCode);
+      prevPanel.appendChild(frame);
+      body.appendChild(prevPanel);
+    }
+
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  function showPanel(name) {
+    const code = document.getElementById('chPanelCode');
+    const prev = document.getElementById('chPanelPreview');
+    if (code) code.classList.toggle('active', name === 'code');
+    if (prev) prev.classList.toggle('active', name === 'preview');
+  }
+
+  window.closeCodeModal = function () {
+    document.getElementById('chOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    /* clear iframe src to stop any running scripts */
+    const frame = document.querySelector('#chPanelPreview iframe');
+    if (frame) { frame.srcdoc = ''; }
+  };
+
+  window.copyModalCode = function () {
+    if (!_currentCode) return;
+    navigator.clipboard.writeText(_currentCode).then(function () {
+      const btn = document.getElementById('chCopyBtn');
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<iconify-icon icon="lucide:check"></iconify-icon> Copied!';
+      setTimeout(function () { btn.innerHTML = orig; }, 1800);
+    });
+  };
+
+  /* Wire up all View buttons via event delegation */
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.ch-view-btn');
+    if (!btn) return;
+    window.openCodeModal({
+      lang:  btn.dataset.lang  || '',
+      code:  btn.dataset.code  || '',
+      isWeb: btn.dataset.isweb === '1',
+    });
+  });
+
+  /* Close on backdrop click */
+  document.getElementById('chOverlay').addEventListener('click', function (e) {
+    if (e.target === this) { window.closeCodeModal(); }
+  });
+
+  /* Close on Escape */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { window.closeCodeModal(); }
+  });
+}());
+</script>
 
 <?php require_once dirname(dirname(__DIR__)) . '/includes/footer.php'; ?>
