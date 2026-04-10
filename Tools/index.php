@@ -411,6 +411,38 @@ require_once __DIR__ . '/../includes/header.php';
       Code
       <span class="tools-cat-count">3</span>
     </button>
+    <div style="height:1px;background:var(--border-color);margin:10px 6px;"></div>
+    <div class="tools-sidebar-title" style="margin-top:4px;">Industry</div>
+    <button class="tools-cat-btn" data-cat="education" onclick="switchCat('education')">
+      <iconify-icon icon="lucide:graduation-cap"></iconify-icon>
+      Education
+      <span class="tools-cat-count">4</span>
+    </button>
+    <button class="tools-cat-btn" data-cat="finance" onclick="switchCat('finance')">
+      <iconify-icon icon="lucide:dollar-sign"></iconify-icon>
+      Finance
+      <span class="tools-cat-count">4</span>
+    </button>
+    <button class="tools-cat-btn" data-cat="healthcare" onclick="switchCat('healthcare')">
+      <iconify-icon icon="lucide:heart-pulse"></iconify-icon>
+      Healthcare
+      <span class="tools-cat-count">4</span>
+    </button>
+    <button class="tools-cat-btn" data-cat="realestate" onclick="switchCat('realestate')">
+      <iconify-icon icon="lucide:home"></iconify-icon>
+      Real Estate
+      <span class="tools-cat-count">3</span>
+    </button>
+    <button class="tools-cat-btn" data-cat="hr" onclick="switchCat('hr')">
+      <iconify-icon icon="lucide:users"></iconify-icon>
+      HR &amp; Payroll
+      <span class="tools-cat-count">3</span>
+    </button>
+    <button class="tools-cat-btn" data-cat="marketing" onclick="switchCat('marketing')">
+      <iconify-icon icon="lucide:megaphone"></iconify-icon>
+      Marketing
+      <span class="tools-cat-count">3</span>
+    </button>
   </aside>
 
   <!-- ── Main panel ────────────────────────────────────── -->
@@ -1019,6 +1051,765 @@ require_once __DIR__ . '/../includes/header.php';
       </div>
     </div><!-- /cat-code -->
 
+    <!-- ════════════ EDUCATION ════════════ -->
+    <div class="tools-category-panel" id="cat-education">
+      <div class="tools-cat-header">
+        <div class="tools-cat-icon"><iconify-icon icon="lucide:graduation-cap"></iconify-icon></div>
+        <div>
+          <h2>Education Tools</h2>
+          <p>Calculators and utilities for students, teachers, and schools</p>
+        </div>
+      </div>
+      <div class="tools-grid">
+
+        <!-- GPA Calculator -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:star"></iconify-icon>
+            <h3>GPA Calculator</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-label">Courses (Grade, Credits per line — e.g. <em>A 3</em>)</div>
+            <textarea class="tool-textarea" id="gpa-in" rows="6" placeholder="A 3&#10;B+ 4&#10;C 2&#10;A- 3"></textarea>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcGpa()"><iconify-icon icon="lucide:calculator"></iconify-icon> Calculate GPA</button>
+              <button class="tool-btn outline" onclick="clearTool('gpa-in','gpa-out',null)"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="gpa-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('gpa-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grade Percentage -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:percent"></iconify-icon>
+            <h3>Grade Percentage Calculator</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Score Earned</div>
+                <input class="tool-input" id="grade-score" type="number" min="0" placeholder="85">
+              </div>
+              <div>
+                <div class="tool-label">Total Points</div>
+                <input class="tool-input" id="grade-total" type="number" min="1" placeholder="100">
+              </div>
+            </div>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcGradePercent()"><iconify-icon icon="lucide:calculator"></iconify-icon> Calculate</button>
+              <button class="tool-btn outline" onclick="clearTool('grade-score',null,null);clearTool('grade-total',null,null);document.getElementById('grade-out').textContent=''"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="grade-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('grade-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attendance Calculator -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:calendar-check"></iconify-icon>
+            <h3>Attendance Calculator</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Days Present</div>
+                <input class="tool-input" id="att-present" type="number" min="0" placeholder="85">
+              </div>
+              <div>
+                <div class="tool-label">Total School Days</div>
+                <input class="tool-input" id="att-total" type="number" min="1" placeholder="100">
+              </div>
+            </div>
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Minimum Required %</div>
+                <input class="tool-input" id="att-min" type="number" min="0" max="100" value="75" placeholder="75">
+              </div>
+            </div>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcAttendance()"><iconify-icon icon="lucide:calculator"></iconify-icon> Calculate</button>
+              <button class="tool-btn outline" onclick="clearTool('att-present',null,null);clearTool('att-total',null,null);document.getElementById('att-out').textContent=''"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="att-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('att-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reading Level -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:book-open"></iconify-icon>
+            <h3>Reading Level Estimator</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-label">Text</div>
+            <textarea class="tool-textarea" id="rl-in" rows="6" placeholder="Paste a passage to estimate its reading level…"></textarea>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcReadingLevel()"><iconify-icon icon="lucide:bar-chart-2"></iconify-icon> Analyse</button>
+              <button class="tool-btn outline" onclick="clearTool('rl-in','rl-out',null)"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="rl-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('rl-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /cat-education -->
+
+    <!-- ════════════ FINANCE ════════════ -->
+    <div class="tools-category-panel" id="cat-finance">
+      <div class="tools-cat-header">
+        <div class="tools-cat-icon"><iconify-icon icon="lucide:dollar-sign"></iconify-icon></div>
+        <div>
+          <h2>Finance Tools</h2>
+          <p>Loan, interest, and investment calculators for everyday financial decisions</p>
+        </div>
+      </div>
+      <div class="tools-grid">
+
+        <!-- Loan Payment Calculator -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:landmark"></iconify-icon>
+            <h3>Loan Payment Calculator</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Loan Amount ($)</div>
+                <input class="tool-input" id="loan-principal" type="number" min="0" placeholder="10000">
+              </div>
+              <div>
+                <div class="tool-label">Annual Rate (%)</div>
+                <input class="tool-input" id="loan-rate" type="number" min="0" step="0.01" placeholder="5.5">
+              </div>
+            </div>
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Term (months)</div>
+                <input class="tool-input" id="loan-term" type="number" min="1" placeholder="60">
+              </div>
+            </div>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcLoan()"><iconify-icon icon="lucide:calculator"></iconify-icon> Calculate</button>
+              <button class="tool-btn outline" onclick="clearTool('loan-principal',null,null);clearTool('loan-rate',null,null);clearTool('loan-term',null,null);document.getElementById('loan-out').textContent=''"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="loan-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('loan-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compound Interest -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:trending-up"></iconify-icon>
+            <h3>Compound Interest Calculator</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Principal ($)</div>
+                <input class="tool-input" id="ci-principal" type="number" min="0" placeholder="5000">
+              </div>
+              <div>
+                <div class="tool-label">Annual Rate (%)</div>
+                <input class="tool-input" id="ci-rate" type="number" min="0" step="0.01" placeholder="7">
+              </div>
+            </div>
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Years</div>
+                <input class="tool-input" id="ci-years" type="number" min="1" placeholder="10">
+              </div>
+              <div>
+                <div class="tool-label">Compounds / Year</div>
+                <select class="tool-select" id="ci-freq" style="width:100%;">
+                  <option value="1">Annually</option>
+                  <option value="2">Semi-annually</option>
+                  <option value="4">Quarterly</option>
+                  <option value="12" selected>Monthly</option>
+                  <option value="365">Daily</option>
+                </select>
+              </div>
+            </div>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcCompoundInterest()"><iconify-icon icon="lucide:calculator"></iconify-icon> Calculate</button>
+              <button class="tool-btn outline" onclick="clearTool('ci-principal',null,null);clearTool('ci-rate',null,null);clearTool('ci-years',null,null);document.getElementById('ci-out').textContent=''"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="ci-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('ci-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tip Calculator -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:receipt"></iconify-icon>
+            <h3>Tip Calculator</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Bill Amount ($)</div>
+                <input class="tool-input" id="tip-bill" type="number" min="0" step="0.01" placeholder="45.00">
+              </div>
+              <div>
+                <div class="tool-label">Tip %</div>
+                <input class="tool-input" id="tip-pct" type="number" min="0" value="18" placeholder="18">
+              </div>
+            </div>
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Number of People</div>
+                <input class="tool-input" id="tip-people" type="number" min="1" value="1" placeholder="1">
+              </div>
+            </div>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcTip()"><iconify-icon icon="lucide:calculator"></iconify-icon> Calculate</button>
+              <button class="tool-btn outline" onclick="clearTool('tip-bill',null,null);document.getElementById('tip-out').textContent=''"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="tip-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('tip-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROI Calculator -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:bar-chart"></iconify-icon>
+            <h3>ROI Calculator</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Initial Investment ($)</div>
+                <input class="tool-input" id="roi-init" type="number" min="0" placeholder="10000">
+              </div>
+              <div>
+                <div class="tool-label">Final Value ($)</div>
+                <input class="tool-input" id="roi-final" type="number" min="0" placeholder="13500">
+              </div>
+            </div>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcRoi()"><iconify-icon icon="lucide:calculator"></iconify-icon> Calculate</button>
+              <button class="tool-btn outline" onclick="clearTool('roi-init',null,null);clearTool('roi-final',null,null);document.getElementById('roi-out').textContent=''"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="roi-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('roi-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /cat-finance -->
+
+    <!-- ════════════ HEALTHCARE ════════════ -->
+    <div class="tools-category-panel" id="cat-healthcare">
+      <div class="tools-cat-header">
+        <div class="tools-cat-icon"><iconify-icon icon="lucide:heart-pulse"></iconify-icon></div>
+        <div>
+          <h2>Healthcare Tools</h2>
+          <p>Health calculators and clinical utilities for patients and practitioners</p>
+        </div>
+      </div>
+      <div class="tools-grid">
+
+        <!-- BMI Calculator -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:activity"></iconify-icon>
+            <h3>BMI Calculator</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Unit System</div>
+                <select class="tool-select" id="bmi-unit" style="width:100%;" onchange="bmiUnitToggle()">
+                  <option value="metric">Metric (kg / cm)</option>
+                  <option value="imperial">Imperial (lb / in)</option>
+                </select>
+              </div>
+            </div>
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;" id="bmi-metric-row">
+              <div>
+                <div class="tool-label">Weight (kg)</div>
+                <input class="tool-input" id="bmi-wt-kg" type="number" min="0" step="0.1" placeholder="70">
+              </div>
+              <div>
+                <div class="tool-label">Height (cm)</div>
+                <input class="tool-input" id="bmi-ht-cm" type="number" min="0" step="0.1" placeholder="175">
+              </div>
+            </div>
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;display:none;" id="bmi-imperial-row">
+              <div>
+                <div class="tool-label">Weight (lb)</div>
+                <input class="tool-input" id="bmi-wt-lb" type="number" min="0" step="0.1" placeholder="154">
+              </div>
+              <div>
+                <div class="tool-label">Height (in)</div>
+                <input class="tool-input" id="bmi-ht-in" type="number" min="0" step="0.1" placeholder="69">
+              </div>
+            </div>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcBmi()"><iconify-icon icon="lucide:calculator"></iconify-icon> Calculate BMI</button>
+              <button class="tool-btn outline" onclick="document.getElementById('bmi-out').textContent=''"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="bmi-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('bmi-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Age Calculator -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:cake"></iconify-icon>
+            <h3>Age Calculator</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Date of Birth</div>
+                <input class="tool-input" id="age-dob" type="date">
+              </div>
+              <div>
+                <div class="tool-label">As of Date</div>
+                <input class="tool-input" id="age-asof" type="date">
+              </div>
+            </div>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcAge()"><iconify-icon icon="lucide:calculator"></iconify-icon> Calculate Age</button>
+              <button class="tool-btn outline" onclick="document.getElementById('age-out').textContent=''"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="age-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('age-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ideal Body Weight -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:scale"></iconify-icon>
+            <h3>Ideal Body Weight</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Height (cm)</div>
+                <input class="tool-input" id="ibw-ht" type="number" min="100" placeholder="175">
+              </div>
+              <div>
+                <div class="tool-label">Sex</div>
+                <select class="tool-select" id="ibw-sex" style="width:100%;">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+            </div>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcIbw()"><iconify-icon icon="lucide:calculator"></iconify-icon> Calculate</button>
+              <button class="tool-btn outline" onclick="clearTool('ibw-ht',null,null);document.getElementById('ibw-out').textContent=''"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="ibw-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('ibw-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calorie Burn Estimator -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:flame"></iconify-icon>
+            <h3>Calorie Burn Estimator</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Body Weight (kg)</div>
+                <input class="tool-input" id="cal-wt" type="number" min="0" step="0.1" placeholder="70">
+              </div>
+              <div>
+                <div class="tool-label">Duration (min)</div>
+                <input class="tool-input" id="cal-dur" type="number" min="1" placeholder="30">
+              </div>
+            </div>
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Activity</div>
+                <select class="tool-select" id="cal-act" style="width:100%;">
+                  <option value="1.5">Rest / Sleeping</option>
+                  <option value="2.5">Light Walking</option>
+                  <option value="4.0" selected>Brisk Walking</option>
+                  <option value="6.0">Jogging</option>
+                  <option value="9.8">Running (fast)</option>
+                  <option value="7.0">Cycling (moderate)</option>
+                  <option value="8.0">Swimming</option>
+                  <option value="5.0">Yoga</option>
+                  <option value="8.0">Weight Training</option>
+                </select>
+              </div>
+            </div>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcCalorieBurn()"><iconify-icon icon="lucide:calculator"></iconify-icon> Estimate</button>
+              <button class="tool-btn outline" onclick="clearTool('cal-wt',null,null);clearTool('cal-dur',null,null);document.getElementById('cal-out').textContent=''"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="cal-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('cal-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /cat-healthcare -->
+
+    <!-- ════════════ REAL ESTATE ════════════ -->
+    <div class="tools-category-panel" id="cat-realestate">
+      <div class="tools-cat-header">
+        <div class="tools-cat-icon"><iconify-icon icon="lucide:home"></iconify-icon></div>
+        <div>
+          <h2>Real Estate Tools</h2>
+          <p>Mortgage, property, and investment calculators for buyers and agents</p>
+        </div>
+      </div>
+      <div class="tools-grid">
+
+        <!-- Mortgage Calculator -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:building-2"></iconify-icon>
+            <h3>Mortgage Calculator</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Home Price ($)</div>
+                <input class="tool-input" id="mort-price" type="number" min="0" placeholder="350000">
+              </div>
+              <div>
+                <div class="tool-label">Down Payment ($)</div>
+                <input class="tool-input" id="mort-down" type="number" min="0" placeholder="70000">
+              </div>
+            </div>
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Annual Rate (%)</div>
+                <input class="tool-input" id="mort-rate" type="number" min="0" step="0.01" placeholder="6.5">
+              </div>
+              <div>
+                <div class="tool-label">Term (years)</div>
+                <select class="tool-select" id="mort-term" style="width:100%;">
+                  <option value="10">10 years</option>
+                  <option value="15">15 years</option>
+                  <option value="20">20 years</option>
+                  <option value="30" selected>30 years</option>
+                </select>
+              </div>
+            </div>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcMortgage()"><iconify-icon icon="lucide:calculator"></iconify-icon> Calculate</button>
+              <button class="tool-btn outline" onclick="clearTool('mort-price',null,null);clearTool('mort-down',null,null);clearTool('mort-rate',null,null);document.getElementById('mort-out').textContent=''"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="mort-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('mort-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Square Footage Calculator -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:ruler"></iconify-icon>
+            <h3>Square Footage Calculator</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-label">Rooms (Length × Width per line, e.g. <em>12 10</em>)</div>
+            <textarea class="tool-textarea" id="sqft-in" rows="5" placeholder="12 10&#10;8 9&#10;15 12"></textarea>
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;margin-top:8px;">
+              <div>
+                <div class="tool-label">Unit</div>
+                <select class="tool-select" id="sqft-unit" style="width:100%;">
+                  <option value="ft">Feet → sq ft</option>
+                  <option value="m">Metres → sq m</option>
+                </select>
+              </div>
+            </div>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcSqft()"><iconify-icon icon="lucide:calculator"></iconify-icon> Calculate</button>
+              <button class="tool-btn outline" onclick="clearTool('sqft-in','sqft-out',null)"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="sqft-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('sqft-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Property ROI -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:trending-up"></iconify-icon>
+            <h3>Rental Property ROI</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Purchase Price ($)</div>
+                <input class="tool-input" id="prop-price" type="number" min="0" placeholder="300000">
+              </div>
+              <div>
+                <div class="tool-label">Monthly Rent ($)</div>
+                <input class="tool-input" id="prop-rent" type="number" min="0" placeholder="2200">
+              </div>
+            </div>
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Annual Expenses ($)</div>
+                <input class="tool-input" id="prop-exp" type="number" min="0" placeholder="6000">
+              </div>
+            </div>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcPropRoi()"><iconify-icon icon="lucide:calculator"></iconify-icon> Calculate</button>
+              <button class="tool-btn outline" onclick="clearTool('prop-price',null,null);clearTool('prop-rent',null,null);clearTool('prop-exp',null,null);document.getElementById('prop-out').textContent=''"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="prop-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('prop-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /cat-realestate -->
+
+    <!-- ════════════ HR & PAYROLL ════════════ -->
+    <div class="tools-category-panel" id="cat-hr">
+      <div class="tools-cat-header">
+        <div class="tools-cat-icon"><iconify-icon icon="lucide:users"></iconify-icon></div>
+        <div>
+          <h2>HR &amp; Payroll Tools</h2>
+          <p>Salary, working days, and payroll calculators for HR professionals</p>
+        </div>
+      </div>
+      <div class="tools-grid">
+
+        <!-- Salary ↔ Hourly -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:banknote"></iconify-icon>
+            <h3>Salary ↔ Hourly Converter</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Annual Salary ($)</div>
+                <input class="tool-input" id="sal-annual" type="number" min="0" placeholder="60000" oninput="salFromAnnual()">
+              </div>
+              <div>
+                <div class="tool-label">Hourly Rate ($)</div>
+                <input class="tool-input" id="sal-hourly" type="number" min="0" step="0.01" placeholder="28.85" oninput="salFromHourly()">
+              </div>
+            </div>
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Hours / Week</div>
+                <input class="tool-input" id="sal-hrs" type="number" min="1" value="40" placeholder="40" oninput="salFromAnnual()">
+              </div>
+              <div>
+                <div class="tool-label">Weeks / Year</div>
+                <input class="tool-input" id="sal-wks" type="number" min="1" value="52" placeholder="52" oninput="salFromAnnual()">
+              </div>
+            </div>
+            <div class="tool-output-wrap" style="margin-top:4px;">
+              <div class="tool-output" id="sal-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('sal-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Working Days Calculator -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:calendar-days"></iconify-icon>
+            <h3>Working Days Calculator</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Start Date</div>
+                <input class="tool-input" id="wd-start" type="date">
+              </div>
+              <div>
+                <div class="tool-label">End Date</div>
+                <input class="tool-input" id="wd-end" type="date">
+              </div>
+            </div>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcWorkingDays()"><iconify-icon icon="lucide:calculator"></iconify-icon> Calculate</button>
+              <button class="tool-btn outline" onclick="document.getElementById('wd-out').textContent=''"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="wd-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('wd-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Take-Home Pay Estimator -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:wallet"></iconify-icon>
+            <h3>Take-Home Pay Estimator (US)</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Gross Pay ($)</div>
+                <input class="tool-input" id="pay-gross" type="number" min="0" step="0.01" placeholder="5000">
+              </div>
+              <div>
+                <div class="tool-label">Pay Period</div>
+                <select class="tool-select" id="pay-period" style="width:100%;">
+                  <option value="weekly">Weekly</option>
+                  <option value="biweekly">Bi-weekly</option>
+                  <option value="semimonthly">Semi-monthly</option>
+                  <option value="monthly" selected>Monthly</option>
+                </select>
+              </div>
+            </div>
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Filing Status</div>
+                <select class="tool-select" id="pay-status" style="width:100%;">
+                  <option value="single">Single</option>
+                  <option value="married">Married</option>
+                  <option value="hoh">Head of Household</option>
+                </select>
+              </div>
+            </div>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcTakeHome()"><iconify-icon icon="lucide:calculator"></iconify-icon> Estimate</button>
+              <button class="tool-btn outline" onclick="clearTool('pay-gross',null,null);document.getElementById('pay-out').textContent=''"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <p style="font-size:11px;color:var(--text-subtle);margin:4px 0 8px;">Simplified estimate. Consult a payroll professional for accuracy.</p>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="pay-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('pay-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /cat-hr -->
+
+    <!-- ════════════ MARKETING ════════════ -->
+    <div class="tools-category-panel" id="cat-marketing">
+      <div class="tools-cat-header">
+        <div class="tools-cat-icon"><iconify-icon icon="lucide:megaphone"></iconify-icon></div>
+        <div>
+          <h2>Marketing Tools</h2>
+          <p>Copy, readability, and content analysis tools for marketers</p>
+        </div>
+      </div>
+      <div class="tools-grid">
+
+        <!-- Ad Character Counter -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:type"></iconify-icon>
+            <h3>Ad Copy Character Counter</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row" style="gap:8px;margin-bottom:8px;">
+              <div>
+                <div class="tool-label">Platform</div>
+                <select class="tool-select" id="adcc-platform" style="width:100%;" onchange="adccUpdate()">
+                  <option value="140">X / Twitter (140)</option>
+                  <option value="280">X / Twitter (280)</option>
+                  <option value="30" data-desc="Google Headline">Google Ads Headline (30)</option>
+                  <option value="90" data-desc="Google Desc">Google Ads Description (90)</option>
+                  <option value="125" data-desc="Facebook">Facebook Ad Text (125)</option>
+                  <option value="2200" data-desc="Instagram">Instagram Caption (2200)</option>
+                  <option value="150" data-desc="LinkedIn">LinkedIn Headline (150)</option>
+                </select>
+              </div>
+            </div>
+            <div class="tool-label">Ad Copy</div>
+            <textarea class="tool-textarea" id="adcc-text" rows="4" placeholder="Write your ad copy here…" oninput="adccUpdate()"></textarea>
+            <div class="tool-output-wrap" style="margin-top:8px;">
+              <div class="tool-output" id="adcc-out"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Keyword Density -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:search"></iconify-icon>
+            <h3>Keyword Density Analyser</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-label">Content</div>
+            <textarea class="tool-textarea" id="kd-text" rows="5" placeholder="Paste your article or page content here…"></textarea>
+            <div class="tool-label" style="margin-top:8px;">Keyword / Phrase</div>
+            <input class="tool-input" id="kd-kw" type="text" placeholder="e.g. cloud hosting">
+            <div class="tool-actions" style="margin-top:8px;">
+              <button class="tool-btn primary" onclick="calcKwDensity()"><iconify-icon icon="lucide:search"></iconify-icon> Analyse</button>
+              <button class="tool-btn outline" onclick="clearTool('kd-text','kd-out',null);clearTool('kd-kw',null,null)"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="kd-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('kd-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flesch Readability -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:bar-chart-2"></iconify-icon>
+            <h3>Flesch Readability Score</h3>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-label">Text</div>
+            <textarea class="tool-textarea" id="fre-in" rows="6" placeholder="Paste your marketing copy, blog post, or email here…"></textarea>
+            <div class="tool-actions">
+              <button class="tool-btn primary" onclick="calcFlesch()"><iconify-icon icon="lucide:bar-chart-2"></iconify-icon> Score</button>
+              <button class="tool-btn outline" onclick="clearTool('fre-in','fre-out',null)"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+            </div>
+            <div class="tool-output-wrap">
+              <div class="tool-output" id="fre-out"></div>
+              <button class="tool-output-copy" onclick="copyOutput('fre-out',this)"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /cat-marketing -->
+
   </div><!-- /tools-main -->
 </div><!-- /tools-workspace -->
 
@@ -1587,6 +2378,521 @@ function linesDedup() {
 function linesReverse() {
   var lines = document.getElementById('lines-in').value.split('\n');
   document.getElementById('lines-out').textContent = lines.reverse().join('\n');
+}
+
+/* ══════════════════════════════════════════════════════════
+   EDUCATION TOOLS
+   ══════════════════════════════════════════════════════════ */
+
+/* ── EDUCATION: GPA Calculator ──────────────────────────── */
+var _gradePoints = {
+  'A+':4.0,'A':4.0,'A-':3.7,
+  'B+':3.3,'B':3.0,'B-':2.7,
+  'C+':2.3,'C':2.0,'C-':1.7,
+  'D+':1.3,'D':1.0,'D-':0.7,
+  'F':0.0
+};
+function calcGpa() {
+  var lines = document.getElementById('gpa-in').value.trim().split('\n');
+  var totalPoints = 0, totalCredits = 0, rows = [];
+  var ok = true;
+  lines.forEach(function(line, i) {
+    line = line.trim();
+    if (!line) return;
+    var parts = line.trim().split(/\s+/);
+    if (parts.length < 2) { ok = false; return; }
+    var grade = parts[0].toUpperCase();
+    var credits = parseFloat(parts[1]);
+    if (isNaN(credits) || credits <= 0) { ok = false; return; }
+    var pts = _gradePoints[grade];
+    if (pts === undefined) { ok = false; return; }
+    totalPoints += pts * credits;
+    totalCredits += credits;
+    rows.push('Course ' + (i + 1) + ': ' + grade + ' × ' + credits + ' cr = ' + (pts * credits).toFixed(2) + ' pts');
+  });
+  if (!ok || totalCredits === 0) {
+    document.getElementById('gpa-out').textContent = 'Invalid input. Use: grade credits (e.g. "A 3").\nSupported grades: A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, F';
+    return;
+  }
+  var gpa = totalPoints / totalCredits;
+  var out = rows.join('\n') + '\n\nTotal Credits : ' + totalCredits + '\nTotal Points  : ' + totalPoints.toFixed(2) + '\n\nGPA           : ' + gpa.toFixed(2);
+  document.getElementById('gpa-out').textContent = out;
+}
+
+/* ── EDUCATION: Grade Percentage ─────────────────────────── */
+function calcGradePercent() {
+  var score = parseFloat(document.getElementById('grade-score').value);
+  var total = parseFloat(document.getElementById('grade-total').value);
+  if (isNaN(score) || isNaN(total) || total <= 0) {
+    document.getElementById('grade-out').textContent = 'Please enter a valid score and total.';
+    return;
+  }
+  var pct = (score / total) * 100;
+  var letter;
+  if      (pct >= 90) letter = 'A';
+  else if (pct >= 80) letter = 'B';
+  else if (pct >= 70) letter = 'C';
+  else if (pct >= 60) letter = 'D';
+  else                letter = 'F';
+  document.getElementById('grade-out').textContent =
+    'Score      : ' + score + ' / ' + total +
+    '\nPercentage : ' + pct.toFixed(2) + '%' +
+    '\nLetter     : ' + letter;
+}
+
+/* ── EDUCATION: Attendance Calculator ───────────────────── */
+function calcAttendance() {
+  var present = parseFloat(document.getElementById('att-present').value);
+  var total   = parseFloat(document.getElementById('att-total').value);
+  var minPct  = parseFloat(document.getElementById('att-min').value) || 75;
+  if (isNaN(present) || isNaN(total) || total <= 0) {
+    document.getElementById('att-out').textContent = 'Please enter valid values.';
+    return;
+  }
+  var pct = (present / total) * 100;
+  var daysShort = 0;
+  if (pct < minPct) {
+    /* how many more days needed to reach minimum */
+    daysShort = Math.ceil((minPct / 100 * total - present) / (1 - minPct / 100));
+  }
+  var status = pct >= minPct ? '✓ Meets requirement' : '✗ Below requirement';
+  var out = 'Days Present : ' + present + ' / ' + total +
+    '\nAttendance   : ' + pct.toFixed(2) + '%' +
+    '\nRequired     : ' + minPct + '%' +
+    '\nStatus       : ' + status;
+  if (pct < minPct) {
+    out += '\nDays needed to reach ' + minPct + '%: ' + Math.max(0, daysShort);
+  }
+  document.getElementById('att-out').textContent = out;
+}
+
+/* ── EDUCATION: Reading Level (Flesch-Kincaid Grade) ─────── */
+function _countSyllables(word) {
+  word = word.toLowerCase().replace(/[^a-z]/g, '');
+  if (!word) return 0;
+  if (word.length <= 3) return 1;
+  word = word.replace(/(?:[^laeiouy]es|[^laeiouy]ed|[aeiou]$)/g, '');
+  var count = (word.match(/[aeiouy]{1,2}/g) || []).length;
+  return count || 1;
+}
+function calcReadingLevel() {
+  var text = document.getElementById('rl-in').value.trim();
+  if (!text) { document.getElementById('rl-out').textContent = 'Please enter some text.'; return; }
+  var sentences = (text.match(/[.!?]+/g) || []).length || 1;
+  var words     = text.trim().split(/\s+/).filter(Boolean);
+  var wordCount = words.length;
+  if (wordCount < 5) { document.getElementById('rl-out').textContent = 'Please enter more text for an accurate estimate.'; return; }
+  var syllables = words.reduce(function(s, w) { return s + _countSyllables(w); }, 0);
+  var fre = 206.835 - 1.015 * (wordCount / sentences) - 84.6 * (syllables / wordCount);
+  var fkg = 0.39 * (wordCount / sentences) + 11.8 * (syllables / wordCount) - 15.59;
+  fre = Math.max(0, Math.min(100, fre));
+  fkg = Math.max(0, fkg);
+  var freDesc;
+  if      (fre >= 90) freDesc = 'Very Easy (Grade 5)';
+  else if (fre >= 80) freDesc = 'Easy (Grade 6)';
+  else if (fre >= 70) freDesc = 'Fairly Easy (Grade 7)';
+  else if (fre >= 60) freDesc = 'Standard (Grades 8–9)';
+  else if (fre >= 50) freDesc = 'Fairly Difficult (Grades 10–12)';
+  else if (fre >= 30) freDesc = 'Difficult (College)';
+  else                freDesc = 'Very Difficult (Professional)';
+  document.getElementById('rl-out').textContent =
+    'Words           : ' + wordCount +
+    '\nSentences       : ' + sentences +
+    '\nSyllables       : ' + syllables +
+    '\n\nFlesch Reading Ease : ' + fre.toFixed(1) + ' — ' + freDesc +
+    '\nFlesch-Kincaid Grade: ' + fkg.toFixed(1) + ' (US school grade level)';
+}
+
+/* ══════════════════════════════════════════════════════════
+   FINANCE TOOLS
+   ══════════════════════════════════════════════════════════ */
+
+/* ── FINANCE: Loan Payment ───────────────────────────────── */
+function calcLoan() {
+  var P = parseFloat(document.getElementById('loan-principal').value);
+  var r = parseFloat(document.getElementById('loan-rate').value) / 100 / 12;
+  var n = parseInt(document.getElementById('loan-term').value);
+  if (isNaN(P) || isNaN(r) || isNaN(n) || P <= 0 || n <= 0) {
+    document.getElementById('loan-out').textContent = 'Please enter valid values.'; return;
+  }
+  var monthly, totalPaid, totalInterest;
+  if (r === 0) {
+    monthly = P / n;
+  } else {
+    monthly = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+  }
+  totalPaid     = monthly * n;
+  totalInterest = totalPaid - P;
+  document.getElementById('loan-out').textContent =
+    'Monthly Payment  : $' + monthly.toFixed(2) +
+    '\nTotal Paid       : $' + totalPaid.toFixed(2) +
+    '\nTotal Interest   : $' + totalInterest.toFixed(2) +
+    '\nLoan Amount      : $' + P.toFixed(2);
+}
+
+/* ── FINANCE: Compound Interest ─────────────────────────── */
+function calcCompoundInterest() {
+  var P = parseFloat(document.getElementById('ci-principal').value);
+  var r = parseFloat(document.getElementById('ci-rate').value) / 100;
+  var t = parseFloat(document.getElementById('ci-years').value);
+  var n = parseInt(document.getElementById('ci-freq').value);
+  if (isNaN(P) || isNaN(r) || isNaN(t) || isNaN(n) || P <= 0 || t <= 0) {
+    document.getElementById('ci-out').textContent = 'Please enter valid values.'; return;
+  }
+  var A = P * Math.pow(1 + r / n, n * t);
+  var interest = A - P;
+  document.getElementById('ci-out').textContent =
+    'Principal        : $' + P.toFixed(2) +
+    '\nFinal Amount     : $' + A.toFixed(2) +
+    '\nInterest Earned  : $' + interest.toFixed(2) +
+    '\nTotal Return     : ' + ((interest / P) * 100).toFixed(2) + '%';
+}
+
+/* ── FINANCE: Tip Calculator ─────────────────────────────── */
+function calcTip() {
+  var bill   = parseFloat(document.getElementById('tip-bill').value);
+  var pct    = parseFloat(document.getElementById('tip-pct').value) || 0;
+  var people = parseInt(document.getElementById('tip-people').value) || 1;
+  if (isNaN(bill) || bill < 0) {
+    document.getElementById('tip-out').textContent = 'Please enter a valid bill amount.'; return;
+  }
+  var tip       = bill * (pct / 100);
+  var total     = bill + tip;
+  var perPerson = total / people;
+  document.getElementById('tip-out').textContent =
+    'Bill Amount      : $' + bill.toFixed(2) +
+    '\nTip (' + pct + '%)       : $' + tip.toFixed(2) +
+    '\nTotal            : $' + total.toFixed(2) +
+    '\nPer Person       : $' + perPerson.toFixed(2) + (people > 1 ? ' (' + people + ' people)' : '');
+}
+
+/* ── FINANCE: ROI ────────────────────────────────────────── */
+function calcRoi() {
+  var init  = parseFloat(document.getElementById('roi-init').value);
+  var final = parseFloat(document.getElementById('roi-final').value);
+  if (isNaN(init) || isNaN(final) || init <= 0) {
+    document.getElementById('roi-out').textContent = 'Please enter valid values.'; return;
+  }
+  var profit   = final - init;
+  var roi      = (profit / init) * 100;
+  document.getElementById('roi-out').textContent =
+    'Initial Investment : $' + init.toFixed(2) +
+    '\nFinal Value        : $' + final.toFixed(2) +
+    '\nNet Profit / Loss  : $' + profit.toFixed(2) +
+    '\nROI                : ' + roi.toFixed(2) + '%';
+}
+
+/* ══════════════════════════════════════════════════════════
+   HEALTHCARE TOOLS
+   ══════════════════════════════════════════════════════════ */
+
+/* ── HEALTHCARE: BMI ─────────────────────────────────────── */
+function bmiUnitToggle() {
+  var unit = document.getElementById('bmi-unit').value;
+  document.getElementById('bmi-metric-row').style.display   = unit === 'metric'   ? '' : 'none';
+  document.getElementById('bmi-imperial-row').style.display = unit === 'imperial' ? '' : 'none';
+}
+function calcBmi() {
+  var unit = document.getElementById('bmi-unit').value;
+  var bmi;
+  if (unit === 'metric') {
+    var wt = parseFloat(document.getElementById('bmi-wt-kg').value);
+    var ht = parseFloat(document.getElementById('bmi-ht-cm').value) / 100;
+    if (isNaN(wt) || isNaN(ht) || ht <= 0) { document.getElementById('bmi-out').textContent = 'Please enter valid values.'; return; }
+    bmi = wt / (ht * ht);
+  } else {
+    var lb = parseFloat(document.getElementById('bmi-wt-lb').value);
+    var ins = parseFloat(document.getElementById('bmi-ht-in').value);
+    if (isNaN(lb) || isNaN(ins) || ins <= 0) { document.getElementById('bmi-out').textContent = 'Please enter valid values.'; return; }
+    bmi = (lb / (ins * ins)) * 703;
+  }
+  var cat;
+  if      (bmi < 18.5) cat = 'Underweight';
+  else if (bmi < 25)   cat = 'Normal weight';
+  else if (bmi < 30)   cat = 'Overweight';
+  else                 cat = 'Obese';
+  document.getElementById('bmi-out').textContent =
+    'BMI      : ' + bmi.toFixed(1) +
+    '\nCategory : ' + cat +
+    '\n\nRanges: <18.5 Underweight | 18.5–24.9 Normal | 25–29.9 Overweight | ≥30 Obese';
+}
+
+/* ── HEALTHCARE: Age Calculator ─────────────────────────── */
+function calcAge() {
+  var dob   = document.getElementById('age-dob').value;
+  var asof  = document.getElementById('age-asof').value || new Date().toISOString().slice(0, 10);
+  if (!dob) { document.getElementById('age-out').textContent = 'Please enter a date of birth.'; return; }
+  var d1 = new Date(dob), d2 = new Date(asof);
+  if (d1 >= d2) { document.getElementById('age-out').textContent = 'Date of birth must be before the as-of date.'; return; }
+  var years  = d2.getFullYear() - d1.getFullYear();
+  var months = d2.getMonth()    - d1.getMonth();
+  var days   = d2.getDate()     - d1.getDate();
+  if (days   < 0) { months--; var tmp = new Date(d2.getFullYear(), d2.getMonth(), 0); days += tmp.getDate(); }
+  if (months < 0) { years--;  months += 12; }
+  var totalDays = Math.floor((d2 - d1) / 86400000);
+  document.getElementById('age-out').textContent =
+    'Age        : ' + years + ' years, ' + months + ' months, ' + days + ' days' +
+    '\nTotal days : ' + totalDays.toLocaleString();
+}
+
+/* ── HEALTHCARE: Ideal Body Weight (Devine formula) ─────── */
+function calcIbw() {
+  var htCm = parseFloat(document.getElementById('ibw-ht').value);
+  var sex  = document.getElementById('ibw-sex').value;
+  if (isNaN(htCm) || htCm < 100) { document.getElementById('ibw-out').textContent = 'Please enter a height ≥ 100 cm.'; return; }
+  var htIn  = htCm / 2.54;
+  var extra = Math.max(0, htIn - 60);
+  var ibwKg = sex === 'male' ? 50 + 2.3 * extra : 45.5 + 2.3 * extra;
+  var ibwLb = ibwKg * 2.205;
+  document.getElementById('ibw-out').textContent =
+    'Ideal Body Weight : ' + ibwKg.toFixed(1) + ' kg  (' + ibwLb.toFixed(1) + ' lb)' +
+    '\nHealthy Range     : ' + (ibwKg * 0.9).toFixed(1) + '–' + (ibwKg * 1.1).toFixed(1) + ' kg' +
+    '\n\n(Devine formula — for clinical estimation only)';
+}
+
+/* ── HEALTHCARE: Calorie Burn ───────────────────────────── */
+function calcCalorieBurn() {
+  var wt  = parseFloat(document.getElementById('cal-wt').value);
+  var dur = parseFloat(document.getElementById('cal-dur').value);
+  var met = parseFloat(document.getElementById('cal-act').value);
+  if (isNaN(wt) || isNaN(dur) || wt <= 0 || dur <= 0) {
+    document.getElementById('cal-out').textContent = 'Please enter valid weight and duration.'; return;
+  }
+  var calories = met * wt * (dur / 60);
+  document.getElementById('cal-out').textContent =
+    'Estimated Calories Burned : ' + Math.round(calories) + ' kcal' +
+    '\nActivity MET              : ' + met +
+    '\nDuration                  : ' + dur + ' minutes';
+}
+
+/* ══════════════════════════════════════════════════════════
+   REAL ESTATE TOOLS
+   ══════════════════════════════════════════════════════════ */
+
+/* ── REAL ESTATE: Mortgage ───────────────────────────────── */
+function calcMortgage() {
+  var price = parseFloat(document.getElementById('mort-price').value);
+  var down  = parseFloat(document.getElementById('mort-down').value) || 0;
+  var rate  = parseFloat(document.getElementById('mort-rate').value) / 100 / 12;
+  var term  = parseInt(document.getElementById('mort-term').value) * 12;
+  var P = price - down;
+  if (isNaN(price) || isNaN(rate) || P <= 0 || term <= 0) {
+    document.getElementById('mort-out').textContent = 'Please enter valid values.'; return;
+  }
+  var monthly;
+  if (rate === 0) { monthly = P / term; }
+  else { monthly = P * (rate * Math.pow(1 + rate, term)) / (Math.pow(1 + rate, term) - 1); }
+  var total     = monthly * term;
+  var interest  = total - P;
+  document.getElementById('mort-out').textContent =
+    'Loan Amount      : $' + P.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) +
+    '\nMonthly Payment  : $' + monthly.toFixed(2) +
+    '\nTotal Paid       : $' + total.toFixed(2) +
+    '\nTotal Interest   : $' + interest.toFixed(2) +
+    '\nDown Payment     : $' + down.toFixed(2) + ' (' + ((down/price)*100).toFixed(1) + '%)';
+}
+
+/* ── REAL ESTATE: Square Footage ─────────────────────────── */
+function calcSqft() {
+  var lines  = document.getElementById('sqft-in').value.trim().split('\n');
+  var unit   = document.getElementById('sqft-unit').value;
+  var total  = 0, rows = [], ok = true;
+  lines.forEach(function(line, i) {
+    line = line.trim();
+    if (!line) return;
+    var parts = line.split(/[\s,x×*]+/);
+    var l = parseFloat(parts[0]), w = parseFloat(parts[1]);
+    if (isNaN(l) || isNaN(w)) { ok = false; return; }
+    var area = l * w;
+    total += area;
+    rows.push('Room ' + (i + 1) + ': ' + l + ' × ' + w + ' = ' + area.toFixed(2) + ' sq ' + unit);
+  });
+  if (!ok || !rows.length) { document.getElementById('sqft-out').textContent = 'Invalid input. Use: length width (e.g. "12 10").'; return; }
+  document.getElementById('sqft-out').textContent = rows.join('\n') + '\n\nTotal: ' + total.toFixed(2) + ' sq ' + unit;
+}
+
+/* ── REAL ESTATE: Property ROI ───────────────────────────── */
+function calcPropRoi() {
+  var price = parseFloat(document.getElementById('prop-price').value);
+  var rent  = parseFloat(document.getElementById('prop-rent').value);
+  var exp   = parseFloat(document.getElementById('prop-exp').value) || 0;
+  if (isNaN(price) || isNaN(rent) || price <= 0) {
+    document.getElementById('prop-out').textContent = 'Please enter valid values.'; return;
+  }
+  var annualRent = rent * 12;
+  var noi        = annualRent - exp;
+  var capRate    = (noi / price) * 100;
+  var grossYield = (annualRent / price) * 100;
+  document.getElementById('prop-out').textContent =
+    'Annual Gross Rent   : $' + annualRent.toFixed(2) +
+    '\nAnnual Expenses     : $' + exp.toFixed(2) +
+    '\nNet Operating Income: $' + noi.toFixed(2) +
+    '\n\nGross Yield (ROI)   : ' + grossYield.toFixed(2) + '%' +
+    '\nCap Rate            : ' + capRate.toFixed(2) + '%';
+}
+
+/* ══════════════════════════════════════════════════════════
+   HR & PAYROLL TOOLS
+   ══════════════════════════════════════════════════════════ */
+
+/* ── HR: Salary ↔ Hourly ─────────────────────────────────── */
+function salFromAnnual() {
+  var annual = parseFloat(document.getElementById('sal-annual').value);
+  var hrs    = parseFloat(document.getElementById('sal-hrs').value) || 40;
+  var wks    = parseFloat(document.getElementById('sal-wks').value) || 52;
+  if (isNaN(annual)) { document.getElementById('sal-out').textContent = ''; return; }
+  var hourly  = annual / (hrs * wks);
+  var monthly = annual / 12;
+  var weekly  = annual / wks;
+  document.getElementById('sal-hourly').value = hourly.toFixed(2);
+  document.getElementById('sal-out').textContent =
+    'Annual    : $' + annual.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) +
+    '\nMonthly   : $' + monthly.toFixed(2) +
+    '\nWeekly    : $' + weekly.toFixed(2) +
+    '\nHourly    : $' + hourly.toFixed(2) +
+    '\n(' + hrs + ' hrs/week × ' + wks + ' weeks)';
+}
+function salFromHourly() {
+  var hourly = parseFloat(document.getElementById('sal-hourly').value);
+  var hrs    = parseFloat(document.getElementById('sal-hrs').value) || 40;
+  var wks    = parseFloat(document.getElementById('sal-wks').value) || 52;
+  if (isNaN(hourly)) { document.getElementById('sal-out').textContent = ''; return; }
+  var annual  = hourly * hrs * wks;
+  var monthly = annual / 12;
+  var weekly  = hourly * hrs;
+  document.getElementById('sal-annual').value = annual.toFixed(2);
+  document.getElementById('sal-out').textContent =
+    'Annual    : $' + annual.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) +
+    '\nMonthly   : $' + monthly.toFixed(2) +
+    '\nWeekly    : $' + weekly.toFixed(2) +
+    '\nHourly    : $' + hourly.toFixed(2) +
+    '\n(' + hrs + ' hrs/week × ' + wks + ' weeks)';
+}
+
+/* ── HR: Working Days Calculator ─────────────────────────── */
+function calcWorkingDays() {
+  var start = document.getElementById('wd-start').value;
+  var end   = document.getElementById('wd-end').value;
+  if (!start || !end) { document.getElementById('wd-out').textContent = 'Please select both dates.'; return; }
+  var d1 = new Date(start + 'T00:00:00');
+  var d2 = new Date(end   + 'T00:00:00');
+  if (d1 > d2) { document.getElementById('wd-out').textContent = 'Start date must be before end date.'; return; }
+  var working = 0, total = 0, cur = new Date(d1);
+  while (cur <= d2) {
+    total++;
+    var day = cur.getDay();
+    if (day !== 0 && day !== 6) working++;
+    cur.setDate(cur.getDate() + 1);
+  }
+  document.getElementById('wd-out').textContent =
+    'From         : ' + start +
+    '\nTo           : ' + end +
+    '\nCalendar Days: ' + total +
+    '\nWeekend Days : ' + (total - working) +
+    '\nWorking Days : ' + working;
+}
+
+/* ── HR: Take-Home Pay Estimator (simplified US) ─────────── */
+function calcTakeHome() {
+  var gross  = parseFloat(document.getElementById('pay-gross').value);
+  var period = document.getElementById('pay-period').value;
+  var status = document.getElementById('pay-status').value;
+  if (isNaN(gross) || gross <= 0) { document.getElementById('pay-out').textContent = 'Please enter a valid gross pay amount.'; return; }
+  /* convert to annual for bracket lookup */
+  var annualMultiplier = { weekly: 52, biweekly: 26, semimonthly: 24, monthly: 12 }[period] || 12;
+  var annualGross = gross * annualMultiplier;
+  /* 2024 US federal income tax brackets (simplified, standard deduction) */
+  var stdDeduction = { single: 14600, married: 29200, hoh: 21900 }[status] || 14600;
+  var taxable = Math.max(0, annualGross - stdDeduction);
+  /* single brackets */
+  var brackets = status === 'married'
+    ? [[23200,0.10],[94300,0.12],[201050,0.22],[383900,0.24],[487450,0.32],[731200,0.35],[Infinity,0.37]]
+    : [[11600,0.10],[47150,0.12],[100525,0.22],[191950,0.24],[243725,0.32],[609350,0.35],[Infinity,0.37]];
+  var tax = 0, prev = 0;
+  brackets.forEach(function(b) {
+    if (taxable > prev) { tax += (Math.min(taxable, b[0]) - prev) * b[1]; }
+    prev = b[0];
+  });
+  var fica   = gross * 0.0765; /* 6.2% SS + 1.45% Medicare */
+  var netPay = gross - (tax / annualMultiplier) - fica;
+  document.getElementById('pay-out').textContent =
+    'Gross Pay           : $' + gross.toFixed(2) +
+    '\nFederal Income Tax  : $' + (tax / annualMultiplier).toFixed(2) +
+    '\nFICA (SS + Medicare): $' + fica.toFixed(2) +
+    '\nEstimated Net Pay   : $' + netPay.toFixed(2) +
+    '\nEffective Tax Rate  : ' + ((tax / annualGross) * 100).toFixed(1) + '% (federal only)';
+}
+
+/* ══════════════════════════════════════════════════════════
+   MARKETING TOOLS
+   ══════════════════════════════════════════════════════════ */
+
+/* ── MARKETING: Ad Character Counter ───────────────────────── */
+function adccUpdate() {
+  var text  = document.getElementById('adcc-text').value;
+  var limit = parseInt(document.getElementById('adcc-platform').value);
+  var len   = text.length;
+  var remaining = limit - len;
+  var pct   = Math.min(100, Math.round((len / limit) * 100));
+  var color = remaining >= 0 ? (remaining < limit * 0.1 ? '#ffd43b' : '#51cf66') : '#ff6b6b';
+  document.getElementById('adcc-out').textContent =
+    len + ' / ' + limit + ' characters  (' + Math.abs(remaining) + (remaining >= 0 ? ' remaining' : ' over limit') + ')';
+  document.getElementById('adcc-out').style.color = color;
+}
+
+/* ── MARKETING: Keyword Density ──────────────────────────── */
+function calcKwDensity() {
+  var text = document.getElementById('kd-text').value.trim();
+  var kw   = document.getElementById('kd-kw').value.trim().toLowerCase();
+  if (!text || !kw) { document.getElementById('kd-out').textContent = 'Please enter content and a keyword.'; return; }
+  var words   = text.toLowerCase().split(/\s+/).filter(Boolean);
+  var kwWords = kw.split(/\s+/).filter(Boolean);
+  var count   = 0;
+  if (kwWords.length === 1) {
+    count = words.filter(function(w) { return w.replace(/[^a-z0-9]/g, '') === kw.replace(/[^a-z0-9]/g, ''); }).length;
+  } else {
+    var pattern = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    var re = new RegExp(pattern, 'gi');
+    count = (text.match(re) || []).length;
+  }
+  var density = words.length > 0 ? ((kwWords.length === 1 ? count : count * kwWords.length) / words.length) * 100 : 0;
+  var advice = density < 0.5 ? 'Too low — consider using the keyword more.' : density > 3 ? 'Too high — may appear spammy. Aim for 1–2%.' : 'Good keyword density (1–3% is ideal for SEO).';
+  document.getElementById('kd-out').textContent =
+    'Keyword      : "' + kw + '"' +
+    '\nOccurrences  : ' + count +
+    '\nTotal Words  : ' + words.length +
+    '\nDensity      : ' + density.toFixed(2) + '%' +
+    '\n\n' + advice;
+}
+
+/* ── MARKETING: Flesch Readability Score ─────────────────── */
+function calcFlesch() {
+  var text = document.getElementById('fre-in').value.trim();
+  if (!text) { document.getElementById('fre-out').textContent = 'Please enter some text.'; return; }
+  var sentences = (text.match(/[.!?]+/g) || []).length || 1;
+  var words     = text.trim().split(/\s+/).filter(Boolean);
+  var wordCount = words.length;
+  if (wordCount < 5) { document.getElementById('fre-out').textContent = 'Please enter more text for an accurate score.'; return; }
+  var syllables = words.reduce(function(s, w) { return s + _countSyllables(w); }, 0);
+  var fre = 206.835 - 1.015 * (wordCount / sentences) - 84.6 * (syllables / wordCount);
+  fre = Math.max(0, Math.min(100, fre));
+  var desc, audience;
+  if      (fre >= 90) { desc = 'Very Easy';       audience = 'Elementary school (Grade 5)'; }
+  else if (fre >= 80) { desc = 'Easy';             audience = 'Middle school (Grade 6)'; }
+  else if (fre >= 70) { desc = 'Fairly Easy';      audience = 'Middle school (Grade 7)'; }
+  else if (fre >= 60) { desc = 'Standard';         audience = 'High school (Grades 8–9)'; }
+  else if (fre >= 50) { desc = 'Fairly Difficult'; audience = 'High school (Grades 10–12)'; }
+  else if (fre >= 30) { desc = 'Difficult';        audience = 'College level'; }
+  else                { desc = 'Very Difficult';   audience = 'Professional / Academic'; }
+  var tip = fre >= 60 ? 'Great for marketing copy and web content.' : 'Consider shorter sentences and simpler words for better engagement.';
+  document.getElementById('fre-out').textContent =
+    'Flesch Reading Ease : ' + fre.toFixed(1) + ' / 100' +
+    '\nLevel               : ' + desc +
+    '\nAudience            : ' + audience +
+    '\nWords               : ' + wordCount +
+    '\nSentences           : ' + sentences +
+    '\nAvg words/sentence  : ' + (wordCount / sentences).toFixed(1) +
+    '\n\n' + tip;
 }
 PAGEJS;
 
