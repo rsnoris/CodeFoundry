@@ -1317,7 +1317,6 @@ function filterTable(tblId, query, colFilter, colKey) {
       if (input) { input.disabled = false; input.style.height = ''; }
       if (!data || data.error) { alert(data ? data.error : 'Failed to send.'); return; }
       input.value = '';
-      lastMessageId = '';
       adminPollMessages();
     });
   };
@@ -1347,7 +1346,8 @@ function filterTable(tblId, query, colFilter, colKey) {
   };
 
   loadSessions();
-  setInterval(loadSessions, 10000);
+  // Background session list refresh – skip when a session is actively being polled
+  setInterval(function () { if (!currentSessionId) loadSessions(); }, 10000);
 }());
 
 // Background badge refresh (runs on all admin tabs)

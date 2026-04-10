@@ -669,8 +669,7 @@ $page_scripts = <<<'JS'
         return;
       }
       input.value = '';
-      // Immediately poll to show the sent message
-      lastMessageId = '';
+      // Poll immediately for new messages (keeps lastMessageId so only new ones are fetched)
       pollMessages();
     });
   };
@@ -748,6 +747,8 @@ $page_scripts = <<<'JS'
   // ── Background session polling (for unread badge) ─────────────────────────
 
   function backgroundPoll() {
+    // Skip if a session is actively being polled (avoids redundant requests)
+    if (currentSessionId) return;
     api('sessions', {}, function (data) {
       sessions = data.sessions || [];
       renderSessionsList();
