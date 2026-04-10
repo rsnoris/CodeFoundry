@@ -343,6 +343,42 @@ $page_styles = <<<'PAGECSS'
 /* Regex match highlight */
 .regex-match { background: rgba(24,179,255,.25); border-radius: 2px; }
 
+/* ── AI Tool cards ──────────────────────────────────────── */
+.ai-card-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: 0 0 12px;
+}
+.ai-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.tool-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: var(--navy-3);
+  border: 1px solid var(--border-color);
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.tool-tag.free {
+  background: rgba(81,207,102,.1);
+  border-color: rgba(81,207,102,.25);
+  color: #51cf66;
+}
+.tool-card-note {
+  font-size: 11px;
+  color: var(--text-subtle);
+  margin-top: 8px;
+}
+
 /* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 960px) {
   .tools-workspace { flex-direction: column; padding: 0 0 40px; }
@@ -410,6 +446,11 @@ require_once __DIR__ . '/../includes/header.php';
       <iconify-icon icon="lucide:code-2"></iconify-icon>
       Code
       <span class="tools-cat-count">3</span>
+    </button>
+    <button class="tools-cat-btn" data-cat="ai" onclick="switchCat('ai')">
+      <iconify-icon icon="lucide:bot"></iconify-icon>
+      AI Tools
+      <span class="tools-cat-count">9</span>
     </button>
     <div style="height:1px;background:var(--border-color);margin:10px 6px;"></div>
     <div class="tools-sidebar-title" style="margin-top:4px;">Industry</div>
@@ -1809,6 +1850,205 @@ require_once __DIR__ . '/../includes/header.php';
 
       </div>
     </div><!-- /cat-marketing -->
+
+    <!-- ════════════ AI TOOLS ════════════ -->
+    <div class="tools-category-panel" id="cat-ai">
+      <div class="tools-cat-header">
+        <div class="tools-cat-icon"><iconify-icon icon="lucide:bot"></iconify-icon></div>
+        <div>
+          <h2>Free AI Tools</h2>
+          <p>Freely available GPT and AI chat assistants — no API key required</p>
+        </div>
+      </div>
+      <div class="tools-grid">
+
+        <!-- ChatGPT -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:message-square"></iconify-icon>
+            <h3>ChatGPT</h3>
+          </div>
+          <div class="tool-card-body">
+            <p class="ai-card-desc">OpenAI's flagship conversational AI. The free tier includes GPT-4o mini and limited access to GPT-4o. Great for writing, coding, analysis, and general Q&amp;A.</p>
+            <div class="ai-card-tags">
+              <span class="tool-tag free">Free Tier</span>
+              <span class="tool-tag">Coding</span>
+              <span class="tool-tag">Writing</span>
+              <span class="tool-tag">Analysis</span>
+            </div>
+            <div class="tool-actions">
+              <a href="https://chat.openai.com" target="_blank" rel="noopener noreferrer" class="tool-btn primary"><iconify-icon icon="lucide:external-link"></iconify-icon> Open ChatGPT</a>
+            </div>
+            <p class="tool-card-note">Opens chat.openai.com in a new tab. Free account required.</p>
+          </div>
+        </div>
+
+        <!-- Google Gemini -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:sparkles"></iconify-icon>
+            <h3>Google Gemini</h3>
+          </div>
+          <div class="tool-card-body">
+            <p class="ai-card-desc">Google's multimodal AI assistant. The free tier includes Gemini 1.5 Flash and supports text, images, and document understanding.</p>
+            <div class="ai-card-tags">
+              <span class="tool-tag free">Free Tier</span>
+              <span class="tool-tag">Multimodal</span>
+              <span class="tool-tag">Writing</span>
+              <span class="tool-tag">Research</span>
+            </div>
+            <div class="tool-actions">
+              <a href="https://gemini.google.com" target="_blank" rel="noopener noreferrer" class="tool-btn primary"><iconify-icon icon="lucide:external-link"></iconify-icon> Open Gemini</a>
+            </div>
+            <p class="tool-card-note">Opens gemini.google.com in a new tab. Google account required.</p>
+          </div>
+        </div>
+
+        <!-- Claude -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:cpu"></iconify-icon>
+            <h3>Claude (Anthropic)</h3>
+          </div>
+          <div class="tool-card-body">
+            <p class="ai-card-desc">Anthropic's AI assistant, known for long context handling, thoughtful reasoning, and nuanced writing. Free tier includes Claude Sonnet.</p>
+            <div class="ai-card-tags">
+              <span class="tool-tag free">Free Tier</span>
+              <span class="tool-tag">Long Context</span>
+              <span class="tool-tag">Writing</span>
+              <span class="tool-tag">Coding</span>
+            </div>
+            <div class="tool-actions">
+              <a href="https://claude.ai" target="_blank" rel="noopener noreferrer" class="tool-btn primary"><iconify-icon icon="lucide:external-link"></iconify-icon> Open Claude</a>
+            </div>
+            <p class="tool-card-note">Opens claude.ai in a new tab. Free account required.</p>
+          </div>
+        </div>
+
+        <!-- Microsoft Copilot -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:zap"></iconify-icon>
+            <h3>Microsoft Copilot</h3>
+          </div>
+          <div class="tool-card-body">
+            <p class="ai-card-desc">Microsoft's AI companion powered by GPT-4 and integrated with Bing search. Completely free — no account needed for basic use.</p>
+            <div class="ai-card-tags">
+              <span class="tool-tag free">No Login Needed</span>
+              <span class="tool-tag">Web Search</span>
+              <span class="tool-tag">Image Gen</span>
+            </div>
+            <div class="tool-actions">
+              <a href="https://copilot.microsoft.com" target="_blank" rel="noopener noreferrer" class="tool-btn primary"><iconify-icon icon="lucide:external-link"></iconify-icon> Open Copilot</a>
+            </div>
+            <p class="tool-card-note">Opens copilot.microsoft.com in a new tab.</p>
+          </div>
+        </div>
+
+        <!-- Perplexity AI -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:search"></iconify-icon>
+            <h3>Perplexity AI</h3>
+          </div>
+          <div class="tool-card-body">
+            <p class="ai-card-desc">An AI-powered answer engine that searches the web in real time and cites its sources. Ideal for research and fact-checking.</p>
+            <div class="ai-card-tags">
+              <span class="tool-tag free">Free Tier</span>
+              <span class="tool-tag">Web Search</span>
+              <span class="tool-tag">Citations</span>
+              <span class="tool-tag">Research</span>
+            </div>
+            <div class="tool-actions">
+              <a href="https://perplexity.ai" target="_blank" rel="noopener noreferrer" class="tool-btn primary"><iconify-icon icon="lucide:external-link"></iconify-icon> Open Perplexity</a>
+            </div>
+            <p class="tool-card-note">Opens perplexity.ai in a new tab.</p>
+          </div>
+        </div>
+
+        <!-- Meta AI -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:layers"></iconify-icon>
+            <h3>Meta AI</h3>
+          </div>
+          <div class="tool-card-body">
+            <p class="ai-card-desc">Meta's free AI assistant powered by Llama models. Available on the web and integrated into WhatsApp, Instagram, and Messenger.</p>
+            <div class="ai-card-tags">
+              <span class="tool-tag free">Completely Free</span>
+              <span class="tool-tag">Llama Models</span>
+              <span class="tool-tag">Image Gen</span>
+            </div>
+            <div class="tool-actions">
+              <a href="https://meta.ai" target="_blank" rel="noopener noreferrer" class="tool-btn primary"><iconify-icon icon="lucide:external-link"></iconify-icon> Open Meta AI</a>
+            </div>
+            <p class="tool-card-note">Opens meta.ai in a new tab.</p>
+          </div>
+        </div>
+
+        <!-- HuggingChat -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:code-2"></iconify-icon>
+            <h3>HuggingChat</h3>
+          </div>
+          <div class="tool-card-body">
+            <p class="ai-card-desc">Hugging Face's open-source chat interface supporting multiple free models including Llama, Mistral, Qwen, and more. No API key needed.</p>
+            <div class="ai-card-tags">
+              <span class="tool-tag free">Open Source</span>
+              <span class="tool-tag">Multi-Model</span>
+              <span class="tool-tag">Coding</span>
+            </div>
+            <div class="tool-actions">
+              <a href="https://huggingface.co/chat" target="_blank" rel="noopener noreferrer" class="tool-btn primary"><iconify-icon icon="lucide:external-link"></iconify-icon> Open HuggingChat</a>
+            </div>
+            <p class="tool-card-note">Opens huggingface.co/chat in a new tab.</p>
+          </div>
+        </div>
+
+        <!-- Mistral Le Chat -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:wind"></iconify-icon>
+            <h3>Mistral Le Chat</h3>
+          </div>
+          <div class="tool-card-body">
+            <p class="ai-card-desc">Mistral AI's free chat interface featuring fast models like Mistral Nemo and Mistral Large. Excellent for multilingual tasks and coding.</p>
+            <div class="ai-card-tags">
+              <span class="tool-tag free">Free Tier</span>
+              <span class="tool-tag">Multilingual</span>
+              <span class="tool-tag">Coding</span>
+              <span class="tool-tag">Fast</span>
+            </div>
+            <div class="tool-actions">
+              <a href="https://chat.mistral.ai" target="_blank" rel="noopener noreferrer" class="tool-btn primary"><iconify-icon icon="lucide:external-link"></iconify-icon> Open Le Chat</a>
+            </div>
+            <p class="tool-card-note">Opens chat.mistral.ai in a new tab.</p>
+          </div>
+        </div>
+
+        <!-- Groq -->
+        <div class="tool-card">
+          <div class="tool-card-head">
+            <iconify-icon icon="lucide:gauge"></iconify-icon>
+            <h3>Groq</h3>
+          </div>
+          <div class="tool-card-body">
+            <p class="ai-card-desc">Ultra-fast AI inference powered by LPU hardware. Free playground with access to Llama 3, Mixtral, Gemma, and more at exceptional speeds.</p>
+            <div class="ai-card-tags">
+              <span class="tool-tag free">Free Playground</span>
+              <span class="tool-tag">Ultra-Fast</span>
+              <span class="tool-tag">Multi-Model</span>
+            </div>
+            <div class="tool-actions">
+              <a href="https://groq.com" target="_blank" rel="noopener noreferrer" class="tool-btn primary"><iconify-icon icon="lucide:external-link"></iconify-icon> Open Groq</a>
+            </div>
+            <p class="tool-card-note">Opens groq.com in a new tab. Free account required.</p>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /cat-ai -->
 
   </div><!-- /tools-main -->
 </div><!-- /tools-workspace -->
