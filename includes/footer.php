@@ -67,9 +67,17 @@ $page_scripts = $page_scripts ?? '';
 
   function _cfSendView(page, referrer, timeOnPage) {
     try {
-      navigator.sendBeacon
-        ? navigator.sendBeacon('/track.php', JSON.stringify({ page: page, referrer: referrer, time_on_page: timeOnPage }))
-        : fetch('/track.php', { method: 'POST', body: JSON.stringify({ page: page, referrer: referrer, time_on_page: timeOnPage }), keepalive: true });
+      var payload = JSON.stringify({ page: page, referrer: referrer, time_on_page: timeOnPage });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/track.php', new Blob([payload], { type: 'application/json' }));
+      } else {
+        fetch('/track.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+          keepalive: true
+        });
+      }
     } catch (e) { /* ignore */ }
   }
 

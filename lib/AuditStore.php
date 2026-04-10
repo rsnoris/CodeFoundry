@@ -252,7 +252,7 @@ class AuditStore
     {
         $dir = dirname($path);
         if (!is_dir($dir)) {
-            mkdir($dir, 0750, true);
+            mkdir($dir, 0700, true);
         }
 
         $json    = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -293,8 +293,8 @@ class AuditStore
         foreach (['HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR'] as $key) {
             $val = $_SERVER[$key] ?? '';
             if ($val !== '') {
-                // Use only the first IP in a forwarded list
-                return explode(',', $val)[0];
+                // Use only the first IP in a forwarded list; trim whitespace
+                return trim(explode(',', $val)[0]);
             }
         }
         return '';

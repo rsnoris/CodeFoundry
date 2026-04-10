@@ -35,7 +35,9 @@ if (
     isset($_POST['action'], $_POST['ticket_id']) &&
     $_POST['action'] === 'update_ticket'
 ) {
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     if (!empty($_POST['csrf_token']) && $_POST['csrf_token'] === ($_SESSION['csrf_token'] ?? '')) {
         $allowed_statuses = ['open', 'in_progress', 'resolved', 'closed'];
         $new_status = $_POST['status'] ?? 'open';
@@ -1041,9 +1043,8 @@ function filterTable(tblId, query, colFilter, colKey) {
   for (var i = 0; i < rows.length; i++) {
     var text = rows[i].innerText.toLowerCase();
     var visible = !q || text.includes(q);
-    if (visible && colFilter && colKey) {
-      var cellText = rows[i].innerText.toLowerCase();
-      visible = !colFilter || cellText.includes(colFilter.toLowerCase());
+    if (visible && colFilter) {
+      visible = !colFilter || text.includes(colFilter.toLowerCase());
     }
     rows[i].style.display = visible ? '' : 'none';
   }
