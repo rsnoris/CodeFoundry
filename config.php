@@ -248,6 +248,15 @@ define('CF_OAUTH_GITHUB_CLIENT_SECRET', getenv('GITHUB_CLIENT_SECRET') ?: '');
 define('CF_OAUTH_GOOGLE_CLIENT_ID',     getenv('GOOGLE_CLIENT_ID')     ?: '');
 define('CF_OAUTH_GOOGLE_CLIENT_SECRET', getenv('GOOGLE_CLIENT_SECRET') ?: '');
 
+/**
+ * LinkedIn OAuth 2.0 / OpenID Connect credentials.
+ * Register at: https://www.linkedin.com/developers/apps
+ * Set the Authorized redirect URL to: https://yourdomain.com/Login/oauth_callback.php
+ * Required scopes: openid, profile, email
+ */
+define('CF_OAUTH_LINKEDIN_CLIENT_ID',     getenv('LINKEDIN_CLIENT_ID')     ?: '');
+define('CF_OAUTH_LINKEDIN_CLIENT_SECRET', getenv('LINKEDIN_CLIENT_SECRET') ?: '');
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------

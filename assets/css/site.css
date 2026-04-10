@@ -78,6 +78,12 @@ header {
   gap: 12px;
   letter-spacing: -0.5px;
   color: var(--text);
+  text-decoration: none;
+}
+
+.brand:visited {
+  color: var(--text);
+  text-decoration: none;
 }
 
 .brand svg {

@@ -165,6 +165,50 @@ if ($provider === 'github') {
     $email      = $profile['email'] ?? '';
     $display    = $profile['name']  ?? '';
 
+} elseif ($provider === 'linkedin') {
+
+    if (!defined('CF_OAUTH_LINKEDIN_CLIENT_ID') || CF_OAUTH_LINKEDIN_CLIENT_ID === '') {
+        cf_oauth_fail('LinkedIn OAuth is not configured.', 503);
+    }
+
+    $tokenBody = http_build_query([
+        'grant_type'    => 'authorization_code',
+        'code'          => $code,
+        'client_id'     => CF_OAUTH_LINKEDIN_CLIENT_ID,
+        'client_secret' => CF_OAUTH_LINKEDIN_CLIENT_SECRET,
+        'redirect_uri'  => (isset($_SERVER['HTTPS']) ? 'https' : 'http')
+            . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')
+            . '/Login/oauth_callback.php',
+    ]);
+    $tokenResp = cf_http_request('POST', 'https://www.linkedin.com/oauth/v2/accessToken', [
+        'Content-Type: application/x-www-form-urlencoded',
+        'Accept: application/json',
+    ], $tokenBody);
+
+    if ($tokenResp === false) {
+        cf_oauth_fail('Token exchange failed.', 502);
+    }
+    $tokenData   = json_decode($tokenResp, true);
+    $accessToken = $tokenData['access_token'] ?? '';
+    if ($accessToken === '') {
+        cf_oauth_fail('No access token returned by LinkedIn.', 502);
+    }
+
+    // Fetch user info via LinkedIn's OpenID Connect UserInfo endpoint
+    $profileResp = cf_http_request('GET', 'https://api.linkedin.com/v2/userinfo', [
+        'Authorization: Bearer ' . $accessToken,
+        'Accept: application/json',
+    ]);
+    if ($profileResp === false) {
+        cf_oauth_fail('Failed to fetch LinkedIn user profile.', 502);
+    }
+    $profile = json_decode($profileResp, true);
+
+    $providerId = $profile['sub']   ?? '';
+    $email      = $profile['email'] ?? '';
+    $fullName   = trim(($profile['given_name'] ?? '') . ' ' . ($profile['family_name'] ?? ''));
+    $display    = $profile['name'] ?? ($fullName !== '' ? $fullName : ($email !== '' ? explode('@', $email)[0] : 'LinkedIn User'));
+
 } else {
     cf_oauth_fail('Unknown OAuth provider.');
 }
