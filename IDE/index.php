@@ -1263,6 +1263,10 @@ function setRunning(on) {
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.error_code === 'subscription_required') {
+          window.location.href = '/Pricing/';
+          return;
+        }
         alert('CodeGen error: ' + (data.error || 'Unknown error'));
         return;
       }
@@ -1333,6 +1337,10 @@ function setRunning(on) {
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.error_code === 'subscription_required') {
+          window.location.href = '/Pricing/';
+          return;
+        }
         explainBody.textContent = 'Error: ' + (data.error || 'Unknown error');
         return;
       }
@@ -1386,6 +1394,10 @@ function setRunning(on) {
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.error_code === 'subscription_required') {
+          window.location.href = '/Pricing/';
+          return;
+        }
         alert('Fix error: ' + (data.error || 'Unknown error'));
         return;
       }

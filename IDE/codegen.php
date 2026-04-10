@@ -74,7 +74,10 @@ $langLabel = preg_replace('/[^a-zA-Z0-9 \+\#\-]/', '', $language);
 $apiKey = CF_OPENAI_KEY;
 if ($apiKey === '') {
     http_response_code(503);
-    echo json_encode(['error' => 'CodeGen is not configured. Set the OPENAI_API_KEY environment variable.']);
+    echo json_encode([
+        'error'      => 'AI features require an active subscription.',
+        'error_code' => 'subscription_required',
+    ]);
     exit;
 }
 

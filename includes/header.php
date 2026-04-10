@@ -48,6 +48,7 @@ function cf_active(string $id): string {
       <a href="/#industries"  class="nav-link<?= cf_active('industries') ?>">Industries</a>
       <a href="/CaseStudies/" class="nav-link<?= cf_active('case-studies') ?>">Case Studies</a>
       <a href="/Training/"    class="nav-link<?= cf_active('training') ?>">Training</a>
+      <a href="/Pricing/"     class="nav-link<?= cf_active('pricing') ?>">Pricing</a>
       <a href="/AboutUs/"     class="nav-link<?= cf_active('about') ?>">About</a>
       <a href="/Careers/"     class="nav-link<?= cf_active('careers') ?>">Careers</a>
     </nav>
@@ -71,6 +72,7 @@ function cf_active(string $id): string {
         <a href="/#industries"  class="nav-link" onclick="closeMobileNav()">Industries</a>
         <a href="/CaseStudies/" class="nav-link" onclick="closeMobileNav()">Case Studies</a>
         <a href="/Training/"    class="nav-link" onclick="closeMobileNav()">Training</a>
+        <a href="/Pricing/"     class="nav-link" onclick="closeMobileNav()">Pricing</a>
         <a href="/AboutUs/"     class="nav-link" onclick="closeMobileNav()">About</a>
         <a href="/Careers/"     class="nav-link" onclick="closeMobileNav()">Careers</a>
       </div>
