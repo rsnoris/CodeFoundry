@@ -449,6 +449,145 @@ $page_styles = <<<'PAGECSS'
 .gen-btn.success { background: #22c55e; color: #fff; }
 .gen-btn.success:hover { background: #16a34a; }
 
+/* ── GitHub Push modal ───────────────────────────────────── */
+.gh-modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.65);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.gh-modal-backdrop.open { display: flex; }
+.gh-modal {
+  background: var(--navy);
+  border: 1px solid var(--border-color);
+  border-radius: var(--card-radius);
+  padding: 32px 28px 24px;
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+}
+.gh-modal-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin: 0 0 4px;
+}
+.gh-modal-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0 0 22px;
+}
+.gh-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 20px;
+  line-height: 1;
+  padding: 4px;
+}
+.gh-modal-close:hover { color: var(--text); }
+.gh-connect-section { text-align: center; padding: 8px 0 4px; }
+.gh-connect-section p {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+.gh-form-group {
+  margin-bottom: 14px;
+}
+.gh-form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: 6px;
+}
+.gh-form-input {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--navy-2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--button-radius);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .2s;
+  box-sizing: border-box;
+}
+.gh-form-input:focus { border-color: var(--primary); }
+.gh-radio-group {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.gh-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.gh-radio-label input { accent-color: var(--primary); cursor: pointer; }
+.gh-connected-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #22c55e;
+  background: rgba(34,197,94,.1);
+  border-radius: 20px;
+  padding: 3px 10px;
+  margin-bottom: 18px;
+}
+.gh-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+.gh-success-msg {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: rgba(34,197,94,.1);
+  border: 1px solid rgba(34,197,94,.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #4ade80;
+  margin-top: 12px;
+}
+.gh-success-msg.visible { display: flex; }
+.gh-success-msg a { color: #4ade80; text-decoration: underline; }
+.gh-push-error {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: #2d1515;
+  border: 1px solid #7f1d1d;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #fca5a5;
+  margin-top: 12px;
+}
+.gh-push-error.visible { display: flex; }
+
 /* ── Error state ─────────────────────────────────────────── */
 .gen-error {
   display: none;
@@ -660,6 +799,12 @@ require_once dirname(__DIR__) . '/includes/header.php';
             <iconify-icon icon="lucide:copy"></iconify-icon>
             Copy
           </button>
+          <?php if ($_cf_user): ?>
+          <button id="genGithubBtn" class="gen-btn ghost">
+            <iconify-icon icon="mdi:github"></iconify-icon>
+            Push to GitHub
+          </button>
+          <?php endif; ?>
           <button id="genOpenIdeBtn" class="gen-btn success">
             <iconify-icon icon="lucide:code-2"></iconify-icon>
             Open in IDE
@@ -751,6 +896,94 @@ require_once dirname(__DIR__) . '/includes/header.php';
   </main>
 
 </div><!-- /gen-layout -->
+
+<?php if ($_cf_user): ?>
+<!-- ── Push to GitHub modal ────────────────────────────────── -->
+<div class="gh-modal-backdrop" id="ghModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="ghModalTitle">
+  <div class="gh-modal">
+    <button class="gh-modal-close" id="ghModalClose" aria-label="Close">
+      <iconify-icon icon="lucide:x"></iconify-icon>
+    </button>
+    <h2 class="gh-modal-title" id="ghModalTitle">
+      <iconify-icon icon="mdi:github" style="vertical-align:middle;margin-right:6px;"></iconify-icon>Push to GitHub
+    </h2>
+    <p class="gh-modal-subtitle">Save your generated code to a private GitHub repository.</p>
+
+    <!-- Step 1: Connect GitHub -->
+    <div id="ghStepConnect">
+      <div class="gh-connect-section">
+        <p>Connect your GitHub account to create private repositories and push your generated code directly from CodeFoundry.</p>
+        <button id="ghConnectBtn" class="gen-btn success" style="margin:0 auto;">
+          <iconify-icon icon="mdi:github"></iconify-icon>
+          Connect GitHub Account
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: Choose repo and push -->
+    <div id="ghStepPush" style="display:none;">
+      <div id="ghConnectedBadge" class="gh-connected-badge">
+        <iconify-icon icon="lucide:check-circle-2"></iconify-icon>
+        <span id="ghConnectedUser">Connected</span>
+      </div>
+
+      <div class="gh-radio-group">
+        <label class="gh-radio-label">
+          <input type="radio" name="ghRepoMode" value="existing" id="ghModeExisting" checked>
+          Existing repository
+        </label>
+        <label class="gh-radio-label">
+          <input type="radio" name="ghRepoMode" value="new" id="ghModeNew">
+          New repository
+        </label>
+      </div>
+
+      <!-- Existing repo -->
+      <div id="ghExistingGroup" class="gh-form-group">
+        <label class="gh-form-label" for="ghRepoSelect">Repository</label>
+        <select id="ghRepoSelect" class="gh-form-input">
+          <option value="">Loading repositories…</option>
+        </select>
+      </div>
+
+      <!-- New repo -->
+      <div id="ghNewGroup" style="display:none;">
+        <div class="gh-form-group">
+          <label class="gh-form-label" for="ghNewRepoName">New repository name</label>
+          <input type="text" id="ghNewRepoName" class="gh-form-input" placeholder="my-project" maxlength="100">
+        </div>
+      </div>
+
+      <!-- File path -->
+      <div class="gh-form-group">
+        <label class="gh-form-label" for="ghFilePath">File path in repository</label>
+        <input type="text" id="ghFilePath" class="gh-form-input" placeholder="main.py" maxlength="255">
+      </div>
+
+      <div id="ghPushError" class="gh-push-error" role="alert">
+        <iconify-icon icon="lucide:alert-circle"></iconify-icon>
+        <span id="ghPushErrorText"></span>
+      </div>
+      <div id="ghPushSuccess" class="gh-success-msg">
+        <iconify-icon icon="lucide:check-circle-2"></iconify-icon>
+        <span id="ghPushSuccessText">Code pushed successfully! <a id="ghPushLink" href="#" target="_blank" rel="noopener">View on GitHub →</a></span>
+      </div>
+
+      <div class="gh-modal-actions">
+        <button id="ghDisconnectBtn" class="gen-btn ghost" style="margin-right:auto;">
+          <iconify-icon icon="lucide:unlink"></iconify-icon>
+          Disconnect
+        </button>
+        <button id="ghCancelBtn" class="gen-btn ghost">Cancel</button>
+        <button id="ghPushBtn" class="gen-btn success">
+          <iconify-icon icon="lucide:upload-cloud"></iconify-icon>
+          Push Code
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<?php endif; ?>
 
 <?php
 $page_scripts = <<<'PAGEJS'
@@ -959,6 +1192,231 @@ $page_scripts .= <<<'PAGEJS'
   });
 })();
 PAGEJS;
+
+<?php if ($_cf_user): ?>
+$page_scripts .= <<<'GHJS'
+
+/* ── Push to GitHub ────────────────────────────────────────── */
+(function () {
+  'use strict';
+
+  var backdrop      = document.getElementById('ghModalBackdrop');
+  var stepConnect   = document.getElementById('ghStepConnect');
+  var stepPush      = document.getElementById('ghStepPush');
+  var ghConnectBtn  = document.getElementById('ghConnectBtn');
+  var ghCancelBtn   = document.getElementById('ghCancelBtn');
+  var ghCloseBtn    = document.getElementById('ghModalClose');
+  var ghPushBtn     = document.getElementById('ghPushBtn');
+  var ghDisconnect  = document.getElementById('ghDisconnectBtn');
+  var ghConnBadge   = document.getElementById('ghConnectedBadge');
+  var ghConnUser    = document.getElementById('ghConnectedUser');
+  var ghRepoSelect  = document.getElementById('ghRepoSelect');
+  var ghNewGroup    = document.getElementById('ghNewGroup');
+  var ghExistGroup  = document.getElementById('ghExistingGroup');
+  var ghNewName     = document.getElementById('ghNewRepoName');
+  var ghFilePath    = document.getElementById('ghFilePath');
+  var ghPushError   = document.getElementById('ghPushError');
+  var ghPushErrTxt  = document.getElementById('ghPushErrorText');
+  var ghPushSuccess = document.getElementById('ghPushSuccess');
+  var ghPushLink    = document.getElementById('ghPushLink');
+  var ghGithubBtn   = document.getElementById('genGithubBtn');
+
+  if (!backdrop || !ghGithubBtn) return;
+
+  var ghConnected = false;
+
+  /* ── helpers ─────────────────────────────────────────────── */
+  function ghApi(payload) {
+    return fetch('/Generate/github_push.php', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    }).then(function (r) { return r.json(); });
+  }
+
+  function showPushError(msg) {
+    ghPushErrTxt.textContent = msg;
+    ghPushError.classList.add('visible');
+    ghPushSuccess.classList.remove('visible');
+  }
+  function clearPushMessages() {
+    ghPushError.classList.remove('visible');
+    ghPushSuccess.classList.remove('visible');
+  }
+
+  function inferFilename() {
+    var lang = document.getElementById('genLangSelect');
+    if (!lang) return 'generated_code.txt';
+    var ext = {
+      python:'py', javascript:'js', typescript:'ts', java:'java', c:'c',
+      'c++':'cpp', csharp:'cs', go:'go', rust:'rs', php:'php', ruby:'rb',
+      bash:'sh', lua:'lua', perl:'pl', haskell:'hs', scala:'scala', r:'r',
+      swift:'swift', kotlin:'kt', dart:'dart', octave:'m', fortran:'f90',
+      verilog:'v', vhdl:'vhd', tcl:'tcl',
+    };
+    return 'generated_code.' + (ext[lang.value] || 'txt');
+  }
+
+  /* ── Load repos into select ──────────────────────────────── */
+  function loadRepos() {
+    ghRepoSelect.innerHTML = '<option value="">Loading…</option>';
+    ghApi({ action: 'repos', per_page: 100 }).then(function (data) {
+      if (data.error) {
+        ghRepoSelect.innerHTML = '<option value="">Error loading repos</option>';
+        return;
+      }
+      var repos = data.repos || [];
+      ghRepoSelect.innerHTML = '';
+      if (repos.length === 0) {
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'No repositories found – create a new one';
+        ghRepoSelect.appendChild(opt);
+        return;
+      }
+      repos.forEach(function (r) {
+        var opt = document.createElement('option');
+        opt.value       = r.full_name;
+        opt.textContent = r.full_name + (r.private ? ' 🔒' : '');
+        ghRepoSelect.appendChild(opt);
+      });
+    }).catch(function () {
+      ghRepoSelect.innerHTML = '<option value="">Error loading repos</option>';
+    });
+  }
+
+  /* ── Open modal ──────────────────────────────────────────── */
+  function openModal() {
+    clearPushMessages();
+    ghFilePath.value = inferFilename();
+    backdrop.classList.add('open');
+
+    // Check connection status
+    ghApi({ action: 'status' }).then(function (data) {
+      ghConnected = !!data.connected;
+      if (ghConnected) {
+        stepConnect.style.display = 'none';
+        stepPush.style.display    = '';
+        ghConnUser.textContent    = 'Connected as ' + (data.github_user || 'GitHub');
+        loadRepos();
+      } else {
+        stepConnect.style.display = '';
+        stepPush.style.display    = 'none';
+      }
+    });
+  }
+
+  function closeModal() {
+    backdrop.classList.remove('open');
+  }
+
+  ghGithubBtn.addEventListener('click', openModal);
+  ghCloseBtn.addEventListener('click', closeModal);
+  ghCancelBtn.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', function (e) {
+    if (e.target === backdrop) closeModal();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && backdrop.classList.contains('open')) closeModal();
+  });
+
+  /* ── Connect GitHub (popup) ──────────────────────────────── */
+  ghConnectBtn.addEventListener('click', function () {
+    var w = window.open('/Generate/github_oauth.php', 'gh_connect',
+      'width=700,height=600,scrollbars=yes');
+    var handler = function (evt) {
+      if (evt.data && evt.data.type === 'gh_connect') {
+        window.removeEventListener('message', handler);
+        if (evt.data.ok) {
+          ghConnected = true;
+          stepConnect.style.display = 'none';
+          stepPush.style.display    = '';
+          ghConnUser.textContent    = 'Connected as ' + (evt.data.ghUser || 'GitHub');
+          clearPushMessages();
+          loadRepos();
+        } else {
+          alert('GitHub connection failed: ' + (evt.data.error || 'Unknown error'));
+        }
+        if (w && !w.closed) w.close();
+      }
+    };
+    window.addEventListener('message', handler);
+  });
+
+  /* ── Disconnect ──────────────────────────────────────────── */
+  ghDisconnect.addEventListener('click', function () {
+    if (!confirm('Disconnect your GitHub account from CodeFoundry?')) return;
+    ghApi({ action: 'disconnect' }).finally(function () {
+      ghConnected = false;
+      stepPush.style.display    = 'none';
+      stepConnect.style.display = '';
+      clearPushMessages();
+    });
+  });
+
+  /* ── Repo mode toggle ────────────────────────────────────── */
+  document.querySelectorAll('input[name="ghRepoMode"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      var isNew = document.getElementById('ghModeNew').checked;
+      ghNewGroup.style.display   = isNew ? '' : 'none';
+      ghExistGroup.style.display = isNew ? 'none' : '';
+      clearPushMessages();
+    });
+  });
+
+  /* ── Push ────────────────────────────────────────────────── */
+  ghPushBtn.addEventListener('click', function () {
+    clearPushMessages();
+    var code = (document.getElementById('genCodeOutput') || {}).textContent || '';
+    if (!code) { showPushError('No generated code to push.'); return; }
+
+    var filePath = ghFilePath.value.trim();
+    if (!filePath) { showPushError('Please enter a file path.'); ghFilePath.focus(); return; }
+
+    var isNew = document.getElementById('ghModeNew').checked;
+
+    function doPush(repoFullName) {
+      ghPushBtn.disabled = true;
+      ghPushBtn.innerHTML = '<span class="spinner"></span> Pushing…';
+      ghApi({
+        action:  'push',
+        repo:    repoFullName,
+        path:    filePath,
+        content: code,
+      }).then(function (data) {
+        if (data.error) { showPushError(data.error); return; }
+        ghPushLink.href = data.html_url || data.url || '#';
+        ghPushSuccess.classList.add('visible');
+      }).catch(function (err) {
+        showPushError('Network error: ' + err.message);
+      }).finally(function () {
+        ghPushBtn.disabled = false;
+        ghPushBtn.innerHTML = '<iconify-icon icon="lucide:upload-cloud"></iconify-icon> Push Code';
+      });
+    }
+
+    if (isNew) {
+      var newName = ghNewName.value.trim();
+      if (!newName) { showPushError('Please enter a repository name.'); ghNewName.focus(); return; }
+      ghPushBtn.disabled = true;
+      ghPushBtn.innerHTML = '<span class="spinner"></span> Creating repo…';
+      ghApi({ action: 'create', name: newName }).then(function (data) {
+        if (data.error) { showPushError(data.error); ghPushBtn.disabled = false; ghPushBtn.innerHTML = '<iconify-icon icon="lucide:upload-cloud"></iconify-icon> Push Code'; return; }
+        doPush(data.full_name);
+      }).catch(function (err) {
+        showPushError('Network error: ' + err.message);
+        ghPushBtn.disabled = false;
+        ghPushBtn.innerHTML = '<iconify-icon icon="lucide:upload-cloud"></iconify-icon> Push Code';
+      });
+    } else {
+      var selected = ghRepoSelect.value;
+      if (!selected) { showPushError('Please select a repository.'); return; }
+      doPush(selected);
+    }
+  });
+})();
+GHJS;
+<?php endif; ?>
 
 require_once dirname(__DIR__) . '/includes/footer.php';
 ?>

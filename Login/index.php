@@ -12,9 +12,9 @@ require_once dirname(__DIR__) . '/lib/AuditStore.php';
 
 session_start();
 
-// Redirect already-logged-in users to the home page
+// Redirect already-logged-in users to the Generate page
 if (!empty($_SESSION['cf_user'])) {
-    header('Location: /');
+    header('Location: /Generate/');
     exit;
 }
 
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 is_string($raw_redirect) &&
                 preg_match('#^/[^/\\\\]#', $raw_redirect) &&
                 strpos($raw_redirect, '..') === false
-            ) ? $raw_redirect : '/';
+            ) ? $raw_redirect : '/Generate/';
             header('Location: ' . $safe_redirect);
             exit;
         }

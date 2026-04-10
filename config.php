@@ -18,6 +18,37 @@ define('CF_ROOT', dirname(__FILE__));
 /** Path to the shared navigation data. */
 define('CF_NAV_JSON', CF_ROOT . '/data/navigation.json');
 
+/**
+ * Absolute filesystem path to the API-key storage folder (no trailing slash).
+ *
+ * The folder is placed ONE level above the webroot so it is never accessible
+ * over HTTP.  Each key is stored as a plain-text file whose name matches the
+ * environment-variable name (e.g. "GROQ_API_KEY", "OPENAI_API_KEY").
+ *
+ * Layout example:
+ *   /home/user/Cf-Config-keys/
+ *       GROQ_API_KEY
+ *       OPENROUTER_API_KEY
+ *       HF_API_KEY
+ *       TOGETHER_API_KEY
+ *       OPENAI_API_KEY
+ *       OLLAMA_URL
+ *       STRIPE_PUBLISHABLE_KEY
+ *       STRIPE_SECRET_KEY
+ *       PAYPAL_CLIENT_ID
+ *       PAYPAL_CLIENT_SECRET
+ *       PAYPAL_MODE
+ *       GITHUB_CLIENT_ID
+ *       GITHUB_CLIENT_SECRET
+ *       GOOGLE_CLIENT_ID
+ *       GOOGLE_CLIENT_SECRET
+ *       LINKEDIN_CLIENT_ID
+ *       LINKEDIN_CLIENT_SECRET
+ *
+ * To change the location, adjust the path below.
+ */
+define('CF_KEYS_DIR', dirname(CF_ROOT) . '/Cf-Config-keys');
+
 // ---------------------------------------------------------------------------
 // Site metadata
 // ---------------------------------------------------------------------------
@@ -52,6 +83,12 @@ define('CF_USERS', [
         'display'       => 'Admin',
         'role'          => 'admin',
     ],
+    [
+        'username'      => 'roshnori',
+        'password_hash' => '$2y$10$NxR.XtTCgg.yTwu6hNbaKeh4T/YWaLyxYxVh3giFUi8I8iBudAsxS',
+        'display'       => 'roshnori',
+        'role'          => 'admin',
+    ],
 ]);
 
 // ---------------------------------------------------------------------------
@@ -83,8 +120,8 @@ define('CF_DATA_CHAT_MESSAGES',   CF_ROOT . '/UserAccountData/chat_messages.json
 // AI / CodeGen
 // ---------------------------------------------------------------------------
 
-/** OpenAI API key for the CodeGen feature. Set via environment or replace the empty string. */
-define('CF_OPENAI_KEY', getenv('OPENAI_API_KEY') ?: '');
+/** OpenAI API key for the CodeGen feature. Set via key file or environment variable. */
+define('CF_OPENAI_KEY', cf_load_key('OPENAI_API_KEY'));
 
 /**
  * CodeGen provider registry.
@@ -231,10 +268,11 @@ define('CF_CODEGEN_PROVIDERS', [
 /**
  * Stripe API keys.
  * Register at: https://dashboard.stripe.com/apikeys
- * Set STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY as environment variables.
+ * Store keys in Cf-Config-keys/STRIPE_PUBLISHABLE_KEY and Cf-Config-keys/STRIPE_SECRET_KEY,
+ * or set STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY as environment variables.
  */
-define('CF_STRIPE_PUBLISHABLE_KEY', getenv('STRIPE_PUBLISHABLE_KEY') ?: '');
-define('CF_STRIPE_SECRET_KEY',      getenv('STRIPE_SECRET_KEY')      ?: '');
+define('CF_STRIPE_PUBLISHABLE_KEY', cf_load_key('STRIPE_PUBLISHABLE_KEY'));
+define('CF_STRIPE_SECRET_KEY',      cf_load_key('STRIPE_SECRET_KEY'));
 
 // ---------------------------------------------------------------------------
 // PayPal
@@ -243,12 +281,13 @@ define('CF_STRIPE_SECRET_KEY',      getenv('STRIPE_SECRET_KEY')      ?: '');
 /**
  * PayPal REST API credentials.
  * Register at: https://developer.paypal.com/dashboard/
- * Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET as environment variables.
- * Set PAYPAL_MODE to 'live' in production (default: 'sandbox').
+ * Store keys in Cf-Config-keys/PAYPAL_CLIENT_ID, Cf-Config-keys/PAYPAL_CLIENT_SECRET,
+ * and Cf-Config-keys/PAYPAL_MODE, or set them as environment variables.
+ * PAYPAL_MODE defaults to 'sandbox' if not set.
  */
-define('CF_PAYPAL_CLIENT_ID',     getenv('PAYPAL_CLIENT_ID')     ?: '');
-define('CF_PAYPAL_CLIENT_SECRET', getenv('PAYPAL_CLIENT_SECRET') ?: '');
-define('CF_PAYPAL_MODE',          getenv('PAYPAL_MODE')          ?: 'sandbox');
+define('CF_PAYPAL_CLIENT_ID',     cf_load_key('PAYPAL_CLIENT_ID'));
+define('CF_PAYPAL_CLIENT_SECRET', cf_load_key('PAYPAL_CLIENT_SECRET'));
+define('CF_PAYPAL_MODE',          cf_load_key('PAYPAL_MODE', 'sandbox'));
 
 // ---------------------------------------------------------------------------
 // OAuth / Social Login
@@ -258,30 +297,71 @@ define('CF_PAYPAL_MODE',          getenv('PAYPAL_MODE')          ?: 'sandbox');
  * GitHub OAuth app credentials.
  * Register at: https://github.com/settings/developers
  * Set the Authorization callback URL to: https://yourdomain.com/Login/oauth_callback.php
+ * Store keys in Cf-Config-keys/GITHUB_CLIENT_ID and Cf-Config-keys/GITHUB_CLIENT_SECRET,
+ * or set them as environment variables.
  */
-define('CF_OAUTH_GITHUB_CLIENT_ID',     getenv('GITHUB_CLIENT_ID')     ?: '');
-define('CF_OAUTH_GITHUB_CLIENT_SECRET', getenv('GITHUB_CLIENT_SECRET') ?: '');
+define('CF_OAUTH_GITHUB_CLIENT_ID',     cf_load_key('GITHUB_CLIENT_ID'));
+define('CF_OAUTH_GITHUB_CLIENT_SECRET', cf_load_key('GITHUB_CLIENT_SECRET'));
 
 /**
  * Google OAuth app credentials.
  * Register at: https://console.cloud.google.com/apis/credentials
  * Set the Authorized redirect URI to: https://yourdomain.com/Login/oauth_callback.php
+ * Store keys in Cf-Config-keys/GOOGLE_CLIENT_ID and Cf-Config-keys/GOOGLE_CLIENT_SECRET,
+ * or set them as environment variables.
  */
-define('CF_OAUTH_GOOGLE_CLIENT_ID',     getenv('GOOGLE_CLIENT_ID')     ?: '');
-define('CF_OAUTH_GOOGLE_CLIENT_SECRET', getenv('GOOGLE_CLIENT_SECRET') ?: '');
+define('CF_OAUTH_GOOGLE_CLIENT_ID',     cf_load_key('GOOGLE_CLIENT_ID'));
+define('CF_OAUTH_GOOGLE_CLIENT_SECRET', cf_load_key('GOOGLE_CLIENT_SECRET'));
 
 /**
  * LinkedIn OAuth 2.0 / OpenID Connect credentials.
  * Register at: https://www.linkedin.com/developers/apps
  * Set the Authorized redirect URL to: https://yourdomain.com/Login/oauth_callback.php
  * Required scopes: openid, profile, email
+ * Store keys in Cf-Config-keys/LINKEDIN_CLIENT_ID and Cf-Config-keys/LINKEDIN_CLIENT_SECRET,
+ * or set them as environment variables.
  */
-define('CF_OAUTH_LINKEDIN_CLIENT_ID',     getenv('LINKEDIN_CLIENT_ID')     ?: '');
-define('CF_OAUTH_LINKEDIN_CLIENT_SECRET', getenv('LINKEDIN_CLIENT_SECRET') ?: '');
+define('CF_OAUTH_LINKEDIN_CLIENT_ID',     cf_load_key('LINKEDIN_CLIENT_ID'));
+define('CF_OAUTH_LINKEDIN_CLIENT_SECRET', cf_load_key('LINKEDIN_CLIENT_SECRET'));
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/**
+ * Load a configuration key / secret by name.
+ *
+ * Resolution order:
+ *   1. File:    CF_KEYS_DIR . '/' . $name  (plain-text, whitespace stripped)
+ *   2. Env var: getenv($name)
+ *   3. $default (empty string if omitted)
+ *
+ * This lets you store all API keys in the Cf-Config-keys folder on the server
+ * without ever putting them in source code or setting server-wide env vars.
+ *
+ * @param  string $name    Filename / env-var name (e.g. 'GROQ_API_KEY')
+ * @param  string $default Returned when neither source has a value
+ * @return string
+ */
+function cf_load_key(string $name, string $default = ''): string
+{
+    // 1. Try the key file
+    $file = CF_KEYS_DIR . '/' . $name;
+    if (is_file($file) && is_readable($file)) {
+        $value = trim((string)file_get_contents($file));
+        if ($value !== '') {
+            return $value;
+        }
+    }
+
+    // 2. Fall back to environment variable
+    $env = getenv($name);
+    if ($env !== false && $env !== '') {
+        return $env;
+    }
+
+    return $default;
+}
 
 /**
  * Return the decoded navigation JSON as an associative array.
