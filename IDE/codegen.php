@@ -143,8 +143,9 @@ if (function_exists('apcu_fetch')) {
 }
 
 // ── Token limits ──────────────────────────────────────────────────────────
-const MAX_TOKENS_EXPLAIN = 1024;
-const MAX_TOKENS_CODE    = 2048;
+const MAX_TOKENS_EXPLAIN    = 1024;
+const MAX_TOKENS_CODE       = 2048;
+const MAX_CODE_OUTPUT_LENGTH = 20000;
 
 // ── Build messages ────────────────────────────────────────────────────────
 $messages = [];
@@ -219,6 +220,7 @@ try {
 if ($tokens > 0 && $_sessionUser !== null) {
     require_once dirname(__DIR__) . '/lib/UserStore.php';
     $promptSnippet = mb_substr($prompt ?: $currentCode, 0, 80, 'UTF-8');
+    $codeOutput    = ($action !== 'explain') ? mb_substr(trim($content), 0, MAX_CODE_OUTPUT_LENGTH, 'UTF-8') : '';
     UserStore::appendTokenHistory([
         'username'       => $_sessionUser['username'],
         'action'         => $action,
@@ -227,6 +229,7 @@ if ($tokens > 0 && $_sessionUser !== null) {
         'model'          => $model,
         'prompt_snippet' => $promptSnippet,
         'tokens_used'    => $tokens,
+        'code_output'    => $codeOutput,
         'created_at'     => date('c'),
     ]);
     UserStore::addTokensUsed($_sessionUser['username'], $tokens);
