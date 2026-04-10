@@ -220,10 +220,10 @@ class CodeGenProvider
         }
         $cfg = $providers[$providerId];
 
-        // Allow overriding the base URL via env (useful for Ollama pointing at a remote host)
+        // Allow overriding the base URL via key file or env (useful for Ollama pointing at a remote host)
         if (!empty($cfg['api_url_env'])) {
-            $envUrl = getenv($cfg['api_url_env']);
-            if ($envUrl !== false && $envUrl !== '') {
+            $envUrl = cf_load_key($cfg['api_url_env']);
+            if ($envUrl !== '') {
                 $cfg['api_url'] = rtrim($envUrl, '/');
             }
         }
@@ -231,14 +231,14 @@ class CodeGenProvider
         return $cfg;
     }
 
-    /** Resolve the API key from either the hard-coded value or an env var. */
+    /** Resolve the API key from the hard-coded value, a key file, or an env var. */
     private static function resolveApiKey(array $cfg): string
     {
         if (!empty($cfg['api_key'])) {
             return (string)$cfg['api_key'];
         }
         if (!empty($cfg['api_key_env'])) {
-            return getenv($cfg['api_key_env']) ?: '';
+            return cf_load_key($cfg['api_key_env']);
         }
         return '';
     }
