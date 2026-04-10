@@ -8,6 +8,7 @@
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/lib/UserStore.php';
+require_once dirname(__DIR__) . '/lib/AuditStore.php';
 
 session_start();
 
@@ -82,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($matched) {
             session_regenerate_id(true);
+            AuditStore::log('user.login', $username, ['method' => 'password']);
             $raw_redirect = $_GET['redirect'] ?? '';
             // Only allow relative paths: single leading slash, no double-slash, no path traversal
             $safe_redirect = (
@@ -95,6 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Short delay to slow brute-force attempts
         sleep(1);
+        AuditStore::log('user.login_failed', $username, []);
         $error = 'Invalid username or password.';
     }
 }

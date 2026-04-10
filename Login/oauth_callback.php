@@ -9,6 +9,7 @@
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/lib/UserStore.php';
+require_once dirname(__DIR__) . '/lib/AuditStore.php';
 
 session_start();
 
@@ -229,6 +230,7 @@ if ($user === null) {
 // ── Log the user in ──────────────────────────────────────────────────────────
 
 session_regenerate_id(true);
+AuditStore::log('user.login', $user['username'], ['method' => 'oauth', 'provider' => $provider]);
 $_SESSION['cf_user'] = [
     'username' => $user['username'],
     'display'  => $user['display'] ?? $user['username'],

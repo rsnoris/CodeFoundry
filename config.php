@@ -69,10 +69,13 @@ define('CF_PLANS', [
 // Data file paths
 // ---------------------------------------------------------------------------
 
-define('CF_DATA_USERS',         CF_ROOT . '/UserAccountData/users.json');
-define('CF_DATA_TOKEN_HISTORY', CF_ROOT . '/UserAccountData/token_history.json');
-define('CF_DATA_PROJECTS',      CF_ROOT . '/UserAccountData/projects.json');
-define('CF_DATA_PAYMENTS',      CF_ROOT . '/UserAccountData/payments.json');
+define('CF_DATA_USERS',           CF_ROOT . '/UserAccountData/users.json');
+define('CF_DATA_TOKEN_HISTORY',   CF_ROOT . '/UserAccountData/token_history.json');
+define('CF_DATA_PROJECTS',        CF_ROOT . '/UserAccountData/projects.json');
+define('CF_DATA_PAYMENTS',        CF_ROOT . '/UserAccountData/payments.json');
+define('CF_DATA_AUDIT_LOG',       CF_ROOT . '/UserAccountData/audit_log.json');
+define('CF_DATA_PAGE_VIEWS',      CF_ROOT . '/UserAccountData/page_views.json');
+define('CF_DATA_SUPPORT_TICKETS', CF_ROOT . '/UserAccountData/support_tickets.json');
 
 // ---------------------------------------------------------------------------
 // AI / CodeGen

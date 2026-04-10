@@ -7,6 +7,10 @@
 declare(strict_types=1);
 
 session_start();
+
+// Capture user before destroying the session
+$_logoutUser = $_SESSION['cf_user']['username'] ?? '';
+
 $_SESSION = [];
 
 if (ini_get('session.use_cookies')) {
@@ -23,5 +27,13 @@ if (ini_get('session.use_cookies')) {
 }
 
 session_destroy();
+
+// Log the logout event after session destruction (uses its own file write, no session needed)
+if ($_logoutUser !== '') {
+    require_once dirname(__DIR__) . '/config.php';
+    require_once dirname(__DIR__) . '/lib/AuditStore.php';
+    AuditStore::log('user.logout', $_logoutUser, []);
+}
+
 header('Location: /');
 exit;
