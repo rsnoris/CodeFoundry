@@ -25,10 +25,12 @@ class UserStore
     public static function findUser(string $username): ?array
     {
         // Look up in CF_USERS first
-        $base = null;
+        $base         = null;
+        $basePassword = null;
         foreach (CF_USERS as $u) {
             if (isset($u['username']) && $u['username'] === $username) {
-                $base = $u;
+                $base         = $u;
+                $basePassword = $u['password_hash'];
                 break;
             }
         }
@@ -40,18 +42,17 @@ class UserStore
         $stored = self::allUsers();
         foreach ($stored as $row) {
             if (($row['username'] ?? '') === $username) {
-                // runtime fields override defaults; credentials stay from CF_USERS
+                // runtime fields override defaults; credentials come from CF_USERS unless overridden
                 $base = array_merge($base, $row);
-                // Always keep the CF_USERS hash unless data/users.json has an override
-                if (!isset($row['password_hash'])) {
-                    unset($base['password_hash']);
-                    $base['password_hash'] = $u['password_hash'];
+                // Prefer data/users.json password_hash if present, otherwise keep CF_USERS hash
+                if (empty($row['password_hash'])) {
+                    $base['password_hash'] = $basePassword;
                 }
                 break;
             }
         }
 
-        // Apply defaults
+        // Apply defaults for plan, tokens_used, email
         $base['plan']        = $base['plan']        ?? 'free';
         $base['tokens_used'] = $base['tokens_used'] ?? 0;
         $base['email']       = $base['email']       ?? '';

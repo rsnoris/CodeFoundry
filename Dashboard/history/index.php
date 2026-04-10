@@ -11,7 +11,12 @@ $username     = $user_session['username'];
 
 // Handle project delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['action'] ?? '') === 'delete_project') {
-    $project_id = trim($_POST['id'] ?? $_GET['id'] ?? '');
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
+    if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+        http_response_code(403);
+        exit('Forbidden: invalid CSRF token.');
+    }
+    $project_id = trim($_POST['id'] ?? '');
     if ($project_id !== '') {
         UserStore::deleteProject($project_id, $username);
     }
@@ -21,6 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['action'] ?? '') === 'delete
 
 $history  = UserStore::tokenHistoryForUser($username, 100);
 $projects = UserStore::projectsForUser($username);
+
+// Ensure CSRF token exists (session already started via cf_require_login)
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 
 $dash_active = 'history';
 $page_title  = 'History – CodeFoundry';
@@ -214,6 +225,7 @@ require_once dirname(dirname(__DIR__)) . '/includes/header.php';
                   <td style="white-space:nowrap"><?= cf_e(date('M j, Y', strtotime($project['created_at'] ?? 'now'))) ?></td>
                   <td>
                     <form method="POST" action="/Dashboard/history/?action=delete_project" style="display:inline" onsubmit="return confirm('Delete this project?')">
+                      <input type="hidden" name="csrf_token" value="<?= cf_e($csrf_token) ?>">
                       <input type="hidden" name="id" value="<?= cf_e($project['id'] ?? '') ?>">
                       <button type="submit" class="btn-delete">
                         <iconify-icon icon="lucide:trash-2"></iconify-icon> Delete

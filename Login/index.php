@@ -58,10 +58,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ];
                 session_regenerate_id(true);
                 $raw_redirect = $_GET['redirect'] ?? '';
-                // Only allow relative paths that start with a single slash (no open-redirect)
+                // Only allow relative paths: single leading slash, no double-slash, no path traversal
                 $safe_redirect = (
                     is_string($raw_redirect) &&
-                    preg_match('#^/[^/\\\\]#', $raw_redirect)
+                    preg_match('#^/[^/\\\\]#', $raw_redirect) &&
+                    strpos($raw_redirect, '..') === false
                 ) ? $raw_redirect : '/';
                 header('Location: ' . $safe_redirect);
                 exit;
