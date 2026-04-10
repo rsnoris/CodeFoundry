@@ -1,4 +1,25 @@
 <?php
+declare(strict_types=1);
+require_once dirname(__DIR__) . '/config.php';
+require_once dirname(__DIR__) . '/lib/CodeGenProvider.php';
+
+// Provider list for the client-side model selector
+$_cf_providers_js = [];
+foreach (CodeGenProvider::all() as $pid => $pdata) {
+    if (!$pdata['available']) continue;
+    $models = [];
+    foreach ($pdata['models'] as $m) {
+        $models[] = ['id' => $m['id'], 'label' => $m['label']];
+    }
+    $_cf_providers_js[] = [
+        'id'            => $pid,
+        'label'         => $pdata['label'],
+        'opensource'    => $pdata['opensource'],
+        'default_model' => $pdata['default_model'],
+        'models'        => $models,
+    ];
+}
+
 $page_title  = 'Generate Code with AI – CodeFoundry';
 $active_page = 'ide';
 $page_styles = <<<'PAGECSS'
@@ -71,6 +92,38 @@ $page_styles = <<<'PAGECSS'
 .gen-lang-select:focus {
   outline: none;
   border-color: var(--primary);
+}
+
+/* ── AI model select ────────────────────────────────────── */
+.gen-model-select {
+  background: var(--navy-2);
+  color: var(--text);
+  border: 1px solid var(--border-color);
+  border-radius: var(--button-radius);
+  padding: 9px 32px 9px 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  max-width: 360px;
+  transition: border-color .2s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2392a3bb' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+.gen-model-select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.gen-model-hint {
+  font-size: 12px;
+  color: var(--text-subtle);
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .gen-prompt {
@@ -334,6 +387,18 @@ require_once dirname(__DIR__) . '/includes/header.php';
       </select>
     </div>
 
+    <!-- AI Model -->
+    <div class="gen-row" id="genModelRow">
+      <label class="gen-label" for="genModelSelect">AI Model</label>
+      <select id="genModelSelect" class="gen-model-select" aria-label="AI model">
+        <option value="">No AI providers configured</option>
+      </select>
+      <span class="gen-model-hint">
+        <iconify-icon icon="lucide:info" style="font-size:12px"></iconify-icon>
+        ✦ = open-source / free tier
+      </span>
+    </div>
+
     <!-- Prompt -->
     <div class="gen-row">
       <label class="gen-label" for="genPrompt">Describe the code you want</label>
@@ -512,6 +577,51 @@ $page_scripts = <<<'PAGEJS'
 (function () {
   'use strict';
 
+  /* ── Available AI providers ───────────────────────────── */
+PAGEJS;
+$page_scripts .= 'const CF_PROVIDERS = ' . json_encode($_cf_providers_js, JSON_UNESCAPED_UNICODE) . ";\n";
+$page_scripts .= <<<'PAGEJS'
+
+  /* ── Populate AI model selector ──────────────────────── */
+  (function () {
+    const sel = document.getElementById('genModelSelect');
+    if (!sel || !CF_PROVIDERS.length) {
+      const row = document.getElementById('genModelRow');
+      if (row) row.style.display = 'none';
+      return;
+    }
+    sel.innerHTML = '';
+    CF_PROVIDERS.forEach(function (p) {
+      const group = document.createElement('optgroup');
+      group.label = p.label + (p.opensource ? ' ✦' : '');
+      p.models.forEach(function (m) {
+        const opt = document.createElement('option');
+        opt.value       = p.id + ':' + m.id;
+        opt.textContent = m.label;
+        group.appendChild(opt);
+      });
+      sel.appendChild(group);
+    });
+    const saved = localStorage.getItem('cf_ai_model');
+    if (saved) {
+      const exists = Array.from(sel.options).some(function (o) { return o.value === saved; });
+      if (exists) sel.value = saved;
+    }
+    sel.addEventListener('change', function () {
+      localStorage.setItem('cf_ai_model', sel.value);
+    });
+  })();
+
+  function getAiSelection() {
+    const sel = document.getElementById('genModelSelect');
+    const val = sel ? sel.value : '';
+    if (!val) return {};
+    const sep = val.indexOf(':');
+    return sep > 0
+      ? { provider: val.slice(0, sep), model: val.slice(sep + 1) }
+      : {};
+  }
+
   const langSelect  = document.getElementById('genLangSelect');
   const promptTA    = document.getElementById('genPrompt');
   const submitBtn   = document.getElementById('genSubmitBtn');
@@ -548,11 +658,11 @@ $page_scripts = <<<'PAGEJS'
       const res  = await fetch('/IDE/codegen.php', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({
+        body:    JSON.stringify(Object.assign({
           action:   'generate',
           prompt:   prompt,
           language: langSelect.value,
-        }),
+        }, getAiSelection())),
       });
       const data = await res.json();
 
