@@ -181,7 +181,7 @@ require_once CF_ROOT . '/includes/header.php';
       <div class="billing-toggle">
         <button class="billing-btn <?= $billing === 'monthly' ? 'active' : '' ?>" data-cycle="monthly">Monthly</button>
         <button class="billing-btn <?= $billing === 'annual'  ? 'active' : '' ?>" data-cycle="annual">
-          Annual <span style="color:var(--primary);font-size:11px">(save <?= round((1 - $priceAnnual / $priceMonthly) * 100) ?>%)</span>
+          Annual <?php if ($priceMonthly > 0): ?><span style="color:var(--primary);font-size:11px">(save <?= round((1 - $priceAnnual / $priceMonthly) * 100) ?>%)</span><?php endif; ?>
         </button>
       </div>
 
@@ -404,14 +404,14 @@ async function initPaymentRequest(clientSecret) {
   if (canMake) {
     prBtn.mount('#payment-request-button');
     pr.on('paymentmethod', async (e) => {
-      const {error: confirmError} = await stripe.confirmCardPayment(clientSecret, {
+      const {paymentIntent, error: confirmError} = await stripe.confirmCardPayment(clientSecret, {
         payment_method: e.paymentMethod.id,
       }, {handleActions: false});
       if (confirmError) {
         e.complete('fail');
       } else {
         e.complete('success');
-        window.location.href = CF_RETURN_URL + '&payment_intent=' + encodeURIComponent(e.paymentMethod.id);
+        window.location.href = CF_RETURN_URL + '&payment_intent=' + encodeURIComponent(paymentIntent.id);
       }
     });
   } else {

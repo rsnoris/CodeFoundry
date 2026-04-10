@@ -47,6 +47,9 @@ if ($method !== 'paypal') {
                 $pi = json_decode($resp, true);
                 if (($pi['status'] ?? '') === 'succeeded') {
                     $amountPaid = ((float)($pi['amount'] ?? 0)) / 100;
+                    if ($amountPaid <= 0) {
+                        $amountPaid = (float) ($plans[$plan]['price'] ?? 0);
+                    }
                     $username   = $pi['metadata']['username'] ?? $user['username'];
                     $planKey    = $pi['metadata']['plan']     ?? $plan;
                     $billingKey = $pi['metadata']['billing']  ?? $billing;
