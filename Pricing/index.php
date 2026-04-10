@@ -251,10 +251,10 @@ require_once CF_ROOT . '/includes/header.php';
       <div class="plan-tagline">Perfect for individual developers exploring AI assistance.</div>
       <div class="plan-price">
         <span class="currency">$</span>
-        <span class="amount">9</span>
+        <span class="amount">12</span>
         <span class="period">/ mo</span>
       </div>
-      <div class="plan-billing-note">Billed monthly · cancel anytime</div>
+      <div class="plan-billing-note">$12/mo billed annually · $15/mo month-to-month</div>
       <ul class="plan-features">
         <li><iconify-icon icon="lucide:check" class="check"></iconify-icon> Everything in Free</li>
         <li><iconify-icon icon="lucide:check" class="check"></iconify-icon> 50 AI generations / month</li>
@@ -274,10 +274,10 @@ require_once CF_ROOT . '/includes/header.php';
       <div class="plan-tagline">Full AI power for serious developers.</div>
       <div class="plan-price">
         <span class="currency">$</span>
-        <span class="amount">29</span>
+        <span class="amount">25</span>
         <span class="period">/ mo</span>
       </div>
-      <div class="plan-billing-note">Billed monthly · cancel anytime</div>
+      <div class="plan-billing-note">$25/mo billed annually · $29.99/mo month-to-month</div>
       <ul class="plan-features">
         <li><iconify-icon icon="lucide:check" class="check"></iconify-icon> Everything in Starter</li>
         <li><iconify-icon icon="lucide:check" class="check"></iconify-icon> 500 AI operations / month</li>
@@ -294,12 +294,10 @@ require_once CF_ROOT . '/includes/header.php';
       <div class="plan-icon">👥</div>
       <div class="plan-name">Team</div>
       <div class="plan-tagline">Collaborate with your whole engineering team.</div>
-      <div class="plan-price">
-        <span class="currency">$</span>
-        <span class="amount">79</span>
-        <span class="period">/ mo</span>
+      <div class="plan-price contact-price">
+        <span class="amount">Contact us</span>
       </div>
-      <div class="plan-billing-note">Up to 10 seats · billed monthly</div>
+      <div class="plan-billing-note">Custom billing &amp; team pricing</div>
       <ul class="plan-features">
         <li><iconify-icon icon="lucide:check" class="check"></iconify-icon> Everything in Pro</li>
         <li><iconify-icon icon="lucide:check" class="check"></iconify-icon> 2,000 AI operations / month</li>
@@ -308,7 +306,7 @@ require_once CF_ROOT . '/includes/header.php';
         <li><iconify-icon icon="lucide:check" class="check"></iconify-icon> Priority email support</li>
         <li class="muted"><iconify-icon icon="lucide:x" class="check"></iconify-icon> Custom integrations</li>
       </ul>
-      <a href="/Contact/" class="plan-cta">Get Team</a>
+      <a href="/Contact/" class="plan-cta">Contact Sales</a>
     </div>
 
     <!-- ── Enterprise ── -->
