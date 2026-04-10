@@ -212,6 +212,12 @@ PAGECSS;
 
 require_once dirname(__DIR__) . '/config.php';
 require_once CF_ROOT . '/includes/header.php';
+
+// Determine CTA URLs based on login state (session started by header.php above)
+$_cf_is_logged_in = !empty($_SESSION['cf_user']);
+$_cf_free_url     = $_cf_is_logged_in ? '/Dashboard/'                                     : '/Login/';
+$_cf_starter_url  = $_cf_is_logged_in ? '/Checkout/?plan=starter'                         : '/Login/?redirect=' . urlencode('/Checkout/?plan=starter');
+$_cf_pro_url      = $_cf_is_logged_in ? '/Checkout/?plan=pro'                             : '/Login/?redirect=' . urlencode('/Checkout/?plan=pro');
 ?>
 
 <main>
@@ -241,7 +247,7 @@ require_once CF_ROOT . '/includes/header.php';
         <li class="muted"><iconify-icon icon="lucide:x" class="check"></iconify-icon> AI improve / fix / explain</li>
         <li class="muted"><iconify-icon icon="lucide:x" class="check"></iconify-icon> Priority support</li>
       </ul>
-      <a href="/Contact/" class="plan-cta">Get Started Free</a>
+      <a href="<?= cf_e($_cf_free_url) ?>" class="plan-cta">Get Started Free</a>
     </div>
 
     <!-- ── Starter ── -->
@@ -263,7 +269,7 @@ require_once CF_ROOT . '/includes/header.php';
         <li class="muted"><iconify-icon icon="lucide:x" class="check"></iconify-icon> AI code improve</li>
         <li class="muted"><iconify-icon icon="lucide:x" class="check"></iconify-icon> Priority support</li>
       </ul>
-      <a href="/Contact/" class="plan-cta">Get Starter</a>
+      <a href="<?= cf_e($_cf_starter_url) ?>" class="plan-cta">Get Starter</a>
     </div>
 
     <!-- ── Pro (featured) ── -->
@@ -286,7 +292,7 @@ require_once CF_ROOT . '/includes/header.php';
         <li><iconify-icon icon="lucide:check" class="check"></iconify-icon> Email support</li>
         <li class="muted"><iconify-icon icon="lucide:x" class="check"></iconify-icon> Team collaboration</li>
       </ul>
-      <a href="/Contact/" class="plan-cta primary">Get Pro</a>
+      <a href="<?= cf_e($_cf_pro_url) ?>" class="plan-cta primary">Get Pro</a>
     </div>
 
     <!-- ── Team ── -->

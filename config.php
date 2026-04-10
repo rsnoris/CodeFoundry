@@ -59,10 +59,10 @@ define('CF_USERS', [
 // ---------------------------------------------------------------------------
 
 define('CF_PLANS', [
-    'free'       => ['label' => 'Free',       'tokens_limit' => 1000,   'price' => 0,   'price_label' => 'Free'],
-    'starter'    => ['label' => 'Starter',    'tokens_limit' => 10000,  'price' => 19,  'price_label' => '$19/mo'],
-    'pro'        => ['label' => 'Pro',        'tokens_limit' => 50000,  'price' => 49,  'price_label' => '$49/mo'],
-    'enterprise' => ['label' => 'Enterprise', 'tokens_limit' => 500000, 'price' => 199, 'price_label' => '$199/mo'],
+    'free'       => ['label' => 'Free',       'tokens_limit' => 1000,   'price' => 0,     'price_annual' => 0,   'price_label' => 'Free'],
+    'starter'    => ['label' => 'Starter',    'tokens_limit' => 10000,  'price' => 15,    'price_annual' => 12,  'price_label' => '$15/mo'],
+    'pro'        => ['label' => 'Pro',        'tokens_limit' => 50000,  'price' => 29.99, 'price_annual' => 25,  'price_label' => '$29.99/mo'],
+    'enterprise' => ['label' => 'Enterprise', 'tokens_limit' => 500000, 'price' => 0,     'price_annual' => 0,   'price_label' => 'Contact us'],
 ]);
 
 // ---------------------------------------------------------------------------
@@ -201,6 +201,32 @@ define('CF_CODEGEN_PROVIDERS', [
     ],
 
 ]);
+
+// ---------------------------------------------------------------------------
+// Stripe
+// ---------------------------------------------------------------------------
+
+/**
+ * Stripe API keys.
+ * Register at: https://dashboard.stripe.com/apikeys
+ * Set STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY as environment variables.
+ */
+define('CF_STRIPE_PUBLISHABLE_KEY', getenv('STRIPE_PUBLISHABLE_KEY') ?: '');
+define('CF_STRIPE_SECRET_KEY',      getenv('STRIPE_SECRET_KEY')      ?: '');
+
+// ---------------------------------------------------------------------------
+// PayPal
+// ---------------------------------------------------------------------------
+
+/**
+ * PayPal REST API credentials.
+ * Register at: https://developer.paypal.com/dashboard/
+ * Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET as environment variables.
+ * Set PAYPAL_MODE to 'live' in production (default: 'sandbox').
+ */
+define('CF_PAYPAL_CLIENT_ID',     getenv('PAYPAL_CLIENT_ID')     ?: '');
+define('CF_PAYPAL_CLIENT_SECRET', getenv('PAYPAL_CLIENT_SECRET') ?: '');
+define('CF_PAYPAL_MODE',          getenv('PAYPAL_MODE')          ?: 'sandbox');
 
 // ---------------------------------------------------------------------------
 // OAuth / Social Login

@@ -324,6 +324,41 @@ class UserStore
         return array_values($filtered);
     }
 
+    /**
+     * Append a payment record to data/payments.json and update the user's plan.
+     *
+     * @param string $username
+     * @param string $plan        Plan key (e.g. 'starter', 'pro')
+     * @param float  $amount      Amount charged in dollars
+     * @param string $method      Payment method ('stripe', 'paypal')
+     * @param string $txnId       Provider transaction / order ID
+     * @param string $description Human-readable description
+     */
+    public static function savePayment(
+        string $username,
+        string $plan,
+        float  $amount,
+        string $method,
+        string $txnId,
+        string $description
+    ): void {
+        $all   = self::readJson(CF_DATA_PAYMENTS);
+        $all[] = [
+            'username'    => $username,
+            'plan'        => $plan,
+            'amount'      => $amount,
+            'method'      => $method,
+            'txn_id'      => $txnId,
+            'description' => $description,
+            'status'      => 'paid',
+            'created_at'  => date('c'),
+        ];
+        self::writeJson(CF_DATA_PAYMENTS, $all);
+
+        // Upgrade the user's plan
+        self::updateUser($username, ['plan' => $plan]);
+    }
+
     // ── Internal helpers ───────────────────────────────────────────────────
 
     private static function readJson(string $path): array
