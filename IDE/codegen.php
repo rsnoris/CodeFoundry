@@ -9,6 +9,8 @@
  *   language    : string  (required)
  *   currentCode : string  (required for improve/explain/fix)
  *   errorOutput : string  (optional, used for fix to include stderr context)
+ *   provider    : string  (optional, provider id from CF_CODEGEN_PROVIDERS; defaults to first available)
+ *   model       : string  (optional, model id within the chosen provider; defaults to provider default)
  *
  * Response:
  *   { "code": "..." }        for generate / improve / fix
@@ -19,6 +21,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/config.php';
+require_once dirname(__DIR__) . '/lib/CodeGenProvider.php';
 
 header('Content-Type: application/json');
 header('X-Content-Type-Options: nosniff');
@@ -39,7 +42,10 @@ $prompt      = isset($body['prompt'])      ? trim((string)$body['prompt'])      
 $language    = isset($body['language'])    ? trim((string)$body['language'])    : '';
 $currentCode = isset($body['currentCode']) ? trim((string)$body['currentCode']) : '';
 $errorOutput = isset($body['errorOutput']) ? trim((string)$body['errorOutput']) : '';
+$providerId  = isset($body['provider'])    ? trim((string)$body['provider'])    : '';
+$model       = isset($body['model'])       ? trim((string)$body['model'])       : '';
 
+// ── Validate action ───────────────────────────────────────────────────────
 $validActions = ['generate', 'improve', 'explain', 'fix'];
 if (!in_array($action, $validActions, true)) {
     http_response_code(400);
@@ -53,14 +59,12 @@ if ($language === '') {
     exit;
 }
 
-// generate/improve require a prompt; explain/fix do not
 if (in_array($action, ['generate', 'improve'], true) && $prompt === '') {
     http_response_code(400);
     echo json_encode(['error' => '"prompt" is required for generate and improve actions.']);
     exit;
 }
 
-// improve/explain/fix require existing code
 if (in_array($action, ['improve', 'explain', 'fix'], true) && $currentCode === '') {
     http_response_code(400);
     echo json_encode(['error' => '"currentCode" is required for improve, explain, and fix actions.']);
@@ -70,20 +74,44 @@ if (in_array($action, ['improve', 'explain', 'fix'], true) && $currentCode === '
 // ── Sanitise language label (used in system prompt only) ─────────────────
 $langLabel = preg_replace('/[^a-zA-Z0-9 \+\#\-]/', '', $language);
 
-// ── API key guard ─────────────────────────────────────────────────────────
-$apiKey = CF_OPENAI_KEY;
-if ($apiKey === '') {
+// ── Resolve provider ──────────────────────────────────────────────────────
+if ($providerId === '') {
+    $providerId = CodeGenProvider::defaultProviderId();
+}
+
+if ($providerId === '') {
     http_response_code(503);
     echo json_encode([
-        'error'      => 'AI features require an active subscription.',
+        'error'      => 'No AI providers are configured. Please add an API key (e.g. GROQ_API_KEY) or start Ollama locally.',
         'error_code' => 'subscription_required',
     ]);
     exit;
 }
 
+if (!CodeGenProvider::isProviderAvailable($providerId)) {
+    http_response_code(503);
+    echo json_encode([
+        'error'      => 'The selected AI provider is not configured. Please choose a different provider or add the required API key.',
+        'error_code' => 'provider_unavailable',
+    ]);
+    exit;
+}
+
+// ── Resolve model ─────────────────────────────────────────────────────────
+if ($model === '') {
+    $providerCfg = CF_CODEGEN_PROVIDERS[$providerId] ?? [];
+    $model = $providerCfg['default_model'] ?? ($providerCfg['models'][0]['id'] ?? '');
+}
+
+if (!CodeGenProvider::isValidModel($providerId, $model)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Invalid model for the selected provider.']);
+    exit;
+}
+
 // ── Simple per-IP rate limit (APCu, best-effort) ─────────────────────────
 if (function_exists('apcu_fetch')) {
-    $ip      = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $ip       = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
     $cacheKey = 'cf_codegen_' . md5($ip);
     if (apcu_fetch($cacheKey) !== false) {
         http_response_code(429);
@@ -97,9 +125,7 @@ if (function_exists('apcu_fetch')) {
 const MAX_TOKENS_EXPLAIN = 1024;
 const MAX_TOKENS_CODE    = 2048;
 
-// ── Call OpenAI Chat Completions ──────────────────────────────────────────
-
-// Build messages based on action
+// ── Build messages ────────────────────────────────────────────────────────
 $messages = [];
 
 if ($action === 'generate') {
@@ -153,54 +179,23 @@ if ($action === 'generate') {
 
 $maxTokens = ($action === 'explain') ? MAX_TOKENS_EXPLAIN : MAX_TOKENS_CODE;
 
-$payload = json_encode([
-    'model'       => 'gpt-4o-mini',
-    'max_tokens'  => $maxTokens,
-    'temperature' => 0.2,
-    'messages'    => $messages,
-]);
-
-$ctx = stream_context_create([
-    'http' => [
-        'method'        => 'POST',
-        'header'        => implode("\r\n", [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $apiKey,
-        ]),
-        'content'       => $payload,
-        'timeout'       => 30,
-        'ignore_errors' => true,
-    ],
-]);
-
-$response = @file_get_contents('https://api.openai.com/v1/chat/completions', false, $ctx);
-
-if ($response === false) {
+// ── Call the provider ─────────────────────────────────────────────────────
+try {
+    $result  = CodeGenProvider::call($providerId, $model, $messages, $maxTokens);
+    $content = $result['content'];
+    $tokens  = $result['tokens'];
+} catch (\InvalidArgumentException $e) {
+    http_response_code(400);
+    echo json_encode(['error' => $e->getMessage()]);
+    exit;
+} catch (\RuntimeException $e) {
     http_response_code(502);
-    echo json_encode(['error' => 'Failed to reach the OpenAI API. Please try again.']);
+    echo json_encode(['error' => $e->getMessage()]);
     exit;
 }
-
-$result = json_decode($response, true);
-
-// Check for OpenAI-level errors
-if (isset($result['error'])) {
-    http_response_code(502);
-    echo json_encode(['error' => $result['error']['message'] ?? 'OpenAI API error.']);
-    exit;
-}
-
-if (empty($result['choices']) || !isset($result['choices'][0]['message']['content'])) {
-    http_response_code(502);
-    echo json_encode(['error' => 'Unexpected response from OpenAI API.']);
-    exit;
-}
-
-$content = $result['choices'][0]['message']['content'];
 
 // ── Record token usage ────────────────────────────────────────────────────
-$tokensUsed = (int)($result['usage']['total_tokens'] ?? 0);
-if ($tokensUsed > 0) {
+if ($tokens > 0) {
     if (session_status() === PHP_SESSION_NONE) { session_start(); }
     $sessionUser = $_SESSION['cf_user'] ?? null;
     if ($sessionUser !== null) {
@@ -210,16 +205,18 @@ if ($tokensUsed > 0) {
             'username'       => $sessionUser['username'],
             'action'         => $action,
             'language'       => $langLabel,
+            'provider'       => $providerId,
+            'model'          => $model,
             'prompt_snippet' => $promptSnippet,
-            'tokens_used'    => $tokensUsed,
+            'tokens_used'    => $tokens,
             'created_at'     => date('c'),
         ]);
-        UserStore::addTokensUsed($sessionUser['username'], $tokensUsed);
+        UserStore::addTokensUsed($sessionUser['username'], $tokens);
     }
 }
 
+// ── Return result ─────────────────────────────────────────────────────────
 if ($action === 'explain') {
-    // Return the explanation as plain text
     http_response_code(200);
     echo json_encode(['explanation' => trim($content)]);
 } else {
@@ -231,3 +228,4 @@ if ($action === 'explain') {
     http_response_code(200);
     echo json_encode(['code' => $code]);
 }
+

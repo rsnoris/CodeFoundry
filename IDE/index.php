@@ -1,4 +1,26 @@
 <?php
+declare(strict_types=1);
+require_once dirname(__DIR__) . '/config.php';
+require_once dirname(__DIR__) . '/lib/CodeGenProvider.php';
+
+// Build a minimal provider/model list for the client-side selector.
+// Only include providers that are "available" (have an API key or are local).
+$_cf_providers_js = [];
+foreach (CodeGenProvider::all() as $pid => $pdata) {
+    if (!$pdata['available']) continue;
+    $models = [];
+    foreach ($pdata['models'] as $m) {
+        $models[] = ['id' => $m['id'], 'label' => $m['label']];
+    }
+    $_cf_providers_js[] = [
+        'id'            => $pid,
+        'label'         => $pdata['label'],
+        'opensource'    => $pdata['opensource'],
+        'default_model' => $pdata['default_model'],
+        'models'        => $models,
+    ];
+}
+
 $page_title  = 'CodeFoundry IDE – Online Code Editor';
 $active_page = 'ide';
 $page_styles = <<<'PAGECSS'
@@ -515,6 +537,40 @@ kbd {
   accent-color: var(--primary);
   cursor: pointer;
 }
+
+/* ── AI model selector ─────────────────────────────────────────── */
+.ai-model-select-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-subtle);
+}
+
+.ai-model-select {
+  background: var(--navy-3);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  border-radius: var(--button-radius);
+  padding: 5px 28px 5px 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  max-width: 220px;
+  transition: border-color .2s, color .2s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2392a3bb'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+}
+
+.ai-model-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  color: var(--text);
+}
 PAGECSS;
 
 require_once dirname(__DIR__) . '/includes/header.php';
@@ -590,6 +646,14 @@ require_once dirname(__DIR__) . '/includes/header.php';
       <iconify-icon icon="lucide:book-open" aria-hidden="true"></iconify-icon>
       Explain
     </button>
+
+    <!-- AI model selector -->
+    <div class="ai-model-select-wrapper" title="AI model for Generate/Improve/Explain/Fix">
+      <iconify-icon icon="lucide:cpu" aria-hidden="true"></iconify-icon>
+      <select id="aiModelSelect" class="ai-model-select" aria-label="AI model">
+        <option value="">Loading…</option>
+      </select>
+    </div>
 
     <div class="toolbar-sep" aria-hidden="true"></div>
 
@@ -743,6 +807,9 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
 'use strict';
 
+/* ── Available AI providers (injected from PHP) ─────────── */
+const CF_PROVIDERS = <?= json_encode($_cf_providers_js, JSON_UNESCAPED_UNICODE) ?>;
+
 /* ── Language registry ──────────────────────────────────── */
 const LANGUAGES = {
   python: {
@@ -860,6 +927,51 @@ const LANGUAGES = {
 let editor     = null;
 let currentLang = 'python';
 let isRunning   = false;
+
+/* ── AI model selector ──────────────────────────────────── */
+(function () {
+  const sel = document.getElementById('aiModelSelect');
+  if (!sel || !CF_PROVIDERS.length) {
+    if (sel) { sel.closest('.ai-model-select-wrapper').style.display = 'none'; }
+    return;
+  }
+
+  sel.innerHTML = '';
+  CF_PROVIDERS.forEach(function (p) {
+    const group = document.createElement('optgroup');
+    group.label = p.label + (p.opensource ? ' ✦' : '');
+    p.models.forEach(function (m) {
+      const opt = document.createElement('option');
+      opt.value       = p.id + ':' + m.id;
+      opt.textContent = m.label;
+      group.appendChild(opt);
+    });
+    sel.appendChild(group);
+  });
+
+  // Restore from localStorage
+  const saved = localStorage.getItem('cf_ai_model');
+  if (saved) {
+    // Verify the saved value is still valid (provider may have been removed)
+    const exists = Array.from(sel.options).some(o => o.value === saved);
+    if (exists) sel.value = saved;
+  }
+
+  sel.addEventListener('change', function () {
+    localStorage.setItem('cf_ai_model', sel.value);
+  });
+})();
+
+/** Return {provider, model} from the toolbar selector. */
+function getAiSelection() {
+  const sel = document.getElementById('aiModelSelect');
+  const val = sel ? sel.value : '';
+  if (!val) return {};
+  const sep = val.indexOf(':');
+  return sep > 0
+    ? { provider: val.slice(0, sep), model: val.slice(sep + 1) }
+    : {};
+}
 
 /* ── Init Monaco ────────────────────────────────────────── */
 require.config({
@@ -1266,6 +1378,7 @@ function setRunning(on) {
         action:   currentMode,
         prompt:   text,
         language: currentLang,
+        ...getAiSelection(),
       };
       if (currentMode === 'improve') {
         body.currentCode = code;
@@ -1344,6 +1457,7 @@ function setRunning(on) {
         action:      'explain',
         language:    currentLang,
         currentCode: code,
+        ...getAiSelection(),
       };
       const res  = await fetch('/IDE/codegen.php', {
         method:  'POST',
@@ -1397,6 +1511,7 @@ function setRunning(on) {
         action:      'fix',
         language:    currentLang,
         currentCode: code,
+        ...getAiSelection(),
       };
       if (errorText !== '' && !outputPanel.classList.contains('empty')) {
         body.errorOutput = errorText;
