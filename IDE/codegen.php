@@ -3,8 +3,17 @@
  * CodeFoundry IDE – CodeGen endpoint
  *
  * POST /IDE/codegen.php
- * Body (JSON): { "prompt": "...", "language": "python" }
- * Response:    { "code": "..." }  or  { "error": "..." }
+ * Body (JSON):
+ *   action      : "generate" | "improve" | "explain" | "fix"  (default: "generate")
+ *   prompt      : string  (required for generate/improve)
+ *   language    : string  (required)
+ *   currentCode : string  (required for improve/explain/fix)
+ *   errorOutput : string  (optional, used for fix to include stderr context)
+ *
+ * Response:
+ *   { "code": "..." }        for generate / improve / fix
+ *   { "explanation": "..." } for explain
+ *   { "error": "..." }       on failure
  */
 
 declare(strict_types=1);
@@ -25,12 +34,36 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $raw  = file_get_contents('php://input');
 $body = json_decode($raw ?: '', true);
 
-$prompt   = isset($body['prompt'])   ? trim((string)$body['prompt'])   : '';
-$language = isset($body['language']) ? trim((string)$body['language']) : '';
+$action      = isset($body['action'])      ? trim((string)$body['action'])      : 'generate';
+$prompt      = isset($body['prompt'])      ? trim((string)$body['prompt'])      : '';
+$language    = isset($body['language'])    ? trim((string)$body['language'])    : '';
+$currentCode = isset($body['currentCode']) ? trim((string)$body['currentCode']) : '';
+$errorOutput = isset($body['errorOutput']) ? trim((string)$body['errorOutput']) : '';
 
-if ($prompt === '' || $language === '') {
+$validActions = ['generate', 'improve', 'explain', 'fix'];
+if (!in_array($action, $validActions, true)) {
     http_response_code(400);
-    echo json_encode(['error' => 'Both "prompt" and "language" are required.']);
+    echo json_encode(['error' => 'Invalid action.']);
+    exit;
+}
+
+if ($language === '') {
+    http_response_code(400);
+    echo json_encode(['error' => '"language" is required.']);
+    exit;
+}
+
+// generate/improve require a prompt; explain/fix do not
+if (in_array($action, ['generate', 'improve'], true) && $prompt === '') {
+    http_response_code(400);
+    echo json_encode(['error' => '"prompt" is required for generate and improve actions.']);
+    exit;
+}
+
+// improve/explain/fix require existing code
+if (in_array($action, ['improve', 'explain', 'fix'], true) && $currentCode === '') {
+    http_response_code(400);
+    echo json_encode(['error' => '"currentCode" is required for improve, explain, and fix actions.']);
     exit;
 }
 
@@ -57,12 +90,17 @@ if (function_exists('apcu_fetch')) {
     apcu_store($cacheKey, 1, 3); // 3-second window
 }
 
+// ── Token limits ──────────────────────────────────────────────────────────
+const MAX_TOKENS_EXPLAIN = 1024;
+const MAX_TOKENS_CODE    = 2048;
+
 // ── Call OpenAI Chat Completions ──────────────────────────────────────────
-$payload = json_encode([
-    'model'      => 'gpt-4o-mini',
-    'max_tokens' => 2048,
-    'temperature'=> 0.2,
-    'messages'   => [
+
+// Build messages based on action
+$messages = [];
+
+if ($action === 'generate') {
+    $messages = [
         [
             'role'    => 'system',
             'content' => "You are an expert {$langLabel} programmer. When asked to generate code, respond with ONLY the source code and nothing else — no markdown fences, no commentary, no explanation.",
@@ -71,7 +109,52 @@ $payload = json_encode([
             'role'    => 'user',
             'content' => $prompt,
         ],
-    ],
+    ];
+} elseif ($action === 'improve') {
+    $messages = [
+        [
+            'role'    => 'system',
+            'content' => "You are an expert {$langLabel} programmer. When asked to improve or refine code, respond with ONLY the updated source code and nothing else — no markdown fences, no commentary, no explanation.",
+        ],
+        [
+            'role'    => 'user',
+            'content' => "Here is my existing {$langLabel} code:\n\n{$currentCode}\n\nPlease improve it as follows: {$prompt}",
+        ],
+    ];
+} elseif ($action === 'explain') {
+    $messages = [
+        [
+            'role'    => 'system',
+            'content' => "You are an expert {$langLabel} programmer and teacher. When asked to explain code, provide a clear, concise explanation in plain English. Use bullet points or numbered steps where helpful. Do NOT include code blocks unless illustrating a specific concept.",
+        ],
+        [
+            'role'    => 'user',
+            'content' => "Please explain the following {$langLabel} code:\n\n{$currentCode}",
+        ],
+    ];
+} elseif ($action === 'fix') {
+    $errorContext = $errorOutput !== ''
+        ? "\n\nThe following error output was produced when running the code:\n{$errorOutput}"
+        : '';
+    $messages = [
+        [
+            'role'    => 'system',
+            'content' => "You are an expert {$langLabel} programmer. When asked to fix code, respond with ONLY the corrected source code and nothing else — no markdown fences, no commentary, no explanation.",
+        ],
+        [
+            'role'    => 'user',
+            'content' => "Please fix the following {$langLabel} code:{$errorContext}\n\nCode:\n{$currentCode}",
+        ],
+    ];
+}
+
+$maxTokens = ($action === 'explain') ? MAX_TOKENS_EXPLAIN : MAX_TOKENS_CODE;
+
+$payload = json_encode([
+    'model'       => 'gpt-4o-mini',
+    'max_tokens'  => $maxTokens,
+    'temperature' => 0.2,
+    'messages'    => $messages,
 ]);
 
 $ctx = stream_context_create([
@@ -110,12 +193,18 @@ if (empty($result['choices']) || !isset($result['choices'][0]['message']['conten
     exit;
 }
 
-$code = $result['choices'][0]['message']['content'];
+$content = $result['choices'][0]['message']['content'];
 
-// Strip accidental markdown fences if the model added them anyway
-$code = preg_replace('/^```[a-zA-Z]*\n?/', '', $code);
-$code = preg_replace('/\n?```$/', '', $code);
-$code = trim($code);
+if ($action === 'explain') {
+    // Return the explanation as plain text
+    http_response_code(200);
+    echo json_encode(['explanation' => trim($content)]);
+} else {
+    // Strip accidental markdown fences if the model added them anyway
+    $code = preg_replace('/^```[a-zA-Z]*\n?/', '', $content);
+    $code = preg_replace('/\n?```$/', '', $code);
+    $code = trim($code);
 
-http_response_code(200);
-echo json_encode(['code' => $code]);
+    http_response_code(200);
+    echo json_encode(['code' => $code]);
+}
