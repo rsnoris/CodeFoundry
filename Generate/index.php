@@ -1193,7 +1193,7 @@ $page_scripts .= <<<'PAGEJS'
 })();
 PAGEJS;
 
-<?php if ($_cf_user): ?>
+if ($_cf_user):
 $page_scripts .= <<<'GHJS'
 
 /* ── Push to GitHub ────────────────────────────────────────── */
@@ -1416,7 +1416,7 @@ $page_scripts .= <<<'GHJS'
   });
 })();
 GHJS;
-<?php endif; ?>
+endif;
 
 require_once dirname(__DIR__) . '/includes/footer.php';
 ?>
