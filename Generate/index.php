@@ -711,7 +711,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
            data-lang="rust"
            data-prompt="Write a Rust program that reads a text file, counts word frequencies case-insensitively, and prints the top 10 most frequent words with their counts.">
         <div class="gen-chip-icon">🦀</div>
-        <span class="gen-chip-label">Rust Program</span>
+        <span class="gen-chip-label">Rust Script</span>
       </div>
 
       <div class="gen-chip" role="listitem" tabindex="0"
@@ -732,7 +732,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
         <?php
           $lang    = htmlspecialchars($r['language'] ?? 'code', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
           $snippet = htmlspecialchars($r['prompt_snippet'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-          $ts      = isset($r['ts']) ? date('M j, g:ia', (int)$r['ts']) : '';
+          $ts      = isset($r['ts']) ? date('M j, g:iA', (int)$r['ts']) : '';
         ?>
         <div class="gen-recent-card"
              data-lang="<?= htmlspecialchars($r['language'] ?? 'python', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>"
