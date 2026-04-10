@@ -203,6 +203,26 @@ define('CF_CODEGEN_PROVIDERS', [
 ]);
 
 // ---------------------------------------------------------------------------
+// OAuth / Social Login
+// ---------------------------------------------------------------------------
+
+/**
+ * GitHub OAuth app credentials.
+ * Register at: https://github.com/settings/developers
+ * Set the Authorization callback URL to: https://yourdomain.com/Login/oauth_callback.php
+ */
+define('CF_OAUTH_GITHUB_CLIENT_ID',     getenv('GITHUB_CLIENT_ID')     ?: '');
+define('CF_OAUTH_GITHUB_CLIENT_SECRET', getenv('GITHUB_CLIENT_SECRET') ?: '');
+
+/**
+ * Google OAuth app credentials.
+ * Register at: https://console.cloud.google.com/apis/credentials
+ * Set the Authorized redirect URI to: https://yourdomain.com/Login/oauth_callback.php
+ */
+define('CF_OAUTH_GOOGLE_CLIENT_ID',     getenv('GOOGLE_CLIENT_ID')     ?: '');
+define('CF_OAUTH_GOOGLE_CLIENT_SECRET', getenv('GOOGLE_CLIENT_SECRET') ?: '');
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 

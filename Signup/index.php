@@ -1,9 +1,9 @@
 <?php
 /**
- * CodeFoundry – Login Page
+ * CodeFoundry – Sign Up Page
  *
- * Authenticates the user against the credentials defined in config.php
- * and stores the result in a PHP session.
+ * Allows new users to create a free account.
+ * Credentials are stored in data/users.json via UserStore.
  */
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/config.php';
@@ -17,85 +17,72 @@ if (!empty($_SESSION['cf_user'])) {
     exit;
 }
 
-$error = '';
+$errors  = [];
+$success = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
-    $password = $_POST['password'] ?? '';
-
-    // Validate CSRF token
+    // CSRF check
     if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
-        $error = 'Invalid request. Please try again.';
-    } elseif ($username === '' || $password === '') {
-        $error = 'Please enter both username and password.';
+        $errors[] = 'Invalid request. Please try again.';
     } else {
-        $matched = false;
+        $username  = trim($_POST['username']  ?? '');
+        $display   = trim($_POST['display']   ?? '');
+        $email     = trim($_POST['email']     ?? '');
+        $password  = $_POST['password']       ?? '';
+        $password2 = $_POST['password2']      ?? '';
 
-        // ── 1. Check CF_USERS (hardcoded accounts) ──────────────────────────
-        $cfUsers = defined('CF_USERS') ? CF_USERS : [];
-        foreach ($cfUsers as $user) {
-            if ($user['username'] !== $username) {
-                continue;
-            }
-            // Check data/users.json for a password_hash override
-            $effectiveHash = $user['password_hash'];
-            if (defined('CF_DATA_USERS') && file_exists(CF_DATA_USERS)) {
-                $storedJson = @file_get_contents(CF_DATA_USERS);
-                if ($storedJson !== false) {
-                    $storedUsers = json_decode($storedJson, true) ?? [];
-                    foreach ($storedUsers as $row) {
-                        if (($row['username'] ?? '') === $username && !empty($row['password_hash'])) {
-                            $effectiveHash = $row['password_hash'];
-                            break;
-                        }
-                    }
-                }
-            }
-            if (password_verify($password, $effectiveHash)) {
-                $matched = true;
+        // ── Validate ─────────────────────────────────────────────────────────
+        if ($username === '') {
+            $errors[] = 'Username is required.';
+        } elseif (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $username)) {
+            $errors[] = 'Username must be 3–30 characters and contain only letters, numbers, or underscores.';
+        } elseif (UserStore::usernameExists($username)) {
+            $errors[] = 'That username is already taken.';
+        }
+
+        if ($display === '') {
+            $errors[] = 'Display name is required.';
+        } elseif (mb_strlen($display) > 60) {
+            $errors[] = 'Display name must be 60 characters or fewer.';
+        }
+
+        if ($email === '') {
+            $errors[] = 'Email address is required.';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'Please enter a valid email address.';
+        }
+
+        if (mb_strlen($password) < 8) {
+            $errors[] = 'Password must be at least 8 characters.';
+        } elseif ($password !== $password2) {
+            $errors[] = 'Passwords do not match.';
+        }
+
+        // ── Create account ────────────────────────────────────────────────────
+        if (empty($errors)) {
+            $hash    = password_hash($password, PASSWORD_BCRYPT);
+            $created = UserStore::createUser($username, $display, $email, $hash);
+            if (!$created) {
+                // Race condition: username taken between validation and write
+                $errors[] = 'That username is already taken.';
+            } else {
+                // Auto-login the new user
+                session_regenerate_id(true);
                 $_SESSION['cf_user'] = [
-                    'username' => $user['username'],
-                    'display'  => $user['display'] ?? $user['username'],
-                    'role'     => $user['role']    ?? 'user',
+                    'username' => $username,
+                    'display'  => $display,
+                    'role'     => 'user',
                 ];
-            }
-            break; // username matched – stop regardless of password result
-        }
-
-        // ── 2. Fall back to self-registered users in data/users.json ────────
-        if (!$matched) {
-            $selfUser = UserStore::findUser($username);
-            if (
-                $selfUser !== null &&
-                !empty($selfUser['self_registered']) &&
-                !empty($selfUser['password_hash']) &&
-                password_verify($password, $selfUser['password_hash'])
-            ) {
-                $matched = true;
-                $_SESSION['cf_user'] = [
-                    'username' => $selfUser['username'],
-                    'display'  => $selfUser['display'] ?? $selfUser['username'],
-                    'role'     => $selfUser['role']    ?? 'user',
-                ];
+                $raw_redirect = $_GET['redirect'] ?? '';
+                $safe_redirect = (
+                    is_string($raw_redirect) &&
+                    preg_match('#^/[^/\\\\]#', $raw_redirect) &&
+                    strpos($raw_redirect, '..') === false
+                ) ? $raw_redirect : '/Dashboard/';
+                header('Location: ' . $safe_redirect);
+                exit;
             }
         }
-
-        if ($matched) {
-            session_regenerate_id(true);
-            $raw_redirect = $_GET['redirect'] ?? '';
-            // Only allow relative paths: single leading slash, no double-slash, no path traversal
-            $safe_redirect = (
-                is_string($raw_redirect) &&
-                preg_match('#^/[^/\\\\]#', $raw_redirect) &&
-                strpos($raw_redirect, '..') === false
-            ) ? $raw_redirect : '/';
-            header('Location: ' . $safe_redirect);
-            exit;
-        }
-
-        // Short delay to slow brute-force attempts
-        sleep(1);
-        $error = 'Invalid username or password.';
     }
 }
 
@@ -107,8 +94,8 @@ if (empty($_SESSION['csrf_token'])) {
 $githubEnabled = defined('CF_OAUTH_GITHUB_CLIENT_ID') && CF_OAUTH_GITHUB_CLIENT_ID !== '';
 $googleEnabled = defined('CF_OAUTH_GOOGLE_CLIENT_ID') && CF_OAUTH_GOOGLE_CLIENT_ID !== '';
 
-$page_title  = 'CodeFoundry - Login';
-$active_page = 'login';
+$page_title  = 'CodeFoundry - Create Account';
+$active_page = 'signup';
 $page_styles = <<<'PAGECSS'
   .login-wrap {
     min-height: calc(100vh - var(--header-height) - 200px);
@@ -160,9 +147,16 @@ $page_styles = <<<'PAGECSS'
     padding: 11px 14px;
     font-size: 14px;
     margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  }
+  .login-error ul {
+    margin: 0;
+    padding-left: 18px;
+  }
+  .login-error li {
+    margin-top: 4px;
+  }
+  .login-error li:first-child {
+    margin-top: 0;
   }
   .form-group {
     margin-bottom: 18px;
@@ -192,6 +186,11 @@ $page_styles = <<<'PAGECSS'
   }
   .form-input::placeholder {
     color: var(--text-subtle);
+  }
+  .form-hint {
+    font-size: 12px;
+    color: var(--text-subtle);
+    margin-top: 5px;
   }
   .btn-login {
     width: 100%;
@@ -281,13 +280,21 @@ require_once dirname(__DIR__) . '/includes/header.php';
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m18 16l4-4l-4-4M6 8l-4 4l4 4m8.5-12l-5 16"/></svg>
       CodeFoundry
     </div>
-    <h1 class="login-title">Welcome back</h1>
-    <p class="login-subtitle">Sign in to your CodeFoundry account</p>
+    <h1 class="login-title">Create your account</h1>
+    <p class="login-subtitle">Join CodeFoundry — it's free</p>
 
-    <?php if ($error !== ''): ?>
+    <?php if (!empty($errors)): ?>
       <div class="login-error" role="alert">
-        <iconify-icon icon="lucide:alert-circle"></iconify-icon>
-        <?= htmlspecialchars($error, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>
+        <?php if (count($errors) === 1): ?>
+          <iconify-icon icon="lucide:alert-circle"></iconify-icon>
+          <?= htmlspecialchars($errors[0], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>
+        <?php else: ?>
+          <ul>
+            <?php foreach ($errors as $e): ?>
+              <li><?= htmlspecialchars($e, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></li>
+            <?php endforeach; ?>
+          </ul>
+        <?php endif; ?>
       </div>
     <?php endif; ?>
 
@@ -301,7 +308,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
         }
       ?>" class="btn-social">
         <iconify-icon icon="mdi:github"></iconify-icon>
-        Continue with GitHub
+        Sign up with GitHub
       </a>
       <?php endif; ?>
       <?php if ($googleEnabled): ?>
@@ -312,14 +319,14 @@ require_once dirname(__DIR__) . '/includes/header.php';
         }
       ?>" class="btn-social">
         <iconify-icon icon="flat-color-icons:google"></iconify-icon>
-        Continue with Google
+        Sign up with Google
       </a>
       <?php endif; ?>
     </div>
-    <div class="login-divider">or sign in with email</div>
+    <div class="login-divider">or sign up with email</div>
     <?php endif; ?>
 
-    <form method="POST" action="/Login/<?php
+    <form method="POST" action="/Signup/<?php
       $raw_redir = $_GET['redirect'] ?? '';
       if (is_string($raw_redir) && preg_match('#^/[^/\\\\]#', $raw_redir)) {
           echo '?redirect=' . urlencode($raw_redir);
@@ -334,10 +341,41 @@ require_once dirname(__DIR__) . '/includes/header.php';
           id="username"
           name="username"
           class="form-input"
-          placeholder="Enter your username"
+          placeholder="Choose a username"
           value="<?= htmlspecialchars($_POST['username'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>"
           required
           autocomplete="username"
+          maxlength="30"
+        />
+        <p class="form-hint">3–30 characters; letters, numbers, and underscores only.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="display" class="form-label">Display Name</label>
+        <input
+          type="text"
+          id="display"
+          name="display"
+          class="form-input"
+          placeholder="Your full name or nickname"
+          value="<?= htmlspecialchars($_POST['display'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>"
+          required
+          autocomplete="name"
+          maxlength="60"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          class="form-input"
+          placeholder="you@example.com"
+          value="<?= htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>"
+          required
+          autocomplete="email"
         />
       </div>
 
@@ -348,25 +386,39 @@ require_once dirname(__DIR__) . '/includes/header.php';
           id="password"
           name="password"
           class="form-input"
-          placeholder="Enter your password"
+          placeholder="At least 8 characters"
           required
-          autocomplete="current-password"
+          autocomplete="new-password"
+          minlength="8"
         />
       </div>
 
-      <button type="submit" class="btn-login">Sign In</button>
+      <div class="form-group">
+        <label for="password2" class="form-label">Confirm Password</label>
+        <input
+          type="password"
+          id="password2"
+          name="password2"
+          class="form-input"
+          placeholder="Repeat your password"
+          required
+          autocomplete="new-password"
+          minlength="8"
+        />
+      </div>
+
+      <button type="submit" class="btn-login">Create Account</button>
     </form>
 
     <div class="login-footer">
-      Don't have an account? <a href="/Signup/<?php
+      Already have an account? <a href="/Login/<?php
         $raw_redir = $_GET['redirect'] ?? '';
         if (is_string($raw_redir) && preg_match('#^/[^/\\\\]#', $raw_redir)) {
             echo '?redirect=' . urlencode($raw_redir);
         }
-      ?>">Create one for free</a>
+      ?>">Sign in</a>
     </div>
   </div>
 </main>
 
 <?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
-
