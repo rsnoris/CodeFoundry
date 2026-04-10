@@ -2453,7 +2453,8 @@ function calcAttendance() {
   var daysShort = 0;
   if (pct < minPct) {
     /* how many more days needed to reach minimum */
-    daysShort = Math.ceil((minPct / 100 * total - present) / (1 - minPct / 100));
+    var denom = 1 - minPct / 100;
+    daysShort = denom > 0 ? Math.ceil((minPct / 100 * total - present) / denom) : Infinity;
   }
   var status = pct >= minPct ? '✓ Meets requirement' : '✗ Below requirement';
   var out = 'Days Present : ' + present + ' / ' + total +
@@ -2461,7 +2462,7 @@ function calcAttendance() {
     '\nRequired     : ' + minPct + '%' +
     '\nStatus       : ' + status;
   if (pct < minPct) {
-    out += '\nDays needed to reach ' + minPct + '%: ' + Math.max(0, daysShort);
+    out += '\nDays needed to reach ' + minPct + '%: ' + (isFinite(daysShort) ? Math.max(0, daysShort) : 'N/A (100% required)');
   }
   document.getElementById('att-out').textContent = out;
 }
@@ -2471,7 +2472,7 @@ function _countSyllables(word) {
   word = word.toLowerCase().replace(/[^a-z]/g, '');
   if (!word) return 0;
   if (word.length <= 3) return 1;
-  word = word.replace(/(?:[^laeiouy]es|[^laeiouy]ed|[aeiou]$)/g, '');
+  word = word.replace(/(?:[^laeiouy]es|[^laeiouy]ed|[aeiouy]$)/g, '');
   var count = (word.match(/[aeiouy]{1,2}/g) || []).length;
   return count || 1;
 }
@@ -2801,7 +2802,7 @@ function calcTakeHome() {
   /* convert to annual for bracket lookup */
   var annualMultiplier = { weekly: 52, biweekly: 26, semimonthly: 24, monthly: 12 }[period] || 12;
   var annualGross = gross * annualMultiplier;
-  /* 2024 US federal income tax brackets (simplified, standard deduction) */
+  /* 2025 US federal income tax brackets (simplified, standard deduction) */
   var stdDeduction = { single: 14600, married: 29200, hoh: 21900 }[status] || 14600;
   var taxable = Math.max(0, annualGross - stdDeduction);
   /* single brackets */
@@ -2813,7 +2814,7 @@ function calcTakeHome() {
     if (taxable > prev) { tax += (Math.min(taxable, b[0]) - prev) * b[1]; }
     prev = b[0];
   });
-  var fica   = gross * 0.0765; /* 6.2% SS + 1.45% Medicare */
+  var fica   = gross * 0.0765; /* 6.2% SS (up to wage base) + 1.45% Medicare — simplified estimate */
   var netPay = gross - (tax / annualMultiplier) - fica;
   document.getElementById('pay-out').textContent =
     'Gross Pay           : $' + gross.toFixed(2) +
@@ -2856,7 +2857,7 @@ function calcKwDensity() {
     count = (text.match(re) || []).length;
   }
   var density = words.length > 0 ? ((kwWords.length === 1 ? count : count * kwWords.length) / words.length) * 100 : 0;
-  var advice = density < 0.5 ? 'Too low — consider using the keyword more.' : density > 3 ? 'Too high — may appear spammy. Aim for 1–2%.' : 'Good keyword density (1–3% is ideal for SEO).';
+  var advice = density < 0.5 ? 'Too low — consider using the keyword more.' : density > 3 ? 'Too high — may appear spammy. Aim for 1–2%.' : 'Good keyword density (1–2% is the sweet spot for SEO).';
   document.getElementById('kd-out').textContent =
     'Keyword      : "' + kw + '"' +
     '\nOccurrences  : ' + count +
