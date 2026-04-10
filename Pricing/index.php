@@ -313,6 +313,9 @@ $_cf_pro_url      = $_cf_is_logged_in ? '/Checkout/?plan=pro'                   
         <li class="muted"><iconify-icon icon="lucide:x" class="check"></iconify-icon> Custom integrations</li>
       </ul>
       <a href="/Support/" class="plan-cta">Contact Sales</a>
+    </div>
+
+    <!-- ── Enterprise ── -->
     <div class="pricing-card">
       <div class="plan-icon">🏢</div>
       <div class="plan-name">Enterprise</div>

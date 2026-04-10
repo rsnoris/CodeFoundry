@@ -193,7 +193,7 @@ class UserStore
      */
     public static function updateUser(string $username, array $fields): bool
     {
-        $allowed = ['display', 'email', 'plan', 'tokens_used', 'password_hash'];
+        $allowed = ['display', 'email', 'plan', 'tokens_used', 'password_hash', 'github_token', 'github_username'];
         $clean   = [];
         foreach ($allowed as $key) {
             if (array_key_exists($key, $fields)) {

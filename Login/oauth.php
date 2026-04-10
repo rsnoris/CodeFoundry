@@ -27,7 +27,7 @@ $safe_redirect = (
     is_string($raw_redirect) &&
     preg_match('#^/[^/\\\\]#', $raw_redirect) &&
     strpos($raw_redirect, '..') === false
-) ? $raw_redirect : '/Dashboard/';
+) ? $raw_redirect : '/Generate/';
 
 // Generate and store an opaque state token (CSRF protection for OAuth)
 $state = bin2hex(random_bytes(24));
