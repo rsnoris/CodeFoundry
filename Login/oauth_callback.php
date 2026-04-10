@@ -206,7 +206,8 @@ if ($provider === 'github') {
 
     $providerId = $profile['sub']   ?? '';
     $email      = $profile['email'] ?? '';
-    $display    = $profile['name']  ?? trim(($profile['given_name'] ?? '') . ' ' . ($profile['family_name'] ?? ''));
+    $fullName   = trim(($profile['given_name'] ?? '') . ' ' . ($profile['family_name'] ?? ''));
+    $display    = $profile['name'] ?? ($fullName !== '' ? $fullName : ($email !== '' ? explode('@', $email)[0] : 'LinkedIn User'));
 
 } else {
     cf_oauth_fail('Unknown OAuth provider.');

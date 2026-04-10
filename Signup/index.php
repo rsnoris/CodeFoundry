@@ -256,6 +256,9 @@ $page_styles = <<<'PAGECSS'
   .btn-social iconify-icon {
     font-size: 18px;
   }
+  .btn-social-linkedin iconify-icon {
+    color: #0a66c2;
+  }
   .login-footer {
     margin-top: 24px;
     text-align: center;
@@ -329,8 +332,8 @@ require_once dirname(__DIR__) . '/includes/header.php';
         if (is_string($raw_redir) && preg_match('#^/[^/\\\\]#', $raw_redir)) {
             echo '&redirect=' . urlencode($raw_redir);
         }
-      ?>" class="btn-social">
-        <iconify-icon icon="mdi:linkedin" style="color:#0a66c2;"></iconify-icon>
+      ?>" class="btn-social btn-social-linkedin">
+        <iconify-icon icon="mdi:linkedin"></iconify-icon>
         Sign up with LinkedIn
       </a>
       <?php endif; ?>
