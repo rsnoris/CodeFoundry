@@ -29,7 +29,7 @@
   }
 
   function initThemePicker() {
-    // Floating FAB picker
+    // Desktop picker
     var picker   = document.getElementById('themePicker');
     var pickerBtn = document.getElementById('themePickerBtn');
     var panel    = document.getElementById('themePickerPanel');
