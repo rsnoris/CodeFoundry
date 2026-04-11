@@ -103,6 +103,20 @@ $page_styles = <<<'PAGECSS'
   overflow-y: auto;
 }
 
+/* ── CodeGen brand label ─────────────────────────────────── */
+.gen-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 14px;
+}
+.gen-brand iconify-icon { font-size: 18px; }
+
 /* ── Badge ───────────────────────────────────────────────── */
 .gen-badge {
   display: inline-flex;
@@ -698,6 +712,12 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
   <!-- ── Main ────────────────────────────────────────────── -->
   <main class="gen-main">
+
+    <!-- CodeGen branding -->
+    <div class="gen-brand">
+      <iconify-icon icon="lucide:sparkles" width="22"></iconify-icon>
+      CodeGen
+    </div>
 
     <!-- Badge -->
     <div class="gen-badge">
