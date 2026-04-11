@@ -1,80 +1,12 @@
 /**
  * CodeFoundry – Shared Site JavaScript
  *
- * Mobile navigation toggle, user menu dropdown, and theme switcher,
- * usable on every page that includes the standard header markup produced
- * by includes/header.php.
+ * Mobile navigation toggle and user menu dropdown, usable on every page that
+ * includes the standard header markup produced by includes/header.php.
  */
 
 (function () {
   'use strict';
-
-  // -------------------------------------------------------------------------
-  // Theme Manager
-  // -------------------------------------------------------------------------
-
-  var THEME_KEY     = 'cf-theme';
-  var DEFAULT_THEME = 'ocean';
-
-  /**
-   * Apply a theme by setting data-cf-theme on <html> and persisting the
-   * choice.  Also syncs the active state on all swatch buttons.
-   */
-  function applyTheme(theme) {
-    document.documentElement.setAttribute('data-cf-theme', theme);
-    try { localStorage.setItem(THEME_KEY, theme); } catch (e) { /* ignore */ }
-    document.querySelectorAll('.theme-swatch').forEach(function (btn) {
-      btn.classList.toggle('active', btn.dataset.theme === theme);
-    });
-  }
-
-  function initThemePicker() {
-    // Desktop picker
-    var picker   = document.getElementById('themePicker');
-    var pickerBtn = document.getElementById('themePickerBtn');
-    var panel    = document.getElementById('themePickerPanel');
-
-    if (picker && pickerBtn && panel) {
-      pickerBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var isOpen = picker.classList.contains('open');
-        picker.classList.toggle('open', !isOpen);
-        pickerBtn.setAttribute('aria-expanded', String(!isOpen));
-      });
-
-      document.addEventListener('click', function (e) {
-        if (!picker.contains(e.target)) {
-          picker.classList.remove('open');
-          pickerBtn.setAttribute('aria-expanded', 'false');
-        }
-      });
-
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-          picker.classList.remove('open');
-          pickerBtn.setAttribute('aria-expanded', 'false');
-        }
-      });
-    }
-
-    // Swatch buttons (both desktop and mobile share the same handler)
-    document.querySelectorAll('.theme-swatch').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        applyTheme(btn.dataset.theme);
-        // Close desktop panel
-        if (picker) {
-          picker.classList.remove('open');
-          if (pickerBtn) pickerBtn.setAttribute('aria-expanded', 'false');
-        }
-      });
-    });
-
-    // Sync active swatch with the already-applied theme (set in <head>)
-    var current = document.documentElement.getAttribute('data-cf-theme') || DEFAULT_THEME;
-    document.querySelectorAll('.theme-swatch').forEach(function (btn) {
-      btn.classList.toggle('active', btn.dataset.theme === current);
-    });
-  }
 
   /**
    * Initialise the mobile navigation overlay.
@@ -157,12 +89,10 @@
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
-      initThemePicker();
       initMobileNav();
       initUserMenu();
     });
   } else {
-    initThemePicker();
     initMobileNav();
     initUserMenu();
   }

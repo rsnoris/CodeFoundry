@@ -40,7 +40,6 @@ function cf_active(string $id): string {
   </style>
 <?php endif; ?>
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
-  <script>(function(){var t=localStorage.getItem('cf-theme');if(t)document.documentElement.setAttribute('data-cf-theme',t);})();</script>
 </head>
 <body>
 <header>
@@ -63,28 +62,6 @@ function cf_active(string $id): string {
 
     </nav>
     <div class="nav-actions">
-      <!-- Theme Picker (desktop) -->
-      <div class="theme-picker" id="themePicker" aria-label="Choose color theme">
-        <button class="theme-picker-btn" id="themePickerBtn" aria-haspopup="true" aria-expanded="false" title="Change theme">
-          <iconify-icon icon="lucide:palette" width="18"></iconify-icon>
-        </button>
-        <div class="theme-picker-panel" id="themePickerPanel" role="menu">
-          <div class="theme-picker-title">Color Theme</div>
-          <div class="theme-swatches" id="themeSwatches">
-            <button class="theme-swatch" data-theme="ocean"    title="Ocean" role="menuitem"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#0e1828,#18b3ff)"></span><span class="theme-swatch-label">Ocean</span></button>
-            <button class="theme-swatch" data-theme="midnight" title="Midnight" role="menuitem"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#12102a,#9d7aff)"></span><span class="theme-swatch-label">Midnight</span></button>
-            <button class="theme-swatch" data-theme="forest"   title="Forest" role="menuitem"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#0e1f16,#2dc653)"></span><span class="theme-swatch-label">Forest</span></button>
-            <button class="theme-swatch" data-theme="crimson"  title="Crimson" role="menuitem"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#200e10,#ff4d6d)"></span><span class="theme-swatch-label">Crimson</span></button>
-            <button class="theme-swatch" data-theme="amber"    title="Amber" role="menuitem"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#1e1600,#ffb700)"></span><span class="theme-swatch-label">Amber</span></button>
-            <button class="theme-swatch" data-theme="teal"     title="Teal" role="menuitem"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#0a1e1f,#00d4d4)"></span><span class="theme-swatch-label">Teal</span></button>
-            <button class="theme-swatch" data-theme="sunset"   title="Sunset" role="menuitem"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#1e100a,#ff6b35)"></span><span class="theme-swatch-label">Sunset</span></button>
-            <button class="theme-swatch" data-theme="arctic"   title="Arctic" role="menuitem"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#e2eaf2,#0077cc)"></span><span class="theme-swatch-label">Arctic</span></button>
-            <button class="theme-swatch" data-theme="graphite" title="Graphite" role="menuitem"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#1a1a1a,#c0c0c0)"></span><span class="theme-swatch-label">Graphite</span></button>
-            <button class="theme-swatch" data-theme="neon"     title="Neon" role="menuitem"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#000,#00ff41)"></span><span class="theme-swatch-label">Neon</span></button>
-            <button class="theme-swatch" data-theme="rose"     title="Rose" role="menuitem"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#1f1218,#f0a0b8)"></span><span class="theme-swatch-label">Rose</span></button>
-          </div>
-        </div>
-      </div>
       <?php if ($_cf_user): ?>
         <div class="nav-user-menu" id="navUserMenu">
           <button class="nav-user-btn" id="navUserBtn" aria-haspopup="true" aria-expanded="false" aria-label="User menu">
@@ -142,22 +119,6 @@ function cf_active(string $id): string {
         <a href="/Pricing/"     class="nav-link" onclick="closeMobileNav()">Pricing</a>
         <a href="/AboutUs/"     class="nav-link" onclick="closeMobileNav()">About</a>
 
-      </div>
-      <div class="mobile-theme-picker">
-        <div class="theme-picker-title">Color Theme</div>
-        <div class="mobile-theme-swatches">
-          <button class="theme-swatch" data-theme="ocean"    title="Ocean"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#0e1828,#18b3ff)"></span><span class="theme-swatch-label">Ocean</span></button>
-          <button class="theme-swatch" data-theme="midnight" title="Midnight"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#12102a,#9d7aff)"></span><span class="theme-swatch-label">Midnight</span></button>
-          <button class="theme-swatch" data-theme="forest"   title="Forest"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#0e1f16,#2dc653)"></span><span class="theme-swatch-label">Forest</span></button>
-          <button class="theme-swatch" data-theme="crimson"  title="Crimson"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#200e10,#ff4d6d)"></span><span class="theme-swatch-label">Crimson</span></button>
-          <button class="theme-swatch" data-theme="amber"    title="Amber"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#1e1600,#ffb700)"></span><span class="theme-swatch-label">Amber</span></button>
-          <button class="theme-swatch" data-theme="teal"     title="Teal"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#0a1e1f,#00d4d4)"></span><span class="theme-swatch-label">Teal</span></button>
-          <button class="theme-swatch" data-theme="sunset"   title="Sunset"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#1e100a,#ff6b35)"></span><span class="theme-swatch-label">Sunset</span></button>
-          <button class="theme-swatch" data-theme="arctic"   title="Arctic"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#e2eaf2,#0077cc)"></span><span class="theme-swatch-label">Arctic</span></button>
-          <button class="theme-swatch" data-theme="graphite" title="Graphite"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#1a1a1a,#c0c0c0)"></span><span class="theme-swatch-label">Graphite</span></button>
-          <button class="theme-swatch" data-theme="neon"     title="Neon"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#000,#00ff41)"></span><span class="theme-swatch-label">Neon</span></button>
-          <button class="theme-swatch" data-theme="rose"     title="Rose"><span class="theme-swatch-dot" style="background:linear-gradient(135deg,#1f1218,#f0a0b8)"></span><span class="theme-swatch-label">Rose</span></button>
-        </div>
       </div>
       <div class="mobile-menu-actions">
         <?php if ($_cf_user): ?>
