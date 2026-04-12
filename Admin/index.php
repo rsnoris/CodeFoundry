@@ -72,10 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $new_plan     = in_array($_POST['new_plan'] ?? '', array_keys(CF_PLANS), true) ? $_POST['new_plan'] : 'free';
             if ($new_username !== '' && $new_password !== '') {
                 $hash = password_hash($new_password, PASSWORD_DEFAULT);
-                $ok   = UserStore::createUser($new_username, $new_display ?: $new_username, $new_email, $hash, $new_role);
-                if ($ok && $new_plan !== 'free') {
-                    UserStore::updateUser($new_username, ['plan' => $new_plan]);
-                }
+                $ok   = UserStore::createUser($new_username, $new_display ?: $new_username, $new_email, $hash, $new_role, $new_plan);
                 if ($ok) {
                     AuditStore::log('admin.user_added', $admin_user['username'], ['target' => $new_username]);
                 }
@@ -539,7 +536,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
     <!-- ═══ USERS ══════════════════════════════════════════════════════════ -->
     <div class="adm-header">
       <h1><iconify-icon icon="lucide:users" style="vertical-align:middle;margin-right:8px"></iconify-icon>User Management</h1>
-      <p>All registered users – click a username for full details. <?= $frozen_users > 0 ? '<span class="badge badge-orange">' . $frozen_users . ' frozen</span>' : '' ?></p>
+      <p>All registered users – click a username for full details.<?php if ($frozen_users > 0): ?> <span class="badge badge-orange"><?= $frozen_users ?> frozen</span><?php endif; ?></p>
     </div>
 
     <!-- Add User form -->

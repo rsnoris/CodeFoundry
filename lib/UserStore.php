@@ -95,13 +95,15 @@ class UserStore
      * Returns false if the username is already taken.
      *
      * @param string $role Optional role override (default 'user'). Use 'admin' only when creating via the admin panel.
+     * @param string $plan Optional plan override (default 'free').
      */
     public static function createUser(
         string $username,
         string $display,
         string $email,
         string $passwordHash,
-        string $role = 'user'
+        string $role = 'user',
+        string $plan = 'free'
     ): bool {
         if (self::usernameExists($username)) {
             return false;
@@ -113,7 +115,7 @@ class UserStore
             'email'           => $email,
             'password_hash'   => $passwordHash,
             'role'            => $role,
-            'plan'            => 'free',
+            'plan'            => $plan,
             'tokens_used'     => 0,
             'self_registered' => true,
             'created_at'      => date('c'),
