@@ -93,12 +93,17 @@ class UserStore
     /**
      * Create a new self-registered user in data/users.json.
      * Returns false if the username is already taken.
+     *
+     * @param string $role Optional role override (default 'user'). Use 'admin' only when creating via the admin panel.
+     * @param string $plan Optional plan override (default 'free').
      */
     public static function createUser(
         string $username,
         string $display,
         string $email,
-        string $passwordHash
+        string $passwordHash,
+        string $role = 'user',
+        string $plan = 'free'
     ): bool {
         if (self::usernameExists($username)) {
             return false;
@@ -109,8 +114,8 @@ class UserStore
             'display'         => $display,
             'email'           => $email,
             'password_hash'   => $passwordHash,
-            'role'            => 'user',
-            'plan'            => 'free',
+            'role'            => $role,
+            'plan'            => $plan,
             'tokens_used'     => 0,
             'self_registered' => true,
             'created_at'      => date('c'),
@@ -189,11 +194,11 @@ class UserStore
 
     /**
      * Update mutable fields of a single user in data/users.json.
-     * Only allows: display, email, plan, tokens_used, password_hash.
+     * Only allows: display, email, plan, tokens_used, password_hash, role, frozen, failed_login_attempts.
      */
     public static function updateUser(string $username, array $fields): bool
     {
-        $allowed = ['display', 'email', 'plan', 'tokens_used', 'password_hash', 'github_token', 'github_username'];
+        $allowed = ['display', 'email', 'plan', 'tokens_used', 'password_hash', 'github_token', 'github_username', 'role', 'frozen', 'failed_login_attempts'];
         $clean   = [];
         foreach ($allowed as $key) {
             if (array_key_exists($key, $fields)) {
@@ -222,6 +227,59 @@ class UserStore
 
         self::saveUsers($users);
         return true;
+    }
+
+    /**
+     * Increment the failed-login counter for a user.
+     * Automatically freezes the account when the count reaches 3.
+     * Returns the new failed_login_attempts value.
+     */
+    public static function incrementFailedLogin(string $username): int
+    {
+        $users    = self::allUsers();
+        $newCount = 1;
+        $found    = false;
+        foreach ($users as &$row) {
+            if (($row['username'] ?? '') === $username) {
+                $newCount                    = ((int)($row['failed_login_attempts'] ?? 0)) + 1;
+                $row['failed_login_attempts'] = $newCount;
+                if ($newCount >= 3) {
+                    $row['frozen'] = true;
+                }
+                $found = true;
+                break;
+            }
+        }
+        unset($row);
+
+        if (!$found) {
+            // Create a minimal record to track attempts for CF_USERS accounts too
+            $users[] = ['username' => $username, 'failed_login_attempts' => 1];
+        }
+
+        self::saveUsers($users);
+        return $newCount;
+    }
+
+    /**
+     * Reset the failed-login counter for a user after a successful login.
+     */
+    public static function resetFailedLogin(string $username): void
+    {
+        $users = self::allUsers();
+        $found = false;
+        foreach ($users as &$row) {
+            if (($row['username'] ?? '') === $username) {
+                $row['failed_login_attempts'] = 0;
+                $found = true;
+                break;
+            }
+        }
+        unset($row);
+
+        if ($found) {
+            self::saveUsers($users);
+        }
     }
 
     /** Add $tokens to a user's running total in data/users.json. */

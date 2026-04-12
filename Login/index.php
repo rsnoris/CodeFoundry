@@ -30,6 +30,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($username === '' || $password === '') {
         $error = 'Please enter both username and password.';
     } else {
+        // Check whether the account is frozen before attempting password validation
+        $loginUserRecord = UserStore::findUser($username);
+        if ($loginUserRecord !== null && !empty($loginUserRecord['frozen'])) {
+            $error = 'Your account has been frozen. Please contact support.';
+        } else {
         $matched = false;
 
         // ── 1. Check CF_USERS (hardcoded accounts) ──────────────────────────
@@ -83,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($matched) {
             session_regenerate_id(true);
+            UserStore::resetFailedLogin($username);
             AuditStore::log('user.login', $username, ['method' => 'password']);
             $raw_redirect = $_GET['redirect'] ?? '';
             // Only allow relative paths: single leading slash, no double-slash, no path traversal
@@ -97,8 +103,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Short delay to slow brute-force attempts
         sleep(1);
+        if ($loginUserRecord !== null) {
+            UserStore::incrementFailedLogin($username);
+        }
         AuditStore::log('user.login_failed', $username, []);
         $error = 'Invalid username or password.';
+        } // end frozen-else
     }
 }
 
