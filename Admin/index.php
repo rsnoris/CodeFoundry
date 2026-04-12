@@ -50,6 +50,92 @@ if (
     exit;
 }
 
+// ── Handle user management actions ───────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    $admin_user = cf_current_user();
+    if (
+        ($admin_user['role'] ?? '') === 'admin' &&
+        !empty($_POST['csrf_token']) &&
+        $_POST['csrf_token'] === ($_SESSION['csrf_token'] ?? '')
+    ) {
+        $action = $_POST['action'];
+
+        if ($action === 'add_user') {
+            $new_username = trim($_POST['new_username'] ?? '');
+            $new_display  = trim($_POST['new_display']  ?? '');
+            $new_email    = trim($_POST['new_email']    ?? '');
+            $new_password = $_POST['new_password'] ?? '';
+            $new_role     = in_array($_POST['new_role'] ?? '', ['user', 'admin'], true) ? $_POST['new_role'] : 'user';
+            $new_plan     = in_array($_POST['new_plan'] ?? '', array_keys(CF_PLANS), true) ? $_POST['new_plan'] : 'free';
+            if ($new_username !== '' && $new_password !== '') {
+                $hash = password_hash($new_password, PASSWORD_DEFAULT);
+                $ok   = UserStore::createUser($new_username, $new_display ?: $new_username, $new_email, $hash, $new_role);
+                if ($ok && $new_plan !== 'free') {
+                    UserStore::updateUser($new_username, ['plan' => $new_plan]);
+                }
+                if ($ok) {
+                    AuditStore::log('admin.user_added', $admin_user['username'], ['target' => $new_username]);
+                }
+            }
+            header('Location: /Admin/?tab=users');
+            exit;
+        }
+
+        if ($action === 'update_user') {
+            $target = trim($_POST['target_username'] ?? '');
+            if ($target !== '') {
+                $fields = [];
+                if (isset($_POST['upd_display']))  $fields['display'] = trim($_POST['upd_display']);
+                if (isset($_POST['upd_email']))     $fields['email']   = trim($_POST['upd_email']);
+                $upd_plan = $_POST['upd_plan'] ?? '';
+                if (in_array($upd_plan, array_keys(CF_PLANS), true)) {
+                    $fields['plan'] = $upd_plan;
+                }
+                $upd_role = $_POST['upd_role'] ?? '';
+                if (in_array($upd_role, ['user', 'admin'], true)) {
+                    $fields['role'] = $upd_role;
+                }
+                if (!empty($_POST['upd_password'])) {
+                    $fields['password_hash'] = password_hash($_POST['upd_password'], PASSWORD_DEFAULT);
+                }
+                if (!empty($fields)) {
+                    UserStore::updateUser($target, $fields);
+                    AuditStore::log('admin.user_updated', $admin_user['username'], ['target' => $target, 'fields' => array_keys($fields)]);
+                }
+            }
+            header('Location: /Admin/?tab=user_detail&u=' . urlencode($target));
+            exit;
+        }
+
+        if ($action === 'freeze_user') {
+            $target = trim($_POST['target_username'] ?? '');
+            if ($target !== '') {
+                UserStore::updateUser($target, ['frozen' => true]);
+                AuditStore::log('admin.user_frozen', $admin_user['username'], ['target' => $target]);
+            }
+            $redirect_tab = trim($_POST['redirect_tab'] ?? 'users');
+            $safe_tab = in_array($redirect_tab, ['users', 'user_detail'], true) ? $redirect_tab : 'users';
+            header('Location: /Admin/?tab=' . $safe_tab . ($safe_tab === 'user_detail' ? '&u=' . urlencode($target) : ''));
+            exit;
+        }
+
+        if ($action === 'unfreeze_user') {
+            $target = trim($_POST['target_username'] ?? '');
+            if ($target !== '') {
+                UserStore::updateUser($target, ['frozen' => false, 'failed_login_attempts' => 0]);
+                AuditStore::log('admin.user_unfrozen', $admin_user['username'], ['target' => $target]);
+            }
+            $redirect_tab = trim($_POST['redirect_tab'] ?? 'users');
+            $safe_tab = in_array($redirect_tab, ['users', 'user_detail'], true) ? $redirect_tab : 'users';
+            header('Location: /Admin/?tab=' . $safe_tab . ($safe_tab === 'user_detail' ? '&u=' . urlencode($target) : ''));
+            exit;
+        }
+    }
+}
+
 // Ensure session is started for CSRF token
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -89,6 +175,7 @@ $total_events   = count($all_events);
 $total_pviews   = count(AuditStore::allPageViews());
 $total_tickets  = count($all_tickets);
 $open_tickets   = count(array_filter($all_tickets, fn($t) => ($t['status'] ?? 'open') === 'open'));
+$frozen_users   = count(array_filter($all_users, fn($u) => !empty($u['frozen'])));
 
 // Signups in last 30 days
 $signup_events = array_filter($all_events, fn($e) => ($e['event'] ?? '') === 'user.signup');
@@ -163,6 +250,11 @@ $page_styles = <<<'CSS'
   .badge-yellow { background:rgba(245,158,11,.1); color:#fbbf24; border:1px solid rgba(245,158,11,.2); }
   .badge-red { background:rgba(239,68,68,.1); color:#f87171; border:1px solid rgba(239,68,68,.2); }
   .badge-gray { background:rgba(148,163,184,.1); color:var(--text-subtle); border:1px solid var(--border-color); }
+  .badge-orange { background:rgba(249,115,22,.1); color:#fb923c; border:1px solid rgba(249,115,22,.2); }
+  .btn-danger { background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.3); color:#f87171; }
+  .btn-danger:hover { border-color:#f87171; color:#fca5a5; }
+  .btn-success { background:rgba(34,197,94,.1); border-color:rgba(34,197,94,.25); color:#4ade80; }
+  .btn-success:hover { border-color:#4ade80; color:#86efac; }
   .arch-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
   .arch-card { background:var(--navy-3); border:1px solid var(--border-color); border-radius:10px; padding:16px 18px; }
   .arch-card-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:8px; }
@@ -404,6 +496,10 @@ require_once dirname(__DIR__) . '/includes/header.php';
             <option value="codegen.request">codegen.request</option>
             <option value="payment.completed">payment.completed</option>
             <option value="support.ticket_created">support.ticket_created</option>
+            <option value="admin.user_added">admin.user_added</option>
+            <option value="admin.user_updated">admin.user_updated</option>
+            <option value="admin.user_frozen">admin.user_frozen</option>
+            <option value="admin.user_unfrozen">admin.user_unfrozen</option>
           </select>
         </div>
         <?php if (empty($all_events)): ?>
@@ -443,8 +539,58 @@ require_once dirname(__DIR__) . '/includes/header.php';
     <!-- ═══ USERS ══════════════════════════════════════════════════════════ -->
     <div class="adm-header">
       <h1><iconify-icon icon="lucide:users" style="vertical-align:middle;margin-right:8px"></iconify-icon>User Management</h1>
-      <p>All registered users – click a username for full details.</p>
+      <p>All registered users – click a username for full details. <?= $frozen_users > 0 ? '<span class="badge badge-orange">' . $frozen_users . ' frozen</span>' : '' ?></p>
     </div>
+
+    <!-- Add User form -->
+    <div class="adm-section" style="margin-bottom:20px">
+      <div class="adm-section-header">
+        <h2><iconify-icon icon="lucide:user-plus" style="vertical-align:middle;margin-right:6px"></iconify-icon>Add New User</h2>
+      </div>
+      <div class="adm-section-body">
+        <form method="POST" action="/Admin/?tab=users" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;align-items:end">
+          <input type="hidden" name="csrf_token" value="<?= cf_e($csrf) ?>">
+          <input type="hidden" name="action" value="add_user">
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Username *</label>
+            <input type="text" name="new_username" class="filter-input" placeholder="username" required style="width:100%;box-sizing:border-box">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Display Name</label>
+            <input type="text" name="new_display" class="filter-input" placeholder="Display Name" style="width:100%;box-sizing:border-box">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Email</label>
+            <input type="email" name="new_email" class="filter-input" placeholder="email@example.com" style="width:100%;box-sizing:border-box">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Password *</label>
+            <input type="password" name="new_password" class="filter-input" placeholder="Password" required style="width:100%;box-sizing:border-box">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Role</label>
+            <select name="new_role" class="filter-select" style="width:100%;box-sizing:border-box">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Plan</label>
+            <select name="new_plan" class="filter-select" style="width:100%;box-sizing:border-box">
+              <?php foreach (array_keys(CF_PLANS) as $pk): ?>
+                <option value="<?= cf_e($pk) ?>"><?= cf_e(ucfirst($pk)) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div>
+            <button type="submit" class="btn-sm btn-sm-primary" style="padding:8px 16px;font-size:12px;width:100%;justify-content:center">
+              <iconify-icon icon="lucide:plus"></iconify-icon> Add User
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <div class="adm-section">
       <div class="adm-section-header"><h2>All Users (<?= number_format($total_users) ?>)</h2></div>
       <div class="adm-section-body">
@@ -458,8 +604,8 @@ require_once dirname(__DIR__) . '/includes/header.php';
             <thead>
               <tr>
                 <th>Username</th><th>Display</th><th>Email</th>
-                <th>Role</th><th>Plan</th><th>Tokens Used</th>
-                <th>Joined</th><th>OAuth</th>
+                <th>Role</th><th>Plan</th><th>Status</th><th>Tokens Used</th>
+                <th>Joined</th><th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -470,9 +616,38 @@ require_once dirname(__DIR__) . '/includes/header.php';
                 <td><?= cf_e($u['email'] ?? '') ?></td>
                 <td><span class="badge <?= ($u['role'] ?? '') === 'admin' ? 'badge-yellow' : 'badge-gray' ?>"><?= cf_e(ucfirst($u['role'] ?? 'user')) ?></span></td>
                 <td><span class="badge badge-blue"><?= cf_e(ucfirst($u['plan'] ?? 'free')) ?></span></td>
+                <td>
+                  <?php if (!empty($u['frozen'])): ?>
+                    <span class="badge badge-red"><iconify-icon icon="lucide:lock" style="vertical-align:middle"></iconify-icon> Frozen</span>
+                  <?php else: ?>
+                    <span class="badge badge-green">Active</span>
+                  <?php endif; ?>
+                </td>
                 <td><?= number_format((int)($u['tokens_used'] ?? 0)) ?></td>
                 <td style="white-space:nowrap"><?= cf_e(!empty($u['created_at']) ? date('M j, Y', strtotime($u['created_at'])) : '–') ?></td>
-                <td><?= cf_e($u['oauth_provider'] ?? '') ?></td>
+                <td style="white-space:nowrap">
+                  <?php if (!empty($u['frozen'])): ?>
+                    <form method="POST" action="/Admin/?tab=users" style="display:inline">
+                      <input type="hidden" name="csrf_token" value="<?= cf_e($csrf) ?>">
+                      <input type="hidden" name="action" value="unfreeze_user">
+                      <input type="hidden" name="target_username" value="<?= cf_e($u['username']) ?>">
+                      <input type="hidden" name="redirect_tab" value="users">
+                      <button type="submit" class="btn-sm btn-success" title="Unfreeze account">
+                        <iconify-icon icon="lucide:unlock"></iconify-icon> Unfreeze
+                      </button>
+                    </form>
+                  <?php else: ?>
+                    <form method="POST" action="/Admin/?tab=users" style="display:inline">
+                      <input type="hidden" name="csrf_token" value="<?= cf_e($csrf) ?>">
+                      <input type="hidden" name="action" value="freeze_user">
+                      <input type="hidden" name="target_username" value="<?= cf_e($u['username']) ?>">
+                      <input type="hidden" name="redirect_tab" value="users">
+                      <button type="submit" class="btn-sm btn-danger" title="Freeze account">
+                        <iconify-icon icon="lucide:lock"></iconify-icon> Freeze
+                      </button>
+                    </form>
+                  <?php endif; ?>
+                </td>
               </tr>
               <?php endforeach; ?>
             </tbody>
@@ -483,19 +658,86 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
     <?php elseif ($active_tab === 'user_detail' && $detail_user !== null): ?>
     <!-- ═══ USER DETAIL ════════════════════════════════════════════════════ -->
-    <div style="margin-bottom:16px">
+    <div style="margin-bottom:16px;display:flex;align-items:center;gap:8px">
       <a href="/Admin/?tab=users" class="btn-sm"><iconify-icon icon="lucide:arrow-left"></iconify-icon> All Users</a>
     </div>
     <div class="user-detail-header">
       <div class="user-avatar"><iconify-icon icon="lucide:user-circle-2"></iconify-icon></div>
-      <div>
+      <div style="flex:1">
         <div class="user-detail-name"><?= cf_e($detail_user['display'] ?? $detail_user['username']) ?></div>
         <div class="user-detail-meta">
           @<?= cf_e($detail_user['username']) ?>
           <?php if (!empty($detail_user['email'])): ?> · <?= cf_e($detail_user['email']) ?><?php endif; ?>
           · <span class="badge <?= ($detail_user['role'] ?? '') === 'admin' ? 'badge-yellow' : 'badge-gray' ?>"><?= cf_e(ucfirst($detail_user['role'] ?? 'user')) ?></span>
           · <span class="badge badge-blue"><?= cf_e(ucfirst($detail_user['plan'] ?? 'free')) ?></span>
+          <?php if (!empty($detail_user['frozen'])): ?>
+            · <span class="badge badge-red"><iconify-icon icon="lucide:lock" style="vertical-align:middle"></iconify-icon> Frozen</span>
+          <?php else: ?>
+            · <span class="badge badge-green">Active</span>
+          <?php endif; ?>
         </div>
+      </div>
+      <!-- Freeze / Unfreeze button -->
+      <?php if (!empty($detail_user['frozen'])): ?>
+        <form method="POST" action="/Admin/?tab=user_detail&u=<?= urlencode($detail_user['username']) ?>">
+          <input type="hidden" name="csrf_token" value="<?= cf_e($csrf) ?>">
+          <input type="hidden" name="action" value="unfreeze_user">
+          <input type="hidden" name="target_username" value="<?= cf_e($detail_user['username']) ?>">
+          <input type="hidden" name="redirect_tab" value="user_detail">
+          <button type="submit" class="btn-sm btn-success"><iconify-icon icon="lucide:unlock"></iconify-icon> Unfreeze Account</button>
+        </form>
+      <?php else: ?>
+        <form method="POST" action="/Admin/?tab=user_detail&u=<?= urlencode($detail_user['username']) ?>">
+          <input type="hidden" name="csrf_token" value="<?= cf_e($csrf) ?>">
+          <input type="hidden" name="action" value="freeze_user">
+          <input type="hidden" name="target_username" value="<?= cf_e($detail_user['username']) ?>">
+          <input type="hidden" name="redirect_tab" value="user_detail">
+          <button type="submit" class="btn-sm btn-danger"><iconify-icon icon="lucide:lock"></iconify-icon> Freeze Account</button>
+        </form>
+      <?php endif; ?>
+    </div>
+
+    <!-- Edit user form -->
+    <div class="adm-section" style="margin-bottom:20px">
+      <div class="adm-section-header"><h2><iconify-icon icon="lucide:user-cog" style="vertical-align:middle;margin-right:6px"></iconify-icon>Edit User</h2></div>
+      <div class="adm-section-body">
+        <form method="POST" action="/Admin/?tab=user_detail&u=<?= urlencode($detail_user['username']) ?>" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;align-items:end">
+          <input type="hidden" name="csrf_token" value="<?= cf_e($csrf) ?>">
+          <input type="hidden" name="action" value="update_user">
+          <input type="hidden" name="target_username" value="<?= cf_e($detail_user['username']) ?>">
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Display Name</label>
+            <input type="text" name="upd_display" class="filter-input" value="<?= cf_e($detail_user['display'] ?? '') ?>" style="width:100%;box-sizing:border-box">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Email</label>
+            <input type="email" name="upd_email" class="filter-input" value="<?= cf_e($detail_user['email'] ?? '') ?>" style="width:100%;box-sizing:border-box">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Role</label>
+            <select name="upd_role" class="filter-select" style="width:100%;box-sizing:border-box">
+              <option value="user" <?= ($detail_user['role'] ?? 'user') === 'user' ? 'selected' : '' ?>>User</option>
+              <option value="admin" <?= ($detail_user['role'] ?? '') === 'admin' ? 'selected' : '' ?>>Admin</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Plan</label>
+            <select name="upd_plan" class="filter-select" style="width:100%;box-sizing:border-box">
+              <?php foreach (array_keys(CF_PLANS) as $pk): ?>
+                <option value="<?= cf_e($pk) ?>" <?= ($detail_user['plan'] ?? 'free') === $pk ? 'selected' : '' ?>><?= cf_e(ucfirst($pk)) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">New Password</label>
+            <input type="password" name="upd_password" class="filter-input" placeholder="Leave blank to keep" style="width:100%;box-sizing:border-box">
+          </div>
+          <div>
+            <button type="submit" class="btn-sm btn-sm-primary" style="padding:8px 16px;font-size:12px;width:100%;justify-content:center">
+              <iconify-icon icon="lucide:save"></iconify-icon> Save Changes
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
@@ -535,6 +777,11 @@ require_once dirname(__DIR__) . '/includes/header.php';
       <div class="stat-card">
         <div class="stat-card-label">Support Tickets</div>
         <div class="stat-card-value"><?= count($du_tickets) ?></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Failed Login Attempts</div>
+        <div class="stat-card-value" style="<?= ((int)($detail_user['failed_login_attempts'] ?? 0)) >= 3 ? 'color:#f87171' : '' ?>"><?= (int)($detail_user['failed_login_attempts'] ?? 0) ?></div>
+        <div class="stat-card-sub"><?= !empty($detail_user['frozen']) ? 'Account frozen' : 'of 3 before freeze' ?></div>
       </div>
     </div>
 
