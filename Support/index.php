@@ -618,7 +618,7 @@ require_once __DIR__ . '/../includes/header.php';
       <p class="support-desc">
         Connect with our support team instantly through live chat for immediate assistance with your questions.
       </p>
-      <a href="#" class="support-link">
+      <a href="mailto:support@codefoundry.cloud" class="support-link">
         Start Chat
         <iconify-icon icon="lucide:arrow-right"></iconify-icon>
       </a>
@@ -674,7 +674,7 @@ require_once __DIR__ . '/../includes/header.php';
       <p class="support-desc">
         Join our community to discuss best practices and connect with other CodeFoundry users.
       </p>
-      <a href="#" class="support-link">
+      <a href="/Blog/" class="support-link">
         Visit Forum
         <iconify-icon icon="lucide:arrow-right"></iconify-icon>
       </a>
@@ -688,7 +688,7 @@ require_once __DIR__ . '/../includes/header.php';
       <p class="support-desc">
         Watch step-by-step video tutorials covering various features and common workflows.
       </p>
-      <a href="#" class="support-link">
+      <a href="/Training/" class="support-link">
         Watch Videos
         <iconify-icon icon="lucide:arrow-right"></iconify-icon>
       </a>
