@@ -442,7 +442,7 @@ require_once __DIR__ . '/../includes/header.php';
       <p class="doc-desc">
         Quick start guides and tutorials to help you begin your journey with CodeFoundry services.
       </p>
-      <a href="#" class="doc-link">
+      <a href="/Documentation/getting-started.php" class="doc-link">
         Read Guide
         <iconify-icon icon="lucide:arrow-right"></iconify-icon>
       </a>
@@ -456,7 +456,7 @@ require_once __DIR__ . '/../includes/header.php';
       <p class="doc-desc">
         Complete API documentation with examples and integration guides for developers.
       </p>
-      <a href="#" class="doc-link">
+      <a href="/Documentation/api-reference.php" class="doc-link">
         View API Docs
         <iconify-icon icon="lucide:arrow-right"></iconify-icon>
       </a>
@@ -470,7 +470,7 @@ require_once __DIR__ . '/../includes/header.php';
       <p class="doc-desc">
         Architecture patterns and best practices for deploying and managing cloud infrastructure.
       </p>
-      <a href="#" class="doc-link">
+      <a href="/Documentation/cloud-solutions.php" class="doc-link">
         Explore Docs
         <iconify-icon icon="lucide:arrow-right"></iconify-icon>
       </a>
@@ -484,7 +484,7 @@ require_once __DIR__ . '/../includes/header.php';
       <p class="doc-desc">
         Security guidelines, compliance frameworks, and best practices for secure development.
       </p>
-      <a href="#" class="doc-link">
+      <a href="/Documentation/security-compliance.php" class="doc-link">
         Learn More
         <iconify-icon icon="lucide:arrow-right"></iconify-icon>
       </a>
@@ -498,7 +498,7 @@ require_once __DIR__ . '/../includes/header.php';
       <p class="doc-desc">
         Common issues, debugging guides, and solutions to help you resolve technical problems.
       </p>
-      <a href="#" class="doc-link">
+      <a href="/Documentation/troubleshooting.php" class="doc-link">
         View Solutions
         <iconify-icon icon="lucide:arrow-right"></iconify-icon>
       </a>
