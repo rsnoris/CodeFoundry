@@ -5138,7 +5138,7 @@ require_once __DIR__ . '/../includes/header.php';
           <span class="topic-tag">JWT Auth</span>
           <span class="topic-tag">REST API</span>
         </div>
-        <a href="#" class="guide-link">
+        <a href="/Training/Guides/fullstack-web-app.php" class="guide-link">
           Read Guide <iconify-icon icon="lucide:arrow-right"></iconify-icon>
         </a>
       </div>
@@ -5155,7 +5155,7 @@ require_once __DIR__ . '/../includes/header.php';
           <span class="topic-tag">Kubernetes</span>
           <span class="topic-tag">API Gateway</span>
         </div>
-        <a href="#" class="guide-link">
+        <a href="/Training/Guides/microservices-architecture.php" class="guide-link">
           Read Guide <iconify-icon icon="lucide:arrow-right"></iconify-icon>
         </a>
       </div>
@@ -5172,7 +5172,7 @@ require_once __DIR__ . '/../includes/header.php';
           <span class="topic-tag">Testing</span>
           <span class="topic-tag">Automation</span>
         </div>
-        <a href="#" class="guide-link">
+        <a href="/Training/Guides/cicd-pipeline.php" class="guide-link">
           Read Guide <iconify-icon icon="lucide:arrow-right"></iconify-icon>
         </a>
       </div>
@@ -5189,7 +5189,7 @@ require_once __DIR__ . '/../includes/header.php';
           <span class="topic-tag">Lambda</span>
           <span class="topic-tag">DynamoDB</span>
         </div>
-        <a href="#" class="guide-link">
+        <a href="/Training/Guides/cloud-native-development.php" class="guide-link">
           Read Guide <iconify-icon icon="lucide:arrow-right"></iconify-icon>
         </a>
       </div>
@@ -5206,7 +5206,7 @@ require_once __DIR__ . '/../includes/header.php';
           <span class="topic-tag">iOS</span>
           <span class="topic-tag">Android</span>
         </div>
-        <a href="#" class="guide-link">
+        <a href="/Training/Guides/react-native-mobile.php" class="guide-link">
           Read Guide <iconify-icon icon="lucide:arrow-right"></iconify-icon>
         </a>
       </div>
@@ -5223,7 +5223,7 @@ require_once __DIR__ . '/../includes/header.php';
           <span class="topic-tag">Schema Design</span>
           <span class="topic-tag">Subscriptions</span>
         </div>
-        <a href="#" class="guide-link">
+        <a href="/Training/Guides/graphql-api.php" class="guide-link">
           Read Guide <iconify-icon icon="lucide:arrow-right"></iconify-icon>
         </a>
       </div>
@@ -5254,7 +5254,7 @@ require_once __DIR__ . '/../includes/header.php';
           <span class="cert-stat-label">Per Person</span>
         </div>
       </div>
-      <a href="#" class="card-btn">Enroll Now</a>
+      <a href="/Training/Certifications/" class="card-btn">Enroll Now</a>
     </div>
 
     <div class="cert-card">
@@ -5272,7 +5272,7 @@ require_once __DIR__ . '/../includes/header.php';
           <span class="cert-stat-label">Per Person</span>
         </div>
       </div>
-      <a href="#" class="card-btn">Enroll Now</a>
+      <a href="/Training/Certifications/" class="card-btn">Enroll Now</a>
     </div>
 
     <div class="cert-card">
@@ -5290,7 +5290,7 @@ require_once __DIR__ . '/../includes/header.php';
           <span class="cert-stat-label">Per Person</span>
         </div>
       </div>
-      <a href="#" class="card-btn">Enroll Now</a>
+      <a href="/Training/Certifications/" class="card-btn">Enroll Now</a>
     </div>
 
     <div class="cert-card">
@@ -5308,7 +5308,7 @@ require_once __DIR__ . '/../includes/header.php';
           <span class="cert-stat-label">Per Person</span>
         </div>
       </div>
-      <a href="#" class="card-btn">Enroll Now</a>
+      <a href="/Training/Certifications/" class="card-btn">Enroll Now</a>
     </div>
 
     <div class="cert-card">
@@ -5326,7 +5326,7 @@ require_once __DIR__ . '/../includes/header.php';
           <span class="cert-stat-label">Per Person</span>
         </div>
       </div>
-      <a href="#" class="card-btn">Enroll Now</a>
+      <a href="/Training/Certifications/" class="card-btn">Enroll Now</a>
     </div>
 
     <div class="cert-card">
