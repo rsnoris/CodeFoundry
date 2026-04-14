@@ -455,7 +455,7 @@ require_once __DIR__ . '/../includes/header.php';
       <iconify-icon icon="lucide:shield-check"></iconify-icon>
       Security Guidelines
     </h2>
-    <p class="section-subtitle">These guidelines cover the three foundational pillars of application security: authentication, authorisation, and data protection.</p>
+    <p class="section-subtitle">These guidelines cover the four foundational pillars of application security: authentication, authorisation, data protection, and network security.</p>
     <hr class="section-divider">
     <div class="pillars-grid">
       <div class="pillar-card">
