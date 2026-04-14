@@ -299,7 +299,6 @@ require_once CF_ROOT . '/includes/header.php';
   </div><!-- /.checkout-layout -->
 </main>
 
-<?php if ($stripeConfigured || $paypalConfigured): ?>
 <script>
 // ── Config ───────────────────────────────────────────────────────────────
 const CF_PLAN     = <?= json_encode($plan) ?>;
@@ -328,11 +327,14 @@ document.querySelectorAll('.billing-btn').forEach(btn => {
     document.getElementById('billing-label').textContent = currentBilling === 'annual' ? 'Annual' : 'Monthly';
     document.getElementById('subtotal-val').textContent  = '$' + price.toFixed(2);
     document.getElementById('total-val').textContent     = '$' + price.toFixed(2);
-    document.getElementById('pay-amount').textContent    = price.toFixed(2);
+    const payAmountEl = document.getElementById('pay-amount');
+    if (payAmountEl) payAmountEl.textContent = price.toFixed(2);
     // Re-initialise Stripe with new amount
     if (typeof reinitStripe === 'function') reinitStripe();
   });
 });
+
+<?php if ($stripeConfigured || $paypalConfigured): ?>
 
 // ── Payment method tabs ──────────────────────────────────────────────────
 document.querySelectorAll('.pay-method-btn').forEach(btn => {
@@ -497,7 +499,7 @@ function initPayPal() {
   }).render('#paypal-button-container');
 }
 <?php endif; ?>
+<?php endif; // stripeConfigured || paypalConfigured ?>
 </script>
-<?php endif; ?>
 
 <?php require_once CF_ROOT . '/includes/footer.php'; ?>
