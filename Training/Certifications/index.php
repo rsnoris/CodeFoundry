@@ -955,7 +955,7 @@ require_once __DIR__ . '/../../includes/header.php';
     <div class="section-heading">
       <span class="section-badge">How It Works</span>
       <h2 class="section-title">Certification Process</h2>
-      <p class="section-desc">A clear, structured pathway from enrolment to earning your industry-recognized credential.</p>
+      <p class="section-desc">A clear, structured pathway from enrollment to earning your industry-recognized credential.</p>
     </div>
 
     <div class="process-steps">
