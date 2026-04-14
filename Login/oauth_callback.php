@@ -231,17 +231,13 @@ if ($user === null) {
 
 session_regenerate_id(true);
 $_SESSION['cf_login_at'] = time();
-$loginIp  = AuditStore::clientIpPublic();
+$loginIp  = AuditStore::getClientIp();
 $loginGeo = AuditStore::geoLocate($loginIp);
 AuditStore::log('user.login', $user['username'], array_filter([
-    'method'       => 'oauth',
-    'provider'     => $provider,
-    'location'     => $loginGeo !== [] ? implode(', ', array_filter([
-        $loginGeo['city']         ?? '',
-        $loginGeo['region']       ?? '',
-        $loginGeo['country_code'] ?? '',
-    ])) : '',
-    'user_agent'   => $_SERVER['HTTP_USER_AGENT'] ?? '',
+    'method'     => 'oauth',
+    'provider'   => $provider,
+    'location'   => cf_format_location($loginGeo),
+    'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '',
 ]));
 $_SESSION['cf_user'] = [
     'username' => $user['username'],

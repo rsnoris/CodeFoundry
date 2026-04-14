@@ -90,16 +90,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             session_regenerate_id(true);
             $_SESSION['cf_login_at'] = time();
             UserStore::resetFailedLogin($username);
-            $loginIp  = AuditStore::clientIpPublic();
+            $loginIp  = AuditStore::getClientIp();
             $loginGeo = AuditStore::geoLocate($loginIp);
             AuditStore::log('user.login', $username, array_filter([
-                'method'       => 'password',
-                'location'     => $loginGeo !== [] ? implode(', ', array_filter([
-                    $loginGeo['city'] ?? '',
-                    $loginGeo['region'] ?? '',
-                    $loginGeo['country_code'] ?? '',
-                ])) : '',
-                'user_agent'   => $_SERVER['HTTP_USER_AGENT'] ?? '',
+                'method'     => 'password',
+                'location'   => cf_format_location($loginGeo),
+                'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '',
             ]));
             $raw_redirect = $_GET['redirect'] ?? '';
             // Only allow relative paths: single leading slash, no double-slash, no path traversal

@@ -275,7 +275,7 @@ class AuditStore
             return [];
         }
 
-        $url = 'http://ip-api.com/json/' . rawurlencode($ip)
+        $url = 'https://ip-api.com/json/' . rawurlencode($ip)
              . '?fields=status,city,regionName,country,countryCode';
 
         $ctx = stream_context_create([
@@ -367,8 +367,8 @@ class AuditStore
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
     }
 
-    /** Best-effort client IP extraction (public alias for use outside AuditStore). */
-    public static function clientIpPublic(): string
+    /** Return the best-effort client IP (public accessor). */
+    public static function getClientIp(): string
     {
         return self::clientIp();
     }
