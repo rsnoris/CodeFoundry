@@ -275,8 +275,10 @@ require_once dirname(dirname(__DIR__)) . '/includes/header.php';
               </div>
               <?php if ($pk === $plan_key): ?>
                 <div class="btn-plan-current">Current Plan</div>
+              <?php elseif ($p['price'] > 0): ?>
+                <a href="/Checkout/?plan=<?= cf_e($pk) ?>" class="btn-plan-upgrade">Upgrade</a>
               <?php else: ?>
-                <a href="#" class="btn-plan-upgrade">Upgrade</a>
+                <a href="/Support/" class="btn-plan-upgrade">Contact Sales</a>
               <?php endif; ?>
             </div>
           <?php endforeach; ?>
