@@ -942,7 +942,7 @@ cf logs --project my-project \
         <span class="support-tag">Community</span>
         <h3>GitHub Discussions</h3>
         <p>Search existing community questions, report non-security bugs, and engage with the CodeFoundry developer community on GitHub.</p>
-        <a href="#" class="support-link">
+        <a href="/Support/" class="support-link">
           Visit Discussions <iconify-icon icon="lucide:arrow-right"></iconify-icon>
         </a>
       </div>

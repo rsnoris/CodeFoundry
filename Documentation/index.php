@@ -512,7 +512,7 @@ require_once __DIR__ . '/../includes/header.php';
       <p class="doc-desc">
         Video tutorials, workshops, and certification programs for team development.
       </p>
-      <a href="#" class="doc-link">
+      <a href="/Training/" class="doc-link">
         Start Learning
         <iconify-icon icon="lucide:arrow-right"></iconify-icon>
       </a>
