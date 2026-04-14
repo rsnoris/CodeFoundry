@@ -399,3 +399,45 @@ function cf_nav_links(): array {
 function cf_e(string $s): string {
     return htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
+
+/**
+ * Format a geo-location array returned by AuditStore::geoLocate() into a
+ * human-readable string such as "New York, NY, US".
+ * Returns an empty string when no location data is available.
+ *
+ * @param  array $geoData  Array with optional keys: city, region, country_code.
+ * @return string          Formatted location or empty string.
+ */
+function cf_format_location(array $geoData): string {
+    if (empty($geoData)) {
+        return '';
+    }
+    return implode(', ', array_filter([
+        $geoData['city']         ?? '',
+        $geoData['region']       ?? '',
+        $geoData['country_code'] ?? '',
+    ]));
+}
+
+/**
+ * Format a duration in seconds as a human-readable string.
+ * e.g. 3661 → "1h 1m 1s"
+ *
+ * @param  int    $seconds Non-negative duration in seconds.
+ * @return string          Formatted duration string.
+ */
+function cf_format_duration(int $seconds): string {
+    if ($seconds < 0) {
+        $seconds = 0;
+    }
+    $h   = intdiv($seconds, 3600);
+    $m   = intdiv($seconds % 3600, 60);
+    $sec = $seconds % 60;
+    if ($h > 0) {
+        return "{$h}h {$m}m {$sec}s";
+    }
+    if ($m > 0) {
+        return "{$m}m {$sec}s";
+    }
+    return "{$sec}s";
+}

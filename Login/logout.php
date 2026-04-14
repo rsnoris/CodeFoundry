@@ -8,8 +8,9 @@ declare(strict_types=1);
 
 session_start();
 
-// Capture user before destroying the session
-$_logoutUser = $_SESSION['cf_user']['username'] ?? '';
+// Capture user and login time before destroying the session
+$_logoutUser    = $_SESSION['cf_user']['username'] ?? '';
+$_loginAt       = isset($_SESSION['cf_login_at']) ? (int)$_SESSION['cf_login_at'] : 0;
 
 $_SESSION = [];
 
@@ -32,7 +33,11 @@ session_destroy();
 if ($_logoutUser !== '') {
     require_once dirname(__DIR__) . '/config.php';
     require_once dirname(__DIR__) . '/lib/AuditStore.php';
-    AuditStore::log('user.logout', $_logoutUser, []);
+    $logoutData = [];
+    if ($_loginAt > 0) {
+        $logoutData['session_duration_seconds'] = time() - $_loginAt;
+    }
+    AuditStore::log('user.logout', $_logoutUser, $logoutData);
 }
 
 header('Location: /');

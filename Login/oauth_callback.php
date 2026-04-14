@@ -230,7 +230,15 @@ if ($user === null) {
 // ── Log the user in ──────────────────────────────────────────────────────────
 
 session_regenerate_id(true);
-AuditStore::log('user.login', $user['username'], ['method' => 'oauth', 'provider' => $provider]);
+$_SESSION['cf_login_at'] = time();
+$loginIp  = AuditStore::getClientIp();
+$loginGeo = AuditStore::geoLocate($loginIp);
+AuditStore::log('user.login', $user['username'], array_filter([
+    'method'     => 'oauth',
+    'provider'   => $provider,
+    'location'   => cf_format_location($loginGeo),
+    'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '',
+]));
 $_SESSION['cf_user'] = [
     'username' => $user['username'],
     'display'  => $user['display'] ?? $user['username'],
