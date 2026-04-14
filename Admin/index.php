@@ -143,11 +143,12 @@ if (empty($_SESSION['csrf_token'])) {
 $csrf = $_SESSION['csrf_token'];
 
 // ── Load all data ─────────────────────────────────────────────────────────
-$all_users    = UserStore::allUsers();
-$all_events   = AuditStore::allEvents();
-$all_pviews   = AuditStore::allPageViews(500);
-$all_tickets  = AuditStore::allSupportTickets();
-$pview_counts = AuditStore::pageViewCounts();
+$all_users     = UserStore::allUsers();
+$all_events    = AuditStore::allEvents();
+$all_pviews    = AuditStore::allPageViews(500);
+$all_tickets   = AuditStore::allSupportTickets();
+$pview_counts  = AuditStore::pageViewCounts();
+$login_events  = AuditStore::loginEvents();
 
 // Merge CF_USERS into allUsers for display (admin account from config not in users.json)
 $cf_usernames = array_column(CF_USERS, 'username');
@@ -333,14 +334,15 @@ require_once dirname(__DIR__) . '/includes/header.php';
     <div class="adm-sidebar-title">Control Panel</div>
     <?php
     $tabs = [
-        'overview'     => ['icon' => 'lucide:layout-dashboard', 'label' => 'Overview'],
-        'audit'        => ['icon' => 'lucide:shield-check',     'label' => 'Audit Trail'],
-        'users'        => ['icon' => 'lucide:users',             'label' => 'Users'],
-        'support'      => ['icon' => 'lucide:life-buoy',         'label' => 'Support'],
-        'live_chat'    => ['icon' => 'lucide:message-circle',    'label' => 'Live Chat'],
-        'analytics'    => ['icon' => 'lucide:bar-chart-2',       'label' => 'Analytics'],
-        'architecture' => ['icon' => 'lucide:layout',            'label' => 'Architecture'],
-        'workflows'    => ['icon' => 'lucide:git-pull-request',  'label' => 'Workflows'],
+        'overview'       => ['icon' => 'lucide:layout-dashboard', 'label' => 'Overview'],
+        'audit'          => ['icon' => 'lucide:shield-check',     'label' => 'Audit Trail'],
+        'login_history'  => ['icon' => 'lucide:log-in',           'label' => 'Login History'],
+        'users'          => ['icon' => 'lucide:users',             'label' => 'Users'],
+        'support'        => ['icon' => 'lucide:life-buoy',         'label' => 'Support'],
+        'live_chat'      => ['icon' => 'lucide:message-circle',    'label' => 'Live Chat'],
+        'analytics'      => ['icon' => 'lucide:bar-chart-2',       'label' => 'Analytics'],
+        'architecture'   => ['icon' => 'lucide:layout',            'label' => 'Architecture'],
+        'workflows'      => ['icon' => 'lucide:git-pull-request',  'label' => 'Workflows'],
     ];
     foreach ($tabs as $key => $meta): ?>
     <a href="/Admin/?tab=<?= cf_e($key) ?>"
@@ -524,6 +526,105 @@ require_once dirname(__DIR__) . '/includes/header.php';
                   unset($d['code_output']);
                   echo cf_e(json_encode($d, JSON_UNESCAPED_SLASHES));
                 ?></td>
+              </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        <?php endif; ?>
+      </div>
+    </div>
+
+    <?php elseif ($active_tab === 'login_history'): ?>
+    <!-- ═══ LOGIN HISTORY ══════════════════════════════════════════════════ -->
+    <div class="adm-header">
+      <h1><iconify-icon icon="lucide:log-in" style="vertical-align:middle;margin-right:8px"></iconify-icon>Login History</h1>
+      <p>All user login, failed-login, and logout events including IP address, location, and session duration.</p>
+    </div>
+
+    <!-- Summary stats -->
+    <?php
+      $lh_logins   = array_filter($login_events, fn($e) => ($e['event'] ?? '') === 'user.login');
+      $lh_failures = array_filter($login_events, fn($e) => ($e['event'] ?? '') === 'user.login_failed');
+      $lh_logouts  = array_filter($login_events, fn($e) => ($e['event'] ?? '') === 'user.logout');
+      $lh_recent   = array_filter($login_events, fn($e) =>
+          ($e['event'] ?? '') === 'user.login' &&
+          isset($e['created_at']) && strtotime($e['created_at']) >= strtotime('-24 hours')
+      );
+    ?>
+    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+      <div class="stat-card">
+        <div class="stat-card-label">Total Logins</div>
+        <div class="stat-card-value"><?= number_format(count($lh_logins)) ?></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Failed Logins</div>
+        <div class="stat-card-value" style="<?= count($lh_failures) > 0 ? 'color:#f87171' : '' ?>"><?= number_format(count($lh_failures)) ?></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Logouts</div>
+        <div class="stat-card-value"><?= number_format(count($lh_logouts)) ?></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Logins (24h)</div>
+        <div class="stat-card-value"><?= number_format(count($lh_recent)) ?></div>
+      </div>
+    </div>
+
+    <div class="adm-section">
+      <div class="adm-section-header"><h2>All Login Events (<?= number_format(count($login_events)) ?>)</h2></div>
+      <div class="adm-section-body">
+        <div class="filter-bar">
+          <input type="text" class="filter-input" id="lhSearch" placeholder="Search user, IP, location…" oninput="filterTable('lhTbl',this.value)">
+          <select class="filter-select" onchange="filterTable('lhTbl',document.getElementById('lhSearch').value,this.value,'event')">
+            <option value="">All event types</option>
+            <option value="user.login">user.login</option>
+            <option value="user.login_failed">user.login_failed</option>
+            <option value="user.logout">user.logout</option>
+          </select>
+        </div>
+        <?php if (empty($login_events)): ?>
+          <div class="empty-state"><iconify-icon icon="lucide:inbox"></iconify-icon>No login events recorded yet.</div>
+        <?php else: ?>
+          <table class="adm-table" id="lhTbl">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Event</th>
+                <th>User</th>
+                <th>IP Address</th>
+                <th>Location</th>
+                <th>Method</th>
+                <th>Session Duration</th>
+                <th>Browser / UA</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($login_events as $ev):
+                $ev_data     = $ev['data'] ?? [];
+                $ev_location = $ev_data['location'] ?? '';
+                $ev_method   = isset($ev_data['provider'])
+                    ? 'oauth:' . $ev_data['provider']
+                    : ($ev_data['method'] ?? '');
+                $ev_ua       = $ev_data['user_agent'] ?? ($ev['user_agent'] ?? '');
+                $ev_duration = isset($ev_data['session_duration_seconds'])
+                    ? cf_format_duration((int)$ev_data['session_duration_seconds'])
+                    : '–';
+                $badge_class = match($ev['event'] ?? '') {
+                    'user.login'        => 'badge-green',
+                    'user.login_failed' => 'badge-red',
+                    'user.logout'       => 'badge-gray',
+                    default             => 'badge-blue',
+                };
+              ?>
+              <tr>
+                <td style="white-space:nowrap"><?= cf_e(date('Y-m-d H:i:s', strtotime($ev['created_at'] ?? 'now'))) ?></td>
+                <td><span class="badge <?= $badge_class ?>"><?= cf_e($ev['event'] ?? '') ?></span></td>
+                <td><?= $ev['username'] ? '<a href="/Admin/?tab=user_detail&u='.urlencode($ev['username']).'">'.cf_e($ev['username']).'</a>' : '–' ?></td>
+                <td style="font-family:monospace;font-size:11px"><?= cf_e($ev['ip'] ?? '') ?></td>
+                <td style="font-size:12px"><?= cf_e($ev_location) ?></td>
+                <td style="font-size:12px"><?= cf_e($ev_method) ?></td>
+                <td style="font-size:12px"><?= cf_e($ev_duration) ?></td>
+                <td style="font-size:11px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-subtle)" title="<?= cf_e($ev_ua) ?>"><?= cf_e($ev_ua) ?></td>
               </tr>
               <?php endforeach; ?>
             </tbody>
@@ -740,11 +841,12 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
     <?php
       $du = $detail_user['username'];
-      $du_events   = AuditStore::eventsForUser($du);
-      $du_pviews   = AuditStore::pageViewsForUser($du);
-      $du_tickets  = AuditStore::supportTicketsForUser($du);
-      $du_tokens   = UserStore::tokenHistoryForUser($du, 50);
-      $du_payments = UserStore::paymentsForUser($du);
+      $du_events        = AuditStore::eventsForUser($du);
+      $du_login_events  = AuditStore::loginEventsForUser($du);
+      $du_pviews        = AuditStore::pageViewsForUser($du);
+      $du_tickets       = AuditStore::supportTicketsForUser($du);
+      $du_tokens        = UserStore::tokenHistoryForUser($du, 50);
+      $du_payments      = UserStore::paymentsForUser($du);
 
       // Time on pages
       $du_total_time = array_sum(array_column($du_pviews, 'time_on_page'));
@@ -779,6 +881,62 @@ require_once dirname(__DIR__) . '/includes/header.php';
         <div class="stat-card-label">Failed Login Attempts</div>
         <div class="stat-card-value" style="<?= ((int)($detail_user['failed_login_attempts'] ?? 0)) >= 3 ? 'color:#f87171' : '' ?>"><?= (int)($detail_user['failed_login_attempts'] ?? 0) ?></div>
         <div class="stat-card-sub"><?= !empty($detail_user['frozen']) ? 'Account frozen' : 'of 3 before freeze' ?></div>
+      </div>
+    </div>
+
+    <!-- Login history for this user -->
+    <div class="adm-section">
+      <div class="adm-section-header">
+        <h2><iconify-icon icon="lucide:log-in" style="vertical-align:middle;margin-right:6px"></iconify-icon>Login History</h2>
+        <a href="/Admin/?tab=login_history" class="btn-sm">View all users</a>
+      </div>
+      <div class="adm-section-body">
+        <?php if (empty($du_login_events)): ?>
+          <div class="empty-state"><iconify-icon icon="lucide:inbox"></iconify-icon>No login events recorded.</div>
+        <?php else: ?>
+          <table class="adm-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Event</th>
+                <th>IP Address</th>
+                <th>Location</th>
+                <th>Method</th>
+                <th>Session Duration</th>
+                <th>Browser / UA</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach (array_slice($du_login_events, 0, 50) as $le):
+                $le_data     = $le['data'] ?? [];
+                $le_location = $le_data['location'] ?? '';
+                $le_method   = isset($le_data['provider'])
+                    ? 'oauth:' . $le_data['provider']
+                    : ($le_data['method'] ?? '');
+                $le_ua       = $le_data['user_agent'] ?? ($le['user_agent'] ?? '');
+                $le_duration = isset($le_data['session_duration_seconds'])
+                    ? cf_format_duration((int)$le_data['session_duration_seconds'])
+                    : '–';
+                $le_badge = match($le['event'] ?? '') {
+                    'user.login'        => 'badge-green',
+                    'user.login_failed' => 'badge-red',
+                    'user.logout'       => 'badge-gray',
+                    default             => 'badge-blue',
+                };
+              ?>
+              <tr>
+                <td style="white-space:nowrap"><?= cf_e(date('M j, Y H:i', strtotime($le['created_at'] ?? 'now'))) ?></td>
+                <td><span class="badge <?= $le_badge ?>"><?= cf_e($le['event'] ?? '') ?></span></td>
+                <td style="font-family:monospace;font-size:11px"><?= cf_e($le['ip'] ?? '') ?></td>
+                <td style="font-size:12px"><?= cf_e($le_location) ?></td>
+                <td style="font-size:12px"><?= cf_e($le_method) ?></td>
+                <td style="font-size:12px"><?= cf_e($le_duration) ?></td>
+                <td style="font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-subtle)" title="<?= cf_e($le_ua) ?>"><?= cf_e($le_ua) ?></td>
+              </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        <?php endif; ?>
       </div>
     </div>
 

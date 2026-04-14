@@ -224,6 +224,86 @@ class AuditStore
         return $updated;
     }
 
+    // ── Login-history helpers ──────────────────────────────────────────────
+
+    /**
+     * Return all login-related audit events (user.login, user.login_failed,
+     * user.logout), newest first.
+     */
+    public static function loginEvents(int $limit = 0): array
+    {
+        $all = self::readJson(CF_DATA_AUDIT_LOG);
+        $all = array_reverse($all);
+        $all = array_values(array_filter(
+            $all,
+            fn($e) => in_array($e['event'] ?? '', [
+                'user.login',
+                'user.login_failed',
+                'user.logout',
+            ], true)
+        ));
+        return $limit > 0 ? array_slice($all, 0, $limit) : $all;
+    }
+
+    /**
+     * Return login-related events for a specific user, newest first.
+     */
+    public static function loginEventsForUser(string $username, int $limit = 0): array
+    {
+        $all = self::loginEvents();
+        $all = array_values(array_filter(
+            $all,
+            fn($e) => ($e['username'] ?? '') === $username
+        ));
+        return $limit > 0 ? array_slice($all, 0, $limit) : $all;
+    }
+
+    /**
+     * Best-effort geo-location lookup for an IP address.
+     * Uses the ip-api.com free JSON endpoint (no API key required).
+     * Returns an array with city, region, country, and country_code keys,
+     * or an empty array on failure (private IPs, network errors, etc.).
+     *
+     * @param string $ip  IPv4 or IPv6 address.
+     * @return array{city:string,region:string,country:string,country_code:string}|array{}
+     */
+    public static function geoLocate(string $ip): array
+    {
+        // Skip private/loopback/empty addresses
+        if ($ip === '' || !filter_var($ip, FILTER_VALIDATE_IP,
+                FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+            return [];
+        }
+
+        $url = 'http://ip-api.com/json/' . rawurlencode($ip)
+             . '?fields=status,city,regionName,country,countryCode';
+
+        $ctx = stream_context_create([
+            'http' => [
+                'method'        => 'GET',
+                'timeout'       => 3,
+                'ignore_errors' => true,
+            ],
+        ]);
+
+        $raw = @file_get_contents($url, false, $ctx);
+        if ($raw === false) {
+            return [];
+        }
+
+        $data = json_decode($raw, true);
+        if (!is_array($data) || ($data['status'] ?? '') !== 'success') {
+            return [];
+        }
+
+        return [
+            'city'         => $data['city']        ?? '',
+            'region'       => $data['regionName']  ?? '',
+            'country'      => $data['country']     ?? '',
+            'country_code' => $data['countryCode'] ?? '',
+        ];
+    }
+
     // ── Internal helpers ───────────────────────────────────────────────────
 
     private static function readJson(string $path): array
@@ -285,6 +365,12 @@ class AuditStore
         $bytes[6] = chr((ord($bytes[6]) & 0x0f) | 0x40);
         $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80);
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
+    }
+
+    /** Best-effort client IP extraction (public alias for use outside AuditStore). */
+    public static function clientIpPublic(): string
+    {
+        return self::clientIp();
     }
 
     /** Best-effort client IP extraction. */
