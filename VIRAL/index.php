@@ -254,7 +254,7 @@ foreach (VIRAL_AGENTS as $slug => $a) {
     ];
 }
 
-$categories      = ['All', 'Engineering', 'Business', 'Marketing', 'People', 'Design & Legal'];
+$categories      = ['All', 'Executive', 'Engineering', 'Business', 'Marketing', 'People', 'Operations', 'Finance', 'Design', 'Legal', 'Healthcare', 'Education', 'PR & Comms', 'Real Estate', 'Retail', 'Manufacturing'];
 $agentCount      = count(VIRAL_AGENTS);
 $categoryCount   = count(array_unique(array_column(array_values(VIRAL_AGENTS), 'category')));
 
