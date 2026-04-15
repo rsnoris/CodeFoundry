@@ -121,6 +121,7 @@ class UserStore
             'created_at'      => date('c'),
         ];
         self::saveUsers($users);
+        self::ensureUserConfig($username);
         return true;
     }
 
@@ -183,7 +184,31 @@ class UserStore
         $users   = self::allUsers();
         $users[] = $user;
         self::saveUsers($users);
+        self::ensureUserConfig($username);
         return $user;
+    }
+
+    /** Ensure a per-user config folder exists under Cf-Config-keys/Users/<username>/. */
+    public static function ensureUserConfig(string $username): void
+    {
+        $dir = cf_user_config_dir($username);
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0700, true);
+        }
+    }
+
+    /** Save a user-specific API key file under Cf-Config-keys/Users/<username>/. */
+    public static function saveUserApiKey(string $username, string $keyName, string $value): void
+    {
+        self::ensureUserConfig($username);
+        cf_save_user_key($username, $keyName, $value);
+    }
+
+    /** Load a user-specific API key; falls back to global key lookup. */
+    public static function getUserApiKey(string $username, string $keyName, string $default = ''): string
+    {
+        self::ensureUserConfig($username);
+        return cf_load_user_key($username, $keyName, $default);
     }
 
     /** Persist all user records to data/users.json. */
