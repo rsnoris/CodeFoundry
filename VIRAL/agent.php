@@ -24,8 +24,7 @@ $agentIcon    = htmlspecialchars($agent['icon'],  ENT_QUOTES, 'UTF-8');
 $agentAccent  = htmlspecialchars($agent['accent'], ENT_QUOTES, 'UTF-8');
 $roleJson     = json_encode($role);
 $agentIconJson = json_encode($agent['icon']);
-$expandedRoleCount = 80;
-$expandedRoleSlugsJson = json_encode(array_slice(array_keys(VIRAL_AGENTS), 0, $expandedRoleCount));
+$expandedRoleSlugsJson = json_encode(array_keys(VIRAL_AGENTS));
 
 $page_title  = $agentLabel . ' Agent – CodeFoundry VIRAL';
 $active_page = 'viral';
