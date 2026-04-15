@@ -29,15 +29,20 @@ $expandedRoleSlugsJson = json_encode(array_keys(VIRAL_AGENTS));
 $page_title  = $agentLabel . ' Agent – CodeFoundry VIRAL';
 $active_page = 'viral';
 $page_styles = <<<PAGECSS
-  :root { --accent: {$agent['accent']}; }
+  :root {
+    --accent: {$agent['accent']};
+    --sidebar-reopen-offset: 14px;
+  }
 
   /* ── Layout ──────────────────────────────────────────────────────────── */
   .viral-layout {
     display: flex;
     gap: 0;
-    min-height: calc(100vh - 120px);
-    max-width: 1400px;
-    margin: 0 auto;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    min-height: calc(100vh - var(--header-height));
+    height: calc(100vh - var(--header-height));
   }
 
   /* ── Prompt Sidebar ──────────────────────────────────────────────────── */
@@ -51,6 +56,7 @@ $page_styles = <<<PAGECSS
     position: relative;
     overflow: hidden;
     transition: width .25s ease;
+    height: 100%;
   }
   .prompt-sidebar.collapsed { width: 0; border-right: none; }
   .sidebar-header {
@@ -139,11 +145,37 @@ $page_styles = <<<PAGECSS
     flex-shrink: 0;
   }
   .sidebar-toggle:hover { background: #111b30; color: var(--accent); }
+  .sidebar-reopen {
+    position: fixed;
+    left: 12px;
+    top: calc(var(--header-height) + var(--sidebar-reopen-offset));
+    z-index: 1100;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: #0d1626;
+    color: var(--text-muted);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.31);
+    transition: background .2s, color .2s, border-color .2s;
+  }
+  .sidebar-reopen:hover {
+    background: #111b30;
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .sidebar-reopen iconify-icon { font-size: 18px; }
+  .prompt-sidebar.collapsed + .sidebar-reopen { display: flex; }
 
   /* ── Chat area ───────────────────────────────────────────────────────── */
   .viral-chat-wrap {
     flex: 1;
     min-width: 0;
+    min-height: 0;
     padding: 28px 28px 80px;
     display: flex;
     flex-direction: column;
@@ -171,9 +203,11 @@ $page_styles = <<<PAGECSS
     background: #0d1626; border: 1px solid var(--border-color);
     border-radius: 16px; overflow: hidden;
     display: flex; flex-direction: column;
+    flex: 1;
+    min-height: 0;
   }
   .chat-messages {
-    flex: 1; min-height: 420px; max-height: 560px;
+    flex: 1; min-height: 0; max-height: none;
     overflow-y: auto; padding: 24px 20px;
     display: flex; flex-direction: column; gap: 16px;
     scroll-behavior: smooth;
@@ -251,10 +285,11 @@ $page_styles = <<<PAGECSS
 
   /* ── Mobile ──────────────────────────────────────────────────────────── */
   @media (max-width: 900px) {
-    .viral-layout    { flex-direction: column; }
+    .viral-layout { flex-direction: column; height: auto; min-height: calc(100vh - var(--header-height)); }
     .prompt-sidebar  { width: 100% !important; border-right: none; border-bottom: 1px solid var(--border-color); max-height: 260px; }
     .prompt-sidebar.collapsed { max-height: 0; overflow: hidden; border-bottom: none; }
     .sidebar-toggle  { display: none; }
+    .sidebar-reopen  { display: none !important; }
     .mobile-sidebar-btn { display: inline-flex !important; }
     .viral-chat-wrap { padding: 16px 14px 80px; }
     .chat-messages   { min-height: 340px; }
@@ -273,7 +308,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
     <!-- ── Prompt Sidebar ─────────────────────────────────────────────── -->
     <aside class="prompt-sidebar" id="promptSidebar">
-      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle prompt sidebar">
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle prompt sidebar" aria-expanded="true">
         <iconify-icon icon="lucide:chevron-left" id="sidebarToggleIcon"></iconify-icon>
       </button>
       <div class="sidebar-header">
@@ -285,6 +320,9 @@ require_once dirname(__DIR__) . '/includes/header.php';
       <div class="prompt-list" id="promptList"></div>
       <div class="prompt-count" id="promptCount"></div>
     </aside>
+    <button class="sidebar-reopen" id="sidebarReopen" type="button" aria-label="Reopen prompt sidebar">
+      <iconify-icon icon="lucide:panel-left-open"></iconify-icon>
+    </button>
 
     <!-- ── Chat Area ──────────────────────────────────────────────────── -->
     <div class="viral-chat-wrap">
@@ -486,6 +524,7 @@ $page_scripts = <<<PAGEJS
   const promptSearch  = document.getElementById('promptSearch');
   const sidebarToggle = document.getElementById('sidebarToggle');
   const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
+  const sidebarReopen = document.getElementById('sidebarReopen');
   const mobileSidebarBtn = document.getElementById('mobileSidebarBtn');
   const rolePrompts   = buildPromptsForRole(ROLE);
   let history = [];
@@ -506,8 +545,17 @@ $page_scripts = <<<PAGEJS
   });
 
   function updateSidebarIcon() {
-    if (!sidebarToggleIcon || !promptSidebar) return;
-    sidebarToggleIcon.setAttribute('icon', promptSidebar.classList.contains('collapsed') ? 'lucide:chevron-right' : 'lucide:chevron-left');
+    if (!sidebarToggleIcon || !promptSidebar || !sidebarToggle) return;
+    const collapsed = promptSidebar.classList.contains('collapsed');
+    sidebarToggleIcon.setAttribute('icon', collapsed ? 'lucide:chevron-right' : 'lucide:chevron-left');
+    sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
+    if (sidebarReopen) {
+      if (collapsed) {
+        sidebarReopen.removeAttribute('aria-hidden');
+      } else {
+        sidebarReopen.setAttribute('aria-hidden', 'true');
+      }
+    }
   }
 
   function renderPromptList(searchTerm) {
@@ -547,6 +595,10 @@ $page_scripts = <<<PAGEJS
     sidebarToggle.addEventListener('click', function () {
       promptSidebar.classList.toggle('collapsed');
       updateSidebarIcon();
+      const expanded = !promptSidebar.classList.contains('collapsed');
+      if (expanded && promptSearch) {
+        promptSearch.focus();
+      }
     });
   }
 
@@ -554,6 +606,14 @@ $page_scripts = <<<PAGEJS
     mobileSidebarBtn.addEventListener('click', function () {
       promptSidebar.classList.toggle('collapsed');
       updateSidebarIcon();
+    });
+  }
+
+  if (sidebarReopen && promptSidebar) {
+    sidebarReopen.addEventListener('click', function () {
+      promptSidebar.classList.remove('collapsed');
+      updateSidebarIcon();
+      if (promptSearch) promptSearch.focus();
     });
   }
 
