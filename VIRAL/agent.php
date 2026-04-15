@@ -24,7 +24,8 @@ $agentIcon    = htmlspecialchars($agent['icon'],  ENT_QUOTES, 'UTF-8');
 $agentAccent  = htmlspecialchars($agent['accent'], ENT_QUOTES, 'UTF-8');
 $roleJson     = json_encode($role);
 $agentIconJson = json_encode($agent['icon']);
-$expandedRoleSlugsJson = json_encode(array_slice(array_keys(VIRAL_AGENTS), 0, 30));
+$expandedRoleCount = 30;
+$expandedRoleSlugsJson = json_encode(array_slice(array_keys(VIRAL_AGENTS), 0, $expandedRoleCount));
 
 $page_title  = $agentLabel . ' Agent – CodeFoundry VIRAL';
 $active_page = 'viral';
@@ -467,8 +468,9 @@ $page_scripts = <<<PAGEJS
 
     const roleTitle = titleFromSlug(role);
     const generated = PROMPT_TEMPLATES.map(function (template) {
-      return template.replace(/\{role\}/g, roleTitle);
+      return template.split('{role}').join(roleTitle);
     });
+    // Deduplicate overlap between hand-curated base prompts and generated templates.
     return Array.from(new Set(base.concat(generated))).slice(0, MAX_PROMPTS_PER_EXPANDED_ROLE);
   }
 
