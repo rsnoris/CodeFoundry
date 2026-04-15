@@ -29,7 +29,10 @@ $expandedRoleSlugsJson = json_encode(array_keys(VIRAL_AGENTS));
 $page_title  = $agentLabel . ' Agent – CodeFoundry VIRAL';
 $active_page = 'viral';
 $page_styles = <<<PAGECSS
-  :root { --accent: {$agent['accent']}; }
+  :root {
+    --accent: {$agent['accent']};
+    --sidebar-reopen-offset: 14px;
+  }
 
   /* ── Layout ──────────────────────────────────────────────────────────── */
   .viral-layout {
@@ -145,7 +148,7 @@ $page_styles = <<<PAGECSS
   .sidebar-reopen {
     position: fixed;
     left: 12px;
-    top: calc(var(--header-height) + 14px);
+    top: calc(var(--header-height) + var(--sidebar-reopen-offset));
     z-index: 1100;
     width: 40px;
     height: 40px;
@@ -157,7 +160,7 @@ $page_styles = <<<PAGECSS
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 8px 24px #00000050;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.31);
     transition: background .2s, color .2s, border-color .2s;
   }
   .sidebar-reopen:hover {
@@ -282,7 +285,7 @@ $page_styles = <<<PAGECSS
 
   /* ── Mobile ──────────────────────────────────────────────────────────── */
   @media (max-width: 900px) {
-    .viral-layout    { flex-direction: column; height: auto; min-height: calc(100vh - var(--header-height)); }
+    .viral-layout { flex-direction: column; height: auto; min-height: calc(100vh - var(--header-height)); }
     .prompt-sidebar  { width: 100% !important; border-right: none; border-bottom: 1px solid var(--border-color); max-height: 260px; }
     .prompt-sidebar.collapsed { max-height: 0; overflow: hidden; border-bottom: none; }
     .sidebar-toggle  { display: none; }
@@ -305,7 +308,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
     <!-- ── Prompt Sidebar ─────────────────────────────────────────────── -->
     <aside class="prompt-sidebar" id="promptSidebar">
-      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle prompt sidebar">
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle prompt sidebar" aria-expanded="true">
         <iconify-icon icon="lucide:chevron-left" id="sidebarToggleIcon"></iconify-icon>
       </button>
       <div class="sidebar-header">
@@ -542,11 +545,17 @@ $page_scripts = <<<PAGEJS
   });
 
   function updateSidebarIcon() {
-    if (!sidebarToggleIcon || !promptSidebar) return;
+    if (!sidebarToggleIcon || !promptSidebar || !sidebarToggle) return;
     const collapsed = promptSidebar.classList.contains('collapsed');
     sidebarToggleIcon.setAttribute('icon', collapsed ? 'lucide:chevron-right' : 'lucide:chevron-left');
-    if (sidebarToggle) sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
-    if (sidebarReopen) sidebarReopen.setAttribute('aria-hidden', collapsed ? 'false' : 'true');
+    sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
+    if (sidebarReopen) {
+      if (collapsed) {
+        sidebarReopen.removeAttribute('aria-hidden');
+      } else {
+        sidebarReopen.setAttribute('aria-hidden', 'true');
+      }
+    }
   }
 
   function renderPromptList(searchTerm) {
@@ -586,6 +595,10 @@ $page_scripts = <<<PAGEJS
     sidebarToggle.addEventListener('click', function () {
       promptSidebar.classList.toggle('collapsed');
       updateSidebarIcon();
+      const expanded = !promptSidebar.classList.contains('collapsed');
+      if (expanded && promptSearch) {
+        promptSearch.focus();
+      }
     });
   }
 
