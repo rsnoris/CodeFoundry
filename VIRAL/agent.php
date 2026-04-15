@@ -24,7 +24,7 @@ $agentIcon    = htmlspecialchars($agent['icon'],  ENT_QUOTES, 'UTF-8');
 $agentAccent  = htmlspecialchars($agent['accent'], ENT_QUOTES, 'UTF-8');
 $roleJson     = json_encode($role);
 $agentIconJson = json_encode($agent['icon']);
-$firstThirtyRolesJson = json_encode(array_slice(array_keys(VIRAL_AGENTS), 0, 30));
+$expandedRoleSlugsJson = json_encode(array_slice(array_keys(VIRAL_AGENTS), 0, 30));
 
 $page_title  = $agentLabel . ' Agent – CodeFoundry VIRAL';
 $active_page = 'viral';
@@ -352,7 +352,9 @@ $page_scripts = <<<PAGEJS
 (function () {
   const ROLE       = {$roleJson};
   const AGENT_ICON = {$agentIconJson};
-  const FIRST_THIRTY_ROLES = {$firstThirtyRolesJson};
+  const EXPANDED_ROLE_SLUGS = {$expandedRoleSlugsJson};
+  const MAX_PROMPTS_PER_EXPANDED_ROLE = 64;
+  const SUGGESTION_CHIP_COUNT = 8;
 
   const BASE_SUGGESTIONS = {
     'software-engineer':    ['Review this code snippet', 'How do I design a REST API?', 'Explain SOLID principles', 'Best practices for async JavaScript', 'Optimize a slow database query', 'Implement JWT authentication', 'Explain the CAP theorem', 'How do I implement caching with Redis?'],
@@ -461,13 +463,13 @@ $page_scripts = <<<PAGEJS
 
   function buildPromptsForRole(role) {
     const base = BASE_SUGGESTIONS[role] || [];
-    if (!FIRST_THIRTY_ROLES.includes(role)) return base;
+    if (!EXPANDED_ROLE_SLUGS.includes(role)) return base;
 
     const roleTitle = titleFromSlug(role);
     const generated = PROMPT_TEMPLATES.map(function (template) {
       return template.replace(/\{role\}/g, roleTitle);
     });
-    return Array.from(new Set(base.concat(generated))).slice(0, 64);
+    return Array.from(new Set(base.concat(generated))).slice(0, MAX_PROMPTS_PER_EXPANDED_ROLE);
   }
 
   const chatMessages  = document.getElementById('chatMessages');
@@ -489,7 +491,7 @@ $page_scripts = <<<PAGEJS
   let busy    = false;
 
   // Render suggestion chips
-  const chips = rolePrompts.slice(0, 8);
+  const chips = rolePrompts.slice(0, SUGGESTION_CHIP_COUNT);
   chips.forEach(function (text) {
     const btn = document.createElement('button');
     btn.className = 'chip';
