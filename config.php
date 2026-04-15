@@ -137,7 +137,7 @@ define('CF_GEMINI_KEY', cf_load_key('GEMINI_API_KEY'));
  *   api_url_env       – (optional) env-var to override api_url (used by Ollama so the URL is configurable)
  *   extra_headers     – (optional) additional raw HTTP headers to send
  *   model_in_url      – (optional) true when the model ID is embedded in the URL (HuggingFace)
- *   no_key_required   – (optional) true when no API key is needed (e.g. Pollinations.ai)
+ *   no_key_required   – (optional) true when no API key is needed
  *   free_tier         – (optional) true = default provider for free-plan / unauthenticated users
  *   models            – ordered list of {id, label} model descriptors
  *   default_model     – model ID pre-selected in the UI
@@ -145,26 +145,6 @@ define('CF_GEMINI_KEY', cf_load_key('GEMINI_API_KEY'));
  *   local             – true for local inference (Ollama); these are always "available"
  */
 define('CF_CODEGEN_PROVIDERS', [
-
-    // ── Default free-tier provider (no API key required) ──────────────────────
-    // Pollinations.ai is completely free with no sign-up needed.  It is the first
-    // free_tier entry so unauthenticated / free-plan users are routed here
-    // automatically via CodeGenProvider::defaultFreeProviderId().
-    'pollinations' => [
-        'label'            => 'Pollinations.ai (Free)',
-        'api_url'          => 'https://text.pollinations.ai/openai',
-        'no_key_required'  => true,
-        'free_tier'        => true,
-        'models'           => [
-            ['id' => 'openai',       'label' => 'GPT-4o (via Pollinations)'],
-            ['id' => 'openai-mini',  'label' => 'GPT-4o Mini (via Pollinations)'],
-            ['id' => 'mistral',      'label' => 'Mistral (via Pollinations)'],
-            ['id' => 'llama',        'label' => 'Llama (via Pollinations)'],
-        ],
-        'default_model'    => 'openai-mini',
-        'opensource'       => true,
-        'local'            => false,
-    ],
 
     'groq' => [
         'label'         => 'Groq',
