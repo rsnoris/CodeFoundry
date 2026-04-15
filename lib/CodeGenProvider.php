@@ -246,10 +246,10 @@ class CodeGenProvider
         }
         if (!empty($cfg['api_key_env'])) {
             $keyName = (string)$cfg['api_key_env'];
-            if (session_status() === PHP_SESSION_NONE) {
-                @session_start();
+            $username = '';
+            if (session_status() === PHP_SESSION_ACTIVE) {
+                $username = $_SESSION['cf_user']['username'] ?? '';
             }
-            $username = $_SESSION['cf_user']['username'] ?? '';
             if (is_string($username) && $username !== '') {
                 return cf_load_user_key($username, $keyName);
             }

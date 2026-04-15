@@ -26,6 +26,7 @@ if (session_status() === PHP_SESSION_NONE) {
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+const OPENROUTER_MAX_KEY_LENGTH = 500;
 
 $flash_profile  = '';
 $flash_password = '';
@@ -91,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form'] ?? '') === 'openrou
         $error_api = 'Invalid request. Please refresh and try again.';
     } else {
         $openrouter_key = trim((string)($_POST['openrouter_api_key'] ?? ''));
-        if ($openrouter_key !== '' && strlen($openrouter_key) > 500) {
+        if ($openrouter_key !== '' && strlen($openrouter_key) > OPENROUTER_MAX_KEY_LENGTH) {
             $error_api = 'API key value is too long.';
         } else {
             UserStore::saveUserApiKey($username, 'OPENROUTER_API_KEY', $openrouter_key);
@@ -348,7 +349,7 @@ require_once dirname(dirname(__DIR__)) . '/includes/header.php';
             <div class="form-group full">
               <label class="form-label" for="openrouter_api_key">OpenRouter API Key</label>
               <input type="password" id="openrouter_api_key" name="openrouter_api_key" class="form-input"
-                     placeholder="Paste your OpenRouter API key (stored under Cf-Config-keys/Users/<?= cf_e($username) ?>/)">
+                     placeholder="Paste your OpenRouter API key (stored in your account config folder)">
               <?php if ($openrouter_key_masked !== ''): ?>
                 <span class="form-hint">Current saved value: <?= cf_e($openrouter_key_masked) ?></span>
               <?php else: ?>
