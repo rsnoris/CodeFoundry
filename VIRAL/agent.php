@@ -29,215 +29,238 @@ $page_title  = $agentLabel . ' Agent – CodeFoundry VIRAL';
 $active_page = 'viral';
 $page_styles = <<<PAGECSS
   :root { --accent: {$agent['accent']}; }
-  .viral-chat-wrap {
-    max-width: 860px;
+
+  /* ── Layout ──────────────────────────────────────────────────────────── */
+  .viral-layout {
+    display: flex;
+    gap: 0;
+    min-height: calc(100vh - 120px);
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 40px 24px 100px;
+  }
+
+  /* ── Prompt Sidebar ──────────────────────────────────────────────────── */
+  .prompt-sidebar {
+    width: 290px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    gap: 20px;
-  }
-  .agent-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .agent-icon-lg {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    background: var(--accent)22;
-    border: 1.5px solid var(--accent)55;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .agent-icon-lg iconify-icon {
-    font-size: 26px;
-    color: var(--accent);
-  }
-  .agent-header-info h1 {
-    margin: 0 0 4px;
-    font-size: 22px;
-    font-weight: 800;
-  }
-  .agent-header-info p {
-    margin: 0;
-    color: var(--text-muted);
-    font-size: 14px;
-  }
-  .back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--text-muted);
-    font-size: 13px;
-    margin-bottom: 8px;
-    transition: color .2s;
-  }
-  .back-link:hover { color: var(--accent); }
-  /* Chat window */
-  .chat-window {
-    background: #0d1626;
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
+    background: #080f1e;
+    position: relative;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    transition: width .25s ease;
   }
-  .chat-messages {
-    flex: 1;
-    min-height: 420px;
-    max-height: 560px;
-    overflow-y: auto;
-    padding: 24px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    scroll-behavior: smooth;
-  }
-  .chat-messages::-webkit-scrollbar { width: 5px; }
-  .chat-messages::-webkit-scrollbar-thumb { background: #1e2e48; border-radius: 4px; }
-  /* Message bubbles */
-  .msg {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-    max-width: 88%;
-    animation: msgIn .25s ease;
-  }
-  @keyframes msgIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
-  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
-  .msg-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+  .prompt-sidebar.collapsed { width: 0; border-right: none; }
+  .sidebar-header {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--border-color);
     flex-shrink: 0;
-    font-size: 16px;
+    white-space: nowrap;
   }
-  .msg.assistant .msg-avatar { background: var(--accent)22; color: var(--accent); border: 1px solid var(--accent)44; }
-  .msg.user .msg-avatar      { background: #1a2942; color: var(--text-muted); }
-  .msg-bubble {
-    padding: 12px 16px;
-    border-radius: 12px;
-    font-size: 14px;
-    line-height: 1.7;
-    white-space: pre-wrap;
-    word-break: break-word;
+  .sidebar-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--text-muted);
   }
-  .msg.assistant .msg-bubble {
-    background: #111b30;
-    border: 1px solid var(--border-color);
-    color: var(--text);
+  .sidebar-search {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
   }
-  .msg.user .msg-bubble {
-    background: var(--accent)18;
-    border: 1px solid var(--accent)44;
-    color: var(--text);
-  }
-  /* Typing indicator */
-  .typing-indicator { display: none; }
-  .typing-indicator .dot {
-    display: inline-block;
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--accent);
-    opacity: .5;
-    margin: 0 2px;
-    animation: blink 1.2s infinite;
-  }
-  .typing-indicator .dot:nth-child(2) { animation-delay: .2s; }
-  .typing-indicator .dot:nth-child(3) { animation-delay: .4s; }
-  @keyframes blink { 0%,80%,100%{opacity:.25} 40%{opacity:1} }
-  /* Input bar */
-  .chat-input-bar {
-    padding: 16px 20px;
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
+  .sidebar-search input {
+    width: 100%;
     background: #0d1626;
-  }
-  .chat-input-bar textarea {
-    flex: 1;
-    background: #0e1828;
     border: 1px solid #1e2e48;
     color: var(--text);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 14px;
+    border-radius: 8px;
+    padding: 7px 11px;
+    font-size: 12px;
     font-family: inherit;
-    resize: none;
     outline: none;
-    line-height: 1.6;
-    min-height: 44px;
-    max-height: 160px;
-    overflow-y: auto;
     transition: border-color .2s;
+    box-sizing: border-box;
   }
-  .chat-input-bar textarea:focus { border-color: var(--accent); }
-  .chat-send-btn {
-    background: var(--accent);
-    color: #0a1428;
+  .sidebar-search input:focus { border-color: var(--accent); }
+  .prompt-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 0;
+  }
+  .prompt-list::-webkit-scrollbar { width: 4px; }
+  .prompt-list::-webkit-scrollbar-thumb { background: #1e2e48; border-radius: 3px; }
+  .prompt-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
     border: none;
-    border-radius: 10px;
-    width: 44px;
-    height: 44px;
+    color: #7a8eaa;
+    font-size: 12.5px;
+    line-height: 1.5;
+    padding: 7px 16px;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+    font-family: inherit;
+    white-space: normal;
+  }
+  .prompt-item:hover { background: #0d1626; color: var(--text); }
+  .prompt-item.hidden { display: none; }
+  .prompt-count {
+    padding: 6px 16px 10px;
+    font-size: 11px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-color);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .sidebar-toggle {
+    position: absolute;
+    top: 14px;
+    right: -14px;
+    z-index: 10;
+    width: 28px;
+    height: 28px;
+    background: #0d1626;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    color: var(--text-muted);
+    transition: background .2s, color .2s;
     flex-shrink: 0;
+  }
+  .sidebar-toggle:hover { background: #111b30; color: var(--accent); }
+
+  /* ── Chat area ───────────────────────────────────────────────────────── */
+  .viral-chat-wrap {
+    flex: 1;
+    min-width: 0;
+    padding: 28px 28px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .agent-header { display: flex; align-items: center; gap: 16px; }
+  .agent-icon-lg {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: var(--accent)22;
+    border: 1.5px solid var(--accent)55;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .agent-icon-lg iconify-icon { font-size: 26px; color: var(--accent); }
+  .agent-header-info h1 { margin: 0 0 4px; font-size: 22px; font-weight: 800; }
+  .agent-header-info p  { margin: 0; color: var(--text-muted); font-size: 14px; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--text-muted); font-size: 13px; margin-bottom: 8px;
+    transition: color .2s;
+  }
+  .back-link:hover { color: var(--accent); }
+  .chat-window {
+    background: #0d1626; border: 1px solid var(--border-color);
+    border-radius: 16px; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .chat-messages {
+    flex: 1; min-height: 420px; max-height: 560px;
+    overflow-y: auto; padding: 24px 20px;
+    display: flex; flex-direction: column; gap: 16px;
+    scroll-behavior: smooth;
+  }
+  .chat-messages::-webkit-scrollbar { width: 5px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: #1e2e48; border-radius: 4px; }
+  .msg {
+    display: flex; gap: 10px; align-items: flex-start;
+    max-width: 88%; animation: msgIn .25s ease;
+  }
+  @keyframes msgIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+  .msg-avatar {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 16px;
+  }
+  .msg.assistant .msg-avatar { background: var(--accent)22; color: var(--accent); border: 1px solid var(--accent)44; }
+  .msg.user .msg-avatar      { background: #1a2942; color: var(--text-muted); }
+  .msg-bubble {
+    padding: 12px 16px; border-radius: 12px;
+    font-size: 14px; line-height: 1.7;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .msg.assistant .msg-bubble { background: #111b30; border: 1px solid var(--border-color); color: var(--text); }
+  .msg.user .msg-bubble      { background: var(--accent)18; border: 1px solid var(--accent)44; color: var(--text); }
+  .typing-indicator { display: none; }
+  .typing-indicator .dot {
+    display: inline-block; width: 7px; height: 7px;
+    border-radius: 50%; background: var(--accent);
+    opacity: .5; margin: 0 2px; animation: blink 1.2s infinite;
+  }
+  .typing-indicator .dot:nth-child(2) { animation-delay: .2s; }
+  .typing-indicator .dot:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%,80%,100%{opacity:.25} 40%{opacity:1} }
+  .chat-input-bar {
+    padding: 16px 20px; border-top: 1px solid var(--border-color);
+    display: flex; gap: 10px; align-items: flex-end;
+    background: #0d1626;
+  }
+  .chat-input-bar textarea {
+    flex: 1; background: #0e1828; border: 1px solid #1e2e48;
+    color: var(--text); border-radius: 10px; padding: 10px 14px;
+    font-size: 14px; font-family: inherit; resize: none; outline: none;
+    line-height: 1.6; min-height: 44px; max-height: 160px;
+    overflow-y: auto; transition: border-color .2s;
+  }
+  .chat-input-bar textarea:focus { border-color: var(--accent); }
+  .chat-send-btn {
+    background: var(--accent); color: #0a1428;
+    border: none; border-radius: 10px; width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0;
     transition: background .2s, opacity .2s;
-    font-size: 18px;
   }
   .chat-send-btn:hover:not(:disabled) { background: #009de0; }
   .chat-send-btn:disabled { opacity: .45; cursor: not-allowed; }
   .chat-send-btn iconify-icon { font-size: 18px; }
   .error-toast {
-    display: none;
-    background: #ff4d4d22;
-    border: 1px solid #ff4d4d55;
-    color: #ff7676;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 13px;
+    display: none; background: #ff4d4d22; border: 1px solid #ff4d4d55;
+    color: #ff7676; border-radius: 8px; padding: 10px 14px; font-size: 13px;
   }
-  /* Welcome message */
-  .welcome-hint {
-    text-align: center;
-    padding: 48px 20px;
-    color: var(--text-muted);
-  }
+  .welcome-hint { text-align: center; padding: 48px 20px; color: var(--text-muted); }
   .welcome-hint iconify-icon { font-size: 42px; color: var(--accent); opacity: .6; margin-bottom: 12px; display:block; }
   .welcome-hint h2 { margin: 0 0 8px; font-size: 18px; color: var(--text); }
-  .welcome-hint p { margin: 0; font-size: 14px; line-height: 1.6; }
-  /* Suggestion chips */
-  .suggestion-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 0 20px 16px;
-  }
+  .welcome-hint p  { margin: 0; font-size: 14px; line-height: 1.6; }
+  .suggestion-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 16px; }
   .chip {
-    background: #0e1828;
-    border: 1px solid #1e2e48;
-    color: var(--text-muted);
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 12px;
-    cursor: pointer;
+    background: #0e1828; border: 1px solid #1e2e48;
+    color: var(--text-muted); border-radius: 20px;
+    padding: 6px 14px; font-size: 12px; cursor: pointer;
     transition: border-color .2s, color .2s;
   }
   .chip:hover { border-color: var(--accent); color: var(--accent); }
-  @media (max-width: 600px) {
-    .viral-chat-wrap { padding: 20px 14px 80px; }
-    .chat-messages { min-height: 340px; }
-    .msg { max-width: 96%; }
+
+  /* ── Mobile ──────────────────────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .viral-layout    { flex-direction: column; }
+    .prompt-sidebar  { width: 100% !important; border-right: none; border-bottom: 1px solid var(--border-color); max-height: 260px; }
+    .prompt-sidebar.collapsed { max-height: 0; overflow: hidden; border-bottom: none; }
+    .sidebar-toggle  { display: none; }
+    .mobile-sidebar-btn { display: inline-flex !important; }
+    .viral-chat-wrap { padding: 16px 14px 80px; }
+    .chat-messages   { min-height: 340px; }
+    .msg             { max-width: 96%; }
+  }
+  @media (min-width: 901px) {
+    .mobile-sidebar-btn { display: none !important; }
   }
 PAGECSS;
 
@@ -245,60 +268,82 @@ require_once dirname(__DIR__) . '/includes/header.php';
 ?>
 
 <main>
-  <div class="viral-chat-wrap">
+  <div class="viral-layout">
 
-    <div>
-      <a href="/VIRAL/" class="back-link">
-        <iconify-icon icon="lucide:arrow-left"></iconify-icon>
-        All VIRAL Agents
-      </a>
-    </div>
-
-    <div class="agent-header">
-      <div class="agent-icon-lg">
-        <iconify-icon icon="<?= $agentIcon ?>"></iconify-icon>
+    <!-- ── Prompt Sidebar ─────────────────────────────────────────────── -->
+    <aside class="prompt-sidebar" id="promptSidebar">
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle prompt sidebar">
+        <iconify-icon icon="lucide:chevron-left" id="sidebarToggleIcon"></iconify-icon>
+      </button>
+      <div class="sidebar-header">
+        <span class="sidebar-title">Prompt Examples</span>
       </div>
-      <div class="agent-header-info">
-        <h1><?= $agentLabel ?></h1>
-        <p><?= $agentDesc ?></p>
+      <div class="sidebar-search">
+        <input type="text" id="promptSearch" placeholder="Search prompts…" autocomplete="off">
       </div>
-    </div>
+      <div class="prompt-list" id="promptList"></div>
+      <div class="prompt-count" id="promptCount"></div>
+    </aside>
 
-    <div id="errorToast" class="error-toast"></div>
+    <!-- ── Chat Area ──────────────────────────────────────────────────── -->
+    <div class="viral-chat-wrap">
 
-    <div class="chat-window">
-      <div class="chat-messages" id="chatMessages">
-        <div class="welcome-hint" id="welcomeHint">
+      <div>
+        <button class="chip mobile-sidebar-btn" id="mobileSidebarBtn" style="display:none;margin-bottom:8px;">
+          <iconify-icon icon="lucide:list" style="font-size:13px;margin-right:4px;"></iconify-icon>
+          Prompt Examples
+        </button>
+        <a href="/VIRAL/" class="back-link">
+          <iconify-icon icon="lucide:arrow-left"></iconify-icon>
+          All VIRAL Agents
+        </a>
+      </div>
+
+      <div class="agent-header">
+        <div class="agent-icon-lg">
           <iconify-icon icon="<?= $agentIcon ?>"></iconify-icon>
-          <h2>Your <?= $agentLabel ?></h2>
+        </div>
+        <div class="agent-header-info">
+          <h1><?= $agentLabel ?></h1>
           <p><?= $agentDesc ?></p>
         </div>
+      </div>
 
-        <!-- Typing indicator (hidden by default) -->
-        <div class="msg assistant typing-indicator" id="typingIndicator">
-          <div class="msg-avatar">
+      <div id="errorToast" class="error-toast"></div>
+
+      <div class="chat-window">
+        <div class="chat-messages" id="chatMessages">
+          <div class="welcome-hint" id="welcomeHint">
             <iconify-icon icon="<?= $agentIcon ?>"></iconify-icon>
+            <h2>Your <?= $agentLabel ?></h2>
+            <p><?= $agentDesc ?></p>
           </div>
-          <div class="msg-bubble">
-            <span class="dot"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
+          <!-- Typing indicator (hidden by default) -->
+          <div class="msg assistant typing-indicator" id="typingIndicator">
+            <div class="msg-avatar">
+              <iconify-icon icon="<?= $agentIcon ?>"></iconify-icon>
+            </div>
+            <div class="msg-bubble">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
           </div>
+        </div>
+
+        <!-- Suggestion chips (shown before first message) -->
+        <div class="suggestion-chips" id="suggestionChips"></div>
+
+        <div class="chat-input-bar">
+          <textarea id="chatInput" placeholder="Ask your <?= $agentLabel ?>…" rows="1"></textarea>
+          <button class="chat-send-btn" id="sendBtn" aria-label="Send message">
+            <iconify-icon icon="lucide:send"></iconify-icon>
+          </button>
         </div>
       </div>
 
-      <!-- Suggestion chips (shown before first message) -->
-      <div class="suggestion-chips" id="suggestionChips"></div>
-
-      <div class="chat-input-bar">
-        <textarea id="chatInput" placeholder="Ask your <?= $agentLabel ?>…" rows="1"></textarea>
-        <button class="chat-send-btn" id="sendBtn" aria-label="Send message">
-          <iconify-icon icon="lucide:send"></iconify-icon>
-        </button>
-      </div>
-    </div>
-
-  </div>
+    </div><!-- /.viral-chat-wrap -->
+  </div><!-- /.viral-layout -->
 </main>
 
 <?php

@@ -123,46 +123,70 @@ define('CF_DATA_CHAT_MESSAGES',   CF_ROOT . '/UserAccountData/chat_messages.json
 /** OpenAI API key for the CodeGen feature. Set via key file or environment variable. */
 define('CF_OPENAI_KEY', cf_load_key('OPENAI_API_KEY'));
 
+/** Google Gemini API key. Get a free key at https://aistudio.google.com/app/apikey */
+define('CF_GEMINI_KEY', cf_load_key('GEMINI_API_KEY'));
+
 /**
  * CodeGen provider registry.
  *
  * Each entry describes one inference backend.  Keys:
- *   label          – human-readable provider name shown in the UI
- *   api_url        – full endpoint URL; use {model} placeholder when model_in_url is true
- *   api_key_env    – (optional) env-var name that holds the API key
- *   api_key        – (optional) hard-coded key (used by Ollama which accepts any string)
- *   api_url_env    – (optional) env-var to override api_url (used by Ollama so the URL is configurable)
- *   extra_headers  – (optional) additional raw HTTP headers to send
- *   model_in_url   – (optional) true when the model ID is embedded in the URL (HuggingFace)
- *   models         – ordered list of {id, label} model descriptors
- *   default_model  – model ID pre-selected in the UI
- *   opensource     – true for fully open-source / free-tier models
- *   local          – true for local inference (Ollama); these are always "available"
+ *   label             – human-readable provider name shown in the UI
+ *   api_url           – full endpoint URL; use {model} placeholder when model_in_url is true
+ *   api_key_env       – (optional) env-var name that holds the API key
+ *   api_key           – (optional) hard-coded key (used by Ollama which accepts any string)
+ *   api_url_env       – (optional) env-var to override api_url (used by Ollama so the URL is configurable)
+ *   extra_headers     – (optional) additional raw HTTP headers to send
+ *   model_in_url      – (optional) true when the model ID is embedded in the URL (HuggingFace)
+ *   no_key_required   – (optional) true when no API key is needed (e.g. Pollinations.ai)
+ *   free_tier         – (optional) true = default provider for free-plan / unauthenticated users
+ *   models            – ordered list of {id, label} model descriptors
+ *   default_model     – model ID pre-selected in the UI
+ *   opensource        – true for fully open-source / free-tier models
+ *   local             – true for local inference (Ollama); these are always "available"
  */
 define('CF_CODEGEN_PROVIDERS', [
+
+    // ── Default free-tier provider (no API key required) ──────────────────────
+    // Pollinations.ai is completely free with no sign-up needed.  It is the first
+    // free_tier entry so unauthenticated / free-plan users are routed here
+    // automatically via CodeGenProvider::defaultFreeProviderId().
+    'pollinations' => [
+        'label'            => 'Pollinations.ai (Free)',
+        'api_url'          => 'https://text.pollinations.ai/openai',
+        'no_key_required'  => true,
+        'free_tier'        => true,
+        'models'           => [
+            ['id' => 'openai',       'label' => 'GPT-4o (via Pollinations)'],
+            ['id' => 'openai-mini',  'label' => 'GPT-4o Mini (via Pollinations)'],
+            ['id' => 'mistral',      'label' => 'Mistral (via Pollinations)'],
+            ['id' => 'llama',        'label' => 'Llama (via Pollinations)'],
+        ],
+        'default_model'    => 'openai-mini',
+        'opensource'       => true,
+        'local'            => false,
+    ],
 
     'groq' => [
         'label'         => 'Groq',
         'api_url'       => 'https://api.groq.com/openai/v1/chat/completions',
         'api_key_env'   => 'GROQ_API_KEY',
         'models'        => [
-            ['id' => 'llama-3.1-70b-versatile',          'label' => 'Llama 3.1 70B'],
+            ['id' => 'llama-3.3-70b-versatile',          'label' => 'Llama 3.3 70B'],
             ['id' => 'llama-3.1-8b-instant',             'label' => 'Llama 3.1 8B'],
             ['id' => 'mixtral-8x7b-32768',               'label' => 'Mixtral 8×7B'],
             ['id' => 'gemma2-9b-it',                     'label' => 'Gemma 2 9B'],
             ['id' => 'deepseek-r1-distill-llama-70b',    'label' => 'DeepSeek R1 70B'],
         ],
-        'default_model' => 'llama-3.1-70b-versatile',
+        'default_model' => 'llama-3.3-70b-versatile',
         'opensource'    => true,
         'local'         => false,
     ],
 
-    // ── Free-tier provider ────────────────────────────────────────────────────
+    // ── OpenRouter (free-tier fallback when Pollinations is insufficient) ──────
     // OpenRouter provides access to many open-source models, including several
     // completely free-of-charge ones (marked with :free in the model id).
     // A free OpenRouter account and API key are required; sign up at openrouter.ai.
-    // Set OPENROUTER_API_KEY in the key store. Free-plan users are automatically
-    // routed to the :free models at no cost.
+    // Set OPENROUTER_API_KEY in the key store.
     'openrouter' => [
         'label'         => 'OpenRouter',
         'api_url'       => 'https://openrouter.ai/api/v1/chat/completions',
@@ -171,7 +195,7 @@ define('CF_CODEGEN_PROVIDERS', [
             'HTTP-Referer: https://codefoundry.cloud',
             'X-Title: CodeFoundry',
         ],
-        'free_tier'     => true,   // default for free-plan / unauthenticated users
+        'free_tier'     => true,   // free-tier fallback (requires a free API key)
         'models'        => [
             ['id' => 'meta-llama/llama-3.1-8b-instruct:free',  'label' => 'Llama 3.1 8B (Free)'],
             ['id' => 'mistralai/mistral-7b-instruct:free',      'label' => 'Mistral 7B (Free)'],
@@ -235,14 +259,39 @@ define('CF_CODEGEN_PROVIDERS', [
         'local'         => false,
     ],
 
+    // ── Google Gemini ─────────────────────────────────────────────────────────
+    // Uses Google's OpenAI-compatible endpoint.
+    // Get a free key at: https://aistudio.google.com/app/apikey
+    // Set GEMINI_API_KEY in the key store.
+    'gemini' => [
+        'label'         => 'Google Gemini',
+        'api_url'       => 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+        'api_key_env'   => 'GEMINI_API_KEY',
+        'models'        => [
+            ['id' => 'gemini-2.0-flash',        'label' => 'Gemini 2.0 Flash'],
+            ['id' => 'gemini-2.0-flash-lite',   'label' => 'Gemini 2.0 Flash Lite'],
+            ['id' => 'gemini-1.5-flash',        'label' => 'Gemini 1.5 Flash'],
+            ['id' => 'gemini-1.5-pro',          'label' => 'Gemini 1.5 Pro'],
+            ['id' => 'gemini-1.5-flash-8b',     'label' => 'Gemini 1.5 Flash 8B'],
+        ],
+        'default_model' => 'gemini-2.0-flash',
+        'opensource'    => false,
+        'local'         => false,
+    ],
+
+    // ── OpenAI (ChatGPT) ──────────────────────────────────────────────────────
+    // Set OPENAI_API_KEY in the key store.
     'openai' => [
-        'label'         => 'OpenAI',
+        'label'         => 'OpenAI (ChatGPT)',
         'api_url'       => 'https://api.openai.com/v1/chat/completions',
         'api_key_env'   => 'OPENAI_API_KEY',
         'models'        => [
             ['id' => 'gpt-4o-mini',   'label' => 'GPT-4o Mini'],
             ['id' => 'gpt-4o',        'label' => 'GPT-4o'],
+            ['id' => 'gpt-4-turbo',   'label' => 'GPT-4 Turbo'],
             ['id' => 'gpt-3.5-turbo', 'label' => 'GPT-3.5 Turbo'],
+            ['id' => 'o1-mini',       'label' => 'o1 Mini'],
+            ['id' => 'o3-mini',       'label' => 'o3 Mini'],
         ],
         'default_model' => 'gpt-4o-mini',
         'opensource'    => false,
