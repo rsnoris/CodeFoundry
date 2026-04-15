@@ -54,6 +54,7 @@ function cf_active(string $id): string {
       <a href="/#industries"  class="nav-link<?= cf_active('industries') ?>">Industries</a>
       <a href="/CaseStudies/" class="nav-link<?= cf_active('case-studies') ?>">Case Studies</a>
       <a href="/Training/"    class="nav-link<?= cf_active('training') ?>">Training</a>
+      <a href="/VIRAL/"       class="nav-link<?= cf_active('viral') ?>">VIRAL Agents</a>
       <?php if ($_cf_user): ?>
       <a href="/Tools/"       class="nav-link<?= cf_active('tools') ?>">Tools</a>
       <?php endif; ?>
@@ -113,6 +114,7 @@ function cf_active(string $id): string {
         <a href="/#industries"  class="nav-link" onclick="closeMobileNav()">Industries</a>
         <a href="/CaseStudies/" class="nav-link" onclick="closeMobileNav()">Case Studies</a>
         <a href="/Training/"    class="nav-link" onclick="closeMobileNav()">Training</a>
+        <a href="/VIRAL/"       class="nav-link" onclick="closeMobileNav()">VIRAL Agents</a>
         <?php if ($_cf_user): ?>
         <a href="/Tools/"       class="nav-link" onclick="closeMobileNav()">Tools</a>
         <?php endif; ?>
