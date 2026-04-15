@@ -1352,10 +1352,10 @@ require_once dirname(__DIR__) . '/includes/header.php';
           </div>
           <div class="arch-card">
             <div class="arch-card-title"><iconify-icon icon="lucide:brain-circuit"></iconify-icon>AI / CodeGen</div>
-            <p>Multi-provider AI code generation abstracted by <code>lib/CodeGenProvider.php</code>. Free-tier users are restricted to Pollinations.</p>
+            <p>Multi-provider AI code generation abstracted by <code>lib/CodeGenProvider.php</code>. Free-tier users are restricted to OpenRouter free models.</p>
             <ul>
-              <li>Pollinations AI (free, no key)</li>
-              <li>Groq, OpenRouter, Together AI</li>
+              <li>OpenRouter (free models: Llama 3.1 8B, Mistral 7B, Gemma 2 9B, etc.)</li>
+              <li>Groq, Together AI</li>
               <li>HuggingFace Inference API</li>
               <li>Ollama (local)</li>
               <li>OpenAI</li>
@@ -1469,7 +1469,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
         <div class="wf-section">
           <div class="wf-title">3. AI Code Generation (IDE)</div>
-          <div class="wf-step"><div class="wf-step-num">1</div><div class="wf-step-body"><h4>Open /IDE/</h4><p>User selects language, provider and model. Free-plan users see only Pollinations AI.</p></div></div>
+          <div class="wf-step"><div class="wf-step-num">1</div><div class="wf-step-body"><h4>Open /IDE/</h4><p>User selects language, provider and model. Free-plan users see only OpenRouter free models (Llama 3.1 8B, Mistral 7B, etc.).</p></div></div>
           <div class="wf-step"><div class="wf-step-num">2</div><div class="wf-step-body"><h4>POST /IDE/codegen.php</h4><p>JSON body with action, prompt, language, provider, model. Plan check: free users restricted to free_tier providers.</p></div></div>
           <div class="wf-step"><div class="wf-step-num">3</div><div class="wf-step-body"><h4>Provider Dispatch</h4><p>CodeGenProvider resolves provider config, builds OpenAI-compatible chat request, streams response.</p></div></div>
           <div class="wf-step"><div class="wf-step-num">4</div><div class="wf-step-body"><h4>Token Accounting</h4><p>Response token count written to token_history.json and user tokens_used incremented. AuditStore logs codegen.request.</p></div></div>
