@@ -37,10 +37,10 @@ const VIRAL_MAX_HISTORY_TURNS = 20;
 
 /**
  * Minimum seconds between requests from the same IP.
- * Set high enough to allow comfortable back-and-forth chat while
+ * Low enough to allow comfortable back-and-forth chat while
  * still discouraging automated abuse.
  */
-const VIRAL_RATE_LIMIT_SECONDS = 15;
+const VIRAL_RATE_LIMIT_SECONDS = 5;
 
 // ── Parse body ────────────────────────────────────────────────────────────
 $raw  = file_get_contents('php://input');

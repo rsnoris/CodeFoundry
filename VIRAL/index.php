@@ -254,7 +254,9 @@ foreach (VIRAL_AGENTS as $slug => $a) {
     ];
 }
 
-$categories = ['All', 'Engineering', 'Business', 'Marketing', 'People', 'Design & Legal'];
+$categories      = ['All', 'Engineering', 'Business', 'Marketing', 'People', 'Design & Legal'];
+$agentCount      = count(VIRAL_AGENTS);
+$categoryCount   = count(array_unique(array_column(array_values(VIRAL_AGENTS), 'category')));
 
 require_once dirname(__DIR__) . '/includes/header.php';
 ?>
@@ -316,11 +318,11 @@ require_once dirname(__DIR__) . '/includes/header.php';
   <!-- Stats -->
   <div class="viral-stats">
     <div class="stat-pill">
-      <div class="stat-num"><?= count(VIRAL_AGENTS) ?></div>
+      <div class="stat-num"><?= $agentCount ?></div>
       <div class="stat-lbl">AI Agents</div>
     </div>
     <div class="stat-pill">
-      <div class="stat-num"><?= count(array_unique(array_column(array_values(VIRAL_AGENTS), 'category'))) ?></div>
+      <div class="stat-num"><?= $categoryCount ?></div>
       <div class="stat-lbl">Departments</div>
     </div>
     <div class="stat-pill">

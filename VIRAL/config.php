@@ -16,7 +16,7 @@ if (!defined('VIRAL_AGENTS')) {
      * Keys:
      *   label   – human-readable role name shown in the UI
      *   icon    – Iconify icon identifier
-     *   accent  – CSS colour used for the card / chat theme
+     *   accent  – CSS color used for the card / chat theme
      *   desc    – short one-line description (shown on cards and in chat header)
      *   system  – system-prompt sent to the AI to establish the role persona
      *   category – grouping label used by the index-page filter tabs
