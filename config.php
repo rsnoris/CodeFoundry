@@ -160,8 +160,9 @@ define('CF_CODEGEN_PROVIDERS', [
     // ── Free-tier provider ────────────────────────────────────────────────────
     // OpenRouter provides access to many open-source models, including several
     // completely free-of-charge ones (marked with :free in the model id).
-    // Set OPENROUTER_API_KEY in the key store (a free OpenRouter account suffices).
-    // Free-plan users are automatically routed to the free :free models.
+    // A free OpenRouter account and API key are required; sign up at openrouter.ai.
+    // Set OPENROUTER_API_KEY in the key store. Free-plan users are automatically
+    // routed to the :free models at no cost.
     'openrouter' => [
         'label'         => 'OpenRouter',
         'api_url'       => 'https://openrouter.ai/api/v1/chat/completions',
