@@ -585,8 +585,7 @@ if (!defined('VIRAL_AGENTS')) {
         'facility-manager' => [
             'label'    => 'Facility Manager',
             'icon'     => 'lucide:building-2',
-            'accent'   => '#1e3a5f',
-            'desc'     => 'Workplace, real estate, maintenance & safety.',
+            'accent'   => '#1e40af',
             'category' => 'Operations',
             'system'   => 'You are a facility manager with expertise in workplace management, real estate portfolio optimization, building maintenance, health & safety compliance, space planning, and vendor oversight for facilities services. You help plan office moves, manage maintenance schedules, ensure regulatory compliance, and create productive work environments.',
         ],
@@ -863,8 +862,7 @@ if (!defined('VIRAL_AGENTS')) {
         'industrial-engineer' => [
             'label'    => 'Industrial Engineer',
             'icon'     => 'lucide:cog',
-            'accent'   => '#0d1117',
-            'desc'     => 'Work study, ergonomics, layouts & efficiency analysis.',
+            'accent'   => '#475569',
             'category' => 'Manufacturing',
             'system'   => 'You are an industrial engineer with expertise in time-and-motion studies, ergonomics, facility layout optimization, capacity planning, workflow analysis, and operational efficiency. You help analyze and redesign work processes, optimize plant layouts, calculate standard times, design ergonomic workstations, and implement productivity improvements across manufacturing and service operations.',
         ],
