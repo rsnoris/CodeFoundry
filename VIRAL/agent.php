@@ -24,6 +24,7 @@ $agentIcon    = htmlspecialchars($agent['icon'],  ENT_QUOTES, 'UTF-8');
 $agentAccent  = htmlspecialchars($agent['accent'], ENT_QUOTES, 'UTF-8');
 $roleJson     = json_encode($role);
 $agentIconJson = json_encode($agent['icon']);
+$firstThirtyRolesJson = json_encode(array_slice(array_keys(VIRAL_AGENTS), 0, 30));
 
 $page_title  = $agentLabel . ' Agent – CodeFoundry VIRAL';
 $active_page = 'viral';
@@ -351,9 +352,9 @@ $page_scripts = <<<PAGEJS
 (function () {
   const ROLE       = {$roleJson};
   const AGENT_ICON = {$agentIconJson};
+  const FIRST_THIRTY_ROLES = {$firstThirtyRolesJson};
 
-  // Suggestion prompts keyed by role
-  const SUGGESTIONS = {
+  const BASE_SUGGESTIONS = {
     'software-engineer':    ['Review this code snippet', 'How do I design a REST API?', 'Explain SOLID principles', 'Best practices for async JavaScript', 'Optimize a slow database query', 'Implement JWT authentication', 'Explain the CAP theorem', 'How do I implement caching with Redis?'],
     'product-manager':      ['Write a user story for login', 'How do I prioritize a backlog?', 'Draft a product requirements doc', 'Define success metrics for a feature', 'Write a go-to-market plan', 'Explain the RICE prioritization framework', 'How do I measure product-market fit?', 'Create a product roadmap for a SaaS startup'],
     'data-scientist':       ['How do I handle missing values?', 'Explain gradient boosting', 'Write a Python EDA script', 'Compare classification models', 'Explain the bias-variance tradeoff', 'How do I evaluate a model with imbalanced classes?', 'What is k-fold cross-validation?', 'Build a time series forecasting model'],
@@ -385,6 +386,90 @@ $page_scripts = <<<PAGEJS
     'operations-governance-layer':  ['Set up AI cost monitoring and alerts', 'Explain the EU AI Act requirements', 'Design safety guardrails for an AI agent', 'How to conduct AI red-teaming?', 'Implement PII detection in AI outputs', 'Build an AI audit logging system', 'Create an AI incident response plan', 'Measure and report AI model bias'],
   };
 
+  const PROMPT_TEMPLATES = [
+    'Create a 30-60-90 day plan for a {role}',
+    'Draft an SOP checklist a {role} can use weekly',
+    'Write a beginner-to-advanced roadmap for becoming a {role}',
+    'What KPIs should a {role} track monthly?',
+    'Create a decision framework for a {role} handling tradeoffs',
+    'Write a stakeholder update email from a {role}',
+    'Design a repeatable workflow for a {role}',
+    'Create a risk register template for a {role}',
+    'Draft an executive summary from a {role} perspective',
+    'What are common mistakes new {role}s make and how to avoid them?',
+    'Create a quality review checklist for a {role}',
+    'Design a dashboard a {role} would use daily',
+    'Write interview questions to hire a strong {role}',
+    'Build a competency matrix for a {role}',
+    'Create a weekly planning template for a {role}',
+    'Draft a retrospective template tailored to a {role}',
+    'Write a playbook for handling urgent issues as a {role}',
+    'Create a communication plan a {role} can use cross-functionally',
+    'Define success criteria for a project owned by a {role}',
+    'Create a one-page strategy brief from a {role}',
+    'List automation opportunities a {role} should prioritize',
+    'Write a troubleshooting flowchart for a {role}',
+    'Draft a training plan for onboarding a new {role}',
+    'Create a scorecard to evaluate {role} outcomes',
+    'Build a monthly review template for a {role}',
+    'Write a proposal outline from a {role}',
+    'Create a handoff checklist used by a {role}',
+    'Draft a process-improvement plan for a {role}',
+    'Write a meeting agenda template for a {role}',
+    'Create a project intake form from a {role} perspective',
+    'What tools should every {role} master first?',
+    'Create a prioritization rubric for a {role}',
+    'Design a governance policy a {role} can enforce',
+    'Write a timeline template for work led by a {role}',
+    'Draft escalation guidelines for a {role}',
+    'Create a status-report template used by a {role}',
+    'How should a {role} measure ROI on initiatives?',
+    'Write a budgeting framework for a {role}',
+    'Create a quarterly planning framework for a {role}',
+    'Design a customer/user feedback loop for a {role}',
+    'Write a compliance checklist relevant to a {role}',
+    'Create a documentation standard for a {role}',
+    'Draft a template for presenting recommendations as a {role}',
+    'Create an incident postmortem template for a {role}',
+    'Write a SWOT analysis template from a {role} viewpoint',
+    'Create a change-management plan for a {role}',
+    'What metrics indicate high performance for a {role}?',
+    'Write a mentorship plan for a junior {role}',
+    'Create a cross-team collaboration charter for a {role}',
+    'Draft a stakeholder Q&A sheet from a {role}',
+    'Create a weekly standup update format for a {role}',
+    'Design a pilot program plan led by a {role}',
+    'Write acceptance criteria examples a {role} can use',
+    'Create a governance cadence for a {role}',
+    'Draft a role-specific ethics checklist for a {role}',
+    'Build a cost-optimization plan from a {role}',
+    'Create a quarterly business review template for a {role}',
+    'Write a vendor evaluation checklist for a {role}',
+    'Create a lessons-learned template for a {role}',
+    'Draft a stakeholder alignment memo from a {role}',
+    'Create a risk mitigation matrix for a {role}',
+    'Write a hiring scorecard template for selecting a {role}',
+    'Create a maturity model relevant to a {role}',
+    'Build a service-level expectations template for a {role}',
+  ];
+
+  function titleFromSlug(slug) {
+    return String(slug || '').split('-').map(function (part) {
+      return part ? part.charAt(0).toUpperCase() + part.slice(1) : '';
+    }).join(' ');
+  }
+
+  function buildPromptsForRole(role) {
+    const base = BASE_SUGGESTIONS[role] || [];
+    if (!FIRST_THIRTY_ROLES.includes(role)) return base;
+
+    const roleTitle = titleFromSlug(role);
+    const generated = PROMPT_TEMPLATES.map(function (template) {
+      return template.replace(/\{role\}/g, roleTitle);
+    });
+    return Array.from(new Set(base.concat(generated))).slice(0, 64);
+  }
+
   const chatMessages  = document.getElementById('chatMessages');
   const chatInput     = document.getElementById('chatInput');
   const sendBtn       = document.getElementById('sendBtn');
@@ -392,11 +477,19 @@ $page_scripts = <<<PAGEJS
   const errorToast    = document.getElementById('errorToast');
   const welcomeHint   = document.getElementById('welcomeHint');
   const suggChips     = document.getElementById('suggestionChips');
+  const promptSidebar = document.getElementById('promptSidebar');
+  const promptList    = document.getElementById('promptList');
+  const promptCount   = document.getElementById('promptCount');
+  const promptSearch  = document.getElementById('promptSearch');
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
+  const mobileSidebarBtn = document.getElementById('mobileSidebarBtn');
+  const rolePrompts   = buildPromptsForRole(ROLE);
   let history = [];
   let busy    = false;
 
   // Render suggestion chips
-  const chips = SUGGESTIONS[ROLE] || [];
+  const chips = rolePrompts.slice(0, 8);
   chips.forEach(function (text) {
     const btn = document.createElement('button');
     btn.className = 'chip';
@@ -408,6 +501,58 @@ $page_scripts = <<<PAGEJS
     });
     suggChips.appendChild(btn);
   });
+
+  function updateSidebarIcon() {
+    if (!sidebarToggleIcon || !promptSidebar) return;
+    sidebarToggleIcon.setAttribute('icon', promptSidebar.classList.contains('collapsed') ? 'lucide:chevron-right' : 'lucide:chevron-left');
+  }
+
+  function renderPromptList(searchTerm) {
+    if (!promptList || !promptCount) return;
+    const term = String(searchTerm || '').toLowerCase().trim();
+    promptList.innerHTML = '';
+    let visible = 0;
+
+    rolePrompts.forEach(function (text) {
+      if (term && text.toLowerCase().indexOf(term) === -1) return;
+      visible += 1;
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'prompt-item';
+      item.textContent = text;
+      item.addEventListener('click', function () {
+        chatInput.value = text;
+        chatInput.dispatchEvent(new Event('input'));
+        chatInput.focus();
+      });
+      promptList.appendChild(item);
+    });
+
+    promptCount.textContent = visible + ' of ' + rolePrompts.length + ' prompts';
+  }
+
+  renderPromptList('');
+  updateSidebarIcon();
+
+  if (promptSearch) {
+    promptSearch.addEventListener('input', function () {
+      renderPromptList(this.value);
+    });
+  }
+
+  if (sidebarToggle && promptSidebar) {
+    sidebarToggle.addEventListener('click', function () {
+      promptSidebar.classList.toggle('collapsed');
+      updateSidebarIcon();
+    });
+  }
+
+  if (mobileSidebarBtn && promptSidebar) {
+    mobileSidebarBtn.addEventListener('click', function () {
+      promptSidebar.classList.toggle('collapsed');
+      updateSidebarIcon();
+    });
+  }
 
   function scrollDown() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
