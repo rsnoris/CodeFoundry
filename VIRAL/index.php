@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/config.php';
+require_once __DIR__ . '/config.php';   // VIRAL_AGENTS constant
 
 $page_title  = 'VIRAL Agents – AI for Every Job Role | CodeFoundry';
 $active_page = 'viral';
@@ -239,34 +240,19 @@ $page_styles = <<<'PAGECSS'
   }
 PAGECSS;
 
-// Agent definitions
-$agents = [
-  // Engineering
-  ['slug'=>'software-engineer',    'label'=>'Software Engineer',    'icon'=>'lucide:code-2',             'accent'=>'#18b3ff', 'desc'=>'Code, debug, architecture & technical decisions.',       'category'=>'Engineering'],
-  ['slug'=>'devops-engineer',      'label'=>'DevOps Engineer',      'icon'=>'lucide:server',             'accent'=>'#38bdf8', 'desc'=>'CI/CD pipelines, cloud infra & SRE best practices.',      'category'=>'Engineering'],
-  ['slug'=>'qa-engineer',          'label'=>'QA Engineer',          'icon'=>'lucide:check-circle-2',     'accent'=>'#2dd4bf', 'desc'=>'Test plans, automation scripts & quality assurance.',      'category'=>'Engineering'],
-  ['slug'=>'security-expert',      'label'=>'Security Expert',      'icon'=>'lucide:shield-check',       'accent'=>'#f87171', 'desc'=>'Vulnerability assessment & secure architecture.',          'category'=>'Engineering'],
-  ['slug'=>'data-scientist',       'label'=>'Data Scientist',       'icon'=>'lucide:chart-bar',           'accent'=>'#34d399', 'desc'=>'ML models, statistical analysis & data insights.',        'category'=>'Engineering'],
-  // Business & Strategy
-  ['slug'=>'product-manager',      'label'=>'Product Manager',      'icon'=>'lucide:layout-dashboard',   'accent'=>'#a78bfa', 'desc'=>'Roadmaps, user stories & product strategy.',              'category'=>'Business'],
-  ['slug'=>'business-analyst',     'label'=>'Business Analyst',     'icon'=>'lucide:briefcase',          'accent'=>'#60a5fa', 'desc'=>'Requirements, process modeling & gap analysis.',          'category'=>'Business'],
-  ['slug'=>'project-manager',      'label'=>'Project Manager',      'icon'=>'lucide:kanban',             'accent'=>'#f59e0b', 'desc'=>'Planning, sprint facilitation & risk management.',         'category'=>'Business'],
-  ['slug'=>'financial-analyst',    'label'=>'Financial Analyst',    'icon'=>'lucide:trending-up',        'accent'=>'#4ade80', 'desc'=>'Financial models, forecasts & investment analysis.',       'category'=>'Business'],
-  ['slug'=>'cto-advisor',          'label'=>'CTO Advisor',          'icon'=>'lucide:cpu',                'accent'=>'#818cf8', 'desc'=>'Tech strategy, team scaling & executive decisions.',       'category'=>'Business'],
-  // Marketing & Growth
-  ['slug'=>'marketing-manager',    'label'=>'Marketing Manager',    'icon'=>'lucide:megaphone',          'accent'=>'#f97316', 'desc'=>'Campaigns, copy & go-to-market strategy.',                'category'=>'Marketing'],
-  ['slug'=>'sales-agent',          'label'=>'Sales Agent',          'icon'=>'lucide:badge-dollar-sign',  'accent'=>'#fbbf24', 'desc'=>'Sales scripts, outreach & deal-closing tactics.',         'category'=>'Marketing'],
-  ['slug'=>'seo-specialist',       'label'=>'SEO Specialist',       'icon'=>'lucide:search',             'accent'=>'#facc15', 'desc'=>'Keyword research, on-page & technical SEO audits.',       'category'=>'Marketing'],
-  ['slug'=>'content-writer',       'label'=>'Content Writer',       'icon'=>'lucide:file-text',          'accent'=>'#a3e635', 'desc'=>'Blog posts, long-form articles & brand copy.',            'category'=>'Marketing'],
-  ['slug'=>'social-media-manager', 'label'=>'Social Media Manager', 'icon'=>'lucide:share-2',           'accent'=>'#e879f9', 'desc'=>'Viral content, calendars & community growth.',            'category'=>'Marketing'],
-  // People & Operations
-  ['slug'=>'hr-manager',           'label'=>'HR Manager',           'icon'=>'lucide:users',              'accent'=>'#f472b6', 'desc'=>'Hiring, onboarding, performance & HR policies.',          'category'=>'People'],
-  ['slug'=>'recruiter',            'label'=>'Recruiter',            'icon'=>'lucide:user-search',        'accent'=>'#fb923c', 'desc'=>'Talent sourcing, job posts & structured interviewing.',   'category'=>'People'],
-  ['slug'=>'customer-support',     'label'=>'Customer Support',     'icon'=>'lucide:headphones',         'accent'=>'#22d3ee', 'desc'=>'Empathetic responses, escalation & issue resolution.',    'category'=>'People'],
-  // Design & Legal
-  ['slug'=>'ux-designer',          'label'=>'UX Designer',          'icon'=>'lucide:pen-tool',           'accent'=>'#fb7185', 'desc'=>'User research, wireframes & design critique.',            'category'=>'Design & Legal'],
-  ['slug'=>'legal-counsel',        'label'=>'Legal Counsel',        'icon'=>'lucide:scale',              'accent'=>'#c084fc', 'desc'=>'Contracts, compliance & legal risk guidance.',            'category'=>'Design & Legal'],
-];
+// Build the agent list from the shared VIRAL_AGENTS constant so
+// there is a single source of truth for all agent metadata.
+$agents = [];
+foreach (VIRAL_AGENTS as $slug => $a) {
+    $agents[] = [
+        'slug'     => $slug,
+        'label'    => $a['label'],
+        'icon'     => $a['icon'],
+        'accent'   => $a['accent'],
+        'desc'     => $a['desc'],
+        'category' => $a['category'],
+    ];
+}
 
 $categories = ['All', 'Engineering', 'Business', 'Marketing', 'People', 'Design & Legal'];
 
@@ -330,11 +316,11 @@ require_once dirname(__DIR__) . '/includes/header.php';
   <!-- Stats -->
   <div class="viral-stats">
     <div class="stat-pill">
-      <div class="stat-num">20</div>
+      <div class="stat-num"><?= count(VIRAL_AGENTS) ?></div>
       <div class="stat-lbl">AI Agents</div>
     </div>
     <div class="stat-pill">
-      <div class="stat-num">5</div>
+      <div class="stat-num"><?= count(array_unique(array_column(array_values(VIRAL_AGENTS), 'category'))) ?></div>
       <div class="stat-lbl">Departments</div>
     </div>
     <div class="stat-pill">

@@ -8,30 +8,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/config.php';
-
-// ── Agent definitions (must match chat.php) ───────────────────────────────
-const VIRAL_AGENTS = [
-    'software-engineer'    => ['label' => 'Software Engineer',    'icon' => 'lucide:code-2',             'accent' => '#18b3ff', 'desc' => 'Code, debug, architecture & technical decisions'],
-    'product-manager'      => ['label' => 'Product Manager',      'icon' => 'lucide:layout-dashboard',   'accent' => '#a78bfa', 'desc' => 'Roadmaps, user stories & product strategy'],
-    'data-scientist'       => ['label' => 'Data Scientist',       'icon' => 'lucide:chart-bar',           'accent' => '#34d399', 'desc' => 'Analytics, ML models & data insights'],
-    'marketing-manager'    => ['label' => 'Marketing Manager',    'icon' => 'lucide:megaphone',           'accent' => '#f97316', 'desc' => 'Campaigns, copy & growth strategy'],
-    'sales-agent'          => ['label' => 'Sales Agent',          'icon' => 'lucide:badge-dollar-sign',  'accent' => '#fbbf24', 'desc' => 'Sales scripts, outreach & deal closing'],
-    'customer-support'     => ['label' => 'Customer Support',     'icon' => 'lucide:headphones',         'accent' => '#22d3ee', 'desc' => 'Empathetic responses & issue resolution'],
-    'hr-manager'           => ['label' => 'HR Manager',           'icon' => 'lucide:users',              'accent' => '#f472b6', 'desc' => 'Hiring, onboarding & HR policies'],
-    'financial-analyst'    => ['label' => 'Financial Analyst',    'icon' => 'lucide:trending-up',        'accent' => '#4ade80', 'desc' => 'Financial models, forecasts & analysis'],
-    'legal-counsel'        => ['label' => 'Legal Counsel',        'icon' => 'lucide:scale',              'accent' => '#c084fc', 'desc' => 'Contracts, compliance & legal risk'],
-    'ux-designer'          => ['label' => 'UX Designer',          'icon' => 'lucide:pen-tool',           'accent' => '#fb7185', 'desc' => 'User research, wireframes & design feedback'],
-    'devops-engineer'      => ['label' => 'DevOps Engineer',      'icon' => 'lucide:server',             'accent' => '#38bdf8', 'desc' => 'CI/CD, infrastructure & cloud architecture'],
-    'content-writer'       => ['label' => 'Content Writer',       'icon' => 'lucide:file-text',          'accent' => '#a3e635', 'desc' => 'Blog posts, copy & compelling narratives'],
-    'seo-specialist'       => ['label' => 'SEO Specialist',       'icon' => 'lucide:search',             'accent' => '#facc15', 'desc' => 'Keyword research, on-page & technical SEO'],
-    'business-analyst'     => ['label' => 'Business Analyst',     'icon' => 'lucide:briefcase',          'accent' => '#60a5fa', 'desc' => 'Requirements, process modeling & gap analysis'],
-    'project-manager'      => ['label' => 'Project Manager',      'icon' => 'lucide:kanban',             'accent' => '#f59e0b', 'desc' => 'Planning, sprints & risk management'],
-    'security-expert'      => ['label' => 'Security Expert',      'icon' => 'lucide:shield-check',       'accent' => '#f87171', 'desc' => 'Vulnerability assessment & secure architecture'],
-    'social-media-manager' => ['label' => 'Social Media Manager', 'icon' => 'lucide:share-2',            'accent' => '#e879f9', 'desc' => 'Viral content, calendars & community growth'],
-    'qa-engineer'          => ['label' => 'QA Engineer',          'icon' => 'lucide:check-circle-2',     'accent' => '#2dd4bf', 'desc' => 'Test plans, automation & quality assurance'],
-    'cto-advisor'          => ['label' => 'CTO Advisor',          'icon' => 'lucide:cpu',                'accent' => '#818cf8', 'desc' => 'Tech strategy, team scaling & executive guidance'],
-    'recruiter'            => ['label' => 'Recruiter',            'icon' => 'lucide:user-search',        'accent' => '#fb923c', 'desc' => 'Sourcing talent, job descriptions & interviews'],
-];
+require_once __DIR__ . '/config.php';   // VIRAL_AGENTS constant
 
 $role = isset($_GET['role']) ? trim((string)$_GET['role']) : '';
 
