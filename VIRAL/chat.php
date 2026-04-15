@@ -76,8 +76,11 @@ function viral_daily_usage_for_user(string $username): array
             continue;
         }
         $createdAt = isset($row['created_at']) ? strtotime((string)$row['created_at']) : false;
-        if ($createdAt === false || $createdAt < $todayStart) {
+        if ($createdAt === false) {
             continue;
+        }
+        if ($createdAt < $todayStart) {
+            break; // tokenHistoryForUser() is newest-first; older rows can stop the scan.
         }
         $prompts++;
         $tokens += (int)($row['tokens_used'] ?? 0);
@@ -187,7 +190,7 @@ if ($_isFreePlan) {
     if ($dailyUsage['prompts'] >= VIRAL_FREE_DAILY_PROMPT_LIMIT) {
         http_response_code(429);
         echo json_encode([
-            'error' => 'Daily free limit reached (10 prompts/day). Please try again tomorrow or upgrade your plan.',
+            'error' => 'Daily free limit reached (' . VIRAL_FREE_DAILY_PROMPT_LIMIT . ' prompts/day). Please try again tomorrow or upgrade your plan.',
         ]);
         exit;
     }
