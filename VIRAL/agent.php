@@ -329,6 +329,15 @@ $page_scripts = <<<PAGEJS
     'qa-engineer':          ['Write test cases for login flow', 'How to set up Selenium tests?', 'Create a bug report template', 'Explain boundary value analysis'],
     'cto-advisor':          ['How to scale an engineering team?', 'Build vs buy decision framework', 'How to manage tech debt?', 'Advise on choosing a tech stack'],
     'recruiter':            ['Write a LinkedIn outreach message', 'Create a scorecard for a PM role', 'How to screen resumes efficiently?', 'Draft an offer letter intro'],
+    // AI Architecture layer agents
+    'infrastructure-layer':         ['Design a scalable API gateway', 'Compare managed vs self-hosted vector DB', 'Set up a message queue for agent tasks', 'Best practices for AI infra cost control'],
+    'agent-internet-layer':         ['How do agents share memory?', 'Design a multi-agent coordination flow', 'Compare LangGraph vs CrewAI', 'Build a pub-sub event mesh for agents'],
+    'protocol-layer':               ['Explain Model Context Protocol (MCP)', 'Design a tool schema for a search function', 'How to version an agent API?', 'Create an OpenAPI spec for an agent endpoint'],
+    'tooling-enrichment-layer':     ['Set up a RAG pipeline with Pinecone', 'Best chunking strategy for long documents', 'How to integrate web search into an agent?', 'Compare embedding models for retrieval'],
+    'cognition-reasoning-layer':    ['Explain ReAct vs Chain-of-Thought', 'Design a self-reflection loop for an agent', 'How to decompose a complex multi-step task?', 'Build an error-correction mechanism for agents'],
+    'memory-personalization-layer': ['Design a long-term memory architecture', 'How to store user preferences for an AI?', 'Compare vector memory vs knowledge graph', 'Privacy-preserving agent memory strategies'],
+    'application-layer':            ['Design a conversational AI onboarding flow', 'Best practices for streaming AI responses', 'How to build user trust in an AI assistant?', 'Design a copilot UI for a developer tool'],
+    'operations-governance-layer':  ['Set up AI cost monitoring and alerts', 'Explain the EU AI Act requirements', 'Design safety guardrails for an AI agent', 'How to conduct AI red-teaming?'],
   };
 
   const chatMessages  = document.getElementById('chatMessages');
