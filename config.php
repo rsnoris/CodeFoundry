@@ -141,14 +141,18 @@ define('CF_OPENAI_KEY', cf_load_key('OPENAI_API_KEY'));
  */
 define('CF_CODEGEN_PROVIDERS', [
 
-    // ── Free-tier provider (no API key required) ─────────────────────────────
-    // Pollinations.ai proxies OpenAI GPT models for free with no authentication.
-    // This provider is always available and is the default for free-plan users.
+    // ── Free-tier provider ────────────────────────────────────────────────────
+    // Pollinations.ai proxies OpenAI GPT models. Their API moved to
+    // gen.pollinations.ai and now supports optional API-key authentication.
+    // When no key is configured the request is sent unauthenticated (anonymous
+    // tier, subject to Pollinations rate limits). Set POLLINATIONS_API_KEY in
+    // the key store to lift those limits.
     'pollinations' => [
         'label'           => 'Pollinations AI (Free)',
-        'api_url'         => 'https://text.pollinations.ai/openai',
-        'no_key_required' => true,   // no Authorization header needed
-        'free_tier'       => true,   // available to free-plan / unauthenticated users
+        'api_url'         => 'https://gen.pollinations.ai/v1/chat/completions',
+        'api_key_env'     => 'POLLINATIONS_API_KEY',  // optional – anonymous requests still work
+        'no_key_required' => true,   // provider is always "available" even without a key
+        'free_tier'       => true,   // default for free-plan / unauthenticated users
         'models'          => [
             ['id' => 'openai-fast', 'label' => 'GPT-4o Mini (Free)'],
             ['id' => 'openai',      'label' => 'GPT-4o (Free)'],
