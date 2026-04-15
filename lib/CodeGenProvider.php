@@ -184,7 +184,14 @@ class CodeGenProvider
 
         $result = json_decode($response, true);
 
-        // Surface API-level error messages
+        // Guard against non-JSON responses (e.g. HTML error pages from a dead endpoint).
+        if ($result === null) {
+            throw new \RuntimeException(
+                'Could not parse response from ' . $cfg['label'] . ' API. The service may be temporarily unavailable.'
+            );
+        }
+
+        // Surface API-level error messages (handles both OpenAI and Pollinations formats).
         if (isset($result['error'])) {
             $errMsg = is_array($result['error'])
                 ? ($result['error']['message'] ?? 'API error')

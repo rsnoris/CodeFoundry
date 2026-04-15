@@ -295,6 +295,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
           class="agent-card"
           style="--accent: <?= htmlspecialchars($a['accent'], ENT_QUOTES, 'UTF-8') ?>"
           data-label="<?= htmlspecialchars(strtolower($a['label']), ENT_QUOTES, 'UTF-8') ?>"
+          data-desc="<?= htmlspecialchars(strtolower($a['desc']),  ENT_QUOTES, 'UTF-8') ?>"
           data-cat="<?= htmlspecialchars($a['category'], ENT_QUOTES, 'UTF-8') ?>"
         >
           <div class="agent-card-icon">
@@ -350,7 +351,7 @@ $page_scripts = <<<'PAGEJS'
     const q = searchInput.value.trim().toLowerCase();
     let visible = 0;
     cards.forEach(function (card) {
-      const labelMatch = card.dataset.label.includes(q);
+      const labelMatch = card.dataset.label.includes(q) || card.dataset.desc.includes(q);
       const catMatch   = activeCat === 'All' || card.dataset.cat === activeCat;
       const show       = labelMatch && catMatch;
       card.style.display = show ? '' : 'none';
