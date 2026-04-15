@@ -141,27 +141,6 @@ define('CF_OPENAI_KEY', cf_load_key('OPENAI_API_KEY'));
  */
 define('CF_CODEGEN_PROVIDERS', [
 
-    // ── Free-tier provider ────────────────────────────────────────────────────
-    // Pollinations.ai proxies OpenAI GPT models. Their API moved to
-    // gen.pollinations.ai and now supports optional API-key authentication.
-    // When no key is configured the request is sent unauthenticated (anonymous
-    // tier, subject to Pollinations rate limits). Set POLLINATIONS_API_KEY in
-    // the key store to lift those limits.
-    'pollinations' => [
-        'label'           => 'Pollinations AI (Free)',
-        'api_url'         => 'https://gen.pollinations.ai/v1/chat/completions',
-        'api_key_env'     => 'POLLINATIONS_API_KEY',  // optional – anonymous requests still work
-        'no_key_required' => true,   // provider is always "available" even without a key
-        'free_tier'       => true,   // default for free-plan / unauthenticated users
-        'models'          => [
-            ['id' => 'openai-fast', 'label' => 'GPT-4o Mini (Free)'],
-            ['id' => 'openai',      'label' => 'GPT-4o (Free)'],
-        ],
-        'default_model'   => 'openai-fast',
-        'opensource'      => false,
-        'local'           => false,
-    ],
-
     'groq' => [
         'label'         => 'Groq',
         'api_url'       => 'https://api.groq.com/openai/v1/chat/completions',
@@ -178,6 +157,12 @@ define('CF_CODEGEN_PROVIDERS', [
         'local'         => false,
     ],
 
+    // ── Free-tier provider ────────────────────────────────────────────────────
+    // OpenRouter provides access to many open-source models, including several
+    // completely free-of-charge ones (marked with :free in the model id).
+    // A free OpenRouter account and API key are required; sign up at openrouter.ai.
+    // Set OPENROUTER_API_KEY in the key store. Free-plan users are automatically
+    // routed to the :free models at no cost.
     'openrouter' => [
         'label'         => 'OpenRouter',
         'api_url'       => 'https://openrouter.ai/api/v1/chat/completions',
@@ -186,6 +171,7 @@ define('CF_CODEGEN_PROVIDERS', [
             'HTTP-Referer: https://codefoundry.cloud',
             'X-Title: CodeFoundry',
         ],
+        'free_tier'     => true,   // default for free-plan / unauthenticated users
         'models'        => [
             ['id' => 'meta-llama/llama-3.1-8b-instruct:free',  'label' => 'Llama 3.1 8B (Free)'],
             ['id' => 'mistralai/mistral-7b-instruct:free',      'label' => 'Mistral 7B (Free)'],

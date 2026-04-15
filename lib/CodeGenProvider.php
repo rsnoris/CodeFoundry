@@ -191,7 +191,7 @@ class CodeGenProvider
             );
         }
 
-        // Surface API-level error messages (handles both OpenAI and Pollinations formats).
+        // Surface API-level error messages (handles both OpenAI and OpenRouter formats).
         if (isset($result['error'])) {
             $errMsg = is_array($result['error'])
                 ? ($result['error']['message'] ?? 'API error')
