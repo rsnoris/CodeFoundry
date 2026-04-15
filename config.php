@@ -48,6 +48,7 @@ define('CF_NAV_JSON', CF_ROOT . '/data/navigation.json');
  * To change the location, adjust the path below.
  */
 define('CF_KEYS_DIR', dirname(CF_ROOT) . '/Cf-Config-keys');
+define('CF_USERS_STORAGE_DIR', CF_KEYS_DIR . '/Users');
 
 // ---------------------------------------------------------------------------
 // Site metadata
@@ -106,15 +107,15 @@ define('CF_PLANS', [
 // Data file paths
 // ---------------------------------------------------------------------------
 
-define('CF_DATA_USERS',           CF_ROOT . '/UserAccountData/users.json');
-define('CF_DATA_TOKEN_HISTORY',   CF_ROOT . '/UserAccountData/token_history.json');
-define('CF_DATA_PROJECTS',        CF_ROOT . '/UserAccountData/projects.json');
-define('CF_DATA_PAYMENTS',        CF_ROOT . '/UserAccountData/payments.json');
-define('CF_DATA_AUDIT_LOG',       CF_ROOT . '/UserAccountData/audit_log.json');
-define('CF_DATA_PAGE_VIEWS',      CF_ROOT . '/UserAccountData/page_views.json');
-define('CF_DATA_SUPPORT_TICKETS', CF_ROOT . '/UserAccountData/support_tickets.json');
-define('CF_DATA_CHAT_SESSIONS',   CF_ROOT . '/UserAccountData/chat_sessions.json');
-define('CF_DATA_CHAT_MESSAGES',   CF_ROOT . '/UserAccountData/chat_messages.json');
+define('CF_DATA_USERS',           CF_USERS_STORAGE_DIR . '/users.json');
+define('CF_DATA_TOKEN_HISTORY',   CF_USERS_STORAGE_DIR . '/token_history.json');
+define('CF_DATA_PROJECTS',        CF_USERS_STORAGE_DIR . '/projects.json');
+define('CF_DATA_PAYMENTS',        CF_USERS_STORAGE_DIR . '/payments.json');
+define('CF_DATA_AUDIT_LOG',       CF_USERS_STORAGE_DIR . '/audit_log.json');
+define('CF_DATA_PAGE_VIEWS',      CF_USERS_STORAGE_DIR . '/page_views.json');
+define('CF_DATA_SUPPORT_TICKETS', CF_USERS_STORAGE_DIR . '/support_tickets.json');
+define('CF_DATA_CHAT_SESSIONS',   CF_USERS_STORAGE_DIR . '/chat_sessions.json');
+define('CF_DATA_CHAT_MESSAGES',   CF_USERS_STORAGE_DIR . '/chat_messages.json');
 
 // ---------------------------------------------------------------------------
 // AI / CodeGen
@@ -364,8 +365,13 @@ define('CF_OAUTH_LINKEDIN_CLIENT_SECRET', cf_load_key('LINKEDIN_CLIENT_SECRET'))
  */
 function cf_load_key(string $name, string $default = ''): string
 {
+    $safeName = cf_normalize_key_name($name);
+    if ($safeName === '') {
+        return $default;
+    }
+
     // 1. Try the key file
-    $file = CF_KEYS_DIR . '/' . $name;
+    $file = CF_KEYS_DIR . '/' . $safeName;
     if (is_file($file) && is_readable($file)) {
         $value = trim((string)file_get_contents($file));
         if ($value !== '') {
@@ -373,13 +379,166 @@ function cf_load_key(string $name, string $default = ''): string
         }
     }
 
-    // 2. Fall back to environment variable
-    $env = getenv($name);
+    // 2. Try OpenrouterConfig.env inside Cf-Config-keys
+    $envFileValues = cf_load_env_file(CF_KEYS_DIR . '/OpenrouterConfig.env');
+    if (isset($envFileValues[$safeName]) && trim((string)$envFileValues[$safeName]) !== '') {
+        return trim((string)$envFileValues[$safeName]);
+    }
+
+    // 3. Fall back to environment variable
+    $env = getenv($safeName);
     if ($env !== false && $env !== '') {
         return $env;
     }
 
     return $default;
+}
+
+/**
+ * Load user-specific key/secret by name from Cf-Config-keys/Users/<username>/.
+ *
+ * Resolution order:
+ *   1) File: <user_dir>/<name>
+ *   2) Env file: <user_dir>/OpenrouterConfig.env
+ *   3) Global cf_load_key($name)
+ */
+function cf_load_user_key(string $username, string $name, string $default = ''): string
+{
+    $safeName = cf_normalize_key_name($name);
+    if ($safeName === '') {
+        return $default;
+    }
+
+    $userDir = cf_user_config_dir($username);
+    $file    = $userDir . '/' . $safeName;
+    if (is_file($file) && is_readable($file)) {
+        $value = trim((string)file_get_contents($file));
+        if ($value !== '') {
+            return $value;
+        }
+    }
+
+    $envFileValues = cf_load_env_file($userDir . '/OpenrouterConfig.env');
+    if (isset($envFileValues[$safeName]) && trim((string)$envFileValues[$safeName]) !== '') {
+        return trim((string)$envFileValues[$safeName]);
+    }
+
+    return cf_load_key($safeName, $default);
+}
+
+/** Persist a user-specific key file under Cf-Config-keys/Users/<username>/. */
+function cf_save_user_key(string $username, string $name, string $value): void
+{
+    $safeName = cf_normalize_key_name($name);
+    if ($safeName === '') {
+        throw new \InvalidArgumentException('Invalid key name.');
+    }
+    $userDir = cf_user_config_dir($username);
+    if (!is_dir($userDir)) {
+        @mkdir($userDir, 0700, true);
+    }
+    file_put_contents($userDir . '/' . $safeName, trim($value));
+}
+
+/** Return the absolute config directory for a username. */
+function cf_user_config_dir(string $username): string
+{
+    $raw   = trim($username);
+    $safe  = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $raw);
+    if ($safe === null || $safe === '') {
+        $safe = 'unknown_user';
+    }
+    $hash = substr(hash('sha256', $raw), 0, 12);
+    return CF_USERS_STORAGE_DIR . '/' . $safe . '_' . $hash;
+}
+
+/** Parse a simple .env file into an associative array. */
+function cf_load_env_file(string $path): array
+{
+    static $cache = [];
+    if (array_key_exists($path, $cache)) {
+        return $cache[$path];
+    }
+    if (!is_file($path) || !is_readable($path)) {
+        $cache[$path] = [];
+        return [];
+    }
+
+    $values = [];
+    $lines  = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+    foreach ($lines as $line) {
+        $line = trim((string)$line);
+        if ($line === '' || str_starts_with($line, '#')) {
+            continue;
+        }
+        if (str_starts_with($line, 'export ')) {
+            $line = trim(substr($line, 7));
+        }
+        $parts = explode('=', $line, 2);
+        if (count($parts) !== 2) {
+            continue;
+        }
+        $k = trim($parts[0]);
+        $v = trim($parts[1]);
+        if (strlen($v) >= 2 && ((str_starts_with($v, '"') && str_ends_with($v, '"')) || (str_starts_with($v, "'") && str_ends_with($v, "'")))) {
+            $v = substr($v, 1, -1);
+        } elseif (str_contains($v, ' #')) {
+            $v = rtrim((string)explode(' #', $v, 2)[0]);
+        }
+        if ($k !== '') {
+            $values[$k] = $v;
+        }
+    }
+    $cache[$path] = $values;
+    return $values;
+}
+
+/** Ensure key/data storage directories and JSON files exist. */
+function cf_ensure_storage_layout(): void
+{
+    $dirs = [CF_KEYS_DIR, CF_USERS_STORAGE_DIR];
+    foreach ($dirs as $dir) {
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0700, true);
+        }
+    }
+
+    $jsonFiles = [
+        CF_DATA_USERS,
+        CF_DATA_TOKEN_HISTORY,
+        CF_DATA_PROJECTS,
+        CF_DATA_PAYMENTS,
+        CF_DATA_AUDIT_LOG,
+        CF_DATA_PAGE_VIEWS,
+        CF_DATA_SUPPORT_TICKETS,
+        CF_DATA_CHAT_SESSIONS,
+        CF_DATA_CHAT_MESSAGES,
+    ];
+
+    foreach ($jsonFiles as $file) {
+        $dir = dirname($file);
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0700, true);
+        }
+        if (!is_file($file)) {
+            @file_put_contents($file, "[]\n");
+        }
+    }
+}
+
+cf_ensure_storage_layout();
+
+/** Validate and normalize key-file names to prevent path traversal. */
+function cf_normalize_key_name(string $name): string
+{
+    $trimmed = trim($name);
+    if ($trimmed === '') {
+        return '';
+    }
+    if (!preg_match('/^[A-Za-z0-9_]+$/', $trimmed)) {
+        return '';
+    }
+    return $trimmed;
 }
 
 /**

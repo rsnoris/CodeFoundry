@@ -245,7 +245,15 @@ class CodeGenProvider
             return (string)$cfg['api_key'];
         }
         if (!empty($cfg['api_key_env'])) {
-            return cf_load_key($cfg['api_key_env']);
+            $keyName = (string)$cfg['api_key_env'];
+            $username = '';
+            if (session_status() === PHP_SESSION_ACTIVE) {
+                $username = $_SESSION['cf_user']['username'] ?? '';
+            }
+            if (is_string($username) && $username !== '') {
+                return cf_load_user_key($username, $keyName);
+            }
+            return cf_load_key($keyName);
         }
         return '';
     }

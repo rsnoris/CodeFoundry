@@ -11,6 +11,13 @@ $user_session = cf_current_user();
 $username     = $user_session['username'];
 $user         = UserStore::findUser($username) ?? $user_session;
 $unread_chat  = ChatStore::totalUnreadForUser($username);
+$token_history_count = count(UserStore::tokenHistoryForUser($username, 1000));
+$payment_history_count = count(UserStore::paymentsForUser($username));
+$session_history_count = count(ChatStore::sessionsForUser($username));
+$openrouter_key_current = UserStore::getUserApiKey($username, 'OPENROUTER_API_KEY', '');
+$openrouter_key_masked = $openrouter_key_current !== ''
+    ? str_repeat('•', max(8, min(24, strlen($openrouter_key_current))))
+    : '';
 
 // Generate CSRF token
 if (session_status() === PHP_SESSION_NONE) {
@@ -19,11 +26,14 @@ if (session_status() === PHP_SESSION_NONE) {
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+const OPENROUTER_MAX_KEY_LENGTH = 500;
 
 $flash_profile  = '';
 $flash_password = '';
+$flash_api      = '';
 $error_profile  = '';
 $error_password = '';
+$error_api      = '';
 
 // ── Handle profile update ─────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form'] ?? '') === 'profile') {
@@ -72,6 +82,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form'] ?? '') === 'passwor
             $new_hash = password_hash($new_pw, PASSWORD_BCRYPT);
             UserStore::updateUser($username, ['password_hash' => $new_hash]);
             $flash_password = 'Password updated successfully.';
+        }
+    }
+}
+
+// ── Handle OpenRouter API key update ───────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form'] ?? '') === 'openrouter_key') {
+    if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $error_api = 'Invalid request. Please refresh and try again.';
+    } else {
+        $openrouter_key = trim((string)($_POST['openrouter_api_key'] ?? ''));
+        if ($openrouter_key !== '' && strlen($openrouter_key) > OPENROUTER_MAX_KEY_LENGTH) {
+            $error_api = 'API key value is too long.';
+        } else {
+            UserStore::saveUserApiKey($username, 'OPENROUTER_API_KEY', $openrouter_key);
+            $openrouter_key_current = UserStore::getUserApiKey($username, 'OPENROUTER_API_KEY', '');
+            $openrouter_key_masked = $openrouter_key_current !== ''
+                ? str_repeat('•', max(8, min(24, strlen($openrouter_key_current))))
+                : '';
+            $flash_api = $openrouter_key === ''
+                ? 'OpenRouter API key cleared for this account.'
+                : 'OpenRouter API key saved for this account.';
         }
     }
 }
@@ -158,12 +189,32 @@ $page_styles = <<<'CSS'
     text-align: center;
     line-height: 16px;
   }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .stat-card {
+    background: var(--navy-2);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .stat-label { font-size: 12px; color: var(--text-subtle); margin-bottom: 4px; }
+  .stat-value { font-size: 22px; font-weight: 800; color: var(--text); }
+  .data-path {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text-subtle);
+    word-break: break-all;
+  }
   @media (max-width: 700px) {
     .dash-layout { flex-direction: column; padding: 0; }
     .dash-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); padding: 16px 0; display: flex; overflow-x: auto; }
     .dash-sidebar-title { display: none; }
     .dash-main { padding: 24px 16px 48px; }
     .form-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr; }
   }
 CSS;
 
@@ -278,6 +329,63 @@ require_once dirname(dirname(__DIR__)) . '/includes/header.php';
             <iconify-icon icon="lucide:lock"></iconify-icon> Update Password
           </button>
         </form>
+      </div>
+    </div>
+
+    <!-- API Keys -->
+    <div class="dash-section">
+      <div class="dash-section-header"><h2>API Keys (Per Account)</h2></div>
+      <div class="dash-section-body">
+        <?php if ($flash_api !== ''): ?>
+          <div class="flash-success"><iconify-icon icon="lucide:check-circle"></iconify-icon><?= cf_e($flash_api) ?></div>
+        <?php endif; ?>
+        <?php if ($error_api !== ''): ?>
+          <div class="flash-error"><iconify-icon icon="lucide:alert-circle"></iconify-icon><?= cf_e($error_api) ?></div>
+        <?php endif; ?>
+        <form method="POST" autocomplete="off">
+          <input type="hidden" name="csrf_token" value="<?= cf_e($_SESSION['csrf_token']) ?>">
+          <input type="hidden" name="form" value="openrouter_key">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label class="form-label" for="openrouter_api_key">OpenRouter API Key</label>
+              <input type="password" id="openrouter_api_key" name="openrouter_api_key" class="form-input"
+                     placeholder="Paste your OpenRouter API key (stored in your account config folder)">
+              <?php if ($openrouter_key_masked !== ''): ?>
+                <span class="form-hint">Current saved value: <?= cf_e($openrouter_key_masked) ?></span>
+              <?php else: ?>
+                <span class="form-hint">No key stored for this account yet.</span>
+              <?php endif; ?>
+            </div>
+          </div>
+          <button type="submit" class="btn-save">
+            <iconify-icon icon="lucide:key-round"></iconify-icon> Save OpenRouter Key
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Usage / billing summaries -->
+    <div class="dash-section">
+      <div class="dash-section-header"><h2>Usage, History & Billing</h2></div>
+      <div class="dash-section-body">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Prompts / Token History</div>
+            <div class="stat-value"><?= (int)$token_history_count ?></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Session History</div>
+            <div class="stat-value"><?= (int)$session_history_count ?></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Payment History</div>
+            <div class="stat-value"><?= (int)$payment_history_count ?></div>
+          </div>
+        </div>
+        <div class="data-path">
+          Account data and key config location: <strong><?= cf_e(CF_USERS_STORAGE_DIR) ?></strong><br>
+          Your per-account key folder: <strong><?= cf_e(cf_user_config_dir($username)) ?></strong>
+        </div>
       </div>
     </div>
   </main>
