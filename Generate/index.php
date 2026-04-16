@@ -1016,9 +1016,20 @@ $page_scripts .= <<<'PAGEJS'
       sel.appendChild(group);
     });
     const saved = localStorage.getItem('cf_ai_model');
+    let hasValidSaved = false;
     if (saved) {
-      const exists = Array.from(sel.options).some(function (o) { return o.value === saved; });
-      if (exists) sel.value = saved;
+      hasValidSaved = Array.from(sel.options).some(function (o) { return o.value === saved; });
+      if (hasValidSaved) sel.value = saved;
+    }
+    if (!hasValidSaved) {
+      const maybeOpenRouterProvider = CF_PROVIDERS.find(function (p) { return p.id === 'openrouter'; });
+      if (maybeOpenRouterProvider && maybeOpenRouterProvider.default_model) {
+        const preferred = 'openrouter:' + maybeOpenRouterProvider.default_model;
+        const preferredExists = Array.from(sel.options).some(function (o) { return o.value === preferred; });
+        if (preferredExists) {
+          sel.value = preferred;
+        }
+      }
     }
     sel.addEventListener('change', function () {
       localStorage.setItem('cf_ai_model', sel.value);

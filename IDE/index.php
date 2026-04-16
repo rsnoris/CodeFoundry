@@ -958,10 +958,22 @@ let isRunning   = false;
 
   // Restore from localStorage
   const saved = localStorage.getItem('cf_ai_model');
+  let hasValidSaved = false;
   if (saved) {
     // Verify the saved value is still valid (provider may have been removed)
-    const exists = Array.from(sel.options).some(o => o.value === saved);
-    if (exists) sel.value = saved;
+    hasValidSaved = Array.from(sel.options).some(o => o.value === saved);
+    if (hasValidSaved) sel.value = saved;
+  }
+
+  if (!hasValidSaved) {
+    const maybeOpenRouterProvider = CF_PROVIDERS.find(p => p.id === 'openrouter');
+    if (maybeOpenRouterProvider && maybeOpenRouterProvider.default_model) {
+      const preferred = 'openrouter:' + maybeOpenRouterProvider.default_model;
+      const preferredExists = Array.from(sel.options).some(o => o.value === preferred);
+      if (preferredExists) {
+        sel.value = preferred;
+      }
+    }
   }
 
   sel.addEventListener('change', function () {

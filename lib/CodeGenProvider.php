@@ -15,6 +15,8 @@ declare(strict_types=1);
  */
 class CodeGenProvider
 {
+    private const PREFERRED_DEFAULT_PROVIDER_ID = 'openrouter';
+
     // ── Public API ─────────────────────────────────────────────────────────
 
     /**
@@ -81,10 +83,15 @@ class CodeGenProvider
     }
 
     /**
-     * Return the default (first) available provider id, or '' if none.
+     * Return the default provider id.
+     * Prefer OpenRouter when available, otherwise return the first available provider.
      */
     public static function defaultProviderId(): string
     {
+        $preferredId = self::PREFERRED_DEFAULT_PROVIDER_ID;
+        if (isset(CF_CODEGEN_PROVIDERS[$preferredId]) && self::isAvailable(CF_CODEGEN_PROVIDERS[$preferredId])) {
+            return $preferredId;
+        }
         foreach (CF_CODEGEN_PROVIDERS as $id => $cfg) {
             if (self::isAvailable($cfg)) {
                 return $id;
