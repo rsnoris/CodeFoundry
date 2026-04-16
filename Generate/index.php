@@ -4,10 +4,20 @@ require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/lib/CodeGenProvider.php';
 require_once dirname(__DIR__) . '/lib/UserStore.php';
 
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+$_cf_session_user = $_SESSION['cf_user'] ?? null;
+$_cf_is_free_plan = ($_cf_session_user['plan'] ?? 'free') === 'free';
+
 // Provider list for the client-side model selector
 $_cf_providers_js = [];
 foreach (CodeGenProvider::all() as $pid => $pdata) {
     if (!$pdata['available']) continue;
+    if (
+        $_cf_is_free_plan
+        && empty($pdata['free_tier'])
+        && empty($pdata['no_key_required'])
+        && empty($pdata['local'])
+    ) continue;
     $models = [];
     foreach ($pdata['models'] as $m) {
         $models[] = ['id' => $m['id'], 'label' => $m['label']];
@@ -22,7 +32,6 @@ foreach (CodeGenProvider::all() as $pid => $pdata) {
 }
 
 // Load recent generations for logged-in users
-if (session_status() === PHP_SESSION_NONE) session_start();
 $_cf_user      = $_SESSION['cf_user'] ?? null;
 $_cf_recents   = [];
 if ($_cf_user) {

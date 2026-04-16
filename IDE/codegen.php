@@ -51,6 +51,12 @@ $errorOutput = isset($body['errorOutput']) ? trim((string)$body['errorOutput']) 
 $providerId  = isset($body['provider'])    ? trim((string)$body['provider'])    : '';
 $model       = isset($body['model'])       ? trim((string)$body['model'])       : '';
 
+if ($providerId !== '' && !array_key_exists($providerId, CF_CODEGEN_PROVIDERS)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Unknown provider: ' . $providerId]);
+    exit;
+}
+
 // ── Validate action ───────────────────────────────────────────────────────
 $validActions = ['generate', 'improve', 'explain', 'fix'];
 if (!in_array($action, $validActions, true)) {
@@ -80,13 +86,11 @@ if (in_array($action, ['improve', 'explain', 'fix'], true) && $currentCode === '
 // ── Sanitise language label (used in system prompt only) ─────────────────
 $langLabel = preg_replace('/[^a-zA-Z0-9 \+\#\-]/', '', $language);
 
-// ── Resolve provider ──────────────────────────────────────────────────────
-if ($_isFreePlan) {
-    // Free-plan users are restricted to free-tier providers (no API key required).
-    // If no provider is requested, default to the first available free-tier provider.
-    if ($providerId === '') {
-        $providerId = CodeGenProvider::defaultFreeProviderId();
-    } elseif (!CodeGenProvider::isFreeTierProvider($providerId)) {
+// ── Resolve provider candidates ───────────────────────────────────────────
+if ($_isFreePlan && $providerId !== '') {
+    $allowedFreeProvider = CodeGenProvider::isFreeTierProvider($providerId)
+        || CodeGenProvider::isNoKeyProvider($providerId);
+    if (!$allowedFreeProvider) {
         http_response_code(403);
         echo json_encode([
             'error'      => 'Upgrade your plan to access premium AI providers.',
@@ -94,39 +98,17 @@ if ($_isFreePlan) {
         ]);
         exit;
     }
-} else {
-    if ($providerId === '') {
-        $providerId = CodeGenProvider::defaultProviderId();
-    }
 }
 
-if ($providerId === '') {
+// $providerId (when sent by the client) is treated as a preferred first try,
+// while candidateProviderIds() still provides fallback providers on failure.
+$providerCandidates = CodeGenProvider::candidateProviderIds($_isFreePlan, $providerId);
+if (empty($providerCandidates)) {
     http_response_code(503);
     echo json_encode([
-        'error'      => 'No AI providers are configured. Please add an API key (e.g. GROQ_API_KEY) or start Ollama locally.',
+        'error'      => 'No AI providers are currently available. Please configure an API key (e.g. GROQ_API_KEY) or start a local provider (e.g. Ollama).',
         'error_code' => 'subscription_required',
     ]);
-    exit;
-}
-
-if (!CodeGenProvider::isProviderAvailable($providerId)) {
-    http_response_code(503);
-    echo json_encode([
-        'error'      => 'The selected AI provider is not configured. Please choose a different provider or add the required API key.',
-        'error_code' => 'provider_unavailable',
-    ]);
-    exit;
-}
-
-// ── Resolve model ─────────────────────────────────────────────────────────
-if ($model === '') {
-    $providerCfg = CF_CODEGEN_PROVIDERS[$providerId] ?? [];
-    $model = $providerCfg['default_model'] ?? ($providerCfg['models'][0]['id'] ?? '');
-}
-
-if (!CodeGenProvider::isValidModel($providerId, $model)) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Invalid model for the selected provider.']);
     exit;
 }
 
@@ -203,9 +185,11 @@ $maxTokens = ($action === 'explain') ? MAX_TOKENS_EXPLAIN : MAX_TOKENS_CODE;
 
 // ── Call the provider ─────────────────────────────────────────────────────
 try {
-    $result  = CodeGenProvider::call($providerId, $model, $messages, $maxTokens);
-    $content = $result['content'];
-    $tokens  = $result['tokens'];
+    $result     = CodeGenProvider::callWithFallback($providerCandidates, $model, $messages, $maxTokens);
+    $content    = $result['content'];
+    $tokens     = $result['tokens'];
+    $providerId = $result['provider'];
+    $model      = $result['model'];
 } catch (\InvalidArgumentException $e) {
     http_response_code(400);
     echo json_encode(['error' => $e->getMessage()]);
@@ -256,4 +240,3 @@ if ($action === 'explain') {
     http_response_code(200);
     echo json_encode(['code' => $code]);
 }
-

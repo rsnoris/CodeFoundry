@@ -181,22 +181,20 @@ if ($message === '') {
 
 $agentCfg = VIRAL_AGENTS[$role];
 
-// ── Determine provider ────────────────────────────────────────────────────
+// ── Determine provider candidates ─────────────────────────────────────────
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 $_sessionUser = $_SESSION['cf_user'] ?? null;
 $_userPlan    = $_sessionUser['plan'] ?? 'free';
 $_isFreePlan  = ($_userPlan === 'free');
 
-$providerId = viral_resolve_provider_id($_isFreePlan);
-
-if ($providerId === '') {
+$providerCandidates = CodeGenProvider::candidateProviderIds($_isFreePlan);
+if (empty($providerCandidates)) {
     http_response_code(503);
     echo json_encode(['error' => 'No AI provider is available right now. Please try again later.']);
     exit;
 }
-
-$providerCfg = CF_CODEGEN_PROVIDERS[$providerId] ?? [];
-$model       = $providerCfg['default_model'] ?? ($providerCfg['models'][0]['id'] ?? '');
+$providerId = '';
+$model      = '';
 
 // ── Daily free-plan limits ──────────────────────────────────────────────────
 $dailyUsage = ['prompts' => 0, 'tokens' => 0];
@@ -256,9 +254,11 @@ $messages[] = ['role' => 'user', 'content' => $message];
 
 // ── Call the provider ─────────────────────────────────────────────────────
 try {
-    $result = CodeGenProvider::call($providerId, $model, $messages, 2048);
+    $result = CodeGenProvider::callWithFallback($providerCandidates, '', $messages, 2048);
     $reply  = trim($result['content']);
     $tokens = $result['tokens'];
+    $providerId = $result['provider'];
+    $model = $result['model'];
 } catch (\InvalidArgumentException $e) {
     http_response_code(400);
     echo json_encode(['error' => $e->getMessage()]);
