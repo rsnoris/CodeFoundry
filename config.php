@@ -173,7 +173,6 @@ define('CF_CODEGEN_PROVIDERS', [
         'label'         => 'OpenRouter',
         'api_url'       => 'https://openrouter.ai/api/v1/chat/completions',
         'api_key_env'   => 'OPENROUTER_API_KEY',
-        'global_key_only' => true,
         'extra_headers' => [
             'HTTP-Referer: https://codefoundry.cloud',
             'X-Title: CodeFoundry',
