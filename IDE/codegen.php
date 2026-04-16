@@ -53,7 +53,7 @@ $model       = isset($body['model'])       ? trim((string)$body['model'])       
 
 if ($providerId !== '' && !array_key_exists($providerId, CF_CODEGEN_PROVIDERS)) {
     http_response_code(400);
-    echo json_encode(['error' => 'Unknown provider.']);
+    echo json_encode(['error' => 'Unknown provider: ' . $providerId]);
     exit;
 }
 

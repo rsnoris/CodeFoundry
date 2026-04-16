@@ -180,10 +180,10 @@ class CodeGenProvider
     /** Return the provider's default model id or an empty string. */
     public static function defaultModelForProvider(string $providerId): string
     {
-        $cfg = CF_CODEGEN_PROVIDERS[$providerId] ?? null;
-        if (!is_array($cfg)) {
+        if (!isset(CF_CODEGEN_PROVIDERS[$providerId]) || !is_array(CF_CODEGEN_PROVIDERS[$providerId])) {
             return '';
         }
+        $cfg = CF_CODEGEN_PROVIDERS[$providerId];
         return (string)($cfg['default_model'] ?? ($cfg['models'][0]['id'] ?? ''));
     }
 
@@ -235,7 +235,7 @@ class CodeGenProvider
         if (!empty($attemptErrors)) {
             $suffix = ' Attempts: ' . implode(' | ', $attemptErrors);
         }
-        throw new \RuntimeException('All AI providers failed.' . $suffix);
+        throw new \RuntimeException('All ' . count($providerIds) . ' AI providers failed.' . $suffix);
     }
 
     /**
@@ -426,6 +426,9 @@ class CodeGenProvider
     /** Extract assistant text from multiple response shapes. */
     private static function extractContent(array $result): string
     {
+        if (!isset($result['choices']) || !is_array($result['choices']) || !isset($result['choices'][0]) || !is_array($result['choices'][0])) {
+            return '';
+        }
         $messageContent = $result['choices'][0]['message']['content'] ?? null;
         if (is_string($messageContent)) {
             return $messageContent;
