@@ -14,7 +14,12 @@ $_cf_is_free_plan = ($_cf_session_user['plan'] ?? 'free') === 'free';
 $_cf_providers_js = [];
 foreach (CodeGenProvider::all() as $pid => $pdata) {
     if (!$pdata['available']) continue;
-    if ($_cf_is_free_plan && empty($pdata['free_tier'])) continue;
+    if (
+        $_cf_is_free_plan
+        && empty($pdata['free_tier'])
+        && empty($pdata['no_key_required'])
+        && empty($pdata['local'])
+    ) continue;
     $models = [];
     foreach ($pdata['models'] as $m) {
         $models[] = ['id' => $m['id'], 'label' => $m['label']];

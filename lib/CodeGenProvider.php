@@ -123,6 +123,121 @@ class CodeGenProvider
         return !empty($providers[$providerId]['free_tier']);
     }
 
+    /** Return true when the provider is a no-key or local provider. */
+    public static function isNoKeyProvider(string $providerId): bool
+    {
+        $providers = CF_CODEGEN_PROVIDERS;
+        if (!isset($providers[$providerId])) {
+            return false;
+        }
+        return !empty($providers[$providerId]['no_key_required']) || !empty($providers[$providerId]['local']);
+    }
+
+    /** Return ordered candidate providers for the current request context. */
+    public static function candidateProviderIds(bool $freePlan, string $preferredProviderId = ''): array
+    {
+        $ordered = [];
+        $push = static function (string $id) use (&$ordered): void {
+            if ($id === '') {
+                return;
+            }
+            if (!self::isProviderAvailable($id)) {
+                return;
+            }
+            if (!in_array($id, $ordered, true)) {
+                $ordered[] = $id;
+            }
+        };
+
+        if ($preferredProviderId !== '') {
+            $push($preferredProviderId);
+        }
+
+        if ($freePlan) {
+            foreach (CF_CODEGEN_PROVIDERS as $id => $cfg) {
+                if (!empty($cfg['free_tier'])) {
+                    $push((string)$id);
+                }
+            }
+            foreach (CF_CODEGEN_PROVIDERS as $id => $cfg) {
+                if (!empty($cfg['no_key_required']) || !empty($cfg['local'])) {
+                    $push((string)$id);
+                }
+            }
+            foreach (CF_CODEGEN_PROVIDERS as $id => $cfg) {
+                $push((string)$id);
+            }
+        } else {
+            $push(self::defaultProviderId());
+            foreach (CF_CODEGEN_PROVIDERS as $id => $cfg) {
+                $push((string)$id);
+            }
+        }
+
+        return $ordered;
+    }
+
+    /** Return the provider's default model id or an empty string. */
+    public static function defaultModelForProvider(string $providerId): string
+    {
+        $cfg = CF_CODEGEN_PROVIDERS[$providerId] ?? null;
+        if (!is_array($cfg)) {
+            return '';
+        }
+        return (string)($cfg['default_model'] ?? ($cfg['models'][0]['id'] ?? ''));
+    }
+
+    /**
+     * Try providers in order until one succeeds.
+     *
+     * @param array<int,string> $providerIds
+     * @return array{content:string,tokens:int,provider:string,model:string}
+     */
+    public static function callWithFallback(
+        array $providerIds,
+        string $requestedModel,
+        array $messages,
+        int $maxTokens = 2048,
+        float $temperature = 0.2
+    ): array {
+        $attemptErrors = [];
+        foreach ($providerIds as $providerId) {
+            if (!self::isProviderAvailable($providerId)) {
+                continue;
+            }
+
+            $model = '';
+            if ($requestedModel !== '' && self::isValidModel($providerId, $requestedModel)) {
+                $model = $requestedModel;
+            } else {
+                $model = self::defaultModelForProvider($providerId);
+            }
+
+            if ($model === '') {
+                $attemptErrors[] = $providerId . ': no model configured';
+                continue;
+            }
+
+            try {
+                $result = self::call($providerId, $model, $messages, $maxTokens, $temperature);
+                return [
+                    'content'  => $result['content'],
+                    'tokens'   => $result['tokens'],
+                    'provider' => $providerId,
+                    'model'    => $model,
+                ];
+            } catch (\Throwable $e) {
+                $attemptErrors[] = $providerId . ': ' . $e->getMessage();
+            }
+        }
+
+        $suffix = '';
+        if (!empty($attemptErrors)) {
+            $suffix = ' Attempts: ' . implode(' | ', $attemptErrors);
+        }
+        throw new \RuntimeException('All AI providers failed.' . $suffix);
+    }
+
     /**
      * Call the specified provider/model with a chat-completions request.
      *
@@ -189,6 +304,16 @@ class CodeGenProvider
             );
         }
 
+        $statusCode = 0;
+        if (!empty($http_response_header) && is_array($http_response_header)) {
+            foreach ($http_response_header as $h) {
+                if (preg_match('#^HTTP/\S+\s+(\d{3})#i', $h, $m)) {
+                    $statusCode = (int)$m[1];
+                    break;
+                }
+            }
+        }
+
         $result = json_decode($response, true);
 
         // Guard against non-JSON responses (e.g. HTML error pages from a dead endpoint).
@@ -206,15 +331,36 @@ class CodeGenProvider
             throw new \RuntimeException($cfg['label'] . ' error: ' . $errMsg);
         }
 
-        if (empty($result['choices']) || !isset($result['choices'][0]['message']['content'])) {
+        if ($statusCode >= 400) {
+            $statusMsg = $cfg['label'] . ' returned HTTP ' . $statusCode . '.';
+            if (isset($result['message']) && is_string($result['message']) && trim($result['message']) !== '') {
+                $statusMsg .= ' ' . trim($result['message']);
+            }
+            throw new \RuntimeException($statusMsg);
+        }
+
+        $content = self::extractContent($result);
+        if ($content === '') {
             throw new \RuntimeException(
                 'Unexpected response from ' . $cfg['label'] . ' API.'
             );
         }
 
+        $usage = $result['usage'] ?? [];
+        $tokens = 0;
+        if (is_array($usage)) {
+            if (isset($usage['total_tokens'])) {
+                $tokens = (int)$usage['total_tokens'];
+            } elseif (isset($usage['prompt_tokens']) || isset($usage['completion_tokens'])) {
+                $tokens = (int)($usage['prompt_tokens'] ?? 0) + (int)($usage['completion_tokens'] ?? 0);
+            } elseif (isset($usage['input_tokens']) || isset($usage['output_tokens'])) {
+                $tokens = (int)($usage['input_tokens'] ?? 0) + (int)($usage['output_tokens'] ?? 0);
+            }
+        }
+
         return [
-            'content' => $result['choices'][0]['message']['content'],
-            'tokens'  => (int)($result['usage']['total_tokens'] ?? 0),
+            'content' => $content,
+            'tokens'  => $tokens,
         ];
     }
 
@@ -275,5 +421,41 @@ class CodeGenProvider
             return true;
         }
         return self::resolveApiKey($cfg) !== '';
+    }
+
+    /** Extract assistant text from multiple response shapes. */
+    private static function extractContent(array $result): string
+    {
+        $messageContent = $result['choices'][0]['message']['content'] ?? null;
+        if (is_string($messageContent)) {
+            return $messageContent;
+        }
+        if (is_array($messageContent)) {
+            $parts = [];
+            foreach ($messageContent as $part) {
+                if (!is_array($part)) {
+                    continue;
+                }
+                if (($part['type'] ?? '') === 'text' && isset($part['text']) && is_string($part['text'])) {
+                    $parts[] = $part['text'];
+                }
+            }
+            $joined = trim(implode("\n", $parts));
+            if ($joined !== '') {
+                return $joined;
+            }
+        }
+
+        $choiceText = $result['choices'][0]['text'] ?? null;
+        if (is_string($choiceText) && trim($choiceText) !== '') {
+            return $choiceText;
+        }
+
+        $outputText = $result['output_text'] ?? null;
+        if (is_string($outputText) && trim($outputText) !== '') {
+            return $outputText;
+        }
+
+        return '';
     }
 }
