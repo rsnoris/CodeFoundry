@@ -60,6 +60,29 @@ function viral_free_no_key_provider_id(): string
 }
 
 /**
+ * Resolve the provider to use for VIRAL chats.
+ * Free users prefer configured free-tier providers (e.g. OpenRouter), then
+ * fall back to no-key open-source providers (e.g. Ollama/Pollinations).
+ */
+function viral_resolve_provider_id(bool $isFreePlan): string
+{
+    if ($isFreePlan) {
+        $freeProviderId = CodeGenProvider::defaultFreeProviderId();
+        if ($freeProviderId !== '') {
+            return $freeProviderId;
+        }
+        return viral_free_no_key_provider_id();
+    }
+
+    $defaultProviderId = CodeGenProvider::defaultProviderId();
+    if ($defaultProviderId !== '') {
+        return $defaultProviderId;
+    }
+
+    return viral_free_no_key_provider_id();
+}
+
+/**
  * Daily usage for authenticated users, based on token history.
  *
  * @return array{prompts:int,tokens:int}
@@ -164,13 +187,11 @@ $_sessionUser = $_SESSION['cf_user'] ?? null;
 $_userPlan    = $_sessionUser['plan'] ?? 'free';
 $_isFreePlan  = ($_userPlan === 'free');
 
-$providerId = $_isFreePlan
-    ? viral_free_no_key_provider_id()
-    : CodeGenProvider::defaultProviderId();
+$providerId = viral_resolve_provider_id($_isFreePlan);
 
 if ($providerId === '') {
     http_response_code(503);
-    echo json_encode(['error' => 'No free open-source AI provider is available right now. Please try again later.']);
+    echo json_encode(['error' => 'No AI provider is available right now. Please try again later.']);
     exit;
 }
 
