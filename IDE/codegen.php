@@ -100,6 +100,8 @@ if ($_isFreePlan && $providerId !== '') {
     }
 }
 
+// $providerId (when sent by the client) is treated as a preferred first try,
+// while candidateProviderIds() still provides fallback providers on failure.
 $providerCandidates = CodeGenProvider::candidateProviderIds($_isFreePlan, $providerId);
 if (empty($providerCandidates)) {
     http_response_code(503);

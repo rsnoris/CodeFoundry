@@ -227,6 +227,8 @@ class CodeGenProvider
                 continue;
             }
 
+            // Respect an explicit model choice when it is valid for this provider;
+            // otherwise fall back to the provider default to keep generation working.
             $model = '';
             if ($requestedModel !== '' && self::isValidModel($providerId, $requestedModel)) {
                 $model = $requestedModel;
@@ -363,7 +365,7 @@ class CodeGenProvider
         $content = self::extractContent($result);
         if ($content === '') {
             throw new \RuntimeException(
-                'Unexpected response from ' . $cfg['label'] . ' API.'
+                'No content found in response from ' . $cfg['label'] . ' API.'
             );
         }
 
