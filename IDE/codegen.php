@@ -104,7 +104,7 @@ $providerCandidates = CodeGenProvider::candidateProviderIds($_isFreePlan, $provi
 if (empty($providerCandidates)) {
     http_response_code(503);
     echo json_encode([
-        'error'      => 'No AI providers are currently available. Please configure an API key or start a local provider.',
+        'error'      => 'No AI providers are currently available. Please configure an API key (e.g. GROQ_API_KEY) or start a local provider (e.g. Ollama).',
         'error_code' => 'subscription_required',
     ]);
     exit;

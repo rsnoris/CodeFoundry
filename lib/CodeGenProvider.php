@@ -123,7 +123,12 @@ class CodeGenProvider
         return !empty($providers[$providerId]['free_tier']);
     }
 
-    /** Return true when the provider is a no-key or local provider. */
+    /**
+     * Return true when the provider does not require a user API key.
+     *
+     * A provider qualifies when marked as `no_key_required` or `local`.
+     * Used to determine free-plan-safe provider choices.
+     */
     public static function isNoKeyProvider(string $providerId): bool
     {
         $providers = CF_CODEGEN_PROVIDERS;
@@ -133,7 +138,16 @@ class CodeGenProvider
         return !empty($providers[$providerId]['no_key_required']) || !empty($providers[$providerId]['local']);
     }
 
-    /** Return ordered candidate providers for the current request context. */
+    /**
+     * Return ordered candidate providers for the current request context.
+     *
+     * Ordering:
+     *  - preferred provider first (if provided and available)
+     *  - free plan: free-tier, then no-key/local, then other available providers
+     *  - paid plan: default provider first, then all available providers
+     *
+     * @return array<int,string>
+     */
     public static function candidateProviderIds(bool $freePlan, string $preferredProviderId = ''): array
     {
         $ordered = [];
@@ -177,7 +191,14 @@ class CodeGenProvider
         return $ordered;
     }
 
-    /** Return the provider's default model id or an empty string. */
+    /**
+     * Return the provider's default model id or an empty string.
+     *
+     * Resolution:
+     *  1) `default_model`
+     *  2) first `models[*].id`
+     *  3) ''
+     */
     public static function defaultModelForProvider(string $providerId): string
     {
         if (!isset(CF_CODEGEN_PROVIDERS[$providerId]) || !is_array(CF_CODEGEN_PROVIDERS[$providerId])) {
@@ -214,7 +235,7 @@ class CodeGenProvider
             }
 
             if ($model === '') {
-                $attemptErrors[] = $providerId . ': no model configured';
+                $attemptErrors[] = $providerId . ': No valid model available for provider';
                 continue;
             }
 
@@ -235,7 +256,7 @@ class CodeGenProvider
         if (!empty($attemptErrors)) {
             $suffix = ' Attempts: ' . implode(' | ', $attemptErrors);
         }
-        throw new \RuntimeException('All ' . count($providerIds) . ' AI providers failed.' . $suffix);
+        throw new \RuntimeException('All ' . count($providerIds) . ' provider attempt(s) failed.' . $suffix);
     }
 
     /**
@@ -423,7 +444,15 @@ class CodeGenProvider
         return self::resolveApiKey($cfg) !== '';
     }
 
-    /** Extract assistant text from multiple response shapes. */
+    /**
+     * Extract assistant text from multiple API response shapes.
+     *
+     * Supported sources:
+     *  - choices[0].message.content (string)
+     *  - choices[0].message.content (array of {type:'text', text:'...'})
+     *  - choices[0].text
+     *  - output_text
+     */
     private static function extractContent(array $result): string
     {
         if (!isset($result['choices']) || !is_array($result['choices']) || !isset($result['choices'][0]) || !is_array($result['choices'][0])) {
