@@ -47,7 +47,7 @@ define('CF_NAV_JSON', CF_ROOT . '/data/navigation.json');
  *
  * To change the location, adjust the path below.
  */
-define('CF_KEYS_DIR', dirname(CF_ROOT) . '/Cf-Config-keys');
+define('CF_KEYS_DIR', CF_ROOT . '/Cf-Config-keys');
 define('CF_USERS_STORAGE_DIR', CF_KEYS_DIR . '/Users');
 
 // ---------------------------------------------------------------------------
