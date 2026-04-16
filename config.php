@@ -138,6 +138,7 @@ define('CF_GEMINI_KEY', cf_load_key('GEMINI_API_KEY'));
  *   api_url_env       – (optional) env-var to override api_url (used by Ollama so the URL is configurable)
  *   extra_headers     – (optional) additional raw HTTP headers to send
  *   model_in_url      – (optional) true when the model ID is embedded in the URL (HuggingFace)
+ *   global_key_only   – (optional) true to load api_key_env only from global config sources
  *   no_key_required   – (optional) true when no API key is needed
  *   free_tier         – (optional) true = default provider for free-plan / unauthenticated users
  *   models            – ordered list of {id, label} model descriptors
@@ -172,6 +173,7 @@ define('CF_CODEGEN_PROVIDERS', [
         'label'         => 'OpenRouter',
         'api_url'       => 'https://openrouter.ai/api/v1/chat/completions',
         'api_key_env'   => 'OPENROUTER_API_KEY',
+        'global_key_only' => true,
         'extra_headers' => [
             'HTTP-Referer: https://codefoundry.cloud',
             'X-Title: CodeFoundry',

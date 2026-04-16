@@ -246,7 +246,7 @@ class CodeGenProvider
         }
         if (!empty($cfg['api_key_env'])) {
             $keyName = (string)$cfg['api_key_env'];
-            if ($keyName === 'OPENROUTER_API_KEY') {
+            if (!empty($cfg['global_key_only'])) {
                 return cf_load_key($keyName);
             }
             $username = '';
