@@ -3,23 +3,10 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/lib/CodeGenProvider.php';
 
-// Determine if the current user is on a free plan.
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-$_cf_session_user = $_SESSION['cf_user'] ?? null;
-$_cf_is_free_plan = ($_cf_session_user['plan'] ?? 'free') === 'free';
-
 // Build a minimal provider/model list for the client-side selector.
-// Free-plan / unauthenticated users only see free-tier providers.
-// Paid users see all available providers.
 $_cf_providers_js = [];
 foreach (CodeGenProvider::all() as $pid => $pdata) {
     if (!$pdata['available']) continue;
-    if (
-        $_cf_is_free_plan
-        && empty($pdata['free_tier'])
-        && empty($pdata['no_key_required'])
-        && empty($pdata['local'])
-    ) continue;
     $models = [];
     foreach ($pdata['models'] as $m) {
         $models[] = ['id' => $m['id'], 'label' => $m['label']];
@@ -27,7 +14,6 @@ foreach (CodeGenProvider::all() as $pid => $pdata) {
     $_cf_providers_js[] = [
         'id'            => $pid,
         'label'         => $pdata['label'],
-        'opensource'    => $pdata['opensource'],
         'default_model' => $pdata['default_model'],
         'models'        => $models,
     ];
@@ -951,7 +937,7 @@ let isRunning   = false;
   sel.innerHTML = '';
   CF_PROVIDERS.forEach(function (p) {
     const group = document.createElement('optgroup');
-    group.label = p.label + (p.opensource ? ' ✦' : '');
+    group.label = p.label;
     p.models.forEach(function (m) {
       const opt = document.createElement('option');
       opt.value       = p.id + ':' + m.id;
@@ -971,9 +957,9 @@ let isRunning   = false;
   }
 
   if (!hasValidSaved) {
-    const maybeOpenRouterProvider = CF_PROVIDERS.find(p => p.id === 'openrouter');
-    if (maybeOpenRouterProvider && maybeOpenRouterProvider.default_model) {
-      const preferred = 'openrouter:' + maybeOpenRouterProvider.default_model;
+    const openAIProvider = CF_PROVIDERS.find(p => p.id === 'openai');
+    if (openAIProvider && openAIProvider.default_model) {
+      const preferred = 'openai:' + openAIProvider.default_model;
       const preferredExists = Array.from(sel.options).some(o => o.value === preferred);
       if (preferredExists) {
         sel.value = preferred;

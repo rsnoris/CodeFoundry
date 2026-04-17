@@ -33,11 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// ── Determine user plan (free vs paid) ────────────────────────────────────
+// ── Session context ────────────────────────────────────────────────────────
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 $_sessionUser = $_SESSION['cf_user'] ?? null;
-$_userPlan    = $_sessionUser['plan'] ?? 'free';
-$_isFreePlan  = ($_userPlan === 'free');
 
 // ── Parse body ────────────────────────────────────────────────────────────
 $raw  = file_get_contents('php://input');
@@ -86,28 +84,13 @@ if (in_array($action, ['improve', 'explain', 'fix'], true) && $currentCode === '
 // ── Sanitise language label (used in system prompt only) ─────────────────
 $langLabel = preg_replace('/[^a-zA-Z0-9 \+\#\-]/', '', $language);
 
-// ── Resolve provider candidates ───────────────────────────────────────────
-if ($_isFreePlan && $providerId !== '') {
-    $allowedFreeProvider = CodeGenProvider::isFreeTierProvider($providerId)
-        || CodeGenProvider::isNoKeyProvider($providerId);
-    if (!$allowedFreeProvider) {
-        http_response_code(403);
-        echo json_encode([
-            'error'      => 'Upgrade your plan to access premium AI providers.',
-            'error_code' => 'upgrade_required',
-        ]);
-        exit;
-    }
-}
-
-// $providerId (when sent by the client) is treated as a preferred first try,
-// while candidateProviderIds() still provides fallback providers on failure.
-$providerCandidates = CodeGenProvider::candidateProviderIds($_isFreePlan, $providerId);
+// ── Resolve provider candidates (OpenAI-only) ─────────────────────────────
+$providerCandidates = CodeGenProvider::candidateProviderIds($providerId);
 if (empty($providerCandidates)) {
     http_response_code(503);
     echo json_encode([
-        'error'      => 'No AI providers are currently available. Please configure an API key (e.g. GROQ_API_KEY) or start a local provider (e.g. Ollama).',
-        'error_code' => 'subscription_required',
+        'error'      => 'OpenAI is not configured. Please set OPENAI_API_KEY via environment variable or key file and try again.',
+        'error_code' => 'provider_not_configured',
     ]);
     exit;
 }

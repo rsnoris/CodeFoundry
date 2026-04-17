@@ -124,145 +124,16 @@ define('CF_DATA_CHAT_MESSAGES',   CF_USERS_STORAGE_DIR . '/chat_messages.json');
 /** OpenAI API key for the CodeGen feature. Set via key file or environment variable. */
 define('CF_OPENAI_KEY', cf_load_key('OPENAI_API_KEY'));
 
-/** Google Gemini API key. Get a free key at https://aistudio.google.com/app/apikey */
-define('CF_GEMINI_KEY', cf_load_key('GEMINI_API_KEY'));
-
 /**
- * CodeGen provider registry.
- *
- * Each entry describes one inference backend.  Keys:
+ * OpenAI-only provider registry.
+ * Keys:
  *   label             – human-readable provider name shown in the UI
- *   api_url           – full endpoint URL; use {model} placeholder when model_in_url is true
+ *   api_url           – full endpoint URL
  *   api_key_env       – (optional) env-var name that holds the API key
- *   api_key           – (optional) hard-coded key (used by Ollama which accepts any string)
- *   api_url_env       – (optional) env-var to override api_url (used by Ollama so the URL is configurable)
- *   extra_headers     – (optional) additional raw HTTP headers to send
- *   model_in_url      – (optional) true when the model ID is embedded in the URL (HuggingFace)
- *   global_key_only   – (optional) true to load api_key_env only from global config sources
- *   no_key_required   – (optional) true when no API key is needed
- *   free_tier         – (optional) true = default provider for free-plan / unauthenticated users
  *   models            – ordered list of {id, label} model descriptors
  *   default_model     – model ID pre-selected in the UI
- *   opensource        – true for fully open-source / free-tier models
- *   local             – true for local inference (Ollama); these are always "available"
  */
 define('CF_CODEGEN_PROVIDERS', [
-
-    'groq' => [
-        'label'         => 'Groq',
-        'api_url'       => 'https://api.groq.com/openai/v1/chat/completions',
-        'api_key_env'   => 'GROQ_API_KEY',
-        'models'        => [
-            ['id' => 'llama-3.3-70b-versatile',          'label' => 'Llama 3.3 70B'],
-            ['id' => 'llama-3.1-8b-instant',             'label' => 'Llama 3.1 8B'],
-            ['id' => 'mixtral-8x7b-32768',               'label' => 'Mixtral 8×7B'],
-            ['id' => 'gemma2-9b-it',                     'label' => 'Gemma 2 9B'],
-            ['id' => 'deepseek-r1-distill-llama-70b',    'label' => 'DeepSeek R1 70B'],
-        ],
-        'default_model' => 'llama-3.3-70b-versatile',
-        'opensource'    => true,
-        'local'         => false,
-    ],
-
-    // ── OpenRouter (free-tier fallback when Pollinations is insufficient) ──────
-    // OpenRouter provides access to many open-source models, including several
-    // completely free-of-charge ones (marked with :free in the model id).
-    // A free OpenRouter account and API key are required; sign up at openrouter.ai.
-    // Set OPENROUTER_API_KEY in the key store.
-    'openrouter' => [
-        'label'         => 'OpenRouter',
-        'api_url'       => 'https://openrouter.ai/api/v1/chat/completions',
-        'api_key_env'   => 'OPENROUTER_API_KEY',
-        'extra_headers' => [
-            'HTTP-Referer: https://codefoundry.cloud',
-            'X-Title: CodeFoundry',
-        ],
-        'free_tier'     => true,   // free-tier fallback (requires a free API key)
-        'models'        => [
-            ['id' => 'meta-llama/llama-3.1-8b-instruct:free',  'label' => 'Llama 3.1 8B (Free)'],
-            ['id' => 'mistralai/mistral-7b-instruct:free',      'label' => 'Mistral 7B (Free)'],
-            ['id' => 'google/gemma-2-9b-it:free',               'label' => 'Gemma 2 9B (Free)'],
-            ['id' => 'qwen/qwen-2.5-coder-7b-instruct:free',   'label' => 'Qwen 2.5 Coder 7B (Free)'],
-            ['id' => 'deepseek/deepseek-r1:free',               'label' => 'DeepSeek R1 (Free)'],
-        ],
-        'default_model' => 'meta-llama/llama-3.1-8b-instruct:free',
-        'opensource'    => true,
-        'local'         => false,
-    ],
-
-    'ollama' => [
-        'label'         => 'Ollama (Local)',
-        'api_url'       => 'http://localhost:11434/v1/chat/completions',
-        'api_url_env'   => 'OLLAMA_URL',
-        'api_key'       => 'ollama',          // Ollama accepts any non-empty string
-        'models'        => [
-            ['id' => 'codellama',          'label' => 'CodeLlama'],
-            ['id' => 'qwen2.5-coder',      'label' => 'Qwen 2.5 Coder'],
-            ['id' => 'deepseek-coder-v2',  'label' => 'DeepSeek Coder V2'],
-            ['id' => 'llama3.2',           'label' => 'Llama 3.2'],
-            ['id' => 'phi4',               'label' => 'Phi-4'],
-            ['id' => 'mistral',            'label' => 'Mistral'],
-        ],
-        'default_model' => 'codellama',
-        'opensource'    => true,
-        'local'         => true,              // always treated as available
-    ],
-
-    'huggingface' => [
-        'label'         => 'HuggingFace',
-        // HuggingFace Inference API embeds the model id in the path
-        'api_url'       => 'https://api-inference.huggingface.co/models/{model}/v1/chat/completions',
-        'api_key_env'   => 'HF_API_KEY',
-        'model_in_url'  => true,
-        'models'        => [
-            ['id' => 'Qwen/Qwen2.5-Coder-32B-Instruct',        'label' => 'Qwen 2.5 Coder 32B'],
-            ['id' => 'meta-llama/Llama-3.1-8B-Instruct',       'label' => 'Llama 3.1 8B'],
-            ['id' => 'mistralai/Mistral-7B-Instruct-v0.3',     'label' => 'Mistral 7B'],
-            ['id' => 'codellama/CodeLlama-34b-Instruct-hf',    'label' => 'CodeLlama 34B'],
-        ],
-        'default_model' => 'Qwen/Qwen2.5-Coder-32B-Instruct',
-        'opensource'    => true,
-        'local'         => false,
-    ],
-
-    'together' => [
-        'label'         => 'Together AI',
-        'api_url'       => 'https://api.together.xyz/v1/chat/completions',
-        'api_key_env'   => 'TOGETHER_API_KEY',
-        'models'        => [
-            ['id' => 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo', 'label' => 'Llama 3.1 70B'],
-            ['id' => 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',  'label' => 'Llama 3.1 8B'],
-            ['id' => 'Qwen/Qwen2.5-Coder-32B-Instruct',              'label' => 'Qwen 2.5 Coder 32B'],
-            ['id' => 'mistralai/Mixtral-8x7B-Instruct-v0.1',         'label' => 'Mixtral 8×7B'],
-            ['id' => 'codellama/CodeLlama-34b-Instruct-hf',          'label' => 'CodeLlama 34B'],
-        ],
-        'default_model' => 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo',
-        'opensource'    => true,
-        'local'         => false,
-    ],
-
-    // ── Google Gemini ─────────────────────────────────────────────────────────
-    // Uses Google's OpenAI-compatible endpoint.
-    // Get a free key at: https://aistudio.google.com/app/apikey
-    // Set GEMINI_API_KEY in the key store.
-    'gemini' => [
-        'label'         => 'Google Gemini',
-        'api_url'       => 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
-        'api_key_env'   => 'GEMINI_API_KEY',
-        'models'        => [
-            ['id' => 'gemini-2.0-flash',        'label' => 'Gemini 2.0 Flash'],
-            ['id' => 'gemini-2.0-flash-lite',   'label' => 'Gemini 2.0 Flash Lite'],
-            ['id' => 'gemini-1.5-flash',        'label' => 'Gemini 1.5 Flash'],
-            ['id' => 'gemini-1.5-pro',          'label' => 'Gemini 1.5 Pro'],
-            ['id' => 'gemini-1.5-flash-8b',     'label' => 'Gemini 1.5 Flash 8B'],
-        ],
-        'default_model' => 'gemini-2.0-flash',
-        'opensource'    => false,
-        'local'         => false,
-    ],
-
-    // ── OpenAI (ChatGPT) ──────────────────────────────────────────────────────
-    // Set OPENAI_API_KEY in the key store.
     'openai' => [
         'label'         => 'OpenAI (ChatGPT)',
         'api_url'       => 'https://api.openai.com/v1/chat/completions',
@@ -276,8 +147,6 @@ define('CF_CODEGEN_PROVIDERS', [
             ['id' => 'o3-mini',       'label' => 'o3 Mini'],
         ],
         'default_model' => 'gpt-4o-mini',
-        'opensource'    => false,
-        'local'         => false,
     ],
 
 ]);

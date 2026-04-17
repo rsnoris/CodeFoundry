@@ -4,25 +4,15 @@ declare(strict_types=1);
 /**
  * CodeFoundry – CodeGenProvider
  *
- * Unified abstraction over all supported LLM inference backends.
- * Every provider uses the OpenAI Chat Completions wire format
- * (POST /v1/chat/completions with the same JSON shape), so the
- * only differences are the endpoint URL, the auth header, and
- * optional extra headers (e.g. OpenRouter's HTTP-Referer).
- *
- * HuggingFace is the one exception: the model id is embedded in
- * the URL path instead of the JSON body (model_in_url = true).
+ * OpenAI-only abstraction used by IDE Code Generation and VIRAL agents.
  */
 class CodeGenProvider
 {
-    private const PREFERRED_DEFAULT_PROVIDER_ID = 'openrouter';
-
     // ── Public API ─────────────────────────────────────────────────────────
 
     /**
      * Return every provider descriptor with an 'available' flag and 'id' key
-     * injected.  A provider is "available" when it has a configured API key
-     * or is marked as local (Ollama).
+     * injected. A provider is "available" when it has a configured API key.
      *
      * @return array<string, array<string, mixed>>
      */
@@ -39,7 +29,7 @@ class CodeGenProvider
     }
 
     /**
-     * Return only available providers (key set or local).
+     * Return only available providers.
      *
      * @return array<string, array<string, mixed>>
      */
@@ -62,14 +52,9 @@ class CodeGenProvider
 
     /**
      * Validate that a model id belongs to the given provider.
-     * Returns true unconditionally for the 'ollama' provider so that
-     * locally-pulled models not listed in the config still work.
      */
     public static function isValidModel(string $providerId, string $model): bool
     {
-        if ($providerId === 'ollama') {
-            return $model !== '';
-        }
         $providers = CF_CODEGEN_PROVIDERS;
         if (!isset($providers[$providerId])) {
             return false;
@@ -84,13 +69,13 @@ class CodeGenProvider
 
     /**
      * Return the default provider id.
-     * Prefer OpenRouter when available, otherwise return the first available provider.
+     * Prefer OpenAI when available, otherwise return the first available provider.
      */
     public static function defaultProviderId(): string
     {
-        $preferredId = self::PREFERRED_DEFAULT_PROVIDER_ID;
-        if (isset(CF_CODEGEN_PROVIDERS[$preferredId]) && self::isAvailable(CF_CODEGEN_PROVIDERS[$preferredId])) {
-            return $preferredId;
+        $providerId = 'openai';
+        if (isset(CF_CODEGEN_PROVIDERS[$providerId]) && self::isAvailable(CF_CODEGEN_PROVIDERS[$providerId])) {
+            return $providerId;
         }
         foreach (CF_CODEGEN_PROVIDERS as $id => $cfg) {
             if (self::isAvailable($cfg)) {
@@ -101,94 +86,43 @@ class CodeGenProvider
     }
 
     /**
-     * Return the default free-tier provider id (first provider with free_tier = true),
-     * or '' if none is configured.
+     * Backward-compatible alias for the default provider.
      */
     public static function defaultFreeProviderId(): string
     {
-        foreach (CF_CODEGEN_PROVIDERS as $id => $cfg) {
-            if (!empty($cfg['free_tier']) && self::isAvailable($cfg)) {
-                return $id;
-            }
-        }
-        return '';
+        return self::defaultProviderId();
     }
 
     /**
-     * Return true when the given provider is marked as free_tier.
+     * Return false in OpenAI-only mode (kept for backward compatibility).
      */
     public static function isFreeTierProvider(string $providerId): bool
     {
-        $providers = CF_CODEGEN_PROVIDERS;
-        return !empty($providers[$providerId]['free_tier']);
+        return false;
     }
 
     /**
-     * Return true when the provider does not require a user API key.
-     *
-     * A provider qualifies when marked as `no_key_required` or `local`.
-     * Used to determine free-plan-safe provider choices.
+     * Return false in OpenAI-only mode (kept for backward compatibility).
      */
     public static function isNoKeyProvider(string $providerId): bool
     {
-        $providers = CF_CODEGEN_PROVIDERS;
-        if (!isset($providers[$providerId])) {
-            return false;
-        }
-        return !empty($providers[$providerId]['no_key_required']) || !empty($providers[$providerId]['local']);
+        return false;
     }
 
     /**
      * Return ordered candidate providers for the current request context.
+     * In OpenAI-only mode this always resolves to OpenAI when available.
      *
-     * Ordering:
-     *  - preferred provider first (if provided and available)
-     *  - free plan: free-tier, then no-key/local, then other available providers
-     *  - paid plan: default provider first, then all available providers
-     *
+     * @param string $preferredProviderId Preferred provider id when explicitly requested.
      * @return array<int,string>
      */
-    public static function candidateProviderIds(bool $freePlan, string $preferredProviderId = ''): array
+    public static function candidateProviderIds(string $preferredProviderId = ''): array
     {
-        $ordered = [];
-        $push = static function (string $id) use (&$ordered): void {
-            if ($id === '') {
-                return;
-            }
-            if (!self::isProviderAvailable($id)) {
-                return;
-            }
-            if (!in_array($id, $ordered, true)) {
-                $ordered[] = $id;
-            }
-        };
-
-        if ($preferredProviderId !== '') {
-            $push($preferredProviderId);
+        if ($preferredProviderId !== '' && self::isProviderAvailable($preferredProviderId)) {
+            return [$preferredProviderId];
         }
-
-        if ($freePlan) {
-            foreach (CF_CODEGEN_PROVIDERS as $id => $cfg) {
-                if (!empty($cfg['free_tier'])) {
-                    $push((string)$id);
-                }
-            }
-            foreach (CF_CODEGEN_PROVIDERS as $id => $cfg) {
-                if (!empty($cfg['no_key_required']) || !empty($cfg['local'])) {
-                    $push((string)$id);
-                }
-            }
-            foreach (CF_CODEGEN_PROVIDERS as $id => $cfg) {
-                $push((string)$id);
-            }
-        } else {
-            $push(self::defaultProviderId());
-            foreach (CF_CODEGEN_PROVIDERS as $id => $cfg) {
-                $push((string)$id);
-            }
-        }
-
-        return $ordered;
+        $defaultProvider = self::defaultProviderId();
+        return $defaultProvider !== '' ? [$defaultProvider] : [];
     }
 
     /**
@@ -390,7 +324,7 @@ class CodeGenProvider
     // ── Private helpers ────────────────────────────────────────────────────
 
     /**
-     * Look up provider config and resolve the Ollama URL override from env.
+     * Look up provider config and resolve optional URL override from env.
      *
      * @return array<string, mixed>
      * @throws \InvalidArgumentException
@@ -403,7 +337,7 @@ class CodeGenProvider
         }
         $cfg = $providers[$providerId];
 
-        // Allow overriding the base URL via key file or env (useful for Ollama pointing at a remote host)
+        // Allow overriding the base URL via key file or env.
         if (!empty($cfg['api_url_env'])) {
             $envUrl = cf_load_key($cfg['api_url_env']);
             if ($envUrl !== '') {
@@ -437,12 +371,9 @@ class CodeGenProvider
         return '';
     }
 
-    /** Return true when the provider has a usable API key, is local, or requires no key. */
+    /** Return true when the provider has a usable API key. */
     private static function isAvailable(array $cfg): bool
     {
-        if (!empty($cfg['local']) || !empty($cfg['no_key_required'])) {
-            return true;
-        }
         return self::resolveApiKey($cfg) !== '';
     }
 
