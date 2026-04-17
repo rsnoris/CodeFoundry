@@ -233,10 +233,95 @@ $page_styles = <<<'PAGECSS'
   }
   .stat-pill .stat-num { font-size: 28px; font-weight: 900; color: #18b3ff; }
   .stat-pill .stat-lbl { font-size: 13px; color: #627193; margin-top: 2px; }
+  /* ── Task categories + model guide ── */
+  .viral-extra {
+    max-width: 1200px;
+    margin: 56px auto 0;
+    padding: 0 24px;
+    display: grid;
+    gap: 20px;
+  }
+  .viral-panel {
+    background: #0d1626;
+    border: 1px solid #1a2942;
+    border-radius: 16px;
+    padding: 22px;
+  }
+  .viral-panel h2 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 800;
+  }
+  .viral-panel p {
+    margin: 0 0 14px;
+    color: #92a3bb;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .task-groups {
+    display: grid;
+    gap: 14px;
+  }
+  .task-group-title {
+    margin: 0 0 8px;
+    color: #c9d6ea;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .task-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .task-tag {
+    font-size: 12px;
+    color: #a9b8cf;
+    border: 1px solid #1e2e48;
+    background: #0e1828;
+    border-radius: 999px;
+    padding: 5px 10px;
+  }
+  .model-guide-wrap {
+    overflow-x: auto;
+  }
+  .model-guide {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 780px;
+  }
+  .model-guide th,
+  .model-guide td {
+    border-bottom: 1px solid #1a2942;
+    padding: 10px 8px;
+    text-align: left;
+    vertical-align: top;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .model-guide th {
+    color: #dce7f8;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .model-guide td {
+    color: #92a3bb;
+  }
+  .model-chip {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #1e2e48;
+    background: #0e1828;
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-size: 11px;
+    color: #dce7f8;
+    font-weight: 600;
+  }
   @media (max-width: 640px) {
     .viral-hero { padding: 48px 16px 32px; }
     .viral-categories { padding: 0 16px; }
     .viral-stats { padding: 0 16px 40px; }
+    .viral-extra { padding: 0 16px; }
   }
 PAGECSS;
 
@@ -254,7 +339,13 @@ foreach (VIRAL_AGENTS as $slug => $a) {
     ];
 }
 
-$categories      = ['All', 'Executive', 'Engineering', 'Business', 'Marketing', 'People', 'Operations', 'Finance', 'Design', 'Legal', 'Healthcare', 'Education', 'PR & Comms', 'Real Estate', 'Retail', 'Manufacturing', 'AI Architecture'];
+$categories = array_values(array_unique(array_column(array_values(VIRAL_AGENTS), 'category')));
+natcasesort($categories);
+$categories = array_values($categories);
+array_unshift($categories, 'All');
+
+$taskCategoryGroups = defined('VIRAL_TASK_CATEGORY_GROUPS') ? VIRAL_TASK_CATEGORY_GROUPS : [];
+$modelGuide         = defined('VIRAL_MODEL_RECOMMENDATIONS') ? VIRAL_MODEL_RECOMMENDATIONS : [];
 $agentCount      = count(VIRAL_AGENTS);
 $categoryCount   = count(array_unique(array_column(array_values(VIRAL_AGENTS), 'category')));
 
@@ -314,6 +405,54 @@ require_once dirname(__DIR__) . '/includes/header.php';
       <?php endforeach; ?>
       <div class="no-results" id="noResults" style="display:none;">No agents match your search.</div>
     </div>
+  </div>
+
+  <div class="viral-extra">
+    <section class="viral-panel">
+      <h2>AI Task Categories</h2>
+      <p>Added for all VIRAL user roles to map role workflows to the right AI task type.</p>
+      <div class="task-groups">
+        <?php foreach ($taskCategoryGroups as $groupName => $groupTasks): ?>
+          <div>
+            <h3 class="task-group-title"><?= htmlspecialchars((string)$groupName, ENT_QUOTES, 'UTF-8') ?></h3>
+            <div class="task-tags">
+              <?php foreach ($groupTasks as $task): ?>
+                <span class="task-tag"><?= htmlspecialchars((string)$task, ENT_QUOTES, 'UTF-8') ?></span>
+              <?php endforeach; ?>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    </section>
+
+    <section class="viral-panel">
+      <h2>Model Selection Recommendations</h2>
+      <p>Choose by priority: highest output quality, best quality/performance balance, or lowest token/cost usage for your task category.</p>
+      <div class="model-guide-wrap">
+        <table class="model-guide">
+          <thead>
+            <tr>
+              <th>Task Group</th>
+              <th>Highest Quality</th>
+              <th>Best Balance (Quality + Performance)</th>
+              <th>Cost/Token Efficient</th>
+              <th>Selection Guidance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($modelGuide as $row): ?>
+              <tr>
+                <td><?= htmlspecialchars((string)$row['task_group'], ENT_QUOTES, 'UTF-8') ?></td>
+                <td><span class="model-chip"><?= htmlspecialchars((string)$row['quality'], ENT_QUOTES, 'UTF-8') ?></span></td>
+                <td><span class="model-chip"><?= htmlspecialchars((string)$row['balanced'], ENT_QUOTES, 'UTF-8') ?></span></td>
+                <td><span class="model-chip"><?= htmlspecialchars((string)$row['efficient'], ENT_QUOTES, 'UTF-8') ?></span></td>
+                <td><?= htmlspecialchars((string)$row['note'], ENT_QUOTES, 'UTF-8') ?></td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    </section>
   </div>
 
   <!-- Stats -->
