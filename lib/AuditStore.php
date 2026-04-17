@@ -66,7 +66,7 @@ class AuditStore
     /**
      * Return audit-log entries for a specific user, newest first.
      */
-    public static function eventsForUser(string $username, int $limit = 0): array
+    public static function eventsForUser(string $username, int $limit = 0, array $events = []): array
     {
         $all = self::readJson(CF_DATA_AUDIT_LOG);
         $all = array_reverse($all);
@@ -74,6 +74,13 @@ class AuditStore
             $all,
             fn($e) => ($e['username'] ?? '') === $username
         ));
+        if (!empty($events)) {
+            $allowedEvents = array_flip($events);
+            $all = array_values(array_filter(
+                $all,
+                static fn($e) => isset($allowedEvents[(string)($e['event'] ?? '')])
+            ));
+        }
         return $limit > 0 ? array_slice($all, 0, $limit) : $all;
     }
 

@@ -216,22 +216,22 @@ class UserStore
         if (!is_file($file) || !is_readable($file)) {
             return '';
         }
-        $value = trim((string)file_get_contents($file));
-        return $value;
+        return trim((string)file_get_contents($file));
     }
 
     /** Remove a user-specific key override file for the given key name. */
-    public static function clearUserApiKey(string $username, string $keyName): void
+    public static function clearUserApiKey(string $username, string $keyName): bool
     {
         self::ensureUserConfig($username);
         $safeName = cf_normalize_key_name($keyName);
         if ($safeName === '') {
-            throw new \InvalidArgumentException('Invalid key name.');
+            throw new \InvalidArgumentException('Key name cannot be empty or contain invalid characters.');
         }
         $file = cf_user_config_dir($username) . '/' . $safeName;
-        if (is_file($file)) {
-            @unlink($file);
+        if (!is_file($file)) {
+            return true;
         }
+        return unlink($file);
     }
 
     /** Load a user-specific API key; falls back to global key lookup. */

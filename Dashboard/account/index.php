@@ -33,7 +33,18 @@ if (session_status() === PHP_SESSION_NONE) {
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
-const USER_API_KEY_MAX_LENGTH = 2048;
+const USER_API_KEY_VALUE_MAX_LENGTH = 2048;
+
+/**
+ * Mask a key value for safe UI display.
+ */
+function cf_mask_account_key(string $value): string
+{
+    if ($value === '') {
+        return '';
+    }
+    return str_repeat('•', max(8, min(24, strlen($value))));
+}
 
 $flash_profile  = '';
 $flash_password = '';
@@ -106,10 +117,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form'] ?? '') === 'api_key
             if ($action === 'save_api_key') {
                 $key_value = trim((string)($_POST['key_value'] ?? ''));
                 if ($key_value === '') {
-                    UserStore::clearUserApiKey($username, $key_name);
-                    AuditStore::log('user.api_key_cleared', $username, ['key' => $key_name]);
-                    $flash_api = $user_managed_keys[$key_name]['label'] . ' key cleared for this account.';
-                } elseif (strlen($key_value) > USER_API_KEY_MAX_LENGTH) {
+                    if (!UserStore::clearUserApiKey($username, $key_name)) {
+                        $error_api = 'Unable to clear key at this time. Please try again.';
+                    } else {
+                        AuditStore::log('user.api_key_cleared', $username, ['key' => $key_name]);
+                        $flash_api = $user_managed_keys[$key_name]['label'] . ' key cleared for this account.';
+                    }
+                } elseif (strlen($key_value) > USER_API_KEY_VALUE_MAX_LENGTH) {
                     $error_api = 'API key value is too long.';
                 } else {
                     $had_value = UserStore::getUserApiKeyOverride($username, $key_name) !== '';
@@ -121,9 +135,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form'] ?? '') === 'api_key
                     $flash_api = $user_managed_keys[$key_name]['label'] . ' key ' . ($had_value ? 'rotated' : 'saved') . ' for this account.';
                 }
             } elseif ($action === 'clear_api_key') {
-                UserStore::clearUserApiKey($username, $key_name);
-                AuditStore::log('user.api_key_cleared', $username, ['key' => $key_name]);
-                $flash_api = $user_managed_keys[$key_name]['label'] . ' key cleared for this account.';
+                if (!UserStore::clearUserApiKey($username, $key_name)) {
+                    $error_api = 'Unable to clear key at this time. Please try again.';
+                } else {
+                    AuditStore::log('user.api_key_cleared', $username, ['key' => $key_name]);
+                    $flash_api = $user_managed_keys[$key_name]['label'] . ' key cleared for this account.';
+                }
             } else {
                 $error_api = 'Unsupported API key action.';
             }
@@ -135,11 +152,7 @@ $user_key_overrides = [];
 foreach ($user_managed_keys as $key_name => $_meta) {
     $user_key_overrides[$key_name] = UserStore::getUserApiKeyOverride($username, $key_name);
 }
-$api_key_events = array_values(array_filter(
-    AuditStore::eventsForUser($username, 500),
-    static fn($entry) => in_array(($entry['event'] ?? ''), ['user.api_key_saved', 'user.api_key_cleared'], true)
-));
-$api_key_events = array_slice($api_key_events, 0, 25);
+$api_key_events = AuditStore::eventsForUser($username, 25, ['user.api_key_saved', 'user.api_key_cleared']);
 
 // Reload fresh user data
 $user = UserStore::findUser($username) ?? $user;
@@ -259,7 +272,7 @@ $page_styles = <<<'CSS'
   .btn-key-clear { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; border:1px solid rgba(239,68,68,.25); background:rgba(239,68,68,.07); color:#f87171; transition:border-color .15s; }
   .btn-key-clear:hover { border-color:#f87171; }
   .table-wrap { overflow-x:auto; }
-  .data-table { width:100%; border-collapse: collapse; font-size: 13px; }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .data-table th {
     text-align: left; padding: 12px 16px;
     color: var(--text-subtle); font-weight: 600; font-size: 11px;
@@ -414,10 +427,9 @@ require_once dirname(dirname(__DIR__)) . '/includes/header.php';
           <?php foreach ($user_managed_keys as $key_name => $key_meta):
             $current_val = (string)($user_key_overrides[$key_name] ?? '');
             $is_set      = $current_val !== '';
-            $masked      = $is_set
-                ? substr($current_val, 0, 6) . str_repeat('•', min(20, max(8, strlen($current_val) - 6)))
-                : '';
+            $masked      = $is_set ? cf_mask_account_key($current_val) : '';
             $is_url      = !empty($key_meta['is_url']);
+            $placeholder = $is_set ? 'Enter new value to rotate…' : 'Paste ' . $key_meta['label'] . ' value…';
           ?>
           <div class="key-card">
             <div class="key-card-header">
@@ -444,9 +456,8 @@ require_once dirname(dirname(__DIR__)) . '/includes/header.php';
                 type="<?= $is_url ? 'text' : 'password' ?>"
                 name="key_value"
                 class="key-input"
-                placeholder="<?= $is_set ? 'Enter new value to rotate…' : 'Paste ' . cf_e($key_meta['label']) . ' value…' ?>"
+                placeholder="<?= cf_e($placeholder) ?>"
                 autocomplete="new-password"
-                required
               >
               <div class="key-actions">
                 <button type="submit" class="btn-key-save">
@@ -496,10 +507,13 @@ require_once dirname(dirname(__DIR__)) . '/includes/header.php';
                   $is_saved = $event === 'user.api_key_saved';
                   $badge_class = $is_saved ? 'saved' : 'cleared';
                   $badge_text = $is_saved ? 'Saved / Rotated' : 'Cleared';
-                  $key_name = (string)($entry['data']['key'] ?? 'unknown');
+                  $key_name = (string)($entry['data']['key'] ?? 'Key name not recorded');
+                  $created_raw = (string)($entry['created_at'] ?? '');
+                  $created_ts = $created_raw !== '' ? strtotime($created_raw) : false;
+                  $created_label = $created_ts !== false ? date('M j, Y g:i A', $created_ts) : 'Unknown';
                 ?>
                 <tr>
-                  <td style="white-space:nowrap"><?= cf_e(date('M j, Y g:i a', strtotime((string)($entry['created_at'] ?? 'now')))) ?></td>
+                  <td style="white-space:nowrap"><?= cf_e($created_label) ?></td>
                   <td><span class="event-badge <?= cf_e($badge_class) ?>"><?= cf_e($badge_text) ?></span></td>
                   <td><code><?= cf_e($key_name) ?></code></td>
                   <td><?= cf_e((string)($entry['ip'] ?? '')) ?></td>
@@ -541,9 +555,9 @@ require_once dirname(dirname(__DIR__)) . '/includes/header.php';
 
 <script>
 document.addEventListener('click', function (e) {
-  var btn = e.target.closest('[data-confirm]');
+  const btn = e.target.closest('[data-confirm]');
   if (!btn) return;
-  var msg = btn.getAttribute('data-confirm');
+  const msg = btn.getAttribute('data-confirm');
   if (msg && !window.confirm(msg)) {
     e.preventDefault();
   }
