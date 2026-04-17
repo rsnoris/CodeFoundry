@@ -1071,7 +1071,7 @@ $page_scripts = <<<PAGEJS
     rolePrompts.forEach(function (text) {
       if (term && text.toLowerCase().indexOf(term) === -1) return;
       visible++;
-      var btn = document.createElement('button');
+      const btn = document.createElement('button');
       btn.className = 'example-item';
       btn.type = 'button';
       btn.textContent = text;
@@ -1079,11 +1079,11 @@ $page_scripts = <<<PAGEJS
         if (!chatInput) return;
         chatInput.value = text;
         chatInput.dispatchEvent(new Event('input'));
-        sendMessage();
+        if (typeof sendMessage === 'function') sendMessage();
       });
       exampleList.appendChild(btn);
     });
-    exampleCount.textContent = visible + ' examples';
+    exampleCount.textContent = visible + (visible === 1 ? ' example' : ' examples');
   }
 
   renderPromptExamples('');
