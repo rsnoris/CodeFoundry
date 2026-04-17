@@ -38,7 +38,6 @@ foreach (CodeGenProvider::all() as $pid => $pdata) {
         'label'         => $pdata['label'],
         'available'     => (bool)($pdata['available'] ?? false),
         'api_key_env'   => (string)($pdata['api_key_env'] ?? ''),
-        'no_api_key'    => !empty($pdata['no_api_key']),
         'default_model' => $pdata['default_model'],
         'models'        => $models,
     ];
