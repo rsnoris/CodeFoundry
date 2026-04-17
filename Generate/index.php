@@ -1022,9 +1022,9 @@ $page_scripts .= <<<'PAGEJS'
       if (hasValidSaved) sel.value = saved;
     }
     if (!hasValidSaved) {
-      const maybeOpenAIProvider = CF_PROVIDERS.find(function (p) { return p.id === 'openai'; });
-      if (maybeOpenAIProvider && maybeOpenAIProvider.default_model) {
-        const preferred = 'openai:' + maybeOpenAIProvider.default_model;
+      const openAIProvider = CF_PROVIDERS.find(function (p) { return p.id === 'openai'; });
+      if (openAIProvider && openAIProvider.default_model) {
+        const preferred = 'openai:' + openAIProvider.default_model;
         const preferredExists = Array.from(sel.options).some(function (o) { return o.value === preferred; });
         if (preferredExists) {
           sel.value = preferred;

@@ -957,9 +957,9 @@ let isRunning   = false;
   }
 
   if (!hasValidSaved) {
-    const maybeOpenAIProvider = CF_PROVIDERS.find(p => p.id === 'openai');
-    if (maybeOpenAIProvider && maybeOpenAIProvider.default_model) {
-      const preferred = 'openai:' + maybeOpenAIProvider.default_model;
+    const openAIProvider = CF_PROVIDERS.find(p => p.id === 'openai');
+    if (openAIProvider && openAIProvider.default_model) {
+      const preferred = 'openai:' + openAIProvider.default_model;
       const preferredExists = Array.from(sel.options).some(o => o.value === preferred);
       if (preferredExists) {
         sel.value = preferred;
