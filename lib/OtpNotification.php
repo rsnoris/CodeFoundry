@@ -81,11 +81,12 @@ class OtpNotification
             CURLOPT_CONNECTTIMEOUT => 6,
         ]);
 
-        curl_exec($ch);
+        $response = curl_exec($ch);
+        $curlErr  = curl_errno($ch);
         $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        return $status >= 200 && $status < 300;
+        return $curlErr === 0 && $response !== false && $status >= 200 && $status < 300;
     }
 
     private static function sendViaPhpMail(string $email, string $subject, string $body): bool

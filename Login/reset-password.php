@@ -33,17 +33,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($user !== null) {
                 $username = (string)($user['username'] ?? '');
                 $otpHash  = (string)($user['password_reset_otp_hash'] ?? '');
-                $expires = false;
+                $expiresTimestamp = false;
                 $expiresRaw = (string)($user['password_reset_expires_at'] ?? '');
                 if ($expiresRaw !== '') {
                     $expiresDt = date_create_immutable($expiresRaw);
                     if ($expiresDt !== false) {
-                        $expires = $expiresDt->getTimestamp();
+                        $expiresTimestamp = $expiresDt->getTimestamp();
                     }
                 }
                 $attempts = (int)($user['password_reset_attempts'] ?? 0);
 
-                if ($username !== '' && $otpHash !== '' && $expires !== false && $expires >= time() && $attempts < 5) {
+                if ($username !== '' && $otpHash !== '' && $expiresTimestamp !== false && $expiresTimestamp >= time() && $attempts < 5) {
                     if (password_verify($otp, $otpHash)) {
                         UserStore::updateUser($username, [
                             'password_hash'              => password_hash($newPw, PASSWORD_BCRYPT),

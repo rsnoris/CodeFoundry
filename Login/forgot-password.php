@@ -25,19 +25,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($user !== null) {
                 $username = (string)($user['username'] ?? '');
                 $email    = trim((string)($user['email'] ?? ''));
-                $lastSent = false;
+                $lastSentTimestamp = false;
                 $lastSentRaw = (string)($user['password_reset_requested_at'] ?? '');
                 if ($lastSentRaw !== '') {
                     $lastSentDt = date_create_immutable($lastSentRaw);
                     if ($lastSentDt !== false) {
-                        $lastSent = $lastSentDt->getTimestamp();
+                        $lastSentTimestamp = $lastSentDt->getTimestamp();
                     }
                 }
 
                 if (
                     $username !== '' &&
                     filter_var($email, FILTER_VALIDATE_EMAIL) &&
-                    ($lastSent === false || $lastSent < (time() - 60))
+                    ($lastSentTimestamp === false || $lastSentTimestamp < (time() - 60))
                 ) {
                     $otp = OtpNotification::generateOtp(6);
                     UserStore::updateUser($username, [
