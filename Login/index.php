@@ -393,6 +393,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
     </form>
 
     <div class="login-footer">
+      <a href="/Login/forgot-password.php">Forgot password?</a><br>
       Don't have an account? <a href="/Signup/<?php
         $raw_redir = $_GET['redirect'] ?? '';
         if (is_string($raw_redir) && preg_match('#^/[^/\\\\]#', $raw_redir)) {
@@ -404,4 +405,3 @@ require_once dirname(__DIR__) . '/includes/header.php';
 </main>
 
 <?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
-

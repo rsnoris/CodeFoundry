@@ -1555,6 +1555,8 @@ require_once dirname(__DIR__) . '/includes/header.php';
         'ANTHROPIC_API_KEY'  => ['label' => 'Anthropic (Claude)', 'hint' => 'Claude 3 Haiku, Sonnet, Opus',                               'icon' => 'lucide:brain'],
         'GEMINI_API_KEY'     => ['label' => 'Google Gemini',      'hint' => 'Gemini Pro, Gemini Flash models',                             'icon' => 'lucide:sparkles'],
         'OLLAMA_URL'         => ['label' => 'Ollama (URL)',        'hint' => 'Self-hosted Ollama server URL, e.g. http://localhost:11434',  'icon' => 'lucide:server', 'is_url' => true],
+        'OTP_NOTIFICATION_API_URL' => ['label' => 'OTP Notification API URL', 'hint' => 'Provider endpoint used to send password-reset OTP emails', 'icon' => 'lucide:mail', 'is_url' => true],
+        'OTP_NOTIFICATION_API_KEY' => ['label' => 'OTP Notification API Key', 'hint' => 'Provider key/token used with the OTP notification API', 'icon' => 'lucide:key-round'],
     ];
 
     $saved_key  = $_GET['saved']   ?? '';
@@ -1562,7 +1564,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
     ?>
     <div class="adm-header">
       <h1><iconify-icon icon="lucide:key-round" style="vertical-align:middle;margin-right:8px"></iconify-icon>API Keys</h1>
-      <p>Rotate or update global AI provider API keys. Keys are stored in <code><?= cf_e(CF_KEYS_DIR) ?></code> and never committed to source control.</p>
+      <p>Rotate or update global provider and notification API keys. Keys are stored in <code><?= cf_e(CF_KEYS_DIR) ?></code> and never committed to source control.</p>
     </div>
 
     <?php if ($saved_key !== ''): ?>
@@ -1579,7 +1581,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
     <div class="adm-section">
       <div class="adm-section-header">
-        <h2><iconify-icon icon="lucide:shield-check" style="vertical-align:middle;margin-right:6px"></iconify-icon>AI Provider Keys</h2>
+        <h2><iconify-icon icon="lucide:shield-check" style="vertical-align:middle;margin-right:6px"></iconify-icon>Provider & Notification Keys</h2>
         <span style="font-size:11px;color:var(--text-subtle)">Each key is stored as a plain-text file — never in code.</span>
       </div>
       <div class="adm-section-body">
