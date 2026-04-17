@@ -8,6 +8,131 @@
 
 declare(strict_types=1);
 
+if (!defined('VIRAL_TASK_CATEGORY_GROUPS')) {
+    define('VIRAL_TASK_CATEGORY_GROUPS', [
+        'Multimodal' => [
+            'Audio-Text-to-Text',
+            'Image-Text-to-Text',
+            'Image-Text-to-Image',
+            'Image-Text-to-Video',
+            'Visual Question Answering',
+            'Document Question Answering',
+            'Video-Text-to-Text',
+            'Visual Document Retrieval',
+            'Any-to-Any',
+        ],
+        'Computer Vision' => [
+            'Depth Estimation',
+            'Image Classification',
+            'Object Detection',
+            'Image Segmentation',
+            'Text-to-Image',
+            'Image-to-Text',
+            'Image-to-Image',
+            'Image-to-Video',
+            'Unconditional Image Generation',
+            'Video Classification',
+            'Text-to-Video',
+            'Zero-Shot Image Classification',
+            'Mask Generation',
+            'Zero-Shot Object Detection',
+            'Text-to-3D',
+            'Image-to-3D',
+            'Image Feature Extraction',
+            'Keypoint Detection',
+            'Video-to-Video',
+        ],
+        'Natural Language Processing' => [
+            'Text Classification',
+            'Token Classification',
+            'Table Question Answering',
+            'Question Answering',
+            'Zero-Shot Classification',
+            'Translation',
+            'Summarization',
+            'Feature Extraction',
+            'Text Generation',
+            'Fill-Mask',
+            'Sentence Similarity',
+            'Text Ranking',
+        ],
+        'Audio' => [
+            'Text-to-Speech',
+            'Text-to-Audio',
+            'Automatic Speech Recognition',
+            'Audio-to-Audio',
+            'Audio Classification',
+            'Voice Activity Detection',
+        ],
+        'Tabular' => [
+            'Tabular Classification',
+            'Tabular Regression',
+            'Time Series Forecasting',
+        ],
+        'Reinforcement Learning' => [
+            'Reinforcement Learning',
+            'Robotics',
+        ],
+        'Other' => [
+            'Graph Machine Learning',
+        ],
+    ]);
+}
+
+if (!defined('VIRAL_MODEL_RECOMMENDATIONS')) {
+    define('VIRAL_MODEL_RECOMMENDATIONS', [
+        [
+            'task_group' => 'Multimodal',
+            'quality'    => 'gpt-4o',
+            'balanced'   => 'gpt-4o-mini',
+            'efficient'  => 'gpt-4o-mini',
+            'note'       => 'Best for image/audio/video understanding with strong output quality; use mini for lower cost per request.',
+        ],
+        [
+            'task_group' => 'Computer Vision',
+            'quality'    => 'gpt-4o',
+            'balanced'   => 'gpt-4o-mini',
+            'efficient'  => 'gpt-4o-mini',
+            'note'       => 'Use quality mode for complex visual reasoning; mini for high-volume tagging/classification.',
+        ],
+        [
+            'task_group' => 'Natural Language Processing',
+            'quality'    => 'gpt-4o',
+            'balanced'   => 'o3-mini',
+            'efficient'  => 'gpt-4o-mini',
+            'note'       => 'For deep reasoning or structured analysis prefer o3-mini; for lowest token cost use 4o-mini.',
+        ],
+        [
+            'task_group' => 'Audio',
+            'quality'    => 'gpt-4o',
+            'balanced'   => 'gpt-4o-mini',
+            'efficient'  => 'gpt-4o-mini',
+            'note'       => 'Use gpt-4o for nuanced transcription and audio understanding quality.',
+        ],
+        [
+            'task_group' => 'Tabular',
+            'quality'    => 'o3-mini',
+            'balanced'   => 'gpt-4o-mini',
+            'efficient'  => 'gpt-4o-mini',
+            'note'       => 'o3-mini is strongest for step-by-step quantitative reasoning; use 4o-mini for lower token cost on routine workloads.',
+        ],
+        [
+            'task_group' => 'Reinforcement Learning',
+            'quality'    => 'o3-mini',
+            'balanced'   => 'gpt-4o',
+            'efficient'  => 'gpt-4o-mini',
+            'note'       => 'Planning-heavy robotics/RL design benefits from stronger reasoning-oriented models.',
+        ],
+        [
+            'task_group' => 'Other',
+            'quality'    => 'o3-mini',
+            'balanced'   => 'gpt-4o-mini',
+            'efficient'  => 'gpt-4o-mini',
+            'note'       => 'Graph and specialist analytical tasks often perform best with reasoning-focused models.',
+        ],
+    ]);
+}
+
 if (!defined('VIRAL_AGENTS')) {
 
     /**
