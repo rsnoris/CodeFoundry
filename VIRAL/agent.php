@@ -1065,8 +1065,8 @@ $page_scripts = <<<PAGEJS
 
   function renderPromptExamples(searchTerm) {
     if (!exampleList || !exampleCount) return;
-    var term = String(searchTerm || '').toLowerCase().trim();
-    var visible = 0;
+    const term = String(searchTerm || '').toLowerCase().trim();
+    let visible = 0;
     exampleList.innerHTML = '';
     rolePrompts.forEach(function (text) {
       if (term && text.toLowerCase().indexOf(term) === -1) return;
@@ -1076,6 +1076,7 @@ $page_scripts = <<<PAGEJS
       btn.type = 'button';
       btn.textContent = text;
       btn.addEventListener('click', function () {
+        if (!chatInput) return;
         chatInput.value = text;
         chatInput.dispatchEvent(new Event('input'));
         sendMessage();
