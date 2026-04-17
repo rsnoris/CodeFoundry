@@ -117,9 +117,8 @@ class CodeGenProvider
      *
      * @return array<int,string>
      */
-    public static function candidateProviderIds(bool $freePlan, string $preferredProviderId = ''): array
+    public static function candidateProviderIds(bool $_freePlan, string $preferredProviderId = ''): array
     {
-        unset($freePlan);
         $ordered = [];
         $push = static function (string $id) use (&$ordered): void {
             if ($id === '') {
