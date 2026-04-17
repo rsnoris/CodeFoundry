@@ -626,17 +626,18 @@ $page_scripts = <<<PAGEJS
       });
       modelSelect.appendChild(group);
     });
+    const optionValues = Array.from(modelSelect.options).map(function (o) { return o.value; });
     const saved = localStorage.getItem('cf_viral_ai_model');
     let hasValidSaved = false;
     if (saved) {
-      hasValidSaved = Array.from(modelSelect.options).some(function (o) { return o.value === saved; });
+      hasValidSaved = optionValues.indexOf(saved) !== -1;
       if (hasValidSaved) modelSelect.value = saved;
     }
     if (!hasValidSaved) {
       const preferredProvider = CF_PROVIDERS[0];
       if (preferredProvider && preferredProvider.default_model) {
         const preferred = preferredProvider.id + ':' + preferredProvider.default_model;
-        const preferredExists = Array.from(modelSelect.options).some(function (o) { return o.value === preferred; });
+        const preferredExists = optionValues.indexOf(preferred) !== -1;
         if (preferredExists) modelSelect.value = preferred;
       }
     }
