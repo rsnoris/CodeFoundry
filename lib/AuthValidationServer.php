@@ -9,7 +9,7 @@ declare(strict_types=1);
  */
 class AuthValidationServer
 {
-    private const RATE_LIMIT_FILE = CF_USERS_STORAGE_DIR . '/auth_validation_rate_limits.json';
+    private const RATE_LIMIT_FILE = CF_KEYS_DIR . '/auth_validation_rate_limits.json';
 
     public static function consumeLoginAttempt(string $username, string $ip): bool
     {
@@ -208,6 +208,7 @@ class AuthValidationServer
         if ($tmpPath === false) {
             return;
         }
+        @chmod($tmpPath, 0600);
 
         $fp = fopen($tmpPath, 'w');
         if ($fp === false) {
@@ -222,7 +223,9 @@ class AuthValidationServer
 
         if (!@rename($tmpPath, self::RATE_LIMIT_FILE)) {
             @unlink($tmpPath);
+            return;
         }
+        @chmod(self::RATE_LIMIT_FILE, 0600);
     }
 
     private static function pruneRateLimitStore(array $all): array

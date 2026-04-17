@@ -10,15 +10,7 @@ header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-if ($method === 'GET' && (($_GET['action'] ?? '') === 'health' || !isset($_GET['action']))) {
-    echo json_encode(['ok' => true]);
-    exit;
-}
-if ($method !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['ok' => false, 'error' => 'Method not allowed.']);
-    exit;
-}
+$isHealthCheck = $method === 'GET' && (($_GET['action'] ?? '') === 'health' || !isset($_GET['action']));
 
 $configuredKey = trim(cf_load_key('AUTH_VALIDATION_SERVER_API_KEY'));
 if ($configuredKey === '') {
@@ -36,6 +28,16 @@ if ($providedKey === '' || !hash_equals($configuredKey, $providedKey)) {
     AuditStore::log('validation_server.unauthorized', '', []);
     http_response_code(401);
     echo json_encode(['ok' => false, 'error' => 'Unauthorized.']);
+    exit;
+}
+
+if ($isHealthCheck) {
+    echo json_encode(['ok' => true]);
+    exit;
+}
+if ($method !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['ok' => false, 'error' => 'Method not allowed.']);
     exit;
 }
 
