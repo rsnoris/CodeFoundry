@@ -8,8 +8,6 @@ declare(strict_types=1);
  */
 class CodeGenProvider
 {
-    private const PREFERRED_DEFAULT_PROVIDER_ID = 'openai';
-
     // ── Public API ─────────────────────────────────────────────────────────
 
     /**
@@ -75,9 +73,9 @@ class CodeGenProvider
      */
     public static function defaultProviderId(): string
     {
-        $preferredId = self::PREFERRED_DEFAULT_PROVIDER_ID;
-        if (isset(CF_CODEGEN_PROVIDERS[$preferredId]) && self::isAvailable(CF_CODEGEN_PROVIDERS[$preferredId])) {
-            return $preferredId;
+        $providerId = 'openai';
+        if (isset(CF_CODEGEN_PROVIDERS[$providerId]) && self::isAvailable(CF_CODEGEN_PROVIDERS[$providerId])) {
+            return $providerId;
         }
         foreach (CF_CODEGEN_PROVIDERS as $id => $cfg) {
             if (self::isAvailable($cfg)) {
@@ -119,26 +117,11 @@ class CodeGenProvider
      */
     public static function candidateProviderIds(string $preferredProviderId = ''): array
     {
-        $ordered = [];
-        $push = static function (string $id) use (&$ordered): void {
-            if ($id === '') {
-                return;
-            }
-            if (!self::isProviderAvailable($id)) {
-                return;
-            }
-            if (!in_array($id, $ordered, true)) {
-                $ordered[] = $id;
-            }
-        };
-
-        if ($preferredProviderId !== '') {
-            $push($preferredProviderId);
+        if ($preferredProviderId !== '' && self::isProviderAvailable($preferredProviderId)) {
+            return [$preferredProviderId];
         }
-
-        $push(self::defaultProviderId());
-
-        return $ordered;
+        $defaultProvider = self::defaultProviderId();
+        return $defaultProvider !== '' ? [$defaultProvider] : [];
     }
 
     /**

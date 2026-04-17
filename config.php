@@ -147,7 +147,6 @@ define('CF_CODEGEN_PROVIDERS', [
             ['id' => 'o3-mini',       'label' => 'o3 Mini'],
         ],
         'default_model' => 'gpt-4o-mini',
-        'opensource'    => false,
     ],
 
 ]);

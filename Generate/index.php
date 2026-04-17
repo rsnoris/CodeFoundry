@@ -17,7 +17,6 @@ foreach (CodeGenProvider::all() as $pid => $pdata) {
     $_cf_providers_js[] = [
         'id'            => $pid,
         'label'         => $pdata['label'],
-        'opensource'    => !empty($pdata['opensource']),
         'default_model' => $pdata['default_model'],
         'models'        => $models,
     ];
@@ -1007,7 +1006,7 @@ $page_scripts .= <<<'PAGEJS'
     sel.innerHTML = '';
     CF_PROVIDERS.forEach(function (p) {
       const group = document.createElement('optgroup');
-      group.label = p.label + (p.opensource ? ' ✦' : '');
+      group.label = p.label;
       p.models.forEach(function (m) {
         const opt = document.createElement('option');
         opt.value       = p.id + ':' + m.id;
