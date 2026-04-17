@@ -296,6 +296,26 @@ function cf_load_user_key(string $username, string $name, string $default = ''):
     return cf_load_key($safeName, $default);
 }
 
+/**
+ * Persist a global key file under CF_KEYS_DIR/<name>.
+ * Pass an empty string to clear the key (the file is written but empty,
+ * causing cf_load_key() to fall through to the next resolution source).
+ *
+ * @throws \InvalidArgumentException on an invalid key name
+ */
+function cf_save_key(string $name, string $value): void
+{
+    $safeName = cf_normalize_key_name($name);
+    if ($safeName === '') {
+        throw new \InvalidArgumentException('Invalid key name.');
+    }
+    if (!is_dir(CF_KEYS_DIR)) {
+        @mkdir(CF_KEYS_DIR, 0700, true);
+    }
+    file_put_contents(CF_KEYS_DIR . '/' . $safeName, trim($value), LOCK_EX);
+    @chmod(CF_KEYS_DIR . '/' . $safeName, 0600);
+}
+
 /** Persist a user-specific key file under Cf-Config-keys/Users/<username>/. */
 function cf_save_user_key(string $username, string $name, string $value): void
 {

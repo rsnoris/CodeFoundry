@@ -130,6 +130,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             header('Location: /Admin/?tab=' . $safe_tab . ($safe_tab === 'user_detail' ? '&u=' . urlencode($target) : ''));
             exit;
         }
+
+        if ($action === 'save_api_key') {
+            $key_name  = trim($_POST['key_name'] ?? '');
+            $key_value = trim($_POST['key_value'] ?? '');
+            if ($key_name !== '' && preg_match('/^[A-Za-z0-9_]+$/', $key_name)) {
+                cf_save_key($key_name, $key_value);
+                AuditStore::log('admin.api_key_saved', $admin_user['username'], ['key' => $key_name]);
+            }
+            header('Location: /Admin/?tab=api_keys&saved=' . urlencode($key_name));
+            exit;
+        }
+
+        if ($action === 'clear_api_key') {
+            $key_name = trim($_POST['key_name'] ?? '');
+            if ($key_name !== '' && preg_match('/^[A-Za-z0-9_]+$/', $key_name)) {
+                cf_save_key($key_name, '');
+                AuditStore::log('admin.api_key_cleared', $admin_user['username'], ['key' => $key_name]);
+            }
+            header('Location: /Admin/?tab=api_keys&cleared=' . urlencode($key_name));
+            exit;
+        }
     }
 }
 
@@ -321,6 +342,24 @@ $page_styles = <<<'CSS'
   .chat-empty-state p { margin:0; font-size:13px; }
   .badge-status-open { color:#fbbf24; }
   .badge-status-closed { color:var(--text-subtle); }
+  /* ── API Keys styles ─── */
+  .key-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
+  .key-card { background:var(--navy-3); border:1px solid var(--border-color); border-radius:var(--card-radius); padding:18px 20px; display:flex; flex-direction:column; gap:12px; }
+  .key-card-header { display:flex; align-items:center; gap:10px; }
+  .key-card-icon { width:34px; height:34px; background:rgba(24,179,255,.1); border:1px solid rgba(24,179,255,.2); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--primary); flex-shrink:0; }
+  .key-card-title { font-size:13px; font-weight:700; color:var(--text); }
+  .key-card-hint { font-size:11px; color:var(--text-subtle); margin-top:1px; }
+  .key-status-set { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:#4ade80; }
+  .key-status-unset { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:var(--text-subtle); }
+  .key-input-row { display:flex; gap:6px; align-items:center; }
+  .key-input { flex:1; background:var(--navy); border:1px solid var(--border-color); border-radius:6px; padding:7px 10px; color:var(--text); font-size:12px; outline:none; font-family:monospace; }
+  .key-input:focus { border-color:var(--primary); }
+  .key-masked { font-size:11px; color:var(--text-subtle); font-family:monospace; letter-spacing:.05em; margin-top:2px; }
+  .key-actions { display:flex; gap:6px; flex-wrap:wrap; }
+  .btn-key-save { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; border:1px solid rgba(24,179,255,.3); background:rgba(24,179,255,.12); color:var(--primary); transition:border-color .15s,background .15s; }
+  .btn-key-save:hover { border-color:var(--primary); background:rgba(24,179,255,.2); }
+  .btn-key-clear { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; border:1px solid rgba(239,68,68,.25); background:rgba(239,68,68,.07); color:#f87171; transition:border-color .15s; }
+  .btn-key-clear:hover { border-color:#f87171; }
   @media(max-width:900px){ .stat-grid{grid-template-columns:repeat(2,1fr);} .arch-grid{grid-template-columns:1fr;} }
   @media(max-width:700px){ .adm-layout{flex-direction:column;padding:0;} .adm-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border-color);padding:12px 0;display:flex;overflow-x:auto;} .adm-sidebar-title{display:none;} .adm-main{padding:20px 14px 48px;} .stat-grid{grid-template-columns:repeat(2,1fr);} }
 CSS;
@@ -341,6 +380,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
         'support'        => ['icon' => 'lucide:life-buoy',         'label' => 'Support'],
         'live_chat'      => ['icon' => 'lucide:message-circle',    'label' => 'Live Chat'],
         'analytics'      => ['icon' => 'lucide:bar-chart-2',       'label' => 'Analytics'],
+        'api_keys'       => ['icon' => 'lucide:key-round',         'label' => 'API Keys'],
         'architecture'   => ['icon' => 'lucide:layout',            'label' => 'Architecture'],
         'workflows'      => ['icon' => 'lucide:git-pull-request',  'label' => 'Workflows'],
     ];
@@ -1502,12 +1542,140 @@ require_once dirname(__DIR__) . '/includes/header.php';
       </div>
     </div>
 
+    <?php elseif ($active_tab === 'api_keys'): ?>
+    <!-- ═══ API KEYS ════════════════════════════════════════════════════════ -->
+    <?php
+    // Canonical list of all managed API keys with metadata
+    $admin_managed_keys = [
+        'OPENAI_API_KEY'     => ['label' => 'OpenAI',             'hint' => 'GPT-4o, GPT-4 Turbo, o1, o3 models',                          'icon' => 'lucide:zap'],
+        'GROQ_API_KEY'       => ['label' => 'Groq',               'hint' => 'Ultra-fast inference for Llama, Mixtral, Gemma',               'icon' => 'lucide:cpu'],
+        'OPENROUTER_API_KEY' => ['label' => 'OpenRouter',         'hint' => 'Multi-model routing — free & paid models',                    'icon' => 'lucide:route'],
+        'HF_API_KEY'         => ['label' => 'Hugging Face',       'hint' => 'Inference API for open-source models',                        'icon' => 'lucide:box'],
+        'TOGETHER_API_KEY'   => ['label' => 'Together AI',        'hint' => 'Scalable hosted open-source model inference',                 'icon' => 'lucide:layers'],
+        'ANTHROPIC_API_KEY'  => ['label' => 'Anthropic (Claude)', 'hint' => 'Claude 3 Haiku, Sonnet, Opus',                               'icon' => 'lucide:brain'],
+        'GEMINI_API_KEY'     => ['label' => 'Google Gemini',      'hint' => 'Gemini Pro, Gemini Flash models',                             'icon' => 'lucide:sparkles'],
+        'OLLAMA_URL'         => ['label' => 'Ollama (URL)',        'hint' => 'Self-hosted Ollama server URL, e.g. http://localhost:11434',  'icon' => 'lucide:server', 'is_url' => true],
+    ];
+
+    $saved_key  = $_GET['saved']   ?? '';
+    $cleared_key = $_GET['cleared'] ?? '';
+    ?>
+    <div class="adm-header">
+      <h1><iconify-icon icon="lucide:key-round" style="vertical-align:middle;margin-right:8px"></iconify-icon>API Keys</h1>
+      <p>Rotate or update global AI provider API keys. Keys are stored in <code><?= cf_e(CF_KEYS_DIR) ?></code> and never committed to source control.</p>
+    </div>
+
+    <?php if ($saved_key !== ''): ?>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;padding:12px 16px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:13px;color:#4ade80">
+        <iconify-icon icon="lucide:check-circle"></iconify-icon>
+        Key <strong><?= cf_e($saved_key) ?></strong> saved successfully.
+      </div>
+    <?php elseif ($cleared_key !== ''): ?>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;padding:12px 16px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:8px;font-size:13px;color:#fbbf24">
+        <iconify-icon icon="lucide:info"></iconify-icon>
+        Key <strong><?= cf_e($cleared_key) ?></strong> cleared. The system will fall back to environment variables if set.
+      </div>
+    <?php endif; ?>
+
+    <div class="adm-section">
+      <div class="adm-section-header">
+        <h2><iconify-icon icon="lucide:shield-check" style="vertical-align:middle;margin-right:6px"></iconify-icon>AI Provider Keys</h2>
+        <span style="font-size:11px;color:var(--text-subtle)">Each key is stored as a plain-text file — never in code.</span>
+      </div>
+      <div class="adm-section-body">
+        <div class="key-grid">
+          <?php foreach ($admin_managed_keys as $key_name => $key_meta):
+            $current_val   = cf_load_key($key_name);
+            $is_set        = $current_val !== '';
+            $masked        = $is_set
+                ? substr($current_val, 0, 6) . str_repeat('•', min(20, max(8, strlen($current_val) - 6)))
+                : '';
+            $is_url        = !empty($key_meta['is_url']);
+          ?>
+          <div class="key-card">
+            <div class="key-card-header">
+              <div class="key-card-icon"><iconify-icon icon="<?= cf_e($key_meta['icon']) ?>"></iconify-icon></div>
+              <div>
+                <div class="key-card-title"><?= cf_e($key_meta['label']) ?></div>
+                <div class="key-card-hint"><?= cf_e($key_meta['hint']) ?></div>
+              </div>
+            </div>
+            <div>
+              <?php if ($is_set): ?>
+                <span class="key-status-set"><iconify-icon icon="lucide:check-circle-2"></iconify-icon> Key set</span>
+                <div class="key-masked"><?= cf_e($masked) ?></div>
+              <?php else: ?>
+                <span class="key-status-unset"><iconify-icon icon="lucide:circle-dashed"></iconify-icon> Not configured</span>
+              <?php endif; ?>
+            </div>
+            <!-- Save / Rotate form -->
+            <form method="POST" action="/Admin/?tab=api_keys" autocomplete="off">
+              <input type="hidden" name="csrf_token" value="<?= cf_e($csrf) ?>">
+              <input type="hidden" name="action" value="save_api_key">
+              <input type="hidden" name="key_name" value="<?= cf_e($key_name) ?>">
+              <div class="key-input-row">
+                <input
+                  type="<?= $is_url ? 'text' : 'password' ?>"
+                  name="key_value"
+                  class="key-input"
+                  placeholder="<?= $is_set ? 'Enter new value to rotate…' : 'Paste ' . cf_e($key_meta['label']) . ' key…' ?>"
+                  autocomplete="new-password"
+                  required
+                >
+              </div>
+              <div class="key-actions" style="margin-top:8px">
+                <button type="submit" class="btn-key-save">
+                  <iconify-icon icon="lucide:rotate-ccw"></iconify-icon>
+                  <?= $is_set ? 'Rotate Key' : 'Save Key' ?>
+                </button>
+              </div>
+            </form>
+            <!-- Clear form (separate — nested forms are invalid HTML) -->
+            <?php if ($is_set): ?>
+            <form method="POST" action="/Admin/?tab=api_keys">
+              <input type="hidden" name="csrf_token" value="<?= cf_e($csrf) ?>">
+              <input type="hidden" name="action" value="clear_api_key">
+              <input type="hidden" name="key_name" value="<?= cf_e($key_name) ?>">
+              <button type="submit" class="btn-key-clear"
+                data-confirm="Clear <?= cf_e($key_meta['label']) ?> key?">
+                <iconify-icon icon="lucide:trash-2"></iconify-icon> Clear Key
+              </button>
+            </form>
+            <?php endif; ?>
+          </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="adm-section">
+      <div class="adm-section-header"><h2><iconify-icon icon="lucide:info" style="vertical-align:middle;margin-right:6px"></iconify-icon>How Key Rotation Works</h2></div>
+      <div class="adm-section-body" style="font-size:13px;color:var(--text-muted);line-height:1.7">
+        <ol style="margin:0;padding-left:20px">
+          <li>Enter the new API key in the field above and click <strong>Rotate Key</strong>. The old key file is overwritten immediately.</li>
+          <li>The application picks up the new key on the next request — no restart required.</li>
+          <li><strong>Clear</strong> removes the stored file value; the system then falls back to environment variables (<code>getenv()</code>).</li>
+          <li>Keys are stored as plain-text files in <code><?= cf_e(CF_KEYS_DIR) ?>/</code>, which is outside the webroot and never returned over HTTP.</li>
+          <li>All save and clear actions are recorded in the Audit Trail with the admin's username.</li>
+        </ol>
+      </div>
+    </div>
+
     <?php endif; ?>
 
   </main>
 </div>
 
 <script>
+// data-confirm handler for clear-key buttons
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('[data-confirm]');
+  if (!btn) return;
+  var msg = btn.getAttribute('data-confirm');
+  if (msg && !window.confirm(msg)) {
+    e.preventDefault();
+  }
+});
 // Table client-side filtering
 function filterTable(tblId, query, colFilter, colKey) {
   var tbl = document.getElementById(tblId);
