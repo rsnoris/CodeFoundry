@@ -152,7 +152,7 @@ $_isFreePlan  = ($_userPlan === 'free');
 $providerCandidates = CodeGenProvider::candidateProviderIds(false, 'openai');
 if (empty($providerCandidates)) {
     http_response_code(503);
-    echo json_encode(['error' => 'OpenAI is not configured. Please set OPENAI_API_KEY and try again.']);
+    echo json_encode(['error' => 'OpenAI is not configured. Please set OPENAI_API_KEY via environment variable or key file and try again.']);
     exit;
 }
 $providerId = '';
