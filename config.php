@@ -125,8 +125,6 @@ define('CF_DATA_CHAT_MESSAGES',   CF_USERS_STORAGE_DIR . '/chat_messages.json');
 define('CF_OPENAI_KEY', cf_load_key('OPENAI_API_KEY'));
 
 /**
- * CodeGen provider registry.
- *
  * OpenAI-only provider registry.
  * Keys:
  *   label             – human-readable provider name shown in the UI

@@ -149,7 +149,7 @@ $_sessionUser = $_SESSION['cf_user'] ?? null;
 $_userPlan    = $_sessionUser['plan'] ?? 'free';
 $_isFreePlan  = ($_userPlan === 'free');
 
-$providerCandidates = CodeGenProvider::candidateProviderIds(false, 'openai');
+$providerCandidates = CodeGenProvider::candidateProviderIds('openai');
 if (empty($providerCandidates)) {
     http_response_code(503);
     echo json_encode(['error' => 'OpenAI is not configured. Please set OPENAI_API_KEY via environment variable or key file and try again.']);

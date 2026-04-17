@@ -85,7 +85,7 @@ if (in_array($action, ['improve', 'explain', 'fix'], true) && $currentCode === '
 $langLabel = preg_replace('/[^a-zA-Z0-9 \+\#\-]/', '', $language);
 
 // ── Resolve provider candidates (OpenAI-only) ─────────────────────────────
-$providerCandidates = CodeGenProvider::candidateProviderIds(false, $providerId);
+$providerCandidates = CodeGenProvider::candidateProviderIds($providerId);
 if (empty($providerCandidates)) {
     http_response_code(503);
     echo json_encode([
