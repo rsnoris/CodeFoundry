@@ -822,11 +822,13 @@ $page_scripts = <<<PAGEJS
 
   function updateSettingsSummary() {
     if (!settingsSummary) return;
-    const modelLabel = modelSelect && modelSelect.selectedIndex >= 0
-      ? (modelSelect.options[modelSelect.selectedIndex] ? modelSelect.options[modelSelect.selectedIndex].textContent : '')
-      : '';
-    const catVal = taskCategorySelect ? (taskCategorySelect.value || '') : '';
-    const parts = [modelLabel, catVal].filter(Boolean);
+    var modelLabel = '';
+    if (modelSelect && modelSelect.selectedIndex >= 0) {
+      var selectedOpt = modelSelect.options[modelSelect.selectedIndex];
+      if (selectedOpt) modelLabel = selectedOpt.textContent;
+    }
+    var catVal = taskCategorySelect ? (taskCategorySelect.value || '') : '';
+    var parts = [modelLabel, catVal].filter(Boolean);
     settingsSummary.textContent = parts.length ? parts.join(' · ') : '';
   }
 
@@ -861,8 +863,11 @@ $page_scripts = <<<PAGEJS
       var catBtn = document.createElement('button');
       catBtn.type = 'button';
       catBtn.className = 'agent-nav-cat-btn';
-      catBtn.innerHTML = escapeHtml(cat) +
-        '<iconify-icon icon="lucide:chevron-down" class="agent-nav-cat-caret"></iconify-icon>';
+      catBtn.appendChild(document.createTextNode(cat));
+      var catCaret = document.createElement('iconify-icon');
+      catCaret.setAttribute('icon', 'lucide:chevron-down');
+      catCaret.className = 'agent-nav-cat-caret';
+      catBtn.appendChild(catCaret);
       catBtn.addEventListener('click', function () { catDiv.classList.toggle('open'); });
 
       var itemsDiv = document.createElement('div');
@@ -872,8 +877,10 @@ $page_scripts = <<<PAGEJS
         var link = document.createElement('a');
         link.href = '/VIRAL/agent.php?role=' + encodeURIComponent(a.slug);
         link.className = 'agent-nav-item' + (a.slug === ROLE ? ' active' : '');
-        link.innerHTML = '<iconify-icon icon="' + escapeHtml(a.icon) + '"></iconify-icon>'
-          + escapeHtml(a.label);
+        var navIcon = document.createElement('iconify-icon');
+        navIcon.setAttribute('icon', a.icon);
+        link.appendChild(navIcon);
+        link.appendChild(document.createTextNode(a.label));
         itemsDiv.appendChild(link);
       });
 
