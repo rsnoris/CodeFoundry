@@ -340,7 +340,8 @@ class CodeGenProvider
             if ($envUrl !== '') {
                 $envUrl = rtrim($envUrl, '/');
                 $suffix = (string)($cfg['api_url_suffix'] ?? '');
-                $path   = (string)(parse_url($envUrl, PHP_URL_PATH) ?? '');
+                $parsedPath = parse_url($envUrl, PHP_URL_PATH);
+                $path = ($parsedPath === false || $parsedPath === null) ? '' : (string)$parsedPath;
                 if ($suffix !== '' && ($path === '' || $path === '/')) {
                     $cfg['api_url'] = $envUrl . $suffix;
                 } else {
