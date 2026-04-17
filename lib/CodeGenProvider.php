@@ -465,9 +465,11 @@ class CodeGenProvider
             ];
         }
         if (empty($out)) {
+            // Upstream callers should always provide messages, but keep a safe
+            // non-empty fallback so provider payload validation cannot fail.
             $out[] = [
                 'role' => 'user',
-                'content' => [['type' => 'text', 'text' => '']],
+                'content' => [['type' => 'text', 'text' => 'Please continue.']],
             ];
         }
         return [
@@ -507,9 +509,11 @@ class CodeGenProvider
             ];
         }
         if (empty($contents)) {
+            // Upstream callers should always provide messages, but keep a safe
+            // non-empty fallback so provider payload validation cannot fail.
             $contents[] = [
                 'role'  => 'user',
-                'parts' => [['text' => '']],
+                'parts' => [['text' => 'Please continue.']],
             ];
         }
         return [

@@ -404,7 +404,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
         <div class="agent-selection-field" id="viralModelField">
           <label for="viralModelSelect">AI Model</label>
           <select id="viralModelSelect" aria-label="AI model">
-            <option value="">No AI providers configured</option>
+            <option value="">Loading models…</option>
           </select>
         </div>
         <div class="agent-selection-field">
