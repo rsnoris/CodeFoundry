@@ -465,12 +465,7 @@ class CodeGenProvider
             ];
         }
         if (empty($out)) {
-            // Upstream callers should always provide messages, but keep a safe
-            // non-empty fallback so provider payload validation cannot fail.
-            $out[] = [
-                'role' => 'user',
-                'content' => [['type' => 'text', 'text' => 'Please continue.']],
-            ];
+            throw new \InvalidArgumentException('No valid messages provided for Anthropic request.');
         }
         return [
             'system'   => trim(implode("\n\n", $systemParts)),
@@ -509,12 +504,7 @@ class CodeGenProvider
             ];
         }
         if (empty($contents)) {
-            // Upstream callers should always provide messages, but keep a safe
-            // non-empty fallback so provider payload validation cannot fail.
-            $contents[] = [
-                'role'  => 'user',
-                'parts' => [['text' => 'Please continue.']],
-            ];
+            throw new \InvalidArgumentException('No valid messages provided for Gemini request.');
         }
         return [
             'system'   => trim(implode("\n\n", $systemParts)),
