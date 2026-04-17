@@ -1557,6 +1557,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
         'OLLAMA_URL'         => ['label' => 'Ollama (URL)',        'hint' => 'Self-hosted Ollama server URL, e.g. http://localhost:11434',  'icon' => 'lucide:server', 'is_url' => true],
         'OTP_NOTIFICATION_API_URL' => ['label' => 'OTP Notification API URL', 'hint' => 'Provider endpoint used to send password-reset OTP emails', 'icon' => 'lucide:mail', 'is_url' => true],
         'OTP_NOTIFICATION_API_KEY' => ['label' => 'OTP Notification API Key', 'hint' => 'Provider key/token used with the OTP notification API', 'icon' => 'lucide:key-round'],
+        'AUTH_VALIDATION_SERVER_API_KEY' => ['label' => 'Auth Validation Server API Key', 'hint' => 'Bearer key required by /ValidationServer/api.php', 'icon' => 'lucide:shield-check'],
     ];
 
     $saved_key  = $_GET['saved']   ?? '';

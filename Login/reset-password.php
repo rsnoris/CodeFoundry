@@ -3,12 +3,21 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/lib/UserStore.php';
 require_once dirname(__DIR__) . '/lib/AuditStore.php';
+require_once dirname(__DIR__) . '/lib/AuthValidationServer.php';
 
 session_start();
 
 $error = '';
 $flash = '';
 $maxOtpAttempts = 5;
+$clearOtpState = static function (string $username): void {
+    UserStore::updateUser($username, [
+        'password_reset_otp_hash'    => '',
+        'password_reset_expires_at'  => '',
+        'password_reset_attempts'    => 0,
+        'password_reset_requested_at'=> '',
+    ]);
+};
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', (string)$_POST['csrf_token'])) {
@@ -26,62 +35,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($newPw !== $confirmPw) {
             $error = 'Passwords do not match.';
         } else {
-            $user = filter_var($identifier, FILTER_VALIDATE_EMAIL)
-                ? UserStore::findUserByEmail($identifier)
-                : UserStore::findUser($identifier);
+            if (!AuthValidationServer::consumeOtpVerifyAttempt($identifier, AuditStore::getClientIp())) {
+                AuditStore::log('user.password_reset_otp_rate_limited', '', ['identifier' => $identifier]);
+                $error = 'Too many OTP attempts. Please request a new OTP and try again later.';
+            } else {
+                $validation = AuthValidationServer::validatePasswordResetOtp($identifier, $otp, $maxOtpAttempts);
+                $user = is_array($validation['user'] ?? null) ? $validation['user'] : null;
 
-            $isValid = false;
-            if ($user !== null) {
-                $username = (string)($user['username'] ?? '');
-                $otpHash  = (string)($user['password_reset_otp_hash'] ?? '');
-                $expiresTimestamp = false;
-                $expiresRaw = (string)($user['password_reset_expires_at'] ?? '');
-                if ($expiresRaw !== '') {
-                    $expiresDt = date_create_immutable($expiresRaw);
-                    if ($expiresDt !== false) {
-                        $expiresTimestamp = $expiresDt->getTimestamp();
-                    }
-                }
-                $attempts = (int)($user['password_reset_attempts'] ?? 0);
-
-                $hasOtpData = $username !== '' && $otpHash !== '';
-                $isNotExpired = $expiresTimestamp !== false && $expiresTimestamp >= time();
-                $hasAttemptsRemaining = $attempts < $maxOtpAttempts;
-
-                if ($hasOtpData && $isNotExpired && $hasAttemptsRemaining) {
-                    if (password_verify($otp, $otpHash)) {
+                $isValid = false;
+                if ($user !== null && !empty($validation['ok'])) {
+                    $username = (string)($user['username'] ?? '');
+                    if ($username !== '') {
                         UserStore::updateUser($username, [
                             'password_hash'              => password_hash($newPw, PASSWORD_BCRYPT),
-                            'password_reset_otp_hash'    => '',
-                            'password_reset_expires_at'  => '',
-                            'password_reset_attempts'    => 0,
-                            'password_reset_requested_at'=> '',
                         ]);
+                        $clearOtpState($username);
                         UserStore::resetFailedLogin($username);
                         AuditStore::log('user.password_reset_completed', $username, []);
                         $isValid = true;
-                    } else {
-                        $attempts++;
-                        UserStore::updateUser($username, [
-                            'password_reset_attempts' => $attempts,
-                        ]);
+                    }
+                } elseif ($user !== null) {
+                    $username = (string)($user['username'] ?? '');
+                    $reason = (string)($validation['reason'] ?? '');
+                    if ($username !== '' && $reason === 'invalid_otp') {
+                        $attempts = (int)($user['password_reset_attempts'] ?? 0) + 1;
+                        UserStore::updateUser($username, ['password_reset_attempts' => $attempts]);
                         if ($attempts >= $maxOtpAttempts) {
-                            UserStore::updateUser($username, [
-                                'password_reset_otp_hash'    => '',
-                                'password_reset_expires_at'  => '',
-                                'password_reset_attempts'    => 0,
-                                'password_reset_requested_at'=> '',
-                            ]);
+                            $clearOtpState($username);
                         }
                         AuditStore::log('user.password_reset_otp_failed', $username, ['attempts' => $attempts]);
+                    } elseif ($username !== '' && in_array($reason, ['expired', 'max_attempts'], true)) {
+                        $clearOtpState($username);
                     }
                 }
-            }
 
-            if ($isValid) {
-                $flash = 'Password reset successful. You can now sign in.';
-            } else {
-                $error = 'Invalid or expired OTP. Request a new one and try again.';
+                if ($isValid) {
+                    $flash = 'Password reset successful. You can now sign in.';
+                } else {
+                    $error = 'Invalid or expired OTP. Request a new one and try again.';
+                }
             }
         }
     }
