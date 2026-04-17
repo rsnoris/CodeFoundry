@@ -122,6 +122,10 @@ $body = json_decode($raw ?: '', true);
 $role    = isset($body['role'])    ? trim((string)$body['role'])    : '';
 $message = isset($body['message']) ? trim((string)$body['message']) : '';
 $history = isset($body['history']) && is_array($body['history']) ? $body['history'] : [];
+$providerIdRequested = isset($body['provider']) ? trim((string)$body['provider']) : '';
+$modelRequested      = isset($body['model']) ? trim((string)$body['model']) : '';
+$taskCategory        = isset($body['task_category']) ? trim((string)$body['task_category']) : '';
+$taskType            = isset($body['task']) ? trim((string)$body['task']) : '';
 
 if ($role === '') {
     http_response_code(400);
@@ -141,6 +145,34 @@ if ($message === '') {
     exit;
 }
 
+if ($providerIdRequested !== '' && !array_key_exists($providerIdRequested, CF_CODEGEN_PROVIDERS)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Unknown provider: ' . $providerIdRequested]);
+    exit;
+}
+
+if ($taskCategory !== '' && !array_key_exists($taskCategory, VIRAL_TASK_CATEGORY_GROUPS)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Unknown task category.']);
+    exit;
+}
+
+if ($taskType !== '') {
+    if ($taskCategory === '') {
+        foreach (VIRAL_TASK_CATEGORY_GROUPS as $groupName => $tasks) {
+            if (in_array($taskType, $tasks, true)) {
+                $taskCategory = (string)$groupName;
+                break;
+            }
+        }
+    }
+    if ($taskCategory === '' || !in_array($taskType, VIRAL_TASK_CATEGORY_GROUPS[$taskCategory] ?? [], true)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Unknown task type for selected category.']);
+        exit;
+    }
+}
+
 $agentCfg = VIRAL_AGENTS[$role];
 
 // ── Determine provider candidates ─────────────────────────────────────────
@@ -149,10 +181,10 @@ $_sessionUser = $_SESSION['cf_user'] ?? null;
 $_userPlan    = $_sessionUser['plan'] ?? 'free';
 $_isFreePlan  = ($_userPlan === 'free');
 
-$providerCandidates = CodeGenProvider::candidateProviderIds();
+$providerCandidates = CodeGenProvider::candidateProviderIds($providerIdRequested);
 if (empty($providerCandidates)) {
     http_response_code(503);
-    echo json_encode(['error' => 'OpenAI is not configured. Please set OPENAI_API_KEY via environment variable or key file and try again.']);
+    echo json_encode(['error' => 'No AI providers are configured. Please add at least one provider key in account/admin settings and try again.']);
     exit;
 }
 $providerId = '';
@@ -200,6 +232,19 @@ if (function_exists('apcu_fetch')) {
 $messages = [
     ['role' => 'system', 'content' => $agentCfg['system']],
 ];
+if ($taskCategory !== '' || $taskType !== '') {
+    $selectionParts = [];
+    if ($taskCategory !== '') {
+        $selectionParts[] = 'Selected task category: ' . $taskCategory;
+    }
+    if ($taskType !== '') {
+        $selectionParts[] = 'Selected task type: ' . $taskType;
+    }
+    $messages[] = [
+        'role' => 'system',
+        'content' => implode('. ', $selectionParts) . '. Tailor the response to this selected AI task context while preserving the role persona.',
+    ];
+}
 
 // Append validated history (bounded to VIRAL_MAX_HISTORY_TURNS prior turns)
 $sanitizedHistory = [];
@@ -216,7 +261,7 @@ $messages[] = ['role' => 'user', 'content' => $message];
 
 // ── Call the provider ─────────────────────────────────────────────────────
 try {
-    $result = CodeGenProvider::callWithFallback($providerCandidates, '', $messages, 2048);
+    $result = CodeGenProvider::callWithFallback($providerCandidates, $modelRequested, $messages, 2048);
     $reply  = trim($result['content']);
     $tokens = $result['tokens'];
     $providerId = $result['provider'];
