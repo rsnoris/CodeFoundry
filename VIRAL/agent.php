@@ -633,7 +633,7 @@ $page_scripts = <<<PAGEJS
       if (hasValidSaved) modelSelect.value = saved;
     }
     if (!hasValidSaved) {
-      const preferredProvider = CF_PROVIDERS.find(function (p) { return p.id === 'openai'; }) || CF_PROVIDERS[0];
+      const preferredProvider = CF_PROVIDERS[0];
       if (preferredProvider && preferredProvider.default_model) {
         const preferred = preferredProvider.id + ':' + preferredProvider.default_model;
         const preferredExists = Array.from(modelSelect.options).some(function (o) { return o.value === preferred; });

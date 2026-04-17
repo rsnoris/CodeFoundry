@@ -465,7 +465,9 @@ class CodeGenProvider
             ];
         }
         if (empty($out)) {
-            throw new \InvalidArgumentException('No valid messages provided for Anthropic request.');
+            throw new \InvalidArgumentException(
+                'No valid messages provided for Anthropic request. Messages must include non-empty content with role "system", "user", or "assistant".'
+            );
         }
         return [
             'system'   => trim(implode("\n\n", $systemParts)),
@@ -504,7 +506,9 @@ class CodeGenProvider
             ];
         }
         if (empty($contents)) {
-            throw new \InvalidArgumentException('No valid messages provided for Gemini request.');
+            throw new \InvalidArgumentException(
+                'No valid messages provided for Gemini request. Messages must include non-empty content with role "system", "user", or "assistant".'
+            );
         }
         return [
             'system'   => trim(implode("\n\n", $systemParts)),
