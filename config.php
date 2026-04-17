@@ -46,6 +46,7 @@ define('CF_NAV_JSON', CF_ROOT . '/data/navigation.json');
  *       LINKEDIN_CLIENT_SECRET
  *       OTP_NOTIFICATION_API_URL
  *       OTP_NOTIFICATION_API_KEY
+ *       AUTH_VALIDATION_SERVER_API_KEY
  *
  * To change the location, adjust the path below.
  */

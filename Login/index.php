@@ -9,6 +9,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/lib/UserStore.php';
 require_once dirname(__DIR__) . '/lib/AuditStore.php';
+require_once dirname(__DIR__) . '/lib/AuthValidationServer.php';
 
 session_start();
 
@@ -30,92 +31,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($username === '' || $password === '') {
         $error = 'Please enter both username and password.';
     } else {
-        // Check whether the account is frozen before attempting password validation
-        $loginUserRecord = UserStore::findUser($username);
-        if ($loginUserRecord !== null && !empty($loginUserRecord['frozen'])) {
-            $error = 'Your account has been frozen. Please contact support.';
+        if (!AuthValidationServer::consumeLoginAttempt($username, AuditStore::getClientIp())) {
+            AuditStore::log('user.login_rate_limited', $username, []);
+            $error = 'Too many login attempts. Please wait a few minutes and try again.';
         } else {
-        $matched = false;
-
-        // ── 1. Check CF_USERS (hardcoded accounts) ──────────────────────────
-        $cfUsers = defined('CF_USERS') ? CF_USERS : [];
-        foreach ($cfUsers as $user) {
-            if ($user['username'] !== $username) {
-                continue;
+            $validation = AuthValidationServer::validateLoginCredentials($username, $password);
+            $matched = !empty($validation['ok']) && is_array($validation['user'] ?? null);
+            if ($matched) {
+                $validatedUser = (array)$validation['user'];
+                $_SESSION['cf_user'] = [
+                    'username' => (string)($validatedUser['username'] ?? ''),
+                    'display'  => (string)($validatedUser['display'] ?? $username),
+                    'role'     => (string)($validatedUser['role'] ?? 'user'),
+                ];
             }
-            // Check data/users.json for a password_hash override
-            $effectiveHash = $user['password_hash'];
-            if (defined('CF_DATA_USERS') && file_exists(CF_DATA_USERS)) {
-                $storedJson = @file_get_contents(CF_DATA_USERS);
-                if ($storedJson !== false) {
-                    $storedUsers = json_decode($storedJson, true) ?? [];
-                    foreach ($storedUsers as $row) {
-                        if (($row['username'] ?? '') === $username && !empty($row['password_hash'])) {
-                            $effectiveHash = $row['password_hash'];
-                            break;
-                        }
-                    }
+
+            if ($matched) {
+                session_regenerate_id(true);
+                $_SESSION['cf_login_at'] = time();
+                UserStore::resetFailedLogin($username);
+                $loginIp  = AuditStore::getClientIp();
+                $loginGeo = AuditStore::geoLocate($loginIp);
+                AuditStore::log('user.login', $username, array_filter([
+                    'method'     => 'password',
+                    'location'   => cf_format_location($loginGeo),
+                    'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '',
+                ]));
+                $raw_redirect = $_GET['redirect'] ?? '';
+                // Only allow relative paths: single leading slash, no double-slash, no path traversal
+                $safe_redirect = (
+                    is_string($raw_redirect) &&
+                    preg_match('#^/[^/\\\\]#', $raw_redirect) &&
+                    strpos($raw_redirect, '..') === false
+                ) ? $raw_redirect : '/Generate/';
+                header('Location: ' . $safe_redirect);
+                exit;
+            }
+
+            $reason = (string)($validation['reason'] ?? 'invalid');
+            if ($reason !== 'frozen') {
+                // Short delay to slow brute-force attempts
+                sleep(1);
+                $loginUserRecord = UserStore::findUser($username);
+                if ($loginUserRecord !== null) {
+                    UserStore::incrementFailedLogin($username);
                 }
             }
-            if (password_verify($password, $effectiveHash)) {
-                $matched = true;
-                $_SESSION['cf_user'] = [
-                    'username' => $user['username'],
-                    'display'  => $user['display'] ?? $user['username'],
-                    'role'     => $user['role']    ?? 'user',
-                ];
-            }
-            break; // username matched – stop regardless of password result
+            AuditStore::log('user.login_failed', $username, ['reason' => $reason]);
+            $error = $reason === 'frozen'
+                ? 'Your account has been frozen. Please contact support.'
+                : 'Invalid username or password.';
         }
-
-        // ── 2. Fall back to self-registered users in data/users.json ────────
-        if (!$matched) {
-            $selfUser = UserStore::findUser($username);
-            if (
-                $selfUser !== null &&
-                !empty($selfUser['self_registered']) &&
-                !empty($selfUser['password_hash']) &&
-                password_verify($password, $selfUser['password_hash'])
-            ) {
-                $matched = true;
-                $_SESSION['cf_user'] = [
-                    'username' => $selfUser['username'],
-                    'display'  => $selfUser['display'] ?? $selfUser['username'],
-                    'role'     => $selfUser['role']    ?? 'user',
-                ];
-            }
-        }
-
-        if ($matched) {
-            session_regenerate_id(true);
-            $_SESSION['cf_login_at'] = time();
-            UserStore::resetFailedLogin($username);
-            $loginIp  = AuditStore::getClientIp();
-            $loginGeo = AuditStore::geoLocate($loginIp);
-            AuditStore::log('user.login', $username, array_filter([
-                'method'     => 'password',
-                'location'   => cf_format_location($loginGeo),
-                'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '',
-            ]));
-            $raw_redirect = $_GET['redirect'] ?? '';
-            // Only allow relative paths: single leading slash, no double-slash, no path traversal
-            $safe_redirect = (
-                is_string($raw_redirect) &&
-                preg_match('#^/[^/\\\\]#', $raw_redirect) &&
-                strpos($raw_redirect, '..') === false
-            ) ? $raw_redirect : '/Generate/';
-            header('Location: ' . $safe_redirect);
-            exit;
-        }
-
-        // Short delay to slow brute-force attempts
-        sleep(1);
-        if ($loginUserRecord !== null) {
-            UserStore::incrementFailedLogin($username);
-        }
-        AuditStore::log('user.login_failed', $username, []);
-        $error = 'Invalid username or password.';
-        } // end frozen-else
     }
 }
 

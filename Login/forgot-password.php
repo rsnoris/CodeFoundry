@@ -4,6 +4,7 @@ require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/lib/UserStore.php';
 require_once dirname(__DIR__) . '/lib/AuditStore.php';
 require_once dirname(__DIR__) . '/lib/OtpNotification.php';
+require_once dirname(__DIR__) . '/lib/AuthValidationServer.php';
 
 session_start();
 
@@ -18,51 +19,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($identifier === '') {
             $error = 'Please enter your username or email address.';
         } else {
-            $user = filter_var($identifier, FILTER_VALIDATE_EMAIL)
-                ? UserStore::findUserByEmail($identifier)
-                : UserStore::findUser($identifier);
+            $rateAllowed = AuthValidationServer::consumeOtpRequest($identifier, AuditStore::getClientIp());
+            $user = null;
+            if ($rateAllowed) {
+                $user = filter_var($identifier, FILTER_VALIDATE_EMAIL)
+                    ? UserStore::findUserByEmail($identifier)
+                    : UserStore::findUser($identifier);
 
-            if ($user !== null) {
-                $username = (string)($user['username'] ?? '');
-                $email    = trim((string)($user['email'] ?? ''));
-                $lastSentTimestamp = false;
-                $lastSentRaw = (string)($user['password_reset_requested_at'] ?? '');
-                if ($lastSentRaw !== '') {
-                    $lastSentDt = date_create_immutable($lastSentRaw);
-                    if ($lastSentDt !== false) {
-                        $lastSentTimestamp = $lastSentDt->getTimestamp();
+                if ($user !== null) {
+                    $username = (string)($user['username'] ?? '');
+                    $email    = trim((string)($user['email'] ?? ''));
+                    $lastSentTimestamp = false;
+                    $lastSentRaw = (string)($user['password_reset_requested_at'] ?? '');
+                    if ($lastSentRaw !== '') {
+                        $lastSentDt = date_create_immutable($lastSentRaw);
+                        if ($lastSentDt !== false) {
+                            $lastSentTimestamp = $lastSentDt->getTimestamp();
+                        }
                     }
-                }
 
-                if (
-                    $username !== '' &&
-                    filter_var($email, FILTER_VALIDATE_EMAIL) &&
-                    ($lastSentTimestamp === false || $lastSentTimestamp < (time() - 60))
-                ) {
-                    $otp = OtpNotification::generateOtp(6);
-                    UserStore::updateUser($username, [
-                        'password_reset_otp_hash'     => password_hash($otp, PASSWORD_DEFAULT),
-                        'password_reset_expires_at'   => date('c', time() + 600),
-                        'password_reset_attempts'     => 0,
-                        'password_reset_requested_at' => date('c'),
-                    ]);
-
-                    $sent = OtpNotification::sendPasswordResetOtp($email, (string)($user['display'] ?? $username), $otp);
-                    AuditStore::log(
-                        $sent ? 'user.password_reset_otp_sent' : 'user.password_reset_otp_send_failed',
-                        $username,
-                        ['email' => $email]
-                    );
-
-                    if (!$sent) {
+                    if (
+                        $username !== '' &&
+                        filter_var($email, FILTER_VALIDATE_EMAIL) &&
+                        ($lastSentTimestamp === false || $lastSentTimestamp < (time() - 60))
+                    ) {
+                        $otp = OtpNotification::generateOtp(6);
                         UserStore::updateUser($username, [
-                            'password_reset_otp_hash'     => '',
-                            'password_reset_expires_at'   => '',
+                            'password_reset_otp_hash'     => password_hash($otp, PASSWORD_DEFAULT),
+                            'password_reset_expires_at'   => date('c', time() + 600),
                             'password_reset_attempts'     => 0,
-                            'password_reset_requested_at' => '',
+                            'password_reset_requested_at' => date('c'),
                         ]);
+
+                        $sent = OtpNotification::sendPasswordResetOtp($email, (string)($user['display'] ?? $username), $otp);
+                        AuditStore::log(
+                            $sent ? 'user.password_reset_otp_sent' : 'user.password_reset_otp_send_failed',
+                            $username,
+                            ['email' => $email]
+                        );
+
+                        if (!$sent) {
+                            UserStore::updateUser($username, [
+                                'password_reset_otp_hash'     => '',
+                                'password_reset_expires_at'   => '',
+                                'password_reset_attempts'     => 0,
+                                'password_reset_requested_at' => '',
+                            ]);
+                        }
                     }
                 }
+            } else {
+                AuditStore::log('user.password_reset_otp_rate_limited', '', ['identifier' => $identifier]);
             }
 
             $flash = 'If an account exists with that username/email, a one-time password has been sent.';
