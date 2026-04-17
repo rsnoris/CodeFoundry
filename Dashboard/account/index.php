@@ -3,6 +3,7 @@ declare(strict_types=1);
 require_once dirname(dirname(__DIR__)) . '/config.php';
 require_once dirname(dirname(__DIR__)) . '/lib/UserStore.php';
 require_once dirname(dirname(__DIR__)) . '/lib/ChatStore.php';
+require_once dirname(dirname(__DIR__)) . '/lib/AuditStore.php';
 require_once dirname(dirname(__DIR__)) . '/includes/auth.php';
 
 cf_require_login();
@@ -14,10 +15,16 @@ $unread_chat  = ChatStore::totalUnreadForUser($username);
 $token_history_count = count(UserStore::tokenHistoryForUser($username, 1000));
 $payment_history_count = count(UserStore::paymentsForUser($username));
 $session_history_count = count(ChatStore::sessionsForUser($username));
-$openrouter_key_current = UserStore::getUserApiKey($username, 'OPENROUTER_API_KEY', '');
-$openrouter_key_masked = $openrouter_key_current !== ''
-    ? str_repeat('•', max(8, min(24, strlen($openrouter_key_current))))
-    : '';
+$user_managed_keys = [
+    'OPENAI_API_KEY'     => ['label' => 'OpenAI',             'hint' => 'GPT-4o, GPT-4 Turbo, o1, o3 models',                          'icon' => 'lucide:zap'],
+    'GROQ_API_KEY'       => ['label' => 'Groq',               'hint' => 'Ultra-fast inference for Llama, Mixtral, Gemma',               'icon' => 'lucide:cpu'],
+    'OPENROUTER_API_KEY' => ['label' => 'OpenRouter',         'hint' => 'Multi-model routing — free & paid models',                    'icon' => 'lucide:route'],
+    'HF_API_KEY'         => ['label' => 'Hugging Face',       'hint' => 'Inference API for open-source models',                        'icon' => 'lucide:box'],
+    'TOGETHER_API_KEY'   => ['label' => 'Together AI',        'hint' => 'Scalable hosted open-source model inference',                 'icon' => 'lucide:layers'],
+    'ANTHROPIC_API_KEY'  => ['label' => 'Anthropic (Claude)', 'hint' => 'Claude 3 Haiku, Sonnet, Opus',                                 'icon' => 'lucide:brain'],
+    'GEMINI_API_KEY'     => ['label' => 'Google Gemini',      'hint' => 'Gemini Pro, Gemini Flash models',                             'icon' => 'lucide:sparkles'],
+    'OLLAMA_URL'         => ['label' => 'Ollama (URL)',       'hint' => 'Self-hosted Ollama server URL, e.g. http://localhost:11434',  'icon' => 'lucide:server', 'is_url' => true],
+];
 
 // Generate CSRF token
 if (session_status() === PHP_SESSION_NONE) {
@@ -26,7 +33,7 @@ if (session_status() === PHP_SESSION_NONE) {
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
-const OPENROUTER_MAX_KEY_LENGTH = 500;
+const USER_API_KEY_MAX_LENGTH = 2048;
 
 $flash_profile  = '';
 $flash_password = '';
@@ -86,26 +93,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form'] ?? '') === 'passwor
     }
 }
 
-// ── Handle OpenRouter API key update ───────────────────────────────────────
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form'] ?? '') === 'openrouter_key') {
+// ── Handle user API key update / clear ─────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form'] ?? '') === 'api_key') {
     if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
         $error_api = 'Invalid request. Please refresh and try again.';
     } else {
-        $openrouter_key = trim((string)($_POST['openrouter_api_key'] ?? ''));
-        if ($openrouter_key !== '' && strlen($openrouter_key) > OPENROUTER_MAX_KEY_LENGTH) {
-            $error_api = 'API key value is too long.';
+        $action   = trim((string)($_POST['action'] ?? ''));
+        $key_name = trim((string)($_POST['key_name'] ?? ''));
+        if (!isset($user_managed_keys[$key_name])) {
+            $error_api = 'Unsupported key name.';
         } else {
-            UserStore::saveUserApiKey($username, 'OPENROUTER_API_KEY', $openrouter_key);
-            $openrouter_key_current = UserStore::getUserApiKey($username, 'OPENROUTER_API_KEY', '');
-            $openrouter_key_masked = $openrouter_key_current !== ''
-                ? str_repeat('•', max(8, min(24, strlen($openrouter_key_current))))
-                : '';
-            $flash_api = $openrouter_key === ''
-                ? 'OpenRouter API key cleared for this account.'
-                : 'OpenRouter API key saved for this account.';
+            if ($action === 'save_api_key') {
+                $key_value = trim((string)($_POST['key_value'] ?? ''));
+                if ($key_value === '') {
+                    UserStore::clearUserApiKey($username, $key_name);
+                    AuditStore::log('user.api_key_cleared', $username, ['key' => $key_name]);
+                    $flash_api = $user_managed_keys[$key_name]['label'] . ' key cleared for this account.';
+                } elseif (strlen($key_value) > USER_API_KEY_MAX_LENGTH) {
+                    $error_api = 'API key value is too long.';
+                } else {
+                    $had_value = UserStore::getUserApiKeyOverride($username, $key_name) !== '';
+                    UserStore::saveUserApiKey($username, $key_name, $key_value);
+                    AuditStore::log('user.api_key_saved', $username, [
+                        'key'    => $key_name,
+                        'action' => $had_value ? 'rotated' : 'saved',
+                    ]);
+                    $flash_api = $user_managed_keys[$key_name]['label'] . ' key ' . ($had_value ? 'rotated' : 'saved') . ' for this account.';
+                }
+            } elseif ($action === 'clear_api_key') {
+                UserStore::clearUserApiKey($username, $key_name);
+                AuditStore::log('user.api_key_cleared', $username, ['key' => $key_name]);
+                $flash_api = $user_managed_keys[$key_name]['label'] . ' key cleared for this account.';
+            } else {
+                $error_api = 'Unsupported API key action.';
+            }
         }
     }
 }
+
+$user_key_overrides = [];
+foreach ($user_managed_keys as $key_name => $_meta) {
+    $user_key_overrides[$key_name] = UserStore::getUserApiKeyOverride($username, $key_name);
+}
+$api_key_events = array_values(array_filter(
+    AuditStore::eventsForUser($username, 500),
+    static fn($entry) => in_array(($entry['event'] ?? ''), ['user.api_key_saved', 'user.api_key_cleared'], true)
+));
+$api_key_events = array_slice($api_key_events, 0, 25);
 
 // Reload fresh user data
 $user = UserStore::findUser($username) ?? $user;
@@ -208,6 +242,40 @@ $page_styles = <<<'CSS'
     color: var(--text-subtle);
     word-break: break-all;
   }
+  .key-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
+  .key-card { background:var(--navy-2); border:1px solid var(--border-color); border-radius:12px; padding:18px 20px; display:flex; flex-direction:column; gap:12px; }
+  .key-card-header { display:flex; align-items:center; gap:10px; }
+  .key-card-icon { width:34px; height:34px; background:rgba(24,179,255,.1); border:1px solid rgba(24,179,255,.2); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--primary); flex-shrink:0; }
+  .key-card-title { font-size:13px; font-weight:700; color:var(--text); }
+  .key-card-hint { font-size:11px; color:var(--text-subtle); margin-top:1px; }
+  .key-status-set { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:#4ade80; }
+  .key-status-unset { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:var(--text-subtle); }
+  .key-input { width:100%; background:var(--navy); border:1px solid var(--border-color); border-radius:6px; padding:8px 10px; color:var(--text); font-size:12px; outline:none; font-family:monospace; }
+  .key-input:focus { border-color:var(--primary); }
+  .key-masked { font-size:11px; color:var(--text-subtle); font-family:monospace; letter-spacing:.05em; margin-top:2px; }
+  .key-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+  .btn-key-save { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; border:1px solid rgba(24,179,255,.3); background:rgba(24,179,255,.12); color:var(--primary); transition:border-color .15s,background .15s; }
+  .btn-key-save:hover { border-color:var(--primary); background:rgba(24,179,255,.2); }
+  .btn-key-clear { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; border:1px solid rgba(239,68,68,.25); background:rgba(239,68,68,.07); color:#f87171; transition:border-color .15s; }
+  .btn-key-clear:hover { border-color:#f87171; }
+  .table-wrap { overflow-x:auto; }
+  .data-table { width:100%; border-collapse: collapse; font-size: 13px; }
+  .data-table th {
+    text-align: left; padding: 12px 16px;
+    color: var(--text-subtle); font-weight: 600; font-size: 11px;
+    text-transform: uppercase; letter-spacing: .06em;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--navy-3);
+  }
+  .data-table td {
+    padding: 12px 16px; border-bottom: 1px solid rgba(26,41,66,.5);
+    color: var(--text-muted); vertical-align: middle;
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: rgba(255,255,255,.02); }
+  .event-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 8px; border-radius:999px; font-size:11px; font-weight:700; }
+  .event-badge.saved { background:rgba(34,197,94,.12); color:#4ade80; border:1px solid rgba(34,197,94,.25); }
+  .event-badge.cleared { background:rgba(251,191,36,.12); color:#fbbf24; border:1px solid rgba(251,191,36,.25); }
   @media (max-width: 700px) {
     .dash-layout { flex-direction: column; padding: 0; }
     .dash-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); padding: 16px 0; display: flex; overflow-x: auto; }
@@ -342,25 +410,105 @@ require_once dirname(dirname(__DIR__)) . '/includes/header.php';
         <?php if ($error_api !== ''): ?>
           <div class="flash-error"><iconify-icon icon="lucide:alert-circle"></iconify-icon><?= cf_e($error_api) ?></div>
         <?php endif; ?>
-        <form method="POST" autocomplete="off">
-          <input type="hidden" name="csrf_token" value="<?= cf_e($_SESSION['csrf_token']) ?>">
-          <input type="hidden" name="form" value="openrouter_key">
-          <div class="form-grid">
-            <div class="form-group full">
-              <label class="form-label" for="openrouter_api_key">OpenRouter API Key</label>
-              <input type="password" id="openrouter_api_key" name="openrouter_api_key" class="form-input"
-                     placeholder="Paste your OpenRouter API key (stored in your account config folder)">
-              <?php if ($openrouter_key_masked !== ''): ?>
-                <span class="form-hint">Current saved value: <?= cf_e($openrouter_key_masked) ?></span>
+        <div class="key-grid">
+          <?php foreach ($user_managed_keys as $key_name => $key_meta):
+            $current_val = (string)($user_key_overrides[$key_name] ?? '');
+            $is_set      = $current_val !== '';
+            $masked      = $is_set
+                ? substr($current_val, 0, 6) . str_repeat('•', min(20, max(8, strlen($current_val) - 6)))
+                : '';
+            $is_url      = !empty($key_meta['is_url']);
+          ?>
+          <div class="key-card">
+            <div class="key-card-header">
+              <div class="key-card-icon"><iconify-icon icon="<?= cf_e($key_meta['icon']) ?>"></iconify-icon></div>
+              <div>
+                <div class="key-card-title"><?= cf_e($key_meta['label']) ?></div>
+                <div class="key-card-hint"><?= cf_e($key_meta['hint']) ?></div>
+              </div>
+            </div>
+            <div>
+              <?php if ($is_set): ?>
+                <span class="key-status-set"><iconify-icon icon="lucide:check-circle-2"></iconify-icon> Key set for your account</span>
+                <div class="key-masked"><?= cf_e($masked) ?></div>
               <?php else: ?>
-                <span class="form-hint">No key stored for this account yet.</span>
+                <span class="key-status-unset"><iconify-icon icon="lucide:circle-dashed"></iconify-icon> No account-level key set</span>
               <?php endif; ?>
             </div>
+            <form method="POST" autocomplete="off">
+              <input type="hidden" name="csrf_token" value="<?= cf_e($_SESSION['csrf_token']) ?>">
+              <input type="hidden" name="form" value="api_key">
+              <input type="hidden" name="action" value="save_api_key">
+              <input type="hidden" name="key_name" value="<?= cf_e($key_name) ?>">
+              <input
+                type="<?= $is_url ? 'text' : 'password' ?>"
+                name="key_value"
+                class="key-input"
+                placeholder="<?= $is_set ? 'Enter new value to rotate…' : 'Paste ' . cf_e($key_meta['label']) . ' value…' ?>"
+                autocomplete="new-password"
+                required
+              >
+              <div class="key-actions">
+                <button type="submit" class="btn-key-save">
+                  <iconify-icon icon="lucide:rotate-ccw"></iconify-icon>
+                  <?= $is_set ? 'Rotate Key' : 'Save Key' ?>
+                </button>
+              </div>
+            </form>
+            <?php if ($is_set): ?>
+            <form method="POST">
+              <input type="hidden" name="csrf_token" value="<?= cf_e($_SESSION['csrf_token']) ?>">
+              <input type="hidden" name="form" value="api_key">
+              <input type="hidden" name="action" value="clear_api_key">
+              <input type="hidden" name="key_name" value="<?= cf_e($key_name) ?>">
+              <button type="submit" class="btn-key-clear" data-confirm="Clear <?= cf_e($key_meta['label']) ?> key for your account?">
+                <iconify-icon icon="lucide:trash-2"></iconify-icon> Clear Key
+              </button>
+            </form>
+            <?php endif; ?>
           </div>
-          <button type="submit" class="btn-save">
-            <iconify-icon icon="lucide:key-round"></iconify-icon> Save OpenRouter Key
-          </button>
-        </form>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-section">
+      <div class="dash-section-header"><h2>API Key Change History</h2></div>
+      <div class="dash-section-body" style="padding:0">
+        <?php if (empty($api_key_events)): ?>
+          <div style="padding:22px;color:var(--text-subtle);font-size:13px">
+            No API key changes recorded yet for this account.
+          </div>
+        <?php else: ?>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Action</th>
+                  <th>Key</th>
+                  <th>IP</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($api_key_events as $entry):
+                  $event = (string)($entry['event'] ?? '');
+                  $is_saved = $event === 'user.api_key_saved';
+                  $badge_class = $is_saved ? 'saved' : 'cleared';
+                  $badge_text = $is_saved ? 'Saved / Rotated' : 'Cleared';
+                  $key_name = (string)($entry['data']['key'] ?? 'unknown');
+                ?>
+                <tr>
+                  <td style="white-space:nowrap"><?= cf_e(date('M j, Y g:i a', strtotime((string)($entry['created_at'] ?? 'now')))) ?></td>
+                  <td><span class="event-badge <?= cf_e($badge_class) ?>"><?= cf_e($badge_text) ?></span></td>
+                  <td><code><?= cf_e($key_name) ?></code></td>
+                  <td><?= cf_e((string)($entry['ip'] ?? '')) ?></td>
+                </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
+        <?php endif; ?>
       </div>
     </div>
 
@@ -390,5 +538,16 @@ require_once dirname(dirname(__DIR__)) . '/includes/header.php';
     </div>
   </main>
 </div>
+
+<script>
+document.addEventListener('click', function (e) {
+  var btn = e.target.closest('[data-confirm]');
+  if (!btn) return;
+  var msg = btn.getAttribute('data-confirm');
+  if (msg && !window.confirm(msg)) {
+    e.preventDefault();
+  }
+});
+</script>
 
 <?php require_once dirname(dirname(__DIR__)) . '/includes/footer.php'; ?>

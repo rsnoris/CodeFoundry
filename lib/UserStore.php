@@ -204,6 +204,36 @@ class UserStore
         cf_save_user_key($username, $keyName, $value);
     }
 
+    /** Load a user-specific API key from the user's own key file only (no global fallback). */
+    public static function getUserApiKeyOverride(string $username, string $keyName): string
+    {
+        self::ensureUserConfig($username);
+        $safeName = cf_normalize_key_name($keyName);
+        if ($safeName === '') {
+            return '';
+        }
+        $file = cf_user_config_dir($username) . '/' . $safeName;
+        if (!is_file($file) || !is_readable($file)) {
+            return '';
+        }
+        $value = trim((string)file_get_contents($file));
+        return $value;
+    }
+
+    /** Remove a user-specific key override file for the given key name. */
+    public static function clearUserApiKey(string $username, string $keyName): void
+    {
+        self::ensureUserConfig($username);
+        $safeName = cf_normalize_key_name($keyName);
+        if ($safeName === '') {
+            throw new \InvalidArgumentException('Invalid key name.');
+        }
+        $file = cf_user_config_dir($username) . '/' . $safeName;
+        if (is_file($file)) {
+            @unlink($file);
+        }
+    }
+
     /** Load a user-specific API key; falls back to global key lookup. */
     public static function getUserApiKey(string $username, string $keyName, string $default = ''): string
     {
