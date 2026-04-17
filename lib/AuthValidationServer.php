@@ -10,6 +10,7 @@ declare(strict_types=1);
 class AuthValidationServer
 {
     private const RATE_LIMIT_FILE = CF_KEYS_DIR . '/auth_validation_rate_limits.json';
+    private const RATE_LIMIT_PRUNE_SECONDS = 86400;
 
     public static function consumeLoginAttempt(string $username, string $ip): bool
     {
@@ -195,8 +196,8 @@ class AuthValidationServer
     private static function writeRateLimits(array $data): void
     {
         $dir = dirname(self::RATE_LIMIT_FILE);
-        if (!is_dir($dir)) {
-            @mkdir($dir, 0700, true);
+        if (!is_dir($dir) && !mkdir($dir, 0700, true) && !is_dir($dir)) {
+            return;
         }
 
         $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -230,7 +231,7 @@ class AuthValidationServer
 
     private static function pruneRateLimitStore(array $all): array
     {
-        $oldestAllowed = time() - 86400;
+        $oldestAllowed = time() - self::RATE_LIMIT_PRUNE_SECONDS;
         $clean = [];
         foreach ($all as $key => $bucket) {
             if (!is_string($key) || !is_array($bucket)) {

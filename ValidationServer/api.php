@@ -10,7 +10,7 @@ header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-$isHealthCheck = $method === 'GET' && (($_GET['action'] ?? '') === 'health' || !isset($_GET['action']));
+$isHealthCheck = $method === 'GET' && (($_GET['action'] ?? '') === 'health');
 
 $configuredKey = trim(cf_load_key('AUTH_VALIDATION_SERVER_API_KEY'));
 if ($configuredKey === '') {
