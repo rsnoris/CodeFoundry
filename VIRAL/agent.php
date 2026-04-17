@@ -345,6 +345,132 @@ $page_styles = <<<PAGECSS
   }
   .chip:hover { border-color: var(--accent); color: var(--accent); }
 
+  /* ── Prompt examples right panel ─────────────────────────────────────── */
+  .prompt-examples-panel {
+    width: 320px;
+    flex-shrink: 0;
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    background: #080f1e;
+    position: relative;
+    overflow: hidden;
+    transition: width .25s ease;
+    height: 100%;
+  }
+  .prompt-examples-panel.collapsed { width: 0; border-left: none; }
+  .examples-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .examples-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--text-muted);
+  }
+  .examples-search {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+  }
+  .examples-search input {
+    width: 100%;
+    background: #0d1626;
+    border: 1px solid #1e2e48;
+    color: var(--text);
+    border-radius: 8px;
+    padding: 7px 11px;
+    font-size: 12px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color .2s;
+    box-sizing: border-box;
+  }
+  .examples-search input:focus { border-color: var(--accent); }
+  .examples-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 0;
+  }
+  .examples-list::-webkit-scrollbar { width: 4px; }
+  .examples-list::-webkit-scrollbar-thumb { background: #1e2e48; border-radius: 3px; }
+  .example-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    color: #7a8eaa;
+    font-size: 12.5px;
+    line-height: 1.5;
+    padding: 7px 16px;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+    font-family: inherit;
+    white-space: normal;
+  }
+  .example-item:hover { background: #0d1626; color: var(--text); }
+  .example-item.hidden { display: none; }
+  .examples-count {
+    padding: 6px 16px 10px;
+    font-size: 11px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-color);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .examples-toggle {
+    position: absolute;
+    top: 14px;
+    left: -14px;
+    z-index: 10;
+    width: 28px;
+    height: 28px;
+    background: #0d1626;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: background .2s, color .2s;
+    flex-shrink: 0;
+  }
+  .examples-toggle:hover { background: #111b30; color: var(--accent); }
+  .examples-reopen {
+    position: fixed;
+    right: 12px;
+    top: calc(var(--header-height) + var(--sidebar-reopen-offset));
+    z-index: 1100;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: #0d1626;
+    color: var(--text-muted);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.31);
+    transition: background .2s, color .2s, border-color .2s;
+  }
+  .examples-reopen:hover {
+    background: #111b30;
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .examples-reopen iconify-icon { font-size: 18px; }
+  .prompt-examples-panel.collapsed + .examples-reopen { display: flex; }
+
   /* ── Mobile ──────────────────────────────────────────────────────────── */
   /* ── Settings toggle + collapsible dropdowns ─────────────────────────── */
   .settings-wrap { margin-top: 2px; }
@@ -399,8 +525,12 @@ $page_styles = <<<PAGECSS
     .viral-layout { flex-direction: column; height: auto; min-height: calc(100vh - var(--header-height)); }
     .prompt-sidebar  { width: 100% !important; border-right: none; border-bottom: 1px solid var(--border-color); max-height: 260px; }
     .prompt-sidebar.collapsed { max-height: 0; overflow: hidden; border-bottom: none; }
+    .prompt-examples-panel { width: 100% !important; border-left: none; border-top: 1px solid var(--border-color); max-height: 280px; }
+    .prompt-examples-panel.collapsed { max-height: 0; overflow: hidden; border-top: none; }
     .sidebar-toggle  { display: none; }
     .sidebar-reopen  { display: none !important; }
+    .examples-toggle { display: none; }
+    .examples-reopen { display: none !important; }
     .mobile-sidebar-btn { display: inline-flex !important; }
     .viral-chat-wrap { padding: 16px 14px 80px; }
     .chat-messages   { min-height: 340px; }
@@ -524,6 +654,23 @@ require_once dirname(__DIR__) . '/includes/header.php';
       </div>
 
     </div><!-- /.viral-chat-wrap -->
+
+    <aside class="prompt-examples-panel" id="examplesPanel">
+      <button class="examples-toggle" id="examplesToggle" aria-label="Toggle prompt examples" aria-expanded="true">
+        <iconify-icon icon="lucide:chevron-right" id="examplesToggleIcon"></iconify-icon>
+      </button>
+      <div class="examples-header">
+        <span class="examples-title">Prompt Examples</span>
+      </div>
+      <div class="examples-search">
+        <input type="text" id="exampleSearch" placeholder="Search examples…" autocomplete="off">
+      </div>
+      <div class="examples-list" id="exampleList"></div>
+      <div class="examples-count" id="exampleCount"></div>
+    </aside>
+    <button class="examples-reopen" id="examplesReopen" type="button" aria-label="Reopen prompt examples">
+      <iconify-icon icon="lucide:panel-right-open"></iconify-icon>
+    </button>
   </div><!-- /.viral-layout -->
 </main>
 
@@ -675,6 +822,13 @@ $page_scripts = <<<PAGEJS
   const modelSelect   = document.getElementById('viralModelSelect');
   const taskCategorySelect = document.getElementById('viralTaskCategorySelect');
   const taskSelect    = document.getElementById('viralTaskSelect');
+  const examplesPanel = document.getElementById('examplesPanel');
+  const exampleList   = document.getElementById('exampleList');
+  const exampleCount  = document.getElementById('exampleCount');
+  const exampleSearch = document.getElementById('exampleSearch');
+  const examplesToggle = document.getElementById('examplesToggle');
+  const examplesToggleIcon = document.getElementById('examplesToggleIcon');
+  const examplesReopen = document.getElementById('examplesReopen');
   const settingsToggle = document.getElementById('settingsToggle');
   const agentSelection = document.getElementById('agentSelection');
   const settingsSummary = document.getElementById('settingsSummary');
@@ -895,6 +1049,45 @@ $page_scripts = <<<PAGEJS
   renderAgentNav('');
   updateSidebarIcon();
 
+  function updateExamplesIcon() {
+    if (!examplesToggleIcon || !examplesPanel || !examplesToggle) return;
+    const collapsed = examplesPanel.classList.contains('collapsed');
+    examplesToggleIcon.setAttribute('icon', collapsed ? 'lucide:chevron-left' : 'lucide:chevron-right');
+    examplesToggle.setAttribute('aria-expanded', String(!collapsed));
+    if (examplesReopen) {
+      if (collapsed) {
+        examplesReopen.removeAttribute('aria-hidden');
+      } else {
+        examplesReopen.setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+
+  function renderPromptExamples(searchTerm) {
+    if (!exampleList || !exampleCount) return;
+    var term = String(searchTerm || '').toLowerCase().trim();
+    var visible = 0;
+    exampleList.innerHTML = '';
+    rolePrompts.forEach(function (text) {
+      if (term && text.toLowerCase().indexOf(term) === -1) return;
+      visible++;
+      var btn = document.createElement('button');
+      btn.className = 'example-item';
+      btn.type = 'button';
+      btn.textContent = text;
+      btn.addEventListener('click', function () {
+        chatInput.value = text;
+        chatInput.dispatchEvent(new Event('input'));
+        sendMessage();
+      });
+      exampleList.appendChild(btn);
+    });
+    exampleCount.textContent = visible + ' examples';
+  }
+
+  renderPromptExamples('');
+  updateExamplesIcon();
+
   if (promptSearch) {
     promptSearch.addEventListener('input', function () {
       renderAgentNav(this.value);
@@ -931,6 +1124,31 @@ $page_scripts = <<<PAGEJS
     settingsToggle.addEventListener('click', function () {
       var isOpen = settingsToggle.classList.toggle('open');
       agentSelection.style.display = isOpen ? 'grid' : 'none';
+    });
+  }
+
+  if (exampleSearch) {
+    exampleSearch.addEventListener('input', function () {
+      renderPromptExamples(this.value);
+    });
+  }
+
+  if (examplesToggle && examplesPanel) {
+    examplesToggle.addEventListener('click', function () {
+      examplesPanel.classList.toggle('collapsed');
+      updateExamplesIcon();
+      const expanded = !examplesPanel.classList.contains('collapsed');
+      if (expanded && exampleSearch) {
+        exampleSearch.focus();
+      }
+    });
+  }
+
+  if (examplesReopen && examplesPanel) {
+    examplesReopen.addEventListener('click', function () {
+      examplesPanel.classList.remove('collapsed');
+      updateExamplesIcon();
+      if (exampleSearch) exampleSearch.focus();
     });
   }
 
