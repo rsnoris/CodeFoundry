@@ -34,7 +34,7 @@ class AuthValidationServer
             return false;
         }
 
-        $all = self::readRateLimits();
+        $all = self::pruneRateLimitStore(self::readRateLimits());
         $key = $action . '|' . $scope;
         $now = time();
         $windowStart = $now - $windowSeconds;
@@ -204,7 +204,7 @@ class AuthValidationServer
             return;
         }
 
-        $tmpPath = tempnam(sys_get_temp_dir(), 'cf_rate_limits_');
+        $tmpPath = tempnam($dir, 'cf_rate_limits_');
         if ($tmpPath === false) {
             return;
         }
@@ -223,5 +223,21 @@ class AuthValidationServer
         if (!@rename($tmpPath, self::RATE_LIMIT_FILE)) {
             @unlink($tmpPath);
         }
+    }
+
+    private static function pruneRateLimitStore(array $all): array
+    {
+        $oldestAllowed = time() - 86400;
+        $clean = [];
+        foreach ($all as $key => $bucket) {
+            if (!is_string($key) || !is_array($bucket)) {
+                continue;
+            }
+            $filtered = array_values(array_filter($bucket, static fn($t) => (int)$t >= $oldestAllowed));
+            if (!empty($filtered)) {
+                $clean[$key] = $filtered;
+            }
+        }
+        return $clean;
     }
 }

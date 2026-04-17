@@ -11,7 +11,7 @@ header('X-Content-Type-Options: nosniff');
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 if ($method === 'GET' && (($_GET['action'] ?? '') === 'health' || !isset($_GET['action']))) {
-    echo json_encode(['ok' => true, 'service' => 'validation_server', 'time' => date('c')]);
+    echo json_encode(['ok' => true]);
     exit;
 }
 if ($method !== 'POST') {

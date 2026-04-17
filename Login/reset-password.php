@@ -10,6 +10,14 @@ session_start();
 $error = '';
 $flash = '';
 $maxOtpAttempts = 5;
+$clearOtpState = static function (string $username): void {
+    UserStore::updateUser($username, [
+        'password_reset_otp_hash'    => '',
+        'password_reset_expires_at'  => '',
+        'password_reset_attempts'    => 0,
+        'password_reset_requested_at'=> '',
+    ]);
+};
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', (string)$_POST['csrf_token'])) {
@@ -40,11 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($username !== '') {
                         UserStore::updateUser($username, [
                             'password_hash'              => password_hash($newPw, PASSWORD_BCRYPT),
-                            'password_reset_otp_hash'    => '',
-                            'password_reset_expires_at'  => '',
-                            'password_reset_attempts'    => 0,
-                            'password_reset_requested_at'=> '',
                         ]);
+                        $clearOtpState($username);
                         UserStore::resetFailedLogin($username);
                         AuditStore::log('user.password_reset_completed', $username, []);
                         $isValid = true;
@@ -56,21 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $attempts = (int)($user['password_reset_attempts'] ?? 0) + 1;
                         UserStore::updateUser($username, ['password_reset_attempts' => $attempts]);
                         if ($attempts >= $maxOtpAttempts) {
-                            UserStore::updateUser($username, [
-                                'password_reset_otp_hash'    => '',
-                                'password_reset_expires_at'  => '',
-                                'password_reset_attempts'    => 0,
-                                'password_reset_requested_at'=> '',
-                            ]);
+                            $clearOtpState($username);
                         }
                         AuditStore::log('user.password_reset_otp_failed', $username, ['attempts' => $attempts]);
                     } elseif ($username !== '' && in_array($reason, ['expired', 'max_attempts'], true)) {
-                        UserStore::updateUser($username, [
-                            'password_reset_otp_hash'    => '',
-                            'password_reset_expires_at'  => '',
-                            'password_reset_attempts'    => 0,
-                            'password_reset_requested_at'=> '',
-                        ]);
+                        $clearOtpState($username);
                     }
                 }
 
