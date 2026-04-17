@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/config.php';
+require_once dirname(__DIR__) . '/lib/CodeGenProvider.php';
 require_once __DIR__ . '/config.php';   // VIRAL_AGENTS constant
 
 $role = isset($_GET['role']) ? trim((string)$_GET['role']) : '';
@@ -25,6 +26,23 @@ $agentAccent  = htmlspecialchars($agent['accent'], ENT_QUOTES, 'UTF-8');
 $roleJson     = json_encode($role);
 $agentIconJson = json_encode($agent['icon']);
 $expandedRoleSlugsJson = json_encode(array_keys(VIRAL_AGENTS));
+
+$_cf_providers_js = [];
+foreach (CodeGenProvider::all() as $pid => $pdata) {
+    if (!$pdata['available']) continue;
+    $models = [];
+    foreach ($pdata['models'] as $m) {
+        $models[] = ['id' => $m['id'], 'label' => $m['label']];
+    }
+    $_cf_providers_js[] = [
+        'id'            => $pid,
+        'label'         => $pdata['label'],
+        'default_model' => $pdata['default_model'],
+        'models'        => $models,
+    ];
+}
+$providersJson      = json_encode($_cf_providers_js, JSON_UNESCAPED_UNICODE);
+$taskGroupsJson     = json_encode(VIRAL_TASK_CATEGORY_GROUPS, JSON_UNESCAPED_UNICODE);
 
 $page_title  = $agentLabel . ' Agent – CodeFoundry VIRAL';
 $active_page = 'viral';
@@ -193,6 +211,39 @@ $page_styles = <<<PAGECSS
   .agent-icon-lg iconify-icon { font-size: 26px; color: var(--accent); }
   .agent-header-info h1 { margin: 0 0 4px; font-size: 22px; font-weight: 800; }
   .agent-header-info p  { margin: 0; color: var(--text-muted); font-size: 14px; }
+  .agent-selection {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 2px;
+  }
+  .agent-selection-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .agent-selection-field label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .agent-selection-field select {
+    width: 100%;
+    background: #0d1626;
+    border: 1px solid #1e2e48;
+    color: var(--text);
+    border-radius: 10px;
+    padding: 9px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    min-height: 40px;
+  }
+  .agent-selection-field select:focus {
+    border-color: var(--accent);
+  }
   .back-link {
     display: inline-flex; align-items: center; gap: 6px;
     color: var(--text-muted); font-size: 13px; margin-bottom: 8px;
@@ -294,6 +345,7 @@ $page_styles = <<<PAGECSS
     .viral-chat-wrap { padding: 16px 14px 80px; }
     .chat-messages   { min-height: 340px; }
     .msg             { max-width: 96%; }
+    .agent-selection { grid-template-columns: 1fr; }
   }
   @media (min-width: 901px) {
     .mobile-sidebar-btn { display: none !important; }
@@ -348,6 +400,27 @@ require_once dirname(__DIR__) . '/includes/header.php';
         </div>
       </div>
 
+      <div class="agent-selection">
+        <div class="agent-selection-field" id="viralModelField">
+          <label for="viralModelSelect">AI Model</label>
+          <select id="viralModelSelect" aria-label="AI model">
+            <option value="">No AI providers configured</option>
+          </select>
+        </div>
+        <div class="agent-selection-field">
+          <label for="viralTaskCategorySelect">Task Category</label>
+          <select id="viralTaskCategorySelect" aria-label="Task category">
+            <option value="">Any category</option>
+          </select>
+        </div>
+        <div class="agent-selection-field">
+          <label for="viralTaskSelect">Task Type</label>
+          <select id="viralTaskSelect" aria-label="Task type">
+            <option value="">Any task type</option>
+          </select>
+        </div>
+      </div>
+
       <div id="errorToast" class="error-toast"></div>
 
       <div class="chat-window">
@@ -391,6 +464,8 @@ $page_scripts = <<<PAGEJS
   const ROLE       = {$roleJson};
   const AGENT_ICON = {$agentIconJson};
   const EXPANDED_ROLE_SLUGS = {$expandedRoleSlugsJson};
+  const CF_PROVIDERS = {$providersJson};
+  const VIRAL_TASK_GROUPS = {$taskGroupsJson};
   const MAX_PROMPTS_PER_EXPANDED_ROLE = 64;
   const SUGGESTION_CHIP_COUNT = 8;
 
@@ -526,9 +601,110 @@ $page_scripts = <<<PAGEJS
   const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
   const sidebarReopen = document.getElementById('sidebarReopen');
   const mobileSidebarBtn = document.getElementById('mobileSidebarBtn');
+  const modelField    = document.getElementById('viralModelField');
+  const modelSelect   = document.getElementById('viralModelSelect');
+  const taskCategorySelect = document.getElementById('viralTaskCategorySelect');
+  const taskSelect    = document.getElementById('viralTaskSelect');
   const rolePrompts   = buildPromptsForRole(ROLE);
   let history = [];
   let busy    = false;
+
+  function populateModelSelector() {
+    if (!modelSelect || !Array.isArray(CF_PROVIDERS) || !CF_PROVIDERS.length) {
+      if (modelField) modelField.style.display = 'none';
+      return;
+    }
+    modelSelect.innerHTML = '';
+    CF_PROVIDERS.forEach(function (p) {
+      const group = document.createElement('optgroup');
+      group.label = p.label;
+      (p.models || []).forEach(function (m) {
+        const opt = document.createElement('option');
+        opt.value = p.id + ':' + m.id;
+        opt.textContent = m.label;
+        group.appendChild(opt);
+      });
+      modelSelect.appendChild(group);
+    });
+    const saved = localStorage.getItem('cf_viral_ai_model');
+    let hasValidSaved = false;
+    if (saved) {
+      hasValidSaved = Array.from(modelSelect.options).some(function (o) { return o.value === saved; });
+      if (hasValidSaved) modelSelect.value = saved;
+    }
+    if (!hasValidSaved) {
+      const openAIProvider = CF_PROVIDERS.find(function (p) { return p.id === 'openai'; });
+      if (openAIProvider && openAIProvider.default_model) {
+        const preferred = 'openai:' + openAIProvider.default_model;
+        const preferredExists = Array.from(modelSelect.options).some(function (o) { return o.value === preferred; });
+        if (preferredExists) modelSelect.value = preferred;
+      }
+    }
+    modelSelect.addEventListener('change', function () {
+      localStorage.setItem('cf_viral_ai_model', modelSelect.value);
+    });
+  }
+
+  function populateTaskCategories() {
+    if (!taskCategorySelect || !taskSelect) return;
+    const groups = VIRAL_TASK_GROUPS || {};
+    taskCategorySelect.innerHTML = '<option value="">Any category</option>';
+    Object.keys(groups).forEach(function (cat) {
+      const opt = document.createElement('option');
+      opt.value = cat;
+      opt.textContent = cat;
+      taskCategorySelect.appendChild(opt);
+    });
+    const savedCategory = localStorage.getItem('cf_viral_task_category') || '';
+    if (savedCategory && groups[savedCategory]) {
+      taskCategorySelect.value = savedCategory;
+    }
+    populateTasksForCategory(taskCategorySelect.value);
+    const savedTask = localStorage.getItem('cf_viral_task') || '';
+    if (savedTask) {
+      const taskExists = Array.from(taskSelect.options).some(function (o) { return o.value === savedTask; });
+      if (taskExists) taskSelect.value = savedTask;
+    }
+    taskCategorySelect.addEventListener('change', function () {
+      localStorage.setItem('cf_viral_task_category', this.value || '');
+      populateTasksForCategory(this.value || '');
+    });
+    taskSelect.addEventListener('change', function () {
+      localStorage.setItem('cf_viral_task', this.value || '');
+    });
+  }
+
+  function populateTasksForCategory(category) {
+    if (!taskSelect) return;
+    const groups = VIRAL_TASK_GROUPS || {};
+    taskSelect.innerHTML = '<option value="">Any task type</option>';
+    const tasks = category && Array.isArray(groups[category]) ? groups[category] : [];
+    tasks.forEach(function (task) {
+      const opt = document.createElement('option');
+      opt.value = task;
+      opt.textContent = task;
+      taskSelect.appendChild(opt);
+    });
+  }
+
+  function getAiSelection() {
+    const val = modelSelect ? String(modelSelect.value || '') : '';
+    if (!val) return {};
+    const sep = val.indexOf(':');
+    return sep > 0
+      ? { provider: val.slice(0, sep), model: val.slice(sep + 1) }
+      : {};
+  }
+
+  function getTaskSelection() {
+    return {
+      task_category: taskCategorySelect ? String(taskCategorySelect.value || '') : '',
+      task: taskSelect ? String(taskSelect.value || '') : '',
+    };
+  }
+
+  populateModelSelector();
+  populateTaskCategories();
 
   // Render suggestion chips
   const chips = rolePrompts.slice(0, SUGGESTION_CHIP_COUNT);
@@ -674,7 +850,11 @@ $page_scripts = <<<PAGEJS
     fetch('/VIRAL/chat.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role: ROLE, message: text, history: history.slice(0, -1) }),
+      body: JSON.stringify(Object.assign(
+        { role: ROLE, message: text, history: history.slice(0, -1) },
+        getAiSelection(),
+        getTaskSelection()
+      )),
     })
     .then(function (res) { return res.json(); })
     .then(function (data) {

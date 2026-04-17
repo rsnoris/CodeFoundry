@@ -125,19 +125,24 @@ define('CF_DATA_CHAT_MESSAGES',   CF_USERS_STORAGE_DIR . '/chat_messages.json');
 define('CF_OPENAI_KEY', cf_load_key('OPENAI_API_KEY'));
 
 /**
- * OpenAI-only provider registry.
+ * AI provider registry for Code Generation + VIRAL agents.
  * Keys:
  *   label             – human-readable provider name shown in the UI
- *   api_url           – full endpoint URL
- *   api_key_env       – (optional) env-var name that holds the API key
+ *   api_url           – full endpoint URL (or base + api_url_suffix when overridden by env)
+ *   api_key_env       – (optional) key/env variable name for provider auth
  *   models            – ordered list of {id, label} model descriptors
  *   default_model     – model ID pre-selected in the UI
+ *   format            – request/response format handler: openai|anthropic|gemini
+ *   api_url_env       – (optional) key/env var to override endpoint URL/base
+ *   api_url_suffix    – (optional) appended when api_url_env contains only scheme+host
+ *   no_api_key        – (optional) true for providers that do not require API keys
  */
 define('CF_CODEGEN_PROVIDERS', [
     'openai' => [
         'label'         => 'OpenAI (ChatGPT)',
         'api_url'       => 'https://api.openai.com/v1/chat/completions',
         'api_key_env'   => 'OPENAI_API_KEY',
+        'format'        => 'openai',
         'models'        => [
             ['id' => 'gpt-4o-mini',   'label' => 'GPT-4o Mini'],
             ['id' => 'gpt-4o',        'label' => 'GPT-4o'],
@@ -148,7 +153,108 @@ define('CF_CODEGEN_PROVIDERS', [
         ],
         'default_model' => 'gpt-4o-mini',
     ],
-
+    'anthropic' => [
+        'label'         => 'Anthropic (Claude)',
+        'api_url'       => 'https://api.anthropic.com/v1/messages',
+        'api_key_env'   => 'ANTHROPIC_API_KEY',
+        'format'        => 'anthropic',
+        'auth_header'   => 'x-api-key',
+        'auth_scheme'   => '',
+        'extra_headers' => [
+            'anthropic-version: 2023-06-01',
+        ],
+        'models'        => [
+            ['id' => 'claude-3-5-haiku-latest',  'label' => 'Claude 3.5 Haiku'],
+            ['id' => 'claude-3-5-sonnet-latest', 'label' => 'Claude 3.5 Sonnet'],
+            ['id' => 'claude-3-opus-latest',     'label' => 'Claude 3 Opus'],
+        ],
+        'default_model' => 'claude-3-5-haiku-latest',
+    ],
+    'gemini' => [
+        'label'         => 'Google Gemini',
+        'api_url'       => 'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent',
+        'api_key_env'   => 'GEMINI_API_KEY',
+        'format'        => 'gemini',
+        'model_in_url'  => true,
+        'auth_in_query' => 'key',
+        'api_url_env'   => 'GEMINI_BASE_URL',
+        'api_url_suffix'=> '/v1beta/models/{model}:generateContent',
+        'models'        => [
+            ['id' => 'gemini-1.5-flash', 'label' => 'Gemini 1.5 Flash'],
+            ['id' => 'gemini-1.5-pro',   'label' => 'Gemini 1.5 Pro'],
+            ['id' => 'gemini-2.0-flash', 'label' => 'Gemini 2.0 Flash'],
+        ],
+        'default_model' => 'gemini-1.5-flash',
+    ],
+    'groq' => [
+        'label'         => 'Groq',
+        'api_url'       => 'https://api.groq.com/openai/v1/chat/completions',
+        'api_key_env'   => 'GROQ_API_KEY',
+        'format'        => 'openai',
+        'models'        => [
+            ['id' => 'llama-3.1-8b-instant',     'label' => 'Llama 3.1 8B Instant'],
+            ['id' => 'llama-3.3-70b-versatile',  'label' => 'Llama 3.3 70B Versatile'],
+            ['id' => 'mixtral-8x7b-32768',       'label' => 'Mixtral 8x7B'],
+            ['id' => 'gemma2-9b-it',             'label' => 'Gemma 2 9B'],
+        ],
+        'default_model' => 'llama-3.1-8b-instant',
+    ],
+    'openrouter' => [
+        'label'         => 'OpenRouter',
+        'api_url'       => 'https://openrouter.ai/api/v1/chat/completions',
+        'api_key_env'   => 'OPENROUTER_API_KEY',
+        'format'        => 'openai',
+        'extra_headers' => [
+            'HTTP-Referer: https://codefoundry.cloud',
+            'X-Title: CodeFoundry',
+        ],
+        'models'        => [
+            ['id' => 'openai/gpt-4o-mini',            'label' => 'OpenAI GPT-4o Mini (via OpenRouter)'],
+            ['id' => 'anthropic/claude-3.5-haiku',    'label' => 'Claude 3.5 Haiku (via OpenRouter)'],
+            ['id' => 'meta-llama/llama-3.1-8b-instruct:free', 'label' => 'Llama 3.1 8B Instruct (Free)'],
+            ['id' => 'google/gemini-flash-1.5',       'label' => 'Gemini Flash 1.5 (via OpenRouter)'],
+        ],
+        'default_model' => 'openai/gpt-4o-mini',
+    ],
+    'huggingface' => [
+        'label'         => 'Hugging Face',
+        'api_url'       => 'https://router.huggingface.co/v1/chat/completions',
+        'api_key_env'   => 'HF_API_KEY',
+        'format'        => 'openai',
+        'models'        => [
+            ['id' => 'meta-llama/Meta-Llama-3.1-8B-Instruct',  'label' => 'Llama 3.1 8B Instruct'],
+            ['id' => 'mistralai/Mistral-7B-Instruct-v0.3',     'label' => 'Mistral 7B Instruct v0.3'],
+            ['id' => 'Qwen/Qwen2.5-Coder-32B-Instruct',        'label' => 'Qwen2.5 Coder 32B'],
+        ],
+        'default_model' => 'meta-llama/Meta-Llama-3.1-8B-Instruct',
+    ],
+    'together' => [
+        'label'         => 'Together AI',
+        'api_url'       => 'https://api.together.xyz/v1/chat/completions',
+        'api_key_env'   => 'TOGETHER_API_KEY',
+        'format'        => 'openai',
+        'models'        => [
+            ['id' => 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo', 'label' => 'Llama 3.1 8B Instruct Turbo'],
+            ['id' => 'mistralai/Mixtral-8x7B-Instruct-v0.1',        'label' => 'Mixtral 8x7B Instruct'],
+            ['id' => 'Qwen/Qwen2.5-Coder-32B-Instruct',             'label' => 'Qwen2.5 Coder 32B'],
+        ],
+        'default_model' => 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
+    ],
+    'ollama' => [
+        'label'          => 'Ollama (Local)',
+        'api_url'        => 'http://localhost:11434/v1/chat/completions',
+        'api_url_env'    => 'OLLAMA_URL',
+        'api_url_suffix' => '/v1/chat/completions',
+        'format'         => 'openai',
+        'no_api_key'     => true,
+        'models'         => [
+            ['id' => 'llama3.2', 'label' => 'Llama 3.2'],
+            ['id' => 'mistral',  'label' => 'Mistral'],
+            ['id' => 'qwen2.5-coder', 'label' => 'Qwen2.5 Coder'],
+            ['id' => 'phi3',     'label' => 'Phi-3'],
+        ],
+        'default_model'  => 'llama3.2',
+    ],
 ]);
 
 // ---------------------------------------------------------------------------
