@@ -45,44 +45,6 @@ const VIRAL_FREE_DAILY_PROMPT_LIMIT = 10;
 const VIRAL_FREE_DAILY_TOKEN_LIMIT  = 1000;
 
 /**
- * Pick the first available open-source provider that does not require an API key.
- */
-function viral_free_no_key_provider_id(): string
-{
-    foreach (CF_CODEGEN_PROVIDERS as $id => $cfg) {
-        $isOpenSource = !empty($cfg['opensource']);
-        $noUserKeyNeeded = !empty($cfg['no_key_required']) || !empty($cfg['local']);
-        if ($isOpenSource && $noUserKeyNeeded && CodeGenProvider::isProviderAvailable($id)) {
-            return (string)$id;
-        }
-    }
-    return '';
-}
-
-/**
- * Resolve the provider to use for VIRAL chats.
- * Free users prefer configured free-tier providers (e.g. OpenRouter), then
- * fall back to no-key open-source providers (e.g. Ollama/Pollinations).
- */
-function viral_resolve_provider_id(bool $isFreePlan): string
-{
-    if ($isFreePlan) {
-        $freeProviderId = CodeGenProvider::defaultFreeProviderId();
-        if ($freeProviderId !== '') {
-            return $freeProviderId;
-        }
-        return viral_free_no_key_provider_id();
-    }
-
-    $defaultProviderId = CodeGenProvider::defaultProviderId();
-    if ($defaultProviderId !== '') {
-        return $defaultProviderId;
-    }
-
-    return viral_free_no_key_provider_id();
-}
-
-/**
  * Daily usage for authenticated users, based on token history.
  *
  * @return array{prompts:int,tokens:int}
@@ -187,10 +149,10 @@ $_sessionUser = $_SESSION['cf_user'] ?? null;
 $_userPlan    = $_sessionUser['plan'] ?? 'free';
 $_isFreePlan  = ($_userPlan === 'free');
 
-$providerCandidates = CodeGenProvider::candidateProviderIds($_isFreePlan);
+$providerCandidates = CodeGenProvider::candidateProviderIds(false, 'openai');
 if (empty($providerCandidates)) {
     http_response_code(503);
-    echo json_encode(['error' => 'No AI provider is available right now. Please try again later.']);
+    echo json_encode(['error' => 'OpenAI is not configured. Please set OPENAI_API_KEY and try again.']);
     exit;
 }
 $providerId = '';

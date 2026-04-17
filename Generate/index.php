@@ -5,19 +5,11 @@ require_once dirname(__DIR__) . '/lib/CodeGenProvider.php';
 require_once dirname(__DIR__) . '/lib/UserStore.php';
 
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
-$_cf_session_user = $_SESSION['cf_user'] ?? null;
-$_cf_is_free_plan = ($_cf_session_user['plan'] ?? 'free') === 'free';
 
 // Provider list for the client-side model selector
 $_cf_providers_js = [];
 foreach (CodeGenProvider::all() as $pid => $pdata) {
     if (!$pdata['available']) continue;
-    if (
-        $_cf_is_free_plan
-        && empty($pdata['free_tier'])
-        && empty($pdata['no_key_required'])
-        && empty($pdata['local'])
-    ) continue;
     $models = [];
     foreach ($pdata['models'] as $m) {
         $models[] = ['id' => $m['id'], 'label' => $m['label']];
@@ -25,7 +17,7 @@ foreach (CodeGenProvider::all() as $pid => $pdata) {
     $_cf_providers_js[] = [
         'id'            => $pid,
         'label'         => $pdata['label'],
-        'opensource'    => $pdata['opensource'],
+        'opensource'    => !empty($pdata['opensource']),
         'default_model' => $pdata['default_model'],
         'models'        => $models,
     ];
@@ -1031,9 +1023,9 @@ $page_scripts .= <<<'PAGEJS'
       if (hasValidSaved) sel.value = saved;
     }
     if (!hasValidSaved) {
-      const maybeOpenRouterProvider = CF_PROVIDERS.find(function (p) { return p.id === 'openrouter'; });
-      if (maybeOpenRouterProvider && maybeOpenRouterProvider.default_model) {
-        const preferred = 'openrouter:' + maybeOpenRouterProvider.default_model;
+      const maybeOpenAIProvider = CF_PROVIDERS.find(function (p) { return p.id === 'openai'; });
+      if (maybeOpenAIProvider && maybeOpenAIProvider.default_model) {
+        const preferred = 'openai:' + maybeOpenAIProvider.default_model;
         const preferredExists = Array.from(sel.options).some(function (o) { return o.value === preferred; });
         if (preferredExists) {
           sel.value = preferred;
