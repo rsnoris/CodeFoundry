@@ -18,7 +18,7 @@ $session_history_count = count(ChatStore::sessionsForUser($username));
 $user_managed_keys = [
     'OPENAI_API_KEY'     => ['label' => 'OpenAI',             'hint' => 'GPT-4o, GPT-4 Turbo, o1, o3 models',                                      'icon' => 'lucide:zap',      'docs_url' => 'https://platform.openai.com/api-keys'],
     'GROQ_API_KEY'       => ['label' => 'Groq',               'hint' => 'Ultra-fast inference for Llama, Mixtral, Gemma',                           'icon' => 'lucide:cpu',      'docs_url' => 'https://console.groq.com/keys'],
-    'OPENROUTER_API_KEY' => ['label' => 'OpenRouter',         'hint' => 'Multi-model routing — includes Amazon Nova, Claude, Gemini, and open models', 'icon' => 'lucide:route',    'docs_url' => 'https://openrouter.ai/keys'],
+    'OPENROUTER_API_KEY' => ['label' => 'OpenRouter',         'hint' => 'Multi-model routing with one key (alternative to direct provider keys)',     'icon' => 'lucide:route',    'docs_url' => 'https://openrouter.ai/keys'],
     'HF_API_KEY'         => ['label' => 'Hugging Face',       'hint' => 'Inference API for open-source models',                                    'icon' => 'lucide:box',      'docs_url' => 'https://huggingface.co/settings/tokens'],
     'TOGETHER_API_KEY'   => ['label' => 'Together AI',        'hint' => 'Hosted open models (Llama, Qwen, Mixtral, and more)',                     'icon' => 'lucide:layers',   'docs_url' => 'https://api.together.xyz/settings/api-keys'],
     'ANTHROPIC_API_KEY'  => ['label' => 'Anthropic (Claude)', 'hint' => 'Claude 3 Haiku, Sonnet, Opus',                                             'icon' => 'lucide:brain',    'docs_url' => 'https://console.anthropic.com/settings/keys'],

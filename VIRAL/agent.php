@@ -885,11 +885,10 @@ $page_scripts = <<<PAGEJS
       modelSelect.value = '';
     }
     if (modelHelp) {
-      const uniqueMissing = Array.from(new Set(missingKeys));
       if (!enabledOptions.length) {
-        modelHelp.textContent = 'No provider keys configured yet. Add keys in Dashboard → Account to enable OpenRouter, Hugging Face, Gemini, Claude, Amazon, and other model families.';
-      } else if (uniqueMissing.length) {
-        modelHelp.textContent = 'More providers available after adding keys in Dashboard → Account: ' + uniqueMissing.join(', ') + '.';
+        modelHelp.textContent = 'No provider keys configured yet. Add keys in Dashboard → Account to enable additional providers and model families.';
+      } else if (missingKeys.length) {
+        modelHelp.textContent = 'More providers can be enabled by adding keys in Dashboard → Account.';
       }
     }
     modelSelect.addEventListener('change', function () {
