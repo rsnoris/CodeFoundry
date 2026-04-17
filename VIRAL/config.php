@@ -113,8 +113,8 @@ if (!defined('VIRAL_MODEL_RECOMMENDATIONS')) {
             'task_group' => 'Tabular',
             'quality'    => 'o3-mini',
             'balanced'   => 'gpt-4o-mini',
-            'efficient'  => 'gpt-3.5-turbo',
-            'note'       => 'o3-mini is strongest for step-by-step quantitative reasoning; 3.5 is cheapest for simple summaries.',
+            'efficient'  => 'gpt-4o-mini',
+            'note'       => 'o3-mini is strongest for step-by-step quantitative reasoning; use 4o-mini for lower token cost on routine workloads.',
         ],
         [
             'task_group' => 'Reinforcement Learning',
@@ -127,7 +127,7 @@ if (!defined('VIRAL_MODEL_RECOMMENDATIONS')) {
             'task_group' => 'Other',
             'quality'    => 'o3-mini',
             'balanced'   => 'gpt-4o-mini',
-            'efficient'  => 'gpt-3.5-turbo',
+            'efficient'  => 'gpt-4o-mini',
             'note'       => 'Graph and specialist analytical tasks often perform best with reasoning-focused models.',
         ],
     ]);

@@ -339,15 +339,17 @@ foreach (VIRAL_AGENTS as $slug => $a) {
     ];
 }
 
-$categories = array_values(array_unique(array_column(array_values(VIRAL_AGENTS), 'category')));
-natcasesort($categories);
-$categories = array_values($categories);
+$agentRegistryValues = array_values(VIRAL_AGENTS);
+$categories = array_column($agentRegistryValues, 'category');
+$categories = array_values(array_filter($categories, static fn($cat): bool => is_string($cat) && trim($cat) !== ''));
+$categories = array_values(array_unique($categories));
+sort($categories, SORT_NATURAL | SORT_FLAG_CASE);
 array_unshift($categories, 'All');
 
-$taskCategoryGroups = defined('VIRAL_TASK_CATEGORY_GROUPS') ? VIRAL_TASK_CATEGORY_GROUPS : [];
-$modelGuide         = defined('VIRAL_MODEL_RECOMMENDATIONS') ? VIRAL_MODEL_RECOMMENDATIONS : [];
+$taskCategoryGroups = VIRAL_TASK_CATEGORY_GROUPS;
+$modelGuide         = VIRAL_MODEL_RECOMMENDATIONS;
 $agentCount      = count(VIRAL_AGENTS);
-$categoryCount   = count(array_unique(array_column(array_values(VIRAL_AGENTS), 'category')));
+$categoryCount   = count(array_unique(array_column($agentRegistryValues, 'category')));
 
 require_once dirname(__DIR__) . '/includes/header.php';
 ?>
@@ -427,7 +429,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
     <section class="viral-panel">
       <h2>Model Selection Recommendations</h2>
-      <p>Choose by priority: highest output quality, best quality/performance balance, or lowest token/cost usage for your task category.</p>
+      <p>Choose by priority: highest output quality, best quality / performance balance, or lowest token/cost usage for your task category.</p>
       <div class="model-guide-wrap">
         <table class="model-guide">
           <thead>
