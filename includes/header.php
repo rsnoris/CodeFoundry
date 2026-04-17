@@ -49,11 +49,10 @@ function cf_active(string $id): string {
       CodeFoundry
     </a>
     <nav class="nav-menu">
-      <a href="/#services"    class="nav-link<?= cf_active('services') ?>">Services</a>
       <a href="/#solutions"   class="nav-link<?= cf_active('solutions') ?>">Solutions</a>
+      <a href="/#services"    class="nav-link<?= cf_active('services') ?>">Services</a>
       <a href="/#industries"  class="nav-link<?= cf_active('industries') ?>">Industries</a>
       <a href="/CaseStudies/" class="nav-link<?= cf_active('case-studies') ?>">Case Studies</a>
-      <a href="/Training/"    class="nav-link<?= cf_active('training') ?>">Training</a>
       <?php if ($_cf_user): ?>
       <a href="/VIRAL/"       class="nav-link<?= cf_active('viral') ?>">VIRAL Agents</a>
       <a href="/Tools/"       class="nav-link<?= cf_active('tools') ?>">Tools</a>
@@ -109,11 +108,10 @@ function cf_active(string $id): string {
         <iconify-icon icon="lucide:x"></iconify-icon>
       </button>
       <div class="mobile-menu-links">
-        <a href="/#services"    class="nav-link" onclick="closeMobileNav()">Services</a>
         <a href="/#solutions"   class="nav-link" onclick="closeMobileNav()">Solutions</a>
+        <a href="/#services"    class="nav-link" onclick="closeMobileNav()">Services</a>
         <a href="/#industries"  class="nav-link" onclick="closeMobileNav()">Industries</a>
         <a href="/CaseStudies/" class="nav-link" onclick="closeMobileNav()">Case Studies</a>
-        <a href="/Training/"    class="nav-link" onclick="closeMobileNav()">Training</a>
         <?php if ($_cf_user): ?>
         <a href="/VIRAL/"       class="nav-link" onclick="closeMobileNav()">VIRAL Agents</a>
         <a href="/Tools/"       class="nav-link" onclick="closeMobileNav()">Tools</a>
