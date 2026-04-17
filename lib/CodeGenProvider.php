@@ -125,11 +125,33 @@ class CodeGenProvider
      */
     public static function candidateProviderIds(string $preferredProviderId = ''): array
     {
-        if ($preferredProviderId !== '' && self::isProviderAvailable($preferredProviderId)) {
-            return [$preferredProviderId];
+        $available = [];
+        foreach (CF_CODEGEN_PROVIDERS as $id => $cfg) {
+            if (self::isAvailable($cfg)) {
+                $available[] = $id;
+            }
         }
+        if (empty($available)) {
+            return [];
+        }
+
+        $ordered = [];
+        if ($preferredProviderId !== '' && in_array($preferredProviderId, $available, true)) {
+            $ordered[] = $preferredProviderId;
+        }
+
         $defaultProvider = self::defaultProviderId();
-        return $defaultProvider !== '' ? [$defaultProvider] : [];
+        if ($defaultProvider !== '' && !in_array($defaultProvider, $ordered, true) && in_array($defaultProvider, $available, true)) {
+            $ordered[] = $defaultProvider;
+        }
+
+        foreach ($available as $id) {
+            if (!in_array($id, $ordered, true)) {
+                $ordered[] = $id;
+            }
+        }
+
+        return $ordered;
     }
 
     /**

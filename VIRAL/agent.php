@@ -29,7 +29,6 @@ $expandedRoleSlugsJson = json_encode(array_keys(VIRAL_AGENTS));
 
 $_cf_providers_js = [];
 foreach (CodeGenProvider::all() as $pid => $pdata) {
-    if (!$pdata['available']) continue;
     $models = [];
     foreach ($pdata['models'] as $m) {
         $models[] = ['id' => $m['id'], 'label' => $m['label']];
@@ -37,6 +36,9 @@ foreach (CodeGenProvider::all() as $pid => $pdata) {
     $_cf_providers_js[] = [
         'id'            => $pid,
         'label'         => $pdata['label'],
+        'available'     => (bool)($pdata['available'] ?? false),
+        'api_key_env'   => (string)($pdata['api_key_env'] ?? ''),
+        'no_api_key'    => !empty($pdata['no_api_key']),
         'default_model' => $pdata['default_model'],
         'models'        => $models,
     ];
@@ -604,6 +606,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
             <select id="viralModelSelect" aria-label="AI model">
               <option value="">Loading models…</option>
             </select>
+            <div id="viralModelHelp" style="font-size:11px;color:var(--text-subtle);margin-top:6px;">Configure provider API keys in Dashboard → Account to enable all model families.</div>
           </div>
           <div class="agent-selection-field">
             <label for="viralTaskCategorySelect">Task Category</label>
@@ -820,6 +823,7 @@ $page_scripts = <<<PAGEJS
   const mobileSidebarBtn = document.getElementById('mobileSidebarBtn');
   const modelField    = document.getElementById('viralModelField');
   const modelSelect   = document.getElementById('viralModelSelect');
+  const modelHelp     = document.getElementById('viralModelHelp');
   const taskCategorySelect = document.getElementById('viralTaskCategorySelect');
   const taskSelect    = document.getElementById('viralTaskSelect');
   const examplesPanel = document.getElementById('examplesPanel');
@@ -842,18 +846,24 @@ $page_scripts = <<<PAGEJS
       return;
     }
     modelSelect.innerHTML = '';
+    const missingKeys = [];
     CF_PROVIDERS.forEach(function (p) {
       const group = document.createElement('optgroup');
-      group.label = p.label;
+      group.label = p.available ? p.label : (p.label + ' (setup required)');
+      if (!p.available && p.api_key_env) {
+        missingKeys.push(p.api_key_env);
+      }
       (p.models || []).forEach(function (m) {
         const opt = document.createElement('option');
         opt.value = p.id + ':' + m.id;
-        opt.textContent = m.label;
+        opt.textContent = p.available ? m.label : (m.label + ' (set key in Account)');
+        opt.disabled = !p.available;
         group.appendChild(opt);
       });
       modelSelect.appendChild(group);
     });
-    const optionValues = Array.from(modelSelect.options).map(function (o) { return o.value; });
+    const enabledOptions = Array.from(modelSelect.options).filter(function (o) { return !o.disabled; });
+    const optionValues = enabledOptions.map(function (o) { return o.value; });
     const saved = localStorage.getItem('cf_viral_ai_model');
     let hasValidSaved = false;
     if (saved) {
@@ -866,6 +876,20 @@ $page_scripts = <<<PAGEJS
         const preferred = preferredProvider.id + ':' + preferredProvider.default_model;
         const preferredExists = optionValues.indexOf(preferred) !== -1;
         if (preferredExists) modelSelect.value = preferred;
+      } else if (enabledOptions.length) {
+        modelSelect.value = enabledOptions[0].value;
+      }
+    }
+    if (!enabledOptions.length) {
+      modelSelect.disabled = true;
+      modelSelect.value = '';
+    }
+    if (modelHelp) {
+      const uniqueMissing = Array.from(new Set(missingKeys));
+      if (!enabledOptions.length) {
+        modelHelp.textContent = 'No provider keys configured yet. Add keys in Dashboard → Account to enable OpenRouter, Hugging Face, Gemini, Claude, Amazon, and other model families.';
+      } else if (uniqueMissing.length) {
+        modelHelp.textContent = 'More providers available after adding keys in Dashboard → Account: ' + uniqueMissing.join(', ') + '.';
       }
     }
     modelSelect.addEventListener('change', function () {
