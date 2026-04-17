@@ -113,6 +113,7 @@ class CodeGenProvider
      * Return ordered candidate providers for the current request context.
      * In OpenAI-only mode this always resolves to OpenAI when available.
      *
+     * @param string $preferredProviderId Preferred provider id when explicitly requested.
      * @return array<int,string>
      */
     public static function candidateProviderIds(string $preferredProviderId = ''): array
