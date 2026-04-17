@@ -8,6 +8,7 @@ session_start();
 
 $error = '';
 $flash = '';
+$maxOtpAttempts = 5;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', (string)$_POST['csrf_token'])) {
@@ -43,7 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $attempts = (int)($user['password_reset_attempts'] ?? 0);
 
-                if ($username !== '' && $otpHash !== '' && $expiresTimestamp !== false && $expiresTimestamp >= time() && $attempts < 5) {
+                $hasOtpData = $username !== '' && $otpHash !== '';
+                $isNotExpired = $expiresTimestamp !== false && $expiresTimestamp >= time();
+                $hasAttemptsRemaining = $attempts < $maxOtpAttempts;
+
+                if ($hasOtpData && $isNotExpired && $hasAttemptsRemaining) {
                     if (password_verify($otp, $otpHash)) {
                         UserStore::updateUser($username, [
                             'password_hash'              => password_hash($newPw, PASSWORD_BCRYPT),
@@ -60,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         UserStore::updateUser($username, [
                             'password_reset_attempts' => $attempts,
                         ]);
-                        if ($attempts >= 5) {
+                        if ($attempts >= $maxOtpAttempts) {
                             UserStore::updateUser($username, [
                                 'password_reset_otp_hash'    => '',
                                 'password_reset_expires_at'  => '',

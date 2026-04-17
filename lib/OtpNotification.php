@@ -9,14 +9,13 @@ declare(strict_types=1);
  */
 class OtpNotification
 {
+    private const API_TIMEOUT_SECONDS_DEFAULT = 12;
+    private const API_CONNECT_TIMEOUT_SECONDS_DEFAULT = 6;
+
     public static function generateOtp(int $length = 6): string
     {
         $length = max(4, min(8, $length));
-        $otp = '';
-        for ($i = 0; $i < $length; $i++) {
-            $otp .= (string)random_int(0, 9);
-        }
-        return $otp;
+        return str_pad((string)random_int(0, (10 ** $length) - 1), $length, '0', STR_PAD_LEFT);
     }
 
     public static function sendPasswordResetOtp(string $email, string $displayName, string $otp): bool
@@ -77,8 +76,8 @@ class OtpNotification
                 'Content-Type: application/json',
                 'Authorization: Bearer ' . $apiKey,
             ],
-            CURLOPT_TIMEOUT => 12,
-            CURLOPT_CONNECTTIMEOUT => 6,
+            CURLOPT_TIMEOUT => self::API_TIMEOUT_SECONDS_DEFAULT,
+            CURLOPT_CONNECTTIMEOUT => self::API_CONNECT_TIMEOUT_SECONDS_DEFAULT,
         ]);
 
         $response = curl_exec($ch);
@@ -101,6 +100,6 @@ class OtpNotification
             'Content-Type: text/plain; charset=UTF-8',
         ];
 
-        return @mail($email, $subject, $body, implode("\r\n", $headers));
+        return mail($email, $subject, $body, implode("\r\n", $headers));
     }
 }
