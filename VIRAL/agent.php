@@ -44,6 +44,18 @@ foreach (CodeGenProvider::all() as $pid => $pdata) {
 $providersJson      = json_encode($_cf_providers_js, JSON_UNESCAPED_UNICODE);
 $taskGroupsJson     = json_encode(VIRAL_TASK_CATEGORY_GROUPS, JSON_UNESCAPED_UNICODE);
 
+// Build lightweight agent list for the sidebar navigator
+$_cf_nav_agents = [];
+foreach (VIRAL_AGENTS as $slug => $a) {
+    $_cf_nav_agents[] = [
+        'slug'     => $slug,
+        'label'    => $a['label'],
+        'category' => $a['category'],
+        'icon'     => $a['icon'],
+    ];
+}
+$viralNavAgentsJson = json_encode($_cf_nav_agents, JSON_UNESCAPED_UNICODE);
+
 $page_title  = $agentLabel . ' Agent – CodeFoundry VIRAL';
 $active_page = 'viral';
 $page_styles = <<<PAGECSS
@@ -215,7 +227,6 @@ $page_styles = <<<PAGECSS
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
-    margin-top: 2px;
   }
   .agent-selection-field {
     display: flex;
@@ -335,6 +346,55 @@ $page_styles = <<<PAGECSS
   .chip:hover { border-color: var(--accent); color: var(--accent); }
 
   /* ── Mobile ──────────────────────────────────────────────────────────── */
+  /* ── Settings toggle + collapsible dropdowns ─────────────────────────── */
+  .settings-wrap { margin-top: 2px; }
+  .settings-toggle {
+    display: flex; align-items: center; gap: 8px; width: 100%;
+    background: #0d1626; border: 1px solid #1e2e48;
+    color: var(--text-muted); border-radius: 10px;
+    padding: 9px 14px; font-size: 12.5px; font-family: inherit;
+    cursor: pointer; transition: border-color .2s, color .2s;
+  }
+  .settings-toggle:hover  { border-color: var(--accent)66; color: var(--text); }
+  .settings-toggle.open   { border-color: var(--accent)66; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+  .settings-toggle iconify-icon { font-size: 15px; flex-shrink: 0; }
+  .settings-caret { margin-left: auto; transition: transform .25s; font-size: 14px !important; }
+  .settings-toggle.open .settings-caret { transform: rotate(180deg); }
+  .settings-summary-pill {
+    font-size: 11px; color: #4a5e7a; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; flex: 1; text-align: right; padding-right: 4px;
+  }
+  .agent-selection {
+    border: 1px solid #1e2e48; border-top: none;
+    border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;
+    padding: 12px;
+  }
+
+  /* ── Agent nav sidebar ────────────────────────────────────────────────── */
+  .agent-nav-category { border-bottom: 1px solid #111d30; }
+  .agent-nav-cat-btn {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; background: none; border: none;
+    padding: 8px 14px; color: #627193;
+    font-size: 10.5px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; cursor: pointer; font-family: inherit;
+    transition: color .15s;
+  }
+  .agent-nav-cat-btn:hover { color: var(--text); }
+  .agent-nav-cat-caret { transition: transform .2s; font-size: 12px !important; }
+  .agent-nav-category.open .agent-nav-cat-caret { transform: rotate(180deg); }
+  .agent-nav-items { display: none; }
+  .agent-nav-category.open .agent-nav-items { display: block; }
+  .agent-nav-item {
+    display: flex; align-items: center; gap: 7px;
+    padding: 5px 14px 5px 22px; font-size: 12px; color: #7a8eaa;
+    text-decoration: none; transition: background .12s, color .12s;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .agent-nav-item:hover { background: #0d1626; color: var(--text); }
+  .agent-nav-item.active { color: var(--accent); background: var(--accent)0c; font-weight: 600; }
+  .agent-nav-item iconify-icon { font-size: 12px !important; flex-shrink: 0; }
+
   @media (max-width: 900px) {
     .viral-layout { flex-direction: column; height: auto; min-height: calc(100vh - var(--header-height)); }
     .prompt-sidebar  { width: 100% !important; border-right: none; border-bottom: 1px solid var(--border-color); max-height: 260px; }
@@ -358,21 +418,21 @@ require_once dirname(__DIR__) . '/includes/header.php';
 <main>
   <div class="viral-layout">
 
-    <!-- ── Prompt Sidebar ─────────────────────────────────────────────── -->
+    <!-- ── Agent Navigator Sidebar ───────────────────────────────────────── -->
     <aside class="prompt-sidebar" id="promptSidebar">
-      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle prompt sidebar" aria-expanded="true">
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle agent sidebar" aria-expanded="true">
         <iconify-icon icon="lucide:chevron-left" id="sidebarToggleIcon"></iconify-icon>
       </button>
       <div class="sidebar-header">
-        <span class="sidebar-title">Prompt Examples</span>
+        <span class="sidebar-title">VIRAL Agents</span>
       </div>
       <div class="sidebar-search">
-        <input type="text" id="promptSearch" placeholder="Search prompts…" autocomplete="off">
+        <input type="text" id="promptSearch" placeholder="Search agents…" autocomplete="off">
       </div>
       <div class="prompt-list" id="promptList"></div>
       <div class="prompt-count" id="promptCount"></div>
     </aside>
-    <button class="sidebar-reopen" id="sidebarReopen" type="button" aria-label="Reopen prompt sidebar">
+    <button class="sidebar-reopen" id="sidebarReopen" type="button" aria-label="Reopen agent sidebar">
       <iconify-icon icon="lucide:panel-left-open"></iconify-icon>
     </button>
 
@@ -381,8 +441,8 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
       <div>
         <button class="chip mobile-sidebar-btn" id="mobileSidebarBtn" style="display:none;margin-bottom:8px;">
-          <iconify-icon icon="lucide:list" style="font-size:13px;margin-right:4px;"></iconify-icon>
-          Prompt Examples
+          <iconify-icon icon="lucide:layout-grid" style="font-size:13px;margin-right:4px;"></iconify-icon>
+          All Agents
         </button>
         <a href="/VIRAL/" class="back-link">
           <iconify-icon icon="lucide:arrow-left"></iconify-icon>
@@ -400,24 +460,33 @@ require_once dirname(__DIR__) . '/includes/header.php';
         </div>
       </div>
 
-      <div class="agent-selection">
-        <div class="agent-selection-field" id="viralModelField">
-          <label for="viralModelSelect">AI Model</label>
-          <select id="viralModelSelect" aria-label="AI model">
-            <option value="">Loading models…</option>
-          </select>
-        </div>
-        <div class="agent-selection-field">
-          <label for="viralTaskCategorySelect">Task Category</label>
-          <select id="viralTaskCategorySelect" aria-label="Task category">
-            <option value="">Any category</option>
-          </select>
-        </div>
-        <div class="agent-selection-field">
-          <label for="viralTaskSelect">Task Type</label>
-          <select id="viralTaskSelect" aria-label="Task type">
-            <option value="">Any task type</option>
-          </select>
+      <!-- Collapsible AI settings (model + task selectors) -->
+      <div class="settings-wrap">
+        <button class="settings-toggle" id="settingsToggle" type="button">
+          <iconify-icon icon="lucide:sliders-horizontal"></iconify-icon>
+          AI Settings
+          <span class="settings-summary-pill" id="settingsSummary"></span>
+          <iconify-icon icon="lucide:chevron-down" class="settings-caret"></iconify-icon>
+        </button>
+        <div class="agent-selection" id="agentSelection" style="display:none;">
+          <div class="agent-selection-field" id="viralModelField">
+            <label for="viralModelSelect">AI Model</label>
+            <select id="viralModelSelect" aria-label="AI model">
+              <option value="">Loading models…</option>
+            </select>
+          </div>
+          <div class="agent-selection-field">
+            <label for="viralTaskCategorySelect">Task Category</label>
+            <select id="viralTaskCategorySelect" aria-label="Task category">
+              <option value="">Any category</option>
+            </select>
+          </div>
+          <div class="agent-selection-field">
+            <label for="viralTaskSelect">Task Type</label>
+            <select id="viralTaskSelect" aria-label="Task type">
+              <option value="">Any task type</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -466,6 +535,7 @@ $page_scripts = <<<PAGEJS
   const EXPANDED_ROLE_SLUGS = {$expandedRoleSlugsJson};
   const CF_PROVIDERS = {$providersJson};
   const VIRAL_TASK_GROUPS = {$taskGroupsJson};
+  const ALL_AGENTS = {$viralNavAgentsJson};
   const MAX_PROMPTS_PER_EXPANDED_ROLE = 64;
   const SUGGESTION_CHIP_COUNT = 8;
 
@@ -605,6 +675,9 @@ $page_scripts = <<<PAGEJS
   const modelSelect   = document.getElementById('viralModelSelect');
   const taskCategorySelect = document.getElementById('viralTaskCategorySelect');
   const taskSelect    = document.getElementById('viralTaskSelect');
+  const settingsToggle = document.getElementById('settingsToggle');
+  const agentSelection = document.getElementById('agentSelection');
+  const settingsSummary = document.getElementById('settingsSummary');
   const rolePrompts   = buildPromptsForRole(ROLE);
   let history = [];
   let busy    = false;
@@ -643,6 +716,7 @@ $page_scripts = <<<PAGEJS
     }
     modelSelect.addEventListener('change', function () {
       localStorage.setItem('cf_viral_ai_model', modelSelect.value);
+      updateSettingsSummary();
     });
   }
 
@@ -669,9 +743,11 @@ $page_scripts = <<<PAGEJS
     taskCategorySelect.addEventListener('change', function () {
       localStorage.setItem('cf_viral_task_category', this.value || '');
       populateTasksForCategory(this.value || '');
+      updateSettingsSummary();
     });
     taskSelect.addEventListener('change', function () {
       localStorage.setItem('cf_viral_task', this.value || '');
+      updateSettingsSummary();
     });
   }
 
@@ -706,6 +782,7 @@ $page_scripts = <<<PAGEJS
 
   populateModelSelector();
   populateTaskCategories();
+  updateSettingsSummary();
 
   // Render suggestion chips
   const chips = rolePrompts.slice(0, SUGGESTION_CHIP_COUNT);
@@ -735,36 +812,85 @@ $page_scripts = <<<PAGEJS
     }
   }
 
-  function renderPromptList(searchTerm) {
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function updateSettingsSummary() {
+    if (!settingsSummary) return;
+    const modelLabel = modelSelect && modelSelect.selectedIndex >= 0
+      ? (modelSelect.options[modelSelect.selectedIndex] ? modelSelect.options[modelSelect.selectedIndex].textContent : '')
+      : '';
+    const catVal = taskCategorySelect ? (taskCategorySelect.value || '') : '';
+    const parts = [modelLabel, catVal].filter(Boolean);
+    settingsSummary.textContent = parts.length ? parts.join(' · ') : '';
+  }
+
+  function renderAgentNav(searchTerm) {
     if (!promptList || !promptCount) return;
     const term = String(searchTerm || '').toLowerCase().trim();
     promptList.innerHTML = '';
-    let visible = 0;
 
-    rolePrompts.forEach(function (text) {
-      if (term && text.toLowerCase().indexOf(term) === -1) return;
-      visible += 1;
-      const item = document.createElement('button');
-      item.type = 'button';
-      item.className = 'prompt-item';
-      item.textContent = text;
-      item.addEventListener('click', function () {
-        chatInput.value = text;
-        chatInput.dispatchEvent(new Event('input'));
-        chatInput.focus();
-      });
-      promptList.appendChild(item);
+    // Group agents by category
+    var grouped = {};
+    ALL_AGENTS.forEach(function (a) {
+      if (!grouped[a.category]) grouped[a.category] = [];
+      grouped[a.category].push(a);
     });
 
-    promptCount.textContent = visible + ' of ' + rolePrompts.length + ' prompts';
+    var sortedCats = Object.keys(grouped).sort(function (a, b) { return a.localeCompare(b); });
+    var totalVisible = 0;
+
+    sortedCats.forEach(function (cat) {
+      var agents = grouped[cat].filter(function (a) {
+        if (!term) return true;
+        return a.label.toLowerCase().indexOf(term) !== -1 || a.category.toLowerCase().indexOf(term) !== -1;
+      });
+      if (!agents.length) return;
+      totalVisible += agents.length;
+
+      var isCurrentCat = agents.some(function (a) { return a.slug === ROLE; });
+
+      var catDiv = document.createElement('div');
+      catDiv.className = 'agent-nav-category' + (isCurrentCat || term ? ' open' : '');
+
+      var catBtn = document.createElement('button');
+      catBtn.type = 'button';
+      catBtn.className = 'agent-nav-cat-btn';
+      catBtn.innerHTML = escapeHtml(cat) +
+        '<iconify-icon icon="lucide:chevron-down" class="agent-nav-cat-caret"></iconify-icon>';
+      catBtn.addEventListener('click', function () { catDiv.classList.toggle('open'); });
+
+      var itemsDiv = document.createElement('div');
+      itemsDiv.className = 'agent-nav-items';
+
+      agents.forEach(function (a) {
+        var link = document.createElement('a');
+        link.href = '/VIRAL/agent.php?role=' + encodeURIComponent(a.slug);
+        link.className = 'agent-nav-item' + (a.slug === ROLE ? ' active' : '');
+        link.innerHTML = '<iconify-icon icon="' + escapeHtml(a.icon) + '"></iconify-icon>'
+          + escapeHtml(a.label);
+        itemsDiv.appendChild(link);
+      });
+
+      catDiv.appendChild(catBtn);
+      catDiv.appendChild(itemsDiv);
+      promptList.appendChild(catDiv);
+    });
+
+    promptCount.textContent = totalVisible + ' agents';
   }
 
-  renderPromptList('');
+  renderAgentNav('');
   updateSidebarIcon();
 
   if (promptSearch) {
     promptSearch.addEventListener('input', function () {
-      renderPromptList(this.value);
+      renderAgentNav(this.value);
     });
   }
 
@@ -791,6 +917,13 @@ $page_scripts = <<<PAGEJS
       promptSidebar.classList.remove('collapsed');
       updateSidebarIcon();
       if (promptSearch) promptSearch.focus();
+    });
+  }
+
+  if (settingsToggle && agentSelection) {
+    settingsToggle.addEventListener('click', function () {
+      var isOpen = settingsToggle.classList.toggle('open');
+      agentSelection.style.display = isOpen ? 'grid' : 'none';
     });
   }
 
