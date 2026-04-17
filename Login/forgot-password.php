@@ -25,7 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($user !== null) {
                 $username = (string)($user['username'] ?? '');
                 $email    = trim((string)($user['email'] ?? ''));
-                $lastSent = strtotime((string)($user['password_reset_requested_at'] ?? ''));
+                $lastSent = false;
+                $lastSentRaw = (string)($user['password_reset_requested_at'] ?? '');
+                if ($lastSentRaw !== '') {
+                    $lastSentDt = date_create_immutable($lastSentRaw);
+                    if ($lastSentDt !== false) {
+                        $lastSent = $lastSentDt->getTimestamp();
+                    }
+                }
 
                 if (
                     $username !== '' &&
@@ -117,4 +124,3 @@ require_once dirname(__DIR__) . '/includes/header.php';
 </main>
 
 <?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
-

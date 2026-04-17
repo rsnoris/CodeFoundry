@@ -90,7 +90,10 @@ class OtpNotification
 
     private static function sendViaPhpMail(string $email, string $subject, string $body): bool
     {
-        $from = defined('CF_SITE_EMAIL') ? CF_SITE_EMAIL : 'no-reply@localhost';
+        $from = defined('CF_SITE_EMAIL') ? trim((string)CF_SITE_EMAIL) : '';
+        if (!filter_var($from, FILTER_VALIDATE_EMAIL)) {
+            return false;
+        }
         $headers = [
             'From: ' . $from,
             'Reply-To: ' . $from,
@@ -100,4 +103,3 @@ class OtpNotification
         return @mail($email, $subject, $body, implode("\r\n", $headers));
     }
 }
-

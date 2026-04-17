@@ -33,7 +33,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($user !== null) {
                 $username = (string)($user['username'] ?? '');
                 $otpHash  = (string)($user['password_reset_otp_hash'] ?? '');
-                $expires  = strtotime((string)($user['password_reset_expires_at'] ?? ''));
+                $expires = false;
+                $expiresRaw = (string)($user['password_reset_expires_at'] ?? '');
+                if ($expiresRaw !== '') {
+                    $expiresDt = date_create_immutable($expiresRaw);
+                    if ($expiresDt !== false) {
+                        $expires = $expiresDt->getTimestamp();
+                    }
+                }
                 $attempts = (int)($user['password_reset_attempts'] ?? 0);
 
                 if ($username !== '' && $otpHash !== '' && $expires !== false && $expires >= time() && $attempts < 5) {
@@ -145,4 +152,3 @@ require_once dirname(__DIR__) . '/includes/header.php';
 </main>
 
 <?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
-
