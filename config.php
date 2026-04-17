@@ -216,6 +216,22 @@ define('CF_CODEGEN_PROVIDERS', [
         ],
         'default_model' => 'openai/gpt-4o-mini',
     ],
+    'amazon' => [
+        'label'         => 'Amazon (Nova via OpenRouter)',
+        'api_url'       => 'https://openrouter.ai/api/v1/chat/completions',
+        'api_key_env'   => 'OPENROUTER_API_KEY',
+        'format'        => 'openai',
+        'extra_headers' => [
+            'HTTP-Referer: https://codefoundry.cloud',
+            'X-Title: CodeFoundry',
+        ],
+        'models'        => [
+            ['id' => 'amazon/nova-lite-v1', 'label' => 'Amazon Nova Lite'],
+            ['id' => 'amazon/nova-micro-v1', 'label' => 'Amazon Nova Micro'],
+            ['id' => 'amazon/nova-pro-v1', 'label' => 'Amazon Nova Pro'],
+        ],
+        'default_model' => 'amazon/nova-lite-v1',
+    ],
     'huggingface' => [
         'label'         => 'Hugging Face',
         'api_url'       => 'https://router.huggingface.co/v1/chat/completions',

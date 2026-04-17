@@ -16,14 +16,14 @@ $token_history_count = count(UserStore::tokenHistoryForUser($username, 1000));
 $payment_history_count = count(UserStore::paymentsForUser($username));
 $session_history_count = count(ChatStore::sessionsForUser($username));
 $user_managed_keys = [
-    'OPENAI_API_KEY'     => ['label' => 'OpenAI',             'hint' => 'GPT-4o, GPT-4 Turbo, o1, o3 models',                          'icon' => 'lucide:zap'],
-    'GROQ_API_KEY'       => ['label' => 'Groq',               'hint' => 'Ultra-fast inference for Llama, Mixtral, Gemma',               'icon' => 'lucide:cpu'],
-    'OPENROUTER_API_KEY' => ['label' => 'OpenRouter',         'hint' => 'Multi-model routing — free & paid models',                    'icon' => 'lucide:route'],
-    'HF_API_KEY'         => ['label' => 'Hugging Face',       'hint' => 'Inference API for open-source models',                        'icon' => 'lucide:box'],
-    'TOGETHER_API_KEY'   => ['label' => 'Together AI',        'hint' => 'Scalable hosted open-source model inference',                 'icon' => 'lucide:layers'],
-    'ANTHROPIC_API_KEY'  => ['label' => 'Anthropic (Claude)', 'hint' => 'Claude 3 Haiku, Sonnet, Opus',                                 'icon' => 'lucide:brain'],
-    'GEMINI_API_KEY'     => ['label' => 'Google Gemini',      'hint' => 'Gemini Pro, Gemini Flash models',                             'icon' => 'lucide:sparkles'],
-    'OLLAMA_URL'         => ['label' => 'Ollama (URL)',       'hint' => 'Self-hosted Ollama server URL, e.g. http://localhost:11434',  'icon' => 'lucide:server', 'is_url' => true],
+    'OPENAI_API_KEY'     => ['label' => 'OpenAI',             'hint' => 'GPT-4o, GPT-4 Turbo, o1, o3 models',                                      'icon' => 'lucide:zap',      'docs_url' => 'https://platform.openai.com/api-keys'],
+    'GROQ_API_KEY'       => ['label' => 'Groq',               'hint' => 'Ultra-fast inference for Llama, Mixtral, Gemma',                           'icon' => 'lucide:cpu',      'docs_url' => 'https://console.groq.com/keys'],
+    'OPENROUTER_API_KEY' => ['label' => 'OpenRouter',         'hint' => 'Multi-model routing with one key (alternative to direct provider keys)',     'icon' => 'lucide:route',    'docs_url' => 'https://openrouter.ai/keys'],
+    'HF_API_KEY'         => ['label' => 'Hugging Face',       'hint' => 'Inference API for open-source models',                                    'icon' => 'lucide:box',      'docs_url' => 'https://huggingface.co/settings/tokens'],
+    'TOGETHER_API_KEY'   => ['label' => 'Together AI',        'hint' => 'Hosted open models (Llama, Qwen, Mixtral, and more)',                     'icon' => 'lucide:layers',   'docs_url' => 'https://api.together.xyz/settings/api-keys'],
+    'ANTHROPIC_API_KEY'  => ['label' => 'Anthropic (Claude)', 'hint' => 'Claude 3 Haiku, Sonnet, Opus',                                             'icon' => 'lucide:brain',    'docs_url' => 'https://console.anthropic.com/settings/keys'],
+    'GEMINI_API_KEY'     => ['label' => 'Google Gemini',      'hint' => 'Gemini Pro, Gemini Flash models',                                         'icon' => 'lucide:sparkles', 'docs_url' => 'https://aistudio.google.com/app/apikey'],
+    'OLLAMA_URL'         => ['label' => 'Ollama (URL)',       'hint' => 'Self-hosted Ollama server URL, e.g. http://localhost:11434',              'icon' => 'lucide:server',   'is_url' => true, 'docs_url' => 'https://ollama.com/download'],
 ];
 
 // Generate CSRF token
@@ -261,6 +261,8 @@ $page_styles = <<<'CSS'
   .key-card-icon { width:34px; height:34px; background:rgba(24,179,255,.1); border:1px solid rgba(24,179,255,.2); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--primary); flex-shrink:0; }
   .key-card-title { font-size:13px; font-weight:700; color:var(--text); }
   .key-card-hint { font-size:11px; color:var(--text-subtle); margin-top:1px; }
+  .key-card-link { font-size:11px; color:var(--primary); text-decoration:none; }
+  .key-card-link:hover { text-decoration:underline; }
   .key-status-set { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:#4ade80; }
   .key-status-unset { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; color:var(--text-subtle); }
   .key-input { width:100%; background:var(--navy); border:1px solid var(--border-color); border-radius:6px; padding:8px 10px; color:var(--text); font-size:12px; outline:none; font-family:monospace; }
@@ -437,6 +439,11 @@ require_once dirname(dirname(__DIR__)) . '/includes/header.php';
               <div>
                 <div class="key-card-title"><?= cf_e($key_meta['label']) ?></div>
                 <div class="key-card-hint"><?= cf_e($key_meta['hint']) ?></div>
+                <?php if (!empty($key_meta['docs_url'])): ?>
+                  <a class="key-card-link" href="<?= cf_e((string)$key_meta['docs_url']) ?>" target="_blank" rel="noopener noreferrer">
+                    <?= $is_url ? 'Setup guide' : 'Get API key' ?>
+                  </a>
+                <?php endif; ?>
               </div>
             </div>
             <div>

@@ -9,7 +9,6 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
 // Provider list for the client-side model selector
 $_cf_providers_js = [];
 foreach (CodeGenProvider::all() as $pid => $pdata) {
-    if (!$pdata['available']) continue;
     $models = [];
     foreach ($pdata['models'] as $m) {
         $models[] = ['id' => $m['id'], 'label' => $m['label']];
@@ -17,6 +16,8 @@ foreach (CodeGenProvider::all() as $pid => $pdata) {
     $_cf_providers_js[] = [
         'id'            => $pid,
         'label'         => $pdata['label'],
+        'available'     => (bool)($pdata['available'] ?? false),
+        'api_key_env'   => (string)($pdata['api_key_env'] ?? ''),
         'default_model' => $pdata['default_model'],
         'models'        => $models,
     ];
@@ -761,9 +762,9 @@ require_once dirname(__DIR__) . '/includes/header.php';
             <select id="genModelSelect" class="gen-select gen-model-select" aria-label="AI model">
               <option value="">No AI providers configured</option>
             </select>
-            <span class="gen-model-hint">
+            <span class="gen-model-hint" id="genModelHelp">
               <iconify-icon icon="lucide:info"></iconify-icon>
-              ✦ = open-source / free tier
+              Configure provider API keys in Dashboard → Account to enable all model families.
             </span>
           </div>
         </div>
@@ -998,37 +999,57 @@ $page_scripts .= <<<'PAGEJS'
   /* ── Populate AI model selector ──────────────────────── */
   (function () {
     const sel = document.getElementById('genModelSelect');
+    const help = document.getElementById('genModelHelp');
     if (!sel || !CF_PROVIDERS.length) {
       const field = document.getElementById('genModelField');
       if (field) field.style.display = 'none';
       return;
     }
     sel.innerHTML = '';
+    const missingKeys = [];
     CF_PROVIDERS.forEach(function (p) {
       const group = document.createElement('optgroup');
-      group.label = p.label;
+      group.label = p.available ? p.label : (p.label + ' (setup required)');
+      if (!p.available && p.api_key_env) {
+        missingKeys.push(p.api_key_env);
+      }
       p.models.forEach(function (m) {
         const opt = document.createElement('option');
         opt.value       = p.id + ':' + m.id;
-        opt.textContent = m.label;
+        opt.textContent = p.available ? m.label : (m.label + ' (set key in Account)');
+        opt.disabled    = !p.available;
         group.appendChild(opt);
       });
       sel.appendChild(group);
     });
+    const enabledOptions = Array.from(sel.options).filter(function (o) { return !o.disabled; });
     const saved = localStorage.getItem('cf_ai_model');
     let hasValidSaved = false;
     if (saved) {
-      hasValidSaved = Array.from(sel.options).some(function (o) { return o.value === saved; });
+      hasValidSaved = enabledOptions.some(function (o) { return o.value === saved; });
       if (hasValidSaved) sel.value = saved;
     }
     if (!hasValidSaved) {
-      const openAIProvider = CF_PROVIDERS.find(function (p) { return p.id === 'openai'; });
-      if (openAIProvider && openAIProvider.default_model) {
-        const preferred = 'openai:' + openAIProvider.default_model;
-        const preferredExists = Array.from(sel.options).some(function (o) { return o.value === preferred; });
+      const preferredProvider = CF_PROVIDERS.find(function (p) { return p.available && p.default_model; });
+      if (preferredProvider && preferredProvider.default_model) {
+        const preferred = preferredProvider.id + ':' + preferredProvider.default_model;
+        const preferredExists = enabledOptions.some(function (o) { return o.value === preferred; });
         if (preferredExists) {
           sel.value = preferred;
         }
+      } else if (enabledOptions.length) {
+        sel.value = enabledOptions[0].value;
+      }
+    }
+    if (!enabledOptions.length) {
+      sel.disabled = true;
+      sel.value = '';
+    }
+    if (help) {
+      if (!enabledOptions.length) {
+        help.textContent = 'No provider keys configured yet. Add keys in Dashboard → Account to enable additional providers and model families.';
+      } else if (missingKeys.length) {
+        help.textContent = 'More providers can be enabled by adding keys in Dashboard → Account.';
       }
     }
     sel.addEventListener('change', function () {
