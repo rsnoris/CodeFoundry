@@ -73,6 +73,33 @@ class UserStore
     }
 
     /**
+     * Return a single user by email address (case-insensitive).
+     */
+    public static function findUserByEmail(string $email): ?array
+    {
+        $target = mb_strtolower(trim($email));
+        if ($target === '') {
+            return null;
+        }
+
+        foreach (CF_USERS as $u) {
+            $candidate = mb_strtolower(trim((string)($u['email'] ?? '')));
+            if ($candidate !== '' && $candidate === $target) {
+                return self::findUser((string)$u['username']);
+            }
+        }
+
+        foreach (self::allUsers() as $row) {
+            $candidate = mb_strtolower(trim((string)($row['email'] ?? '')));
+            if ($candidate !== '' && $candidate === $target) {
+                return self::findUser((string)($row['username'] ?? ''));
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Return true if a username is already taken (checks CF_USERS and data/users.json).
      */
     public static function usernameExists(string $username): bool
@@ -253,7 +280,7 @@ class UserStore
      */
     public static function updateUser(string $username, array $fields): bool
     {
-        $allowed = ['display', 'email', 'plan', 'tokens_used', 'password_hash', 'github_token', 'github_username', 'role', 'frozen', 'failed_login_attempts'];
+        $allowed = ['display', 'email', 'plan', 'tokens_used', 'password_hash', 'github_token', 'github_username', 'role', 'frozen', 'failed_login_attempts', 'password_reset_otp_hash', 'password_reset_expires_at', 'password_reset_attempts', 'password_reset_requested_at'];
         $clean   = [];
         foreach ($allowed as $key) {
             if (array_key_exists($key, $fields)) {
