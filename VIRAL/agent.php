@@ -633,9 +633,9 @@ $page_scripts = <<<PAGEJS
       if (hasValidSaved) modelSelect.value = saved;
     }
     if (!hasValidSaved) {
-      const openAIProvider = CF_PROVIDERS.find(function (p) { return p.id === 'openai'; });
-      if (openAIProvider && openAIProvider.default_model) {
-        const preferred = 'openai:' + openAIProvider.default_model;
+      const fallbackProvider = CF_PROVIDERS.find(function (p) { return p.id === 'openai'; }) || CF_PROVIDERS[0];
+      if (fallbackProvider && fallbackProvider.default_model) {
+        const preferred = fallbackProvider.id + ':' + fallbackProvider.default_model;
         const preferredExists = Array.from(modelSelect.options).some(function (o) { return o.value === preferred; });
         if (preferredExists) modelSelect.value = preferred;
       }

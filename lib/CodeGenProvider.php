@@ -240,7 +240,7 @@ class CodeGenProvider
             $url .= $joinChar . rawurlencode($queryKey) . '=' . rawurlencode($apiKey);
         } elseif ($apiKey !== '') {
             $authHeader = (string)($cfg['auth_header'] ?? 'Authorization');
-            $authScheme = array_key_exists('auth_scheme', $cfg) ? (string)$cfg['auth_scheme'] : 'Bearer';
+            $authScheme = (string)($cfg['auth_scheme'] ?? 'Bearer');
             $headers[]  = $authHeader . ': ' . ($authScheme !== '' ? ($authScheme . ' ') : '') . $apiKey;
         }
         if (!empty($cfg['extra_headers'])) {
@@ -295,10 +295,6 @@ class CodeGenProvider
                 : (string)$result['error'];
             throw new \RuntimeException($cfg['label'] . ' error: ' . $errMsg);
         }
-        if (isset($result['message']) && is_string($result['message']) && $statusCode >= 400) {
-            throw new \RuntimeException($cfg['label'] . ' error: ' . trim($result['message']));
-        }
-
         if ($statusCode >= 400) {
             $statusMsg = $cfg['label'] . ' returned HTTP ' . $statusCode . '.';
             if (isset($result['message']) && is_string($result['message']) && trim($result['message']) !== '') {

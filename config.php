@@ -178,7 +178,7 @@ define('CF_CODEGEN_PROVIDERS', [
         'model_in_url'  => true,
         'auth_in_query' => 'key',
         'api_url_env'   => 'GEMINI_BASE_URL',
-        'api_url_suffix'=> '/v1beta/models/{model}:generateContent',
+        'api_url_suffix' => '/v1beta/models/{model}:generateContent',
         'models'        => [
             ['id' => 'gemini-1.5-flash', 'label' => 'Gemini 1.5 Flash'],
             ['id' => 'gemini-1.5-pro',   'label' => 'Gemini 1.5 Pro'],
