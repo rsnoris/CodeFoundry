@@ -26,6 +26,14 @@ function cf_active(string $id): string {
     global $active_page;
     return $id === $active_page ? ' active' : '';
 }
+
+/**
+ * Helper: return 'active' when any of the provided IDs match $active_page.
+ */
+function cf_active_any(array $ids): string {
+    global $active_page;
+    return in_array($active_page, $ids, true) ? ' active' : '';
+}
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,12 +57,22 @@ function cf_active(string $id): string {
       CodeFoundry
     </a>
     <nav class="nav-menu">
-      <a href="/#solutions"   class="nav-link<?= cf_active('solutions') ?>">Solutions</a>
-      <a href="/#services"    class="nav-link<?= cf_active('services') ?>">Services</a>
-      <a href="/#industries"  class="nav-link<?= cf_active('industries') ?>">Industries</a>
-      <a href="/CaseStudies/" class="nav-link<?= cf_active('case-studies') ?>">Case Studies</a>
+      <div class="nav-item-dropdown">
+        <a href="/#solutions" class="nav-link<?= cf_active_any(['solutions', 'services']) ?>">Solutions</a>
+        <div class="nav-submenu" role="menu" aria-label="Solutions submenu">
+          <a href="/#services" class="nav-link nav-sub-link<?= cf_active('services') ?>" role="menuitem">Services</a>
+        </div>
+      </div>
+      <div class="nav-item-dropdown">
+        <a href="/#industries" class="nav-link<?= cf_active_any(['industries', 'case-studies']) ?>">Industries</a>
+        <div class="nav-submenu" role="menu" aria-label="Industries submenu">
+          <a href="/CaseStudies/" class="nav-link nav-sub-link<?= cf_active('case-studies') ?>" role="menuitem">Case Studies</a>
+        </div>
+      </div>
+      <?php if ($_cf_user): ?>
       <a href="/VIRAL/"       class="nav-link<?= cf_active('viral') ?>">VIRAL Agents</a>
       <a href="/Tools/"       class="nav-link<?= cf_active('tools') ?>">Tools</a>
+      <?php endif; ?>
       <a href="/Pricing/"     class="nav-link<?= cf_active('pricing') ?>">Pricing</a>
       <a href="/AboutUs/"     class="nav-link<?= cf_active('about') ?>">About</a>
 
@@ -106,12 +124,18 @@ function cf_active(string $id): string {
         <iconify-icon icon="lucide:x"></iconify-icon>
       </button>
       <div class="mobile-menu-links">
-        <a href="/#solutions"   class="nav-link" onclick="closeMobileNav()">Solutions</a>
-        <a href="/#services"    class="nav-link" onclick="closeMobileNav()">Services</a>
-        <a href="/#industries"  class="nav-link" onclick="closeMobileNav()">Industries</a>
-        <a href="/CaseStudies/" class="nav-link" onclick="closeMobileNav()">Case Studies</a>
+        <div class="mobile-nav-group">
+          <a href="/#solutions" class="nav-link" onclick="closeMobileNav()">Solutions</a>
+          <a href="/#services" class="nav-link nav-sub-link" onclick="closeMobileNav()">Services</a>
+        </div>
+        <div class="mobile-nav-group">
+          <a href="/#industries" class="nav-link" onclick="closeMobileNav()">Industries</a>
+          <a href="/CaseStudies/" class="nav-link nav-sub-link" onclick="closeMobileNav()">Case Studies</a>
+        </div>
+        <?php if ($_cf_user): ?>
         <a href="/VIRAL/"       class="nav-link" onclick="closeMobileNav()">VIRAL Agents</a>
         <a href="/Tools/"       class="nav-link" onclick="closeMobileNav()">Tools</a>
+        <?php endif; ?>
         <a href="/Pricing/"     class="nav-link" onclick="closeMobileNav()">Pricing</a>
         <a href="/AboutUs/"     class="nav-link" onclick="closeMobileNav()">About</a>
 
