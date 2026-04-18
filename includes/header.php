@@ -53,10 +53,8 @@ function cf_active(string $id): string {
       <a href="/#services"    class="nav-link<?= cf_active('services') ?>">Services</a>
       <a href="/#industries"  class="nav-link<?= cf_active('industries') ?>">Industries</a>
       <a href="/CaseStudies/" class="nav-link<?= cf_active('case-studies') ?>">Case Studies</a>
-      <?php if ($_cf_user): ?>
       <a href="/VIRAL/"       class="nav-link<?= cf_active('viral') ?>">VIRAL Agents</a>
       <a href="/Tools/"       class="nav-link<?= cf_active('tools') ?>">Tools</a>
-      <?php endif; ?>
       <a href="/Pricing/"     class="nav-link<?= cf_active('pricing') ?>">Pricing</a>
       <a href="/AboutUs/"     class="nav-link<?= cf_active('about') ?>">About</a>
 
@@ -112,10 +110,8 @@ function cf_active(string $id): string {
         <a href="/#services"    class="nav-link" onclick="closeMobileNav()">Services</a>
         <a href="/#industries"  class="nav-link" onclick="closeMobileNav()">Industries</a>
         <a href="/CaseStudies/" class="nav-link" onclick="closeMobileNav()">Case Studies</a>
-        <?php if ($_cf_user): ?>
         <a href="/VIRAL/"       class="nav-link" onclick="closeMobileNav()">VIRAL Agents</a>
         <a href="/Tools/"       class="nav-link" onclick="closeMobileNav()">Tools</a>
-        <?php endif; ?>
         <a href="/Pricing/"     class="nav-link" onclick="closeMobileNav()">Pricing</a>
         <a href="/AboutUs/"     class="nav-link" onclick="closeMobileNav()">About</a>
 

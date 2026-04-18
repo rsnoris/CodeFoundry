@@ -258,29 +258,6 @@ $page_styles = <<<'PAGECSS'
     font-size: 13px;
     line-height: 1.6;
   }
-  .task-groups {
-    display: grid;
-    gap: 14px;
-  }
-  .task-group-title {
-    margin: 0 0 8px;
-    color: #c9d6ea;
-    font-size: 13px;
-    font-weight: 700;
-  }
-  .task-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .task-tag {
-    font-size: 12px;
-    color: #a9b8cf;
-    border: 1px solid #1e2e48;
-    background: #0e1828;
-    border-radius: 999px;
-    padding: 5px 10px;
-  }
   .model-guide-wrap {
     overflow-x: auto;
   }
@@ -346,7 +323,6 @@ $categories = array_values(array_unique($categories));
 sort($categories, SORT_NATURAL | SORT_FLAG_CASE);
 array_unshift($categories, 'All');
 
-$taskCategoryGroups = VIRAL_TASK_CATEGORY_GROUPS;
 $modelGuide         = VIRAL_MODEL_RECOMMENDATIONS;
 $agentCount      = count(VIRAL_AGENTS);
 $categoryCount   = count(array_unique(array_column($agentRegistryValues, 'category')));
@@ -410,23 +386,6 @@ require_once dirname(__DIR__) . '/includes/header.php';
   </div>
 
   <div class="viral-extra">
-    <section class="viral-panel">
-      <h2>AI Task Categories</h2>
-      <p>Added for all VIRAL user roles to map role workflows to the right AI task type.</p>
-      <div class="task-groups">
-        <?php foreach ($taskCategoryGroups as $groupName => $groupTasks): ?>
-          <div>
-            <h3 class="task-group-title"><?= htmlspecialchars((string)$groupName, ENT_QUOTES, 'UTF-8') ?></h3>
-            <div class="task-tags">
-              <?php foreach ($groupTasks as $task): ?>
-                <span class="task-tag"><?= htmlspecialchars((string)$task, ENT_QUOTES, 'UTF-8') ?></span>
-              <?php endforeach; ?>
-            </div>
-          </div>
-        <?php endforeach; ?>
-      </div>
-    </section>
-
     <section class="viral-panel">
       <h2>Model Selection Recommendations</h2>
       <p>Choose by priority: highest output quality, best quality / performance balance, or lowest token/cost usage for your task category.</p>
