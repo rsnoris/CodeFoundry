@@ -26,6 +26,21 @@ function cf_active(string $id): string {
     global $active_page;
     return $id === $active_page ? ' active' : '';
 }
+
+/**
+ * Helper: whether any of the provided IDs match $active_page.
+ */
+function cf_is_active_any(array $ids): bool {
+    global $active_page;
+    return in_array($active_page, $ids, true);
+}
+
+/**
+ * Helper: return 'active' when any of the provided IDs match $active_page.
+ */
+function cf_active_any(array $ids): string {
+    return cf_is_active_any($ids) ? ' active' : '';
+}
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,12 +64,22 @@ function cf_active(string $id): string {
       CodeFoundry
     </a>
     <nav class="nav-menu">
-      <a href="/#solutions"   class="nav-link<?= cf_active('solutions') ?>">Solutions</a>
-      <a href="/#services"    class="nav-link<?= cf_active('services') ?>">Services</a>
-      <a href="/#industries"  class="nav-link<?= cf_active('industries') ?>">Industries</a>
-      <a href="/CaseStudies/" class="nav-link<?= cf_active('case-studies') ?>">Case Studies</a>
+      <div class="nav-item-dropdown<?= cf_is_active_any(['solutions', 'services']) ? ' open' : '' ?>">
+        <a href="/#solutions" class="nav-link<?= cf_active_any(['solutions', 'services']) ?>" aria-haspopup="true" aria-expanded="<?= cf_is_active_any(['solutions', 'services']) ? 'true' : 'false' ?>">Solutions</a>
+        <div class="nav-submenu" role="menu" aria-label="Solutions submenu">
+          <a href="/#services" class="nav-link nav-sub-link<?= cf_active('services') ?>" role="menuitem">Services</a>
+        </div>
+      </div>
+      <div class="nav-item-dropdown<?= cf_is_active_any(['industries', 'case-studies']) ? ' open' : '' ?>">
+        <a href="/#industries" class="nav-link<?= cf_active_any(['industries', 'case-studies']) ?>" aria-haspopup="true" aria-expanded="<?= cf_is_active_any(['industries', 'case-studies']) ? 'true' : 'false' ?>">Industries</a>
+        <div class="nav-submenu" role="menu" aria-label="Industries submenu">
+          <a href="/CaseStudies/" class="nav-link nav-sub-link<?= cf_active('case-studies') ?>" role="menuitem">Case Studies</a>
+        </div>
+      </div>
+      <?php if ($_cf_user): ?>
       <a href="/VIRAL/"       class="nav-link<?= cf_active('viral') ?>">VIRAL Agents</a>
       <a href="/Tools/"       class="nav-link<?= cf_active('tools') ?>">Tools</a>
+      <?php endif; ?>
       <a href="/Pricing/"     class="nav-link<?= cf_active('pricing') ?>">Pricing</a>
       <a href="/AboutUs/"     class="nav-link<?= cf_active('about') ?>">About</a>
 
@@ -106,12 +131,18 @@ function cf_active(string $id): string {
         <iconify-icon icon="lucide:x"></iconify-icon>
       </button>
       <div class="mobile-menu-links">
-        <a href="/#solutions"   class="nav-link" onclick="closeMobileNav()">Solutions</a>
-        <a href="/#services"    class="nav-link" onclick="closeMobileNav()">Services</a>
-        <a href="/#industries"  class="nav-link" onclick="closeMobileNav()">Industries</a>
-        <a href="/CaseStudies/" class="nav-link" onclick="closeMobileNav()">Case Studies</a>
+        <div class="mobile-nav-group">
+          <a href="/#solutions" class="nav-link" onclick="closeMobileNav()">Solutions</a>
+          <a href="/#services" class="nav-link nav-sub-link" onclick="closeMobileNav()">Services</a>
+        </div>
+        <div class="mobile-nav-group">
+          <a href="/#industries" class="nav-link" onclick="closeMobileNav()">Industries</a>
+          <a href="/CaseStudies/" class="nav-link nav-sub-link" onclick="closeMobileNav()">Case Studies</a>
+        </div>
+        <?php if ($_cf_user): ?>
         <a href="/VIRAL/"       class="nav-link" onclick="closeMobileNav()">VIRAL Agents</a>
         <a href="/Tools/"       class="nav-link" onclick="closeMobileNav()">Tools</a>
+        <?php endif; ?>
         <a href="/Pricing/"     class="nav-link" onclick="closeMobileNav()">Pricing</a>
         <a href="/AboutUs/"     class="nav-link" onclick="closeMobileNav()">About</a>
 

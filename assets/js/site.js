@@ -87,13 +87,87 @@
     });
   }
 
+  /**
+   * Initialise desktop nav dropdown accessibility state.
+   */
+  function initNavDropdowns() {
+    const dropdowns = document.querySelectorAll('.nav-item-dropdown');
+    if (!dropdowns.length) {
+      return;
+    }
+
+    function getTrigger(dropdown) {
+      const el = dropdown.firstElementChild;
+      if (el && el.classList.contains('nav-link') && el.getAttribute('aria-haspopup') === 'true') {
+        return el;
+      }
+      return null;
+    }
+
+    function setOpen(dropdown, isOpen) {
+      dropdown.classList.toggle('open', isOpen);
+      const trigger = getTrigger(dropdown);
+      if (trigger) {
+        trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      }
+    }
+
+    dropdowns.forEach(function (dropdown) {
+      const trigger = getTrigger(dropdown);
+      const firstSubLink = dropdown.querySelector('.nav-submenu .nav-sub-link');
+
+      dropdown.addEventListener('mouseenter', function () {
+        setOpen(dropdown, true);
+      });
+      dropdown.addEventListener('mouseleave', function () {
+        setOpen(dropdown, false);
+      });
+      dropdown.addEventListener('focusin', function () {
+        setOpen(dropdown, true);
+      });
+      dropdown.addEventListener('focusout', function () {
+        setTimeout(function () {
+          if (!dropdown.contains(document.activeElement)) {
+            setOpen(dropdown, false);
+          }
+        }, 0);
+      });
+
+      if (!trigger) {
+        return;
+      }
+
+      trigger.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowDown' && firstSubLink) {
+          e.preventDefault();
+          setOpen(dropdown, true);
+          firstSubLink.focus();
+          return;
+        }
+        if (e.key === 'Escape') {
+          setOpen(dropdown, false);
+        }
+      });
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        dropdowns.forEach(function (dropdown) {
+          setOpen(dropdown, false);
+        });
+      }
+    });
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       initMobileNav();
       initUserMenu();
+      initNavDropdowns();
     });
   } else {
     initMobileNav();
     initUserMenu();
+    initNavDropdowns();
   }
 }());
