@@ -9,10 +9,6 @@
  * any page-specific scripts, and closes </body></html>.
  */
 $page_scripts = $page_scripts ?? '';
-if (session_status() === PHP_SESSION_NONE) {
-  session_start();
-}
-$_cf_user = $_SESSION['cf_user'] ?? null;
 ?>
 <footer class="footer-section">
   <div class="footer-row">
@@ -49,7 +45,7 @@ $_cf_user = $_SESSION['cf_user'] ?? null;
       <div class="footer-col-title">Resources</div>
       <ul class="footer-link-list">
         <li><a href="/Blog/"          class="footer-link">Blog</a></li>
-        <?php if ($_cf_user): ?>
+        <?php if (!empty($_cf_user)): ?>
         <li><a href="/Tools/"         class="footer-link">Developer Tools</a></li>
         <?php endif; ?>
         <li><a href="/IDE/"           class="footer-link">Online IDE</a></li>
