@@ -132,6 +132,7 @@ header {
 }
 
 .nav-item-dropdown:hover .nav-submenu,
+.nav-item-dropdown.open .nav-submenu,
 .nav-item-dropdown:focus-within .nav-submenu {
   display: block;
 }

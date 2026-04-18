@@ -28,11 +28,18 @@ function cf_active(string $id): string {
 }
 
 /**
+ * Helper: whether any of the provided IDs match $active_page.
+ */
+function cf_is_active_any(array $ids): bool {
+    global $active_page;
+    return in_array($active_page, $ids, true);
+}
+
+/**
  * Helper: return 'active' when any of the provided IDs match $active_page.
  */
 function cf_active_any(array $ids): string {
-    global $active_page;
-    return in_array($active_page, $ids, true) ? ' active' : '';
+    return cf_is_active_any($ids) ? ' active' : '';
 }
 ?><!DOCTYPE html>
 <html lang="en">
@@ -57,14 +64,14 @@ function cf_active_any(array $ids): string {
       CodeFoundry
     </a>
     <nav class="nav-menu">
-      <div class="nav-item-dropdown">
-        <a href="/#solutions" class="nav-link<?= cf_active_any(['solutions', 'services']) ?>">Solutions</a>
+      <div class="nav-item-dropdown<?= cf_is_active_any(['solutions', 'services']) ? ' open' : '' ?>">
+        <a href="/#solutions" class="nav-link<?= cf_active_any(['solutions', 'services']) ?>" aria-haspopup="true" aria-expanded="<?= cf_is_active_any(['solutions', 'services']) ? 'true' : 'false' ?>">Solutions</a>
         <div class="nav-submenu" role="menu" aria-label="Solutions submenu">
           <a href="/#services" class="nav-link nav-sub-link<?= cf_active('services') ?>" role="menuitem">Services</a>
         </div>
       </div>
-      <div class="nav-item-dropdown">
-        <a href="/#industries" class="nav-link<?= cf_active_any(['industries', 'case-studies']) ?>">Industries</a>
+      <div class="nav-item-dropdown<?= cf_is_active_any(['industries', 'case-studies']) ? ' open' : '' ?>">
+        <a href="/#industries" class="nav-link<?= cf_active_any(['industries', 'case-studies']) ?>" aria-haspopup="true" aria-expanded="<?= cf_is_active_any(['industries', 'case-studies']) ? 'true' : 'false' ?>">Industries</a>
         <div class="nav-submenu" role="menu" aria-label="Industries submenu">
           <a href="/CaseStudies/" class="nav-link nav-sub-link<?= cf_active('case-studies') ?>" role="menuitem">Case Studies</a>
         </div>
