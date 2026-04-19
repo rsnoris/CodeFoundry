@@ -13,7 +13,6 @@
     { "label": "Industries",   "href": "/#industries",   "id": "industries" },
     { "label": "Case Studies", "href": "/CaseStudies/",  "id": "case-studies" },
     { "label": "Training",     "href": "/Training/",     "id": "training" },
-    { "label": "Tools",        "href": "/Tools/",        "id": "tools" },
     { "label": "IDE",          "href": "/IDE/",          "id": "ide" },
     { "label": "About",        "href": "/AboutUs/",      "id": "about" },
     { "label": "Careers",      "href": "/Careers/",      "id": "careers" }
