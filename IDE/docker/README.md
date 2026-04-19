@@ -31,6 +31,10 @@ program finishes.
   # then restart the web server / PHP-FPM
   ```
 
+The IDE now attempts runtime bootstrap automatically on page load via
+`/IDE/runtime-init.php`, which starts `IDE/docker/setup-runtime.sh` in the
+background when Docker is not ready.
+
 ### Recommended one-command bootstrap
 
 Run this once on a fresh host to install/start Docker (when supported), pre-pull

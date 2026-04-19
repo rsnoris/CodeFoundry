@@ -1036,6 +1036,22 @@ let editor     = null;
 let currentLang = 'python';
 let isRunning   = false;
 
+/* ── Runtime bootstrap on page load ─────────────────────── */
+(function runtimeBootstrapOnLoad() {
+  fetch('/IDE/runtime-init.php', { method: 'POST', keepalive: true })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      if (!data || data.ready) return;
+      const panel = document.getElementById('outputPanel');
+      if (!panel || !panel.classList.contains('empty')) return;
+      panel.classList.remove('empty');
+      panel.textContent = 'Preparing Docker runtime in the background. You can start coding now; code execution will be available shortly.';
+    })
+    .catch(function () {
+      // No-op: IDE remains usable; runtime check will happen on Run.
+    });
+})();
+
 /* ── AI model selector ──────────────────────────────────── */
 (function () {
   const sel = document.getElementById('aiModelSelect');
