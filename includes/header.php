@@ -13,12 +13,33 @@ $page_title  = $page_title  ?? 'CodeFoundry';
 $active_page = $active_page ?? '';
 $page_styles = $page_styles ?? '';
 
+// Start session once (guard against pages that already called session_start())
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$_cf_user = $_SESSION['cf_user'] ?? null;
+
 /**
  * Helper: return 'active' class string when $id matches $active_page.
  */
 function cf_active(string $id): string {
     global $active_page;
     return $id === $active_page ? ' active' : '';
+}
+
+/**
+ * Helper: whether any of the provided IDs match $active_page.
+ */
+function cf_is_active_any(array $ids): bool {
+    global $active_page;
+    return in_array($active_page, $ids, true);
+}
+
+/**
+ * Helper: return 'active' when any of the provided IDs match $active_page.
+ */
+function cf_active_any(array $ids): string {
+    return cf_is_active_any($ids) ? ' active' : '';
 }
 ?><!DOCTYPE html>
 <html lang="en">
@@ -43,17 +64,61 @@ function cf_active(string $id): string {
       CodeFoundry
     </a>
     <nav class="nav-menu">
-      <a href="/#services"    class="nav-link<?= cf_active('services') ?>">Services</a>
-      <a href="/#solutions"   class="nav-link<?= cf_active('solutions') ?>">Solutions</a>
-      <a href="/#industries"  class="nav-link<?= cf_active('industries') ?>">Industries</a>
-      <a href="/CaseStudies/" class="nav-link<?= cf_active('case-studies') ?>">Case Studies</a>
-      <a href="/Training/"    class="nav-link<?= cf_active('training') ?>">Training</a>
+      <div class="nav-item-dropdown<?= cf_is_active_any(['solutions', 'services']) ? ' open' : '' ?>">
+        <a href="/#solutions" class="nav-link<?= cf_active_any(['solutions', 'services']) ?>" aria-haspopup="true" aria-expanded="<?= cf_is_active_any(['solutions', 'services']) ? 'true' : 'false' ?>">Solutions</a>
+        <div class="nav-submenu" role="menu" aria-label="Solutions submenu">
+          <a href="/#services" class="nav-link nav-sub-link<?= cf_active('services') ?>" role="menuitem">Services</a>
+        </div>
+      </div>
+      <div class="nav-item-dropdown<?= cf_is_active_any(['industries', 'case-studies']) ? ' open' : '' ?>">
+        <a href="/#industries" class="nav-link<?= cf_active_any(['industries', 'case-studies']) ?>" aria-haspopup="true" aria-expanded="<?= cf_is_active_any(['industries', 'case-studies']) ? 'true' : 'false' ?>">Industries</a>
+        <div class="nav-submenu" role="menu" aria-label="Industries submenu">
+          <a href="/CaseStudies/" class="nav-link nav-sub-link<?= cf_active('case-studies') ?>" role="menuitem">Case Studies</a>
+        </div>
+      </div>
+      <?php if ($_cf_user): ?>
+      <a href="/VIRAL/"       class="nav-link<?= cf_active('viral') ?>">VIRAL Agents</a>
+      <a href="/Tools/"       class="nav-link<?= cf_active('tools') ?>">Tools</a>
+      <?php endif; ?>
+      <a href="/Pricing/"     class="nav-link<?= cf_active('pricing') ?>">Pricing</a>
       <a href="/AboutUs/"     class="nav-link<?= cf_active('about') ?>">About</a>
-      <a href="/Careers/"     class="nav-link<?= cf_active('careers') ?>">Careers</a>
+
     </nav>
     <div class="nav-actions">
-      <a href="/Contact/" class="nav-btn secondary<?= cf_active('contact') ?>" style="font-weight:800;">Contact Us</a>
-      <a href="/#services" class="nav-btn primary">Get Started</a>
+      <?php if ($_cf_user): ?>
+        <div class="nav-user-menu" id="navUserMenu">
+          <button class="nav-user-btn" id="navUserBtn" aria-haspopup="true" aria-expanded="false" aria-label="User menu">
+            <iconify-icon icon="lucide:user-circle-2"></iconify-icon>
+            <span class="nav-user-name"><?= htmlspecialchars($_cf_user['display'] ?? $_cf_user['username'] ?? 'User', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></span>
+            <iconify-icon icon="lucide:chevron-down" class="nav-user-caret"></iconify-icon>
+          </button>
+          <div class="nav-user-dropdown" id="navUserDropdown" role="menu">
+            <div class="nav-user-info">
+              <div class="nav-user-display"><?= htmlspecialchars($_cf_user['display'] ?? $_cf_user['username'] ?? 'User', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></div>
+              <div class="nav-user-role"><?= htmlspecialchars(ucfirst($_cf_user['role'] ?? 'user'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></div>
+            </div>
+            <a href="/Dashboard/" class="nav-user-dropdown-item" role="menuitem">
+              <iconify-icon icon="lucide:layout-dashboard"></iconify-icon>
+              Dashboard
+            </a>
+            <?php if (($_cf_user['role'] ?? '') === 'admin'): ?>
+            <a href="/Admin/" class="nav-user-dropdown-item" role="menuitem">
+              <iconify-icon icon="lucide:shield-check"></iconify-icon>
+              Control Panel
+            </a>
+            <?php endif; ?>
+            <a href="/Login/logout.php" class="nav-user-dropdown-item" role="menuitem">
+              <iconify-icon icon="lucide:log-out"></iconify-icon>
+              Sign Out
+            </a>
+          </div>
+        </div>
+      <?php else: ?>
+        <a href="/Login/" class="nav-login-btn<?= cf_active('login') ?>" aria-label="Login">
+          <iconify-icon icon="lucide:log-in"></iconify-icon>
+          <span>Login</span>
+        </a>
+      <?php endif; ?>
     </div>
     <button class="mobile-hamburger" id="mobileMenuBtn" aria-label="Open menu">
       <iconify-icon icon="lucide:menu"></iconify-icon>
@@ -66,17 +131,35 @@ function cf_active(string $id): string {
         <iconify-icon icon="lucide:x"></iconify-icon>
       </button>
       <div class="mobile-menu-links">
-        <a href="/#services"    class="nav-link" onclick="closeMobileNav()">Services</a>
-        <a href="/#solutions"   class="nav-link" onclick="closeMobileNav()">Solutions</a>
-        <a href="/#industries"  class="nav-link" onclick="closeMobileNav()">Industries</a>
-        <a href="/CaseStudies/" class="nav-link" onclick="closeMobileNav()">Case Studies</a>
-        <a href="/Training/"    class="nav-link" onclick="closeMobileNav()">Training</a>
+        <div class="mobile-nav-group">
+          <a href="/#solutions" class="nav-link" onclick="closeMobileNav()">Solutions</a>
+          <a href="/#services" class="nav-link nav-sub-link" onclick="closeMobileNav()">Services</a>
+        </div>
+        <div class="mobile-nav-group">
+          <a href="/#industries" class="nav-link" onclick="closeMobileNav()">Industries</a>
+          <a href="/CaseStudies/" class="nav-link nav-sub-link" onclick="closeMobileNav()">Case Studies</a>
+        </div>
+        <?php if ($_cf_user): ?>
+        <a href="/VIRAL/"       class="nav-link" onclick="closeMobileNav()">VIRAL Agents</a>
+        <a href="/Tools/"       class="nav-link" onclick="closeMobileNav()">Tools</a>
+        <?php endif; ?>
+        <a href="/Pricing/"     class="nav-link" onclick="closeMobileNav()">Pricing</a>
         <a href="/AboutUs/"     class="nav-link" onclick="closeMobileNav()">About</a>
-        <a href="/Careers/"     class="nav-link" onclick="closeMobileNav()">Careers</a>
+
       </div>
       <div class="mobile-menu-actions">
-        <a href="/Contact/"  class="nav-btn secondary" style="font-weight:800;">Contact Us</a>
-        <a href="/#services" class="nav-btn primary">Get Started</a>
+        <?php if ($_cf_user): ?>
+          <div class="mobile-user-info">
+            <iconify-icon icon="lucide:user-circle-2"></iconify-icon>
+            <span><?= htmlspecialchars($_cf_user['display'] ?? $_cf_user['username'] ?? 'User', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></span>
+          </div>
+          <a href="/Login/logout.php" class="nav-btn secondary" onclick="closeMobileNav()">Sign Out</a>
+        <?php else: ?>
+          <a href="/Login/" class="nav-btn primary" onclick="closeMobileNav()">
+            <iconify-icon icon="lucide:log-in"></iconify-icon>
+            Login
+          </a>
+        <?php endif; ?>
       </div>
     </div>
   </div>

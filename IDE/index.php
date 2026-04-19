@@ -1,4 +1,25 @@
 <?php
+declare(strict_types=1);
+require_once dirname(__DIR__) . '/config.php';
+require_once dirname(__DIR__) . '/lib/CodeGenProvider.php';
+
+// Build a minimal provider/model list for the client-side selector.
+$_cf_providers_js = [];
+foreach (CodeGenProvider::all() as $pid => $pdata) {
+    $models = [];
+    foreach ($pdata['models'] as $m) {
+        $models[] = ['id' => $m['id'], 'label' => $m['label']];
+    }
+    $_cf_providers_js[] = [
+        'id'            => $pid,
+        'label'         => $pdata['label'],
+        'available'     => (bool)($pdata['available'] ?? false),
+        'api_key_env'   => (string)($pdata['api_key_env'] ?? ''),
+        'default_model' => $pdata['default_model'],
+        'models'        => $models,
+    ];
+}
+
 $page_title  = 'CodeFoundry IDE – Online Code Editor';
 $active_page = 'ide';
 $page_styles = <<<'PAGECSS'
@@ -404,140 +425,153 @@ kbd {
   margin: 0;
 }
 
-/* ── Pro toggle ─────────────────────────────────────── */
-.pro-toggle-wrap {
+/* ── Explain modal ─────────────────────────────────────────────── */
+.explain-modal {
+  background: var(--navy-2);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  width: min(680px, 95vw);
+  max-height: 80vh;
   display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--text-muted);
-  user-select: none;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
 }
 
-.pro-toggle {
-  position: relative;
-  width: 32px;
-  height: 18px;
-  cursor: pointer;
+.explain-modal h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex-shrink: 0;
 }
 
-.pro-toggle input { display: none; }
-
-.pro-toggle-slider {
-  position: absolute;
-  inset: 0;
-  background: #1e293b;
-  border: 1px solid var(--border-color);
-  border-radius: 9px;
-  transition: background .2s, border-color .2s;
+.explain-modal h2 iconify-icon {
+  color: #a78bfa;
 }
 
-.pro-toggle-slider::before {
-  content: '';
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  top: 2px;
-  left: 2px;
-  background: #475569;
-  border-radius: 50%;
-  transition: transform .2s, background .2s;
+.explain-body {
+  flex: 1;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 0;
 }
 
-.pro-toggle input:checked + .pro-toggle-slider {
-  background: rgba(14,165,233,.15);
-  border-color: var(--primary);
-}
-
-.pro-toggle input:checked + .pro-toggle-slider::before {
-  transform: translateX(14px);
-  background: var(--primary);
-}
-
-/* ── CodeGen controls row ────────────────────────────── */
-.codegen-controls {
+.explain-loading {
+  color: var(--text-subtle);
+  font-style: italic;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
   gap: 8px;
 }
 
-/* ── Chat history ────────────────────────────────────── */
-.chat-history {
-  max-height: 200px;
-  overflow-y: auto;
+/* ── CodeGen mode tabs ─────────────────────────────────────────── */
+.codegen-tabs {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  scrollbar-width: thin;
-}
-
-.chat-history:empty { display: none; }
-
-.chat-bubble {
-  font-size: 13px;
-  line-height: 1.5;
-  padding: 8px 11px;
-  border-radius: 8px;
-  max-width: 96%;
-  word-break: break-word;
-}
-
-.chat-bubble.user {
-  background: #1e293b;
-  color: var(--text);
-  align-self: flex-end;
-  border: 1px solid var(--border-color);
-}
-
-.chat-bubble.assistant {
+  gap: 4px;
   background: #0d1117;
-  color: #4ade80;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-  font-size: 11.5px;
-  align-self: flex-start;
-  border: 1px solid rgba(22,163,74,.25);
-  white-space: pre-wrap;
+  border-radius: 8px;
+  padding: 4px;
 }
 
-/* ── History dropdown ────────────────────────────────── */
-.codegen-history-row {
+.codegen-tab {
+  flex: 1;
+  padding: 6px 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  white-space: nowrap;
+}
+
+.codegen-tab.active {
+  background: var(--navy-3);
+  color: var(--text);
+}
+
+.codegen-tab:hover:not(.active) {
+  color: var(--text);
+}
+
+/* ── Fix button in output pane ─────────────────────────────────── */
+.fix-ai-btn {
+  display: none;
+}
+
+.fix-ai-btn.visible {
+  display: inline-flex;
+}
+
+/* ── Insert mode selector ──────────────────────────────────────── */
+.codegen-insert-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.codegen-insert-row label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.codegen-insert-row input[type="radio"] {
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* ── AI model selector ─────────────────────────────────────────── */
+.ai-model-select-wrapper {
   display: flex;
   align-items: center;
   gap: 6px;
-}
-
-.history-select {
-  flex: 1;
-  background: #0d1117;
-  color: var(--text);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 5px 8px;
   font-size: 12px;
-  font-family: 'Inter', sans-serif;
-  cursor: pointer;
-  outline: none;
-}
-
-.history-select:focus { border-color: var(--primary); }
-.history-select option { background: #0d1117; }
-
-.chat-clear-btn {
-  font-size: 11px;
   color: var(--text-subtle);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  text-decoration: underline;
 }
 
-.chat-clear-btn:hover { color: var(--text-muted); }
+.ai-model-select {
+  background: var(--navy-3);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  border-radius: var(--button-radius);
+  padding: 5px 28px 5px 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  max-width: 220px;
+  transition: border-color .2s, color .2s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2392a3bb'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+}
 
-/* ── Inline-edit modal ───────────────────────────────── */
+.ai-model-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+/* ── Inline-edit modal ───────────────────────────────────── */
 .inline-edit-overlay {
   display: none;
   position: fixed;
@@ -588,60 +622,28 @@ kbd {
   word-break: break-all;
 }
 
-/* ── Explain modal ───────────────────────────────────── */
-.explain-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.6);
-  z-index: 1050;
-  align-items: center;
-  justify-content: center;
-}
-
-.explain-overlay.open { display: flex; }
-
-.explain-modal {
-  background: var(--navy-2);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 24px;
-  width: min(640px, 95vw);
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.5);
-}
-
-.explain-modal h2 {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text);
-  margin: 0;
+/* ── Prompt history dropdown ─────────────────────────────── */
+.codegen-history-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
+  gap: 6px;
 }
 
-.explain-modal h2 iconify-icon { color: #34d399; }
-
-.explain-content {
+.history-select {
   flex: 1;
-  overflow-y: auto;
-  font-size: 14px;
-  line-height: 1.75;
+  background: #0d1117;
   color: var(--text);
-  white-space: pre-wrap;
-  min-height: 60px;
-  scrollbar-width: thin;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  outline: none;
 }
 
-.explain-content.loading {
-  color: var(--text-subtle);
-  font-style: italic;
-}
+.history-select:focus { border-color: var(--primary); }
+.history-select option { background: #0d1117; }
 PAGECSS;
 
 require_once dirname(__DIR__) . '/includes/header.php';
@@ -706,6 +708,27 @@ require_once dirname(__DIR__) . '/includes/header.php';
       Generate
     </button>
 
+    <!-- Improve -->
+    <button id="improveBtn" class="ide-btn ghost" title="Improve existing code with AI">
+      <iconify-icon icon="lucide:wand-2" aria-hidden="true"></iconify-icon>
+      Improve
+    </button>
+
+    <!-- Explain -->
+    <button id="explainBtn" class="ide-btn ghost" title="Explain the current code with AI">
+      <iconify-icon icon="lucide:book-open" aria-hidden="true"></iconify-icon>
+      Explain
+    </button>
+
+    <!-- AI model selector -->
+    <div class="ai-model-select-wrapper" title="AI model for Generate/Improve/Explain/Fix">
+      <iconify-icon icon="lucide:cpu" aria-hidden="true"></iconify-icon>
+      <select id="aiModelSelect" class="ai-model-select" aria-label="AI model">
+        <option value="">Loading…</option>
+      </select>
+      <span id="aiModelHelp" class="toolbar-hint" style="margin-left:6px;">Configure provider API keys in Dashboard → Account to enable all model families.</span>
+    </div>
+
     <div class="toolbar-sep" aria-hidden="true"></div>
 
     <!-- Copy -->
@@ -724,12 +747,6 @@ require_once dirname(__DIR__) . '/includes/header.php';
     <button id="downloadBtn" class="ide-btn ghost" title="Download code as file">
       <iconify-icon icon="lucide:download" aria-hidden="true"></iconify-icon>
       Download
-    </button>
-
-    <!-- Explain -->
-    <button id="explainBtn" class="ide-btn ghost" title="Explain code with AI">
-      <iconify-icon icon="lucide:book-open" aria-hidden="true"></iconify-icon>
-      Explain
     </button>
 
     <!-- Keyboard hint -->
@@ -773,7 +790,8 @@ require_once dirname(__DIR__) . '/includes/header.php';
           <span>Output</span>
           <div class="pane-header-right">
             <span id="statusBadge" class="pane-badge" style="display:none;" aria-live="polite"></span>
-            <button id="fixAiBtn" class="ide-btn ghost pane-clear-btn" title="Fix runtime error with AI" style="display:none;">
+            <button id="fixBtn" class="ide-btn ghost pane-clear-btn fix-ai-btn"
+                    aria-label="Fix errors with AI" title="Fix errors with AI">
               <iconify-icon icon="lucide:wrench" aria-hidden="true"></iconify-icon>
               Fix with AI
             </button>
@@ -798,35 +816,44 @@ require_once dirname(__DIR__) . '/includes/header.php';
       <iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon>
       Generate Code with AI
     </h2>
-
-    <!-- Chat history (multi-turn) -->
-    <div id="chatHistory" class="chat-history" aria-live="polite"></div>
-
+    <!-- Mode tabs: Generate / Improve -->
+    <div class="codegen-tabs" role="tablist">
+      <button class="codegen-tab active" id="tabGenerate" role="tab"
+              aria-selected="true" aria-controls="codegenTabPanel">
+        <iconify-icon icon="lucide:sparkles" width="13" aria-hidden="true"></iconify-icon>
+        Generate new
+      </button>
+      <button class="codegen-tab" id="tabImprove" role="tab"
+              aria-selected="false" aria-controls="codegenTabPanel">
+        <iconify-icon icon="lucide:wand-2" width="13" aria-hidden="true"></iconify-icon>
+        Improve existing
+      </button>
+    </div>
     <!-- Prompt history dropdown -->
     <div class="codegen-history-row" id="historyRow" style="display:none;">
       <select id="historySelect" class="history-select" aria-label="Recent prompts">
         <option value="">↑ Recent prompts…</option>
       </select>
     </div>
-
-    <textarea id="codegenPrompt" class="codegen-prompt"
-              placeholder="Describe the code you want to generate…&#10;e.g. &quot;Write a function that sorts a list of dictionaries by a given key.&quot;"
-              rows="4" aria-label="Code generation prompt"></textarea>
-
-    <!-- Controls row: Pro toggle + hint -->
-    <div class="codegen-controls">
-      <div class="pro-toggle-wrap">
-        <label class="pro-toggle" title="GPT-4o for higher quality (uses more quota)">
-          <input type="checkbox" id="proToggle" aria-label="Use Pro model (GPT-4o)">
-          <span class="pro-toggle-slider"></span>
-        </label>
-        <span>Pro <span style="color:var(--primary);font-size:11px;">(GPT-4o)</span></span>
-      </div>
-      <p class="codegen-hint">Replaces editor content · <kbd>Ctrl</kbd>+<kbd>Enter</kbd></p>
+    <div id="codegenTabPanel">
+      <textarea id="codegenPrompt" class="codegen-prompt"
+                placeholder="Describe the code you want to generate…&#10;e.g. &quot;Write a function that sorts a list of dictionaries by a given key.&quot;"
+                rows="4" aria-label="Code generation prompt"></textarea>
     </div>
-
+    <!-- Insert mode -->
+    <div class="codegen-insert-row" id="insertModeRow">
+      <span>Insert:</span>
+      <label>
+        <input type="radio" name="insertMode" value="replace" checked>
+        Replace all
+      </label>
+      <label>
+        <input type="radio" name="insertMode" value="cursor">
+        At cursor
+      </label>
+    </div>
+    <p class="codegen-hint" id="codegenHint">The generated code will replace the current editor content.</p>
     <div class="codegen-actions">
-      <button id="chatClearBtn" class="chat-clear-btn" style="display:none;" aria-label="Clear conversation">Clear chat</button>
       <button id="codegenCancelBtn" class="ide-btn ghost">Cancel</button>
       <button id="codegenSubmitBtn" class="ide-btn primary">
         <iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon>
@@ -836,7 +863,26 @@ require_once dirname(__DIR__) . '/includes/header.php';
   </div>
 </div>
 
-<!-- ── Inline-edit modal ─────────────────────────────────────────────── -->
+<!-- ── Explain modal ────────────────────────────────────────────── -->
+<div id="explainOverlay" class="codegen-overlay" role="dialog"
+     aria-modal="true" aria-labelledby="explainTitle">
+  <div class="explain-modal">
+    <h2 id="explainTitle">
+      <iconify-icon icon="lucide:book-open" aria-hidden="true"></iconify-icon>
+      Code Explanation
+    </h2>
+    <div id="explainBody" class="explain-body">
+      <div class="explain-loading">
+        <span class="spinner"></span> Generating explanation…
+      </div>
+    </div>
+    <div class="codegen-actions">
+      <button id="explainCloseBtn" class="ide-btn ghost">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Inline-edit modal ─────────────────────────────────────────── -->
 <div id="inlineEditOverlay" class="inline-edit-overlay" role="dialog"
      aria-modal="true" aria-labelledby="inlineEditTitle">
   <div class="inline-edit-modal">
@@ -858,21 +904,6 @@ require_once dirname(__DIR__) . '/includes/header.php';
   </div>
 </div>
 
-<!-- ── Explain modal ──────────────────────────────────────────────────── -->
-<div id="explainOverlay" class="explain-overlay" role="dialog"
-     aria-modal="true" aria-labelledby="explainTitle">
-  <div class="explain-modal">
-    <h2 id="explainTitle">
-      <iconify-icon icon="lucide:book-open" aria-hidden="true"></iconify-icon>
-      Code Explanation
-    </h2>
-    <div id="explainContent" class="explain-content loading">Analyzing…</div>
-    <div class="codegen-actions">
-      <button id="explainCloseBtn" class="ide-btn ghost">Close</button>
-    </div>
-  </div>
-</div>
-
 </div><!-- /ide-wrapper -->
 
 <!-- ── Monaco Editor (AMD loader from CDN) ──────────────────── -->
@@ -883,6 +914,9 @@ require_once dirname(__DIR__) . '/includes/header.php';
    ============================================================ */
 
 'use strict';
+
+/* ── Available AI providers (injected from PHP) ─────────── */
+const CF_PROVIDERS = <?= json_encode($_cf_providers_js, JSON_UNESCAPED_UNICODE) ?>;
 
 /* ── Language registry ──────────────────────────────────── */
 const LANGUAGES = {
@@ -1001,7 +1035,86 @@ const LANGUAGES = {
 let editor     = null;
 let currentLang = 'python';
 let isRunning   = false;
-let lastError   = null; // tracks last run error for "Fix with AI"
+
+/* ── AI model selector ──────────────────────────────────── */
+(function () {
+  const sel = document.getElementById('aiModelSelect');
+  const help = document.getElementById('aiModelHelp');
+  if (!sel || !CF_PROVIDERS.length) {
+    if (sel) { sel.closest('.ai-model-select-wrapper').style.display = 'none'; }
+    return;
+  }
+
+  sel.innerHTML = '';
+  const missingKeys = [];
+  CF_PROVIDERS.forEach(function (p) {
+    const group = document.createElement('optgroup');
+    group.label = p.available ? p.label : (p.label + ' (setup required)');
+    if (!p.available && p.api_key_env) {
+      missingKeys.push(p.api_key_env);
+    }
+    p.models.forEach(function (m) {
+      const opt = document.createElement('option');
+      opt.value       = p.id + ':' + m.id;
+      opt.textContent = p.available ? m.label : (m.label + ' (set key in Account)');
+      opt.disabled    = !p.available;
+      group.appendChild(opt);
+    });
+    sel.appendChild(group);
+  });
+
+  const enabledOptions = Array.from(sel.options).filter(function (o) { return !o.disabled; });
+
+  // Restore from localStorage
+  const saved = localStorage.getItem('cf_ai_model');
+  let hasValidSaved = false;
+  if (saved) {
+    // Verify the saved value is still valid and enabled
+    hasValidSaved = enabledOptions.some(function (o) { return o.value === saved; });
+    if (hasValidSaved) sel.value = saved;
+  }
+
+  if (!hasValidSaved) {
+    const preferredProvider = CF_PROVIDERS.find(function (p) { return p.available && p.default_model; });
+    if (preferredProvider && preferredProvider.default_model) {
+      const preferred = preferredProvider.id + ':' + preferredProvider.default_model;
+      const preferredExists = enabledOptions.some(function (o) { return o.value === preferred; });
+      if (preferredExists) {
+        sel.value = preferred;
+      }
+    } else if (enabledOptions.length) {
+      sel.value = enabledOptions[0].value;
+    }
+  }
+
+  if (!enabledOptions.length) {
+    sel.disabled = true;
+    sel.value = '';
+  }
+
+  if (help) {
+    if (!enabledOptions.length) {
+      help.textContent = 'No provider keys configured yet. Add keys in Dashboard → Account to enable additional providers and model families.';
+    } else if (missingKeys.length) {
+      help.textContent = 'More providers can be enabled by adding keys in Dashboard → Account.';
+    }
+  }
+
+  sel.addEventListener('change', function () {
+    localStorage.setItem('cf_ai_model', sel.value);
+  });
+})();
+
+/** Return {provider, model} from the toolbar selector. */
+function getAiSelection() {
+  const sel = document.getElementById('aiModelSelect');
+  const val = sel ? sel.value : '';
+  if (!val) return {};
+  const sep = val.indexOf(':');
+  return sep > 0
+    ? { provider: val.slice(0, sep), model: val.slice(sep + 1) }
+    : {};
+}
 
 /* ── Init Monaco ────────────────────────────────────────── */
 require.config({
@@ -1066,6 +1179,22 @@ require(['vs/editor/editor.main'], function () {
       openInlineEdit(selectedText || '', sel);
     },
   });
+
+  // ── Restore generated code from Generate page ──────────
+  (function () {
+    const savedCode = sessionStorage.getItem('cf_generated_code');
+    const savedLang = sessionStorage.getItem('cf_generated_language');
+    if (savedCode) {
+      sessionStorage.removeItem('cf_generated_code');
+      sessionStorage.removeItem('cf_generated_language');
+      if (savedLang && LANGUAGES[savedLang]) {
+        document.getElementById('langSelect').value = savedLang;
+        monaco.editor.setModelLanguage(editor.getModel(), LANGUAGES[savedLang].monaco);
+        currentLang = savedLang;
+      }
+      editor.setValue(savedCode);
+    }
+  })();
 });
 
 /* ── Language switch ────────────────────────────────────── */
@@ -1135,7 +1264,7 @@ document.getElementById('resetBtn').addEventListener('click', function () {
   }
 });
 
-/* ── Download ───────────────────────────────────────────── */
+/* ── Download ───────────────────────────────────────────────── */
 document.getElementById('downloadBtn').addEventListener('click', function () {
   if (!editor) return;
   const code = editor.getValue();
@@ -1208,9 +1337,8 @@ async function runCode() {
 
 /* ── Output rendering ───────────────────────────────────── */
 function showOutput(stdout, stderr, exitCode, errorMsg) {
-  const panel    = document.getElementById('outputPanel');
-  const badge    = document.getElementById('statusBadge');
-  const fixBtn   = document.getElementById('fixAiBtn');
+  const panel = document.getElementById('outputPanel');
+  const badge = document.getElementById('statusBadge');
 
   panel.className = 'output-content';
   panel.innerHTML = '';
@@ -1220,14 +1348,16 @@ function showOutput(stdout, stderr, exitCode, errorMsg) {
     el.className   = 'output-stderr';
     el.textContent = '⚠ ' + errorMsg;
     panel.appendChild(el);
-    badge.style.display  = 'none';
-    fixBtn.style.display = 'none';
-    lastError = null;
+    badge.style.display = 'none';
+    document.getElementById('fixBtn').classList.add('visible');
     return;
   }
 
   const hasOut = stdout && stdout.length > 0;
   const hasErr = stderr && stderr.length > 0;
+
+  // Show "Fix with AI" button when there is stderr
+  document.getElementById('fixBtn').classList.toggle('visible', hasErr);
 
   if (!hasOut && !hasErr) {
     const el = document.createElement('span');
@@ -1270,33 +1400,24 @@ function showOutput(stdout, stderr, exitCode, errorMsg) {
   if (exitCode === 0) {
     badge.className   = 'pane-badge exit-ok';
     badge.textContent = 'Exit 0 ✓';
-    fixBtn.style.display = 'none';
-    lastError = null;
   } else if (exitCode !== null) {
     badge.className   = 'pane-badge exit-err';
     badge.textContent = 'Exit ' + exitCode;
-    // Show fix button and record error context
-    lastError = { code: editor ? editor.getValue() : '', stderr: stderr || '', exitCode };
-    fixBtn.style.display = '';
   } else {
-    badge.style.display  = 'none';
-    fixBtn.style.display = 'none';
-    lastError = null;
+    badge.style.display = 'none';
   }
 }
 
 function clearOutput() {
-  const panel  = document.getElementById('outputPanel');
-  const badge  = document.getElementById('statusBadge');
-  const fixBtn = document.getElementById('fixAiBtn');
-
+  const panel = document.getElementById('outputPanel');
   panel.textContent = 'Run your code to see output here.';
   panel.className   = 'output-content empty';
 
-  badge.style.display  = 'none';
-  badge.className      = 'pane-badge';
-  fixBtn.style.display = 'none';
-  lastError = null;
+  const badge = document.getElementById('statusBadge');
+  badge.style.display = 'none';
+  badge.className     = 'pane-badge';
+
+  document.getElementById('fixBtn').classList.remove('visible');
 }
 
 function setRunning(on) {
@@ -1323,19 +1444,21 @@ function setRunning(on) {
 
 /* ── Shared SSE streaming helper ────────────────────────── */
 /**
- * Stream a codegen.php SSE response, calling onDelta(str) for each token.
- * Returns the full accumulated text, stripped of markdown fences.
+ * POST to codegen.php with stream:true and call onChunk(accumulatedText)
+ * for every delta. Returns the final trimmed text (fences stripped).
  */
-async function streamCodegen(payload, onDelta) {
+async function streamCodegen(payload, onChunk) {
+  const aiSel = getAiSelection();
   const res = await fetch('/IDE/codegen.php', {
     method:  'POST',
     headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify({ ...payload, stream: true }),
+    body:    JSON.stringify({ ...aiSel, ...payload, stream: true }),
   });
 
   if (!res.ok) {
     let errMsg = 'Unknown error';
-    try { errMsg = (await res.json()).error || errMsg; } catch (_) {}
+    try { const d = await res.json(); errMsg = d.error || errMsg; } catch (_) {}
+    if (errMsg.includes('subscription_required')) { window.location.href = '/Pricing/'; throw new Error('redirect'); }
     throw new Error(errMsg);
   }
 
@@ -1349,7 +1472,7 @@ async function streamCodegen(payload, onDelta) {
     if (done) break;
     buffer += decoder.decode(value, { stream: true });
     const lines = buffer.split('\n');
-    buffer = lines.pop(); // keep incomplete last line
+    buffer = lines.pop();
     for (const line of lines) {
       if (!line.startsWith('data: ')) continue;
       const raw = line.slice(6).trim();
@@ -1358,43 +1481,35 @@ async function streamCodegen(payload, onDelta) {
         const parsed = JSON.parse(raw);
         if (parsed.error) throw new Error(parsed.error.message || String(parsed.error));
         const delta = parsed.choices?.[0]?.delta?.content;
-        if (delta) {
-          accumulated += delta;
-          onDelta(accumulated);
-        }
+        if (delta) { accumulated += delta; onChunk(accumulated); }
       } catch (parseErr) {
-        if (parseErr.message && !parseErr.message.startsWith('JSON')) throw parseErr;
+        if (parseErr.message && !parseErr.message.includes('JSON')) throw parseErr;
       }
     }
   }
 
-  // Strip accidental markdown fences
   return accumulated
     .replace(/^```[a-zA-Z]*\n?/, '')
     .replace(/\n?```$/, '')
     .trim();
 }
 
-/* ── CodeGen (multi-turn, streaming, history, Pro toggle) ── */
+/* ── CodeGen / Improve / Explain / Fix ─────────────────────────── */
 (function () {
-  const HISTORY_KEY = 'cf_codegen_history';
+  /* ── Shared helper ─────────────────────────────────────────────── */
+  function requireEditorCode(action) {
+    const code = editor ? editor.getValue().trim() : '';
+    if (!code) {
+      alert('The editor is empty. Please add code to ' + action + '.');
+      return null;
+    }
+    return code;
+  }
+
+  /* ── Prompt history (localStorage) ────────────────────────────── */
+  const HISTORY_KEY = 'cf_prompt_history';
   const HISTORY_MAX = 20;
 
-  const overlay      = document.getElementById('codegenOverlay');
-  const promptEl     = document.getElementById('codegenPrompt');
-  const submitBtn    = document.getElementById('codegenSubmitBtn');
-  const cancelBtn    = document.getElementById('codegenCancelBtn');
-  const codegenBtn   = document.getElementById('codegenBtn');
-  const historyRow   = document.getElementById('historyRow');
-  const histSelect   = document.getElementById('historySelect');
-  const chatHistEl   = document.getElementById('chatHistory');
-  const chatClearBtn = document.getElementById('chatClearBtn');
-  const proToggle    = document.getElementById('proToggle');
-
-  // Conversation history (user/assistant turns, no system message stored here)
-  let conversation = [];
-
-  // ── localStorage history helpers ──────────────────────────
   function loadHistory() {
     try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
     catch (_) { return []; }
@@ -1408,59 +1523,99 @@ async function streamCodegen(payload, onDelta) {
   }
 
   function refreshHistoryDropdown() {
-    const hist = loadHistory();
-    histSelect.innerHTML = '<option value="">↑ Recent prompts…</option>';
-    hist.forEach(h => {
+    const hist     = loadHistory();
+    const histRow  = document.getElementById('historyRow');
+    const histSel  = document.getElementById('historySelect');
+    if (!histRow || !histSel) return;
+    histSel.innerHTML = '<option value="">↑ Recent prompts…</option>';
+    hist.forEach(function (h) {
       const opt = document.createElement('option');
       opt.value = h;
       opt.textContent = h.length > 65 ? h.slice(0, 62) + '…' : h;
-      histSelect.appendChild(opt);
+      histSel.appendChild(opt);
     });
-    historyRow.style.display = hist.length > 0 ? '' : 'none';
+    histRow.style.display = hist.length > 0 ? '' : 'none';
   }
 
-  histSelect.addEventListener('change', function () {
-    if (this.value) { promptEl.value = this.value; promptEl.focus(); this.value = ''; }
-  });
-
-  // ── Chat history rendering ────────────────────────────────
-  function renderChatHistory() {
-    chatHistEl.innerHTML = '';
-    conversation.forEach(msg => {
-      const div = document.createElement('div');
-      div.className = 'chat-bubble ' + (msg.role === 'user' ? 'user' : 'assistant');
-      const preview = msg.content.length > 220 ? msg.content.slice(0, 217) + '…' : msg.content;
-      div.textContent = preview;
-      chatHistEl.appendChild(div);
+  const histSel = document.getElementById('historySelect');
+  if (histSel) {
+    histSel.addEventListener('change', function () {
+      const promptTA = document.getElementById('codegenPrompt');
+      if (this.value && promptTA) { promptTA.value = this.value; promptTA.focus(); this.value = ''; }
     });
-    if (chatHistEl.children.length > 0) {
-      chatHistEl.scrollTop = chatHistEl.scrollHeight;
-      chatClearBtn.style.display = '';
+  }
+
+  /* ── CodeGen & Improve modal ───────────────────────────────────── */
+  const overlay     = document.getElementById('codegenOverlay');
+  const promptTA    = document.getElementById('codegenPrompt');
+  const submitBtn   = document.getElementById('codegenSubmitBtn');
+  const cancelBtn   = document.getElementById('codegenCancelBtn');
+  const codegenBtn  = document.getElementById('codegenBtn');
+  const improveBtn  = document.getElementById('improveBtn');
+  const tabGenerate = document.getElementById('tabGenerate');
+  const tabImprove  = document.getElementById('tabImprove');
+  const insertRow   = document.getElementById('insertModeRow');
+  const hintEl      = document.getElementById('codegenHint');
+
+  let currentMode = 'generate'; // 'generate' | 'improve'
+
+  function getInsertMode() {
+    const checked = document.querySelector('input[name="insertMode"]:checked');
+    return checked ? checked.value : 'replace';
+  }
+
+  function setMode(mode) {
+    currentMode = mode;
+    if (mode === 'generate') {
+      tabGenerate.classList.add('active');
+      tabGenerate.setAttribute('aria-selected', 'true');
+      tabImprove.classList.remove('active');
+      tabImprove.setAttribute('aria-selected', 'false');
+      promptTA.placeholder = 'Describe the code you want to generate…\ne.g. "Write a function that sorts a list of dictionaries by a given key."';
+      submitBtn.innerHTML  = '<iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon> Generate';
+      insertRow.style.display = '';
+      updateHint();
     } else {
-      chatClearBtn.style.display = 'none';
+      tabImprove.classList.add('active');
+      tabImprove.setAttribute('aria-selected', 'true');
+      tabGenerate.classList.remove('active');
+      tabGenerate.setAttribute('aria-selected', 'false');
+      promptTA.placeholder = 'Describe how you want to improve the code…\ne.g. "Add error handling and input validation."';
+      submitBtn.innerHTML  = '<iconify-icon icon="lucide:wand-2" aria-hidden="true"></iconify-icon> Improve';
+      insertRow.style.display = 'none';
+      hintEl.textContent      = 'The improved code will replace the current editor content.';
     }
   }
 
-  chatClearBtn.addEventListener('click', function () {
-    conversation = [];
-    renderChatHistory();
+  function updateHint() {
+    const mode = getInsertMode();
+    hintEl.textContent = mode === 'cursor'
+      ? 'The generated code will be inserted at the cursor position.'
+      : 'The generated code will replace the current editor content.';
+  }
+
+  document.querySelectorAll('input[name="insertMode"]').forEach(function (radio) {
+    radio.addEventListener('change', updateHint);
   });
 
-  // ── Open / close ──────────────────────────────────────────
-  function openModal() {
+  tabGenerate.addEventListener('click', function () { setMode('generate'); promptTA.focus(); });
+  tabImprove.addEventListener('click',  function () { setMode('improve');  promptTA.focus(); });
+
+  function openModal(mode) {
+    setMode(mode || 'generate');
     refreshHistoryDropdown();
-    renderChatHistory();
-    promptEl.value = '';
+    promptTA.value = '';
     overlay.classList.add('open');
-    promptEl.focus();
+    promptTA.focus();
   }
 
   function closeModal() {
     overlay.classList.remove('open');
-    codegenBtn.focus();
+    (currentMode === 'improve' ? improveBtn : codegenBtn).focus();
   }
 
-  codegenBtn.addEventListener('click', openModal);
+  codegenBtn.addEventListener('click',  function () { window.location.href = '/Generate/'; });
+  improveBtn.addEventListener('click',  function () { openModal('improve');  });
   cancelBtn.addEventListener('click', closeModal);
 
   overlay.addEventListener('click', function (e) {
@@ -1471,86 +1626,162 @@ async function streamCodegen(payload, onDelta) {
     if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
   });
 
-  // ── Generate ──────────────────────────────────────────────
-  async function generateCode() {
-    const text = promptEl.value.trim();
-    if (!text) { promptEl.focus(); return; }
+  async function submitCodegen() {
+    const text = promptTA.value.trim();
+    if (!text) { promptTA.focus(); return; }
+
+    // For improve mode, current editor code is required
+    const code = (currentMode === 'improve') ? requireEditorCode('improve') : null;
+    if (currentMode === 'improve' && code === null) return;
 
     saveToHistory(text);
 
     submitBtn.disabled  = true;
-    submitBtn.innerHTML = '<span class="spinner"></span> Generating…';
-
-    // Build payload
-    const payload = { language: currentLang, mode: 'generate', pro: proToggle.checked };
-
-    if (conversation.length > 0) {
-      // Send full conversation + new user turn
-      payload.messages = [...conversation, { role: 'user', content: text }];
-    } else {
-      payload.prompt = text;
-    }
+    const originalLabel = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span class="spinner"></span> ' +
+      (currentMode === 'improve' ? 'Improving…' : 'Generating…');
 
     try {
+      const payload = {
+        action:   currentMode,
+        prompt:   text,
+        language: currentLang,
+      };
+      if (currentMode === 'improve') {
+        payload.currentCode = code;
+      }
+
       if (editor) editor.setValue('');
-      const clean = await streamCodegen(payload, (acc) => {
-        if (editor) editor.setValue(acc);
+      const clean = await streamCodegen(payload, function (acc) {
+        if (editor) {
+          if (currentMode === 'generate' && getInsertMode() === 'cursor') {
+            // For cursor-insert mode we accumulate and insert once at the end
+          } else {
+            editor.setValue(acc);
+          }
+        }
       });
-      if (editor) { editor.setValue(clean); editor.focus(); }
 
-      // Record exchange in conversation history
-      conversation.push({ role: 'user',      content: text  });
-      conversation.push({ role: 'assistant', content: clean });
-      renderChatHistory();
+      if (editor) {
+        if (currentMode === 'generate' && getInsertMode() === 'cursor') {
+          const position = editor.getPosition();
+          editor.executeEdits('codegen', [{
+            range: new monaco.Range(
+              position.lineNumber, position.column,
+              position.lineNumber, position.column
+            ),
+            text: clean,
+          }]);
+        } else {
+          editor.setValue(clean);
+        }
+        editor.focus();
+      }
 
-      promptEl.value = '';
       closeModal();
     } catch (err) {
-      alert('CodeGen error: ' + err.message);
+      if (err.message !== 'redirect') {
+        alert('CodeGen error: ' + err.message);
+      }
     } finally {
       submitBtn.disabled  = false;
-      submitBtn.innerHTML = '<iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon> Generate';
+      submitBtn.innerHTML = originalLabel;
     }
   }
 
-  submitBtn.addEventListener('click', generateCode);
+  submitBtn.addEventListener('click', submitCodegen);
 
-  promptEl.addEventListener('keydown', function (e) {
+  promptTA.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
-      generateCode();
+      submitCodegen();
     }
   });
-}());
 
-/* ── Fix with AI ────────────────────────────────────────── */
-(function () {
-  const fixBtn = document.getElementById('fixAiBtn');
-  const origLabel = '<iconify-icon icon="lucide:wrench" aria-hidden="true"></iconify-icon> Fix with AI';
+  /* ── Explain modal ─────────────────────────────────────────────── */
+  const explainOverlay   = document.getElementById('explainOverlay');
+  const explainBody      = document.getElementById('explainBody');
+  const explainCloseBtn  = document.getElementById('explainCloseBtn');
+  const explainBtnEl     = document.getElementById('explainBtn');
 
-  fixBtn.addEventListener('click', async function () {
-    if (!lastError || !editor) return;
+  function closeExplain() {
+    explainOverlay.classList.remove('open');
+    explainBtnEl.focus();
+  }
 
-    fixBtn.disabled  = true;
-    fixBtn.innerHTML = '<span class="spinner"></span> Fixing…';
+  explainBtnEl.addEventListener('click', async function () {
+    // Use selection if present, else full editor
+    const sel     = editor ? editor.getSelection() : null;
+    const selText = (sel && editor) ? editor.getModel().getValueInRange(sel).trim() : '';
+    const code    = selText || requireEditorCode('explain');
+    if (code === null) return;
 
-    const { code, stderr } = lastError;
+    explainBody.innerHTML = '<div class="explain-loading"><span class="spinner"></span> Generating explanation…</div>';
+    explainOverlay.classList.add('open');
 
     try {
-      editor.setValue('');
       const clean = await streamCodegen({
-        language:     currentLang,
-        mode:         'fix',
-        prompt:       code,
-        error_output: stderr,
-      }, (acc) => {
-        editor.setValue(acc);
+        action:      'explain',
+        language:    currentLang,
+        currentCode: code,
+      }, function (acc) {
+        explainBody.textContent = acc;
       });
-      editor.setValue(clean);
-      editor.focus();
-      clearOutput();
+      explainBody.textContent = clean || '(No explanation returned.)';
     } catch (err) {
-      alert('Fix error: ' + err.message);
+      if (err.message !== 'redirect') {
+        explainBody.textContent = 'Error: ' + err.message;
+      }
+    }
+  });
+
+  explainCloseBtn.addEventListener('click', closeExplain);
+
+  explainOverlay.addEventListener('click', function (e) {
+    if (e.target === explainOverlay) closeExplain();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && explainOverlay.classList.contains('open')) closeExplain();
+  });
+
+  /* ── Fix with AI ───────────────────────────────────────────────── */
+  const fixBtn = document.getElementById('fixBtn');
+
+  fixBtn.addEventListener('click', async function () {
+    const code = requireEditorCode('fix');
+    if (code === null) return;
+
+    const outputPanel    = document.getElementById('outputPanel');
+    const errorTextRaw   = outputPanel ? outputPanel.textContent : '';
+    const errorText      = errorTextRaw.trim();
+
+    fixBtn.disabled  = true;
+    const origLabel  = fixBtn.innerHTML;
+    fixBtn.innerHTML = '<span class="spinner"></span> Fixing…';
+
+    try {
+      const payload = {
+        action:      'fix',
+        language:    currentLang,
+        currentCode: code,
+      };
+      if (errorText !== '' && !outputPanel.classList.contains('empty')) {
+        payload.errorOutput = errorText;
+      }
+
+      if (editor) editor.setValue('');
+      const clean = await streamCodegen(payload, function (acc) {
+        if (editor) editor.setValue(acc);
+      });
+      if (editor) {
+        editor.setValue(clean);
+        editor.focus();
+      }
+    } catch (err) {
+      if (err.message !== 'redirect') {
+        alert('Fix error: ' + err.message);
+      }
     } finally {
       fixBtn.disabled  = false;
       fixBtn.innerHTML = origLabel;
@@ -1558,63 +1789,15 @@ async function streamCodegen(payload, onDelta) {
   });
 }());
 
-/* ── Explain ────────────────────────────────────────────── */
-(function () {
-  const explainBtn   = document.getElementById('explainBtn');
-  const overlay      = document.getElementById('explainOverlay');
-  const contentEl    = document.getElementById('explainContent');
-  const closeBtn     = document.getElementById('explainCloseBtn');
-
-  function closeModal() { overlay.classList.remove('open'); }
-
-  closeBtn.addEventListener('click', closeModal);
-  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
-  });
-
-  explainBtn.addEventListener('click', async function () {
-    if (!editor) return;
-
-    // Use selected text if any, otherwise full editor content
-    const sel      = editor.getSelection();
-    const selText  = editor.getModel().getValueInRange(sel).trim();
-    const codeText = selText || editor.getValue().trim();
-    if (!codeText) return;
-
-    contentEl.textContent = 'Analyzing…';
-    contentEl.className   = 'explain-content loading';
-    overlay.classList.add('open');
-
-    try {
-      let fullText = '';
-      const clean = await streamCodegen({
-        language: currentLang,
-        mode:     'explain',
-        prompt:   codeText,
-      }, (acc) => {
-        contentEl.textContent = acc;
-        contentEl.className   = 'explain-content';
-        fullText = acc;
-      });
-      contentEl.textContent = clean || fullText;
-      contentEl.className   = 'explain-content';
-    } catch (err) {
-      contentEl.textContent = '⚠ ' + err.message;
-      contentEl.className   = 'explain-content';
-    }
-  });
-}());
-
-/* ── Inline edit ────────────────────────────────────────── */
-let _inlineSel = null; // current Monaco selection for inline edit
+/* ── Inline Edit ────────────────────────────────────────────────── */
+let _inlineSel = null;
 
 function openInlineEdit(selectedText, selection) {
   _inlineSel = selection;
   const preview  = document.getElementById('inlineEditPreview');
   const promptEl = document.getElementById('inlineEditPrompt');
   const overlay  = document.getElementById('inlineEditOverlay');
-
+  if (!preview || !promptEl || !overlay) return;
   preview.textContent = selectedText.length > 0
     ? (selectedText.length > 400 ? selectedText.slice(0, 397) + '…' : selectedText)
     : '(entire file)';
@@ -1628,7 +1811,9 @@ function openInlineEdit(selectedText, selection) {
   const promptEl  = document.getElementById('inlineEditPrompt');
   const submitBtn = document.getElementById('inlineEditSubmitBtn');
   const cancelBtn = document.getElementById('inlineEditCancelBtn');
-  const origLabel = '<iconify-icon icon="lucide:wand-2" aria-hidden="true"></iconify-icon> Apply Edit';
+  if (!overlay) return;
+
+  const origLabel = submitBtn ? submitBtn.innerHTML : '';
 
   function closeModal() {
     overlay.classList.remove('open');
@@ -1640,14 +1825,9 @@ function openInlineEdit(selectedText, selection) {
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
   });
-
   promptEl.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault();
-      applyEdit();
-    }
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); applyEdit(); }
   });
-
   submitBtn.addEventListener('click', applyEdit);
 
   async function applyEdit() {
@@ -1662,11 +1842,11 @@ function openInlineEdit(selectedText, selection) {
 
     try {
       const clean = await streamCodegen({
-        language:  currentLang,
-        mode:      'edit',
-        selection: selectedText || editor.getValue(),
-        prompt:    instruction,
-      }, () => {});
+        action:      'improve',
+        language:    currentLang,
+        currentCode: selectedText || editor.getValue(),
+        prompt:      instruction,
+      }, function () {});
 
       if (selectedText && sel) {
         editor.executeEdits('cf-inline-edit', [{ range: sel, text: clean }]);
@@ -1676,7 +1856,7 @@ function openInlineEdit(selectedText, selection) {
       editor.focus();
       closeModal();
     } catch (err) {
-      alert('Edit error: ' + err.message);
+      if (err.message !== 'redirect') alert('Edit error: ' + err.message);
     } finally {
       submitBtn.disabled  = false;
       submitBtn.innerHTML = origLabel;

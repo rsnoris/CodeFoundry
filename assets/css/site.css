@@ -78,6 +78,12 @@ header {
   gap: 12px;
   letter-spacing: -0.5px;
   color: var(--text);
+  text-decoration: none;
+}
+
+.brand:visited {
+  color: var(--text);
+  text-decoration: none;
 }
 
 .brand svg {
@@ -97,12 +103,51 @@ header {
   align-items: center;
 }
 
+.nav-item-dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .nav-link {
   color: var(--text-muted);
   text-decoration: none;
   font-weight: 500;
   font-size: 15px;
   transition: color .2s;
+}
+
+.nav-submenu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 180px;
+  background: var(--navy);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+  padding: 8px;
+  z-index: 1100;
+}
+
+.nav-item-dropdown:hover .nav-submenu,
+.nav-item-dropdown.open .nav-submenu,
+.nav-item-dropdown:focus-within .nav-submenu {
+  display: block;
+}
+
+.nav-submenu .nav-link.nav-sub-link {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.nav-submenu .nav-link.nav-sub-link:hover,
+.nav-submenu .nav-link.nav-sub-link.active {
+  background: var(--navy-3);
+  color: var(--text);
 }
 
 .nav-link:hover,
@@ -209,10 +254,23 @@ header {
   gap: 8px;
 }
 
+.mobile-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .mobile-menu-links a.nav-link {
   padding: 12px 16px;
   border-radius: 6px;
   font-size: 16px;
+}
+
+.mobile-menu-links a.nav-link.nav-sub-link {
+  margin-left: 14px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 15px;
 }
 
 .mobile-menu-links a.nav-link:hover {
@@ -338,6 +396,135 @@ header {
   gap: 19px;
   flex-wrap: wrap;
   justify-content: space-between;
+}
+
+/* =========================================================================
+   Login / User Menu
+   ========================================================================= */
+.nav-login-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  border: 1px solid var(--border-color);
+  border-radius: var(--button-radius);
+  padding: 9px 16px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text);
+  transition: background .2s, color .2s, border-color .2s;
+  text-decoration: none;
+}
+
+.nav-login-btn:hover,
+.nav-login-btn.active {
+  background: var(--primary);
+  color: var(--navy);
+  border-color: var(--primary);
+}
+
+.nav-user-menu {
+  position: relative;
+}
+
+.nav-user-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+  border-radius: var(--button-radius);
+  padding: 9px 14px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text);
+  transition: background .2s, border-color .2s;
+}
+
+.nav-user-btn:hover,
+.nav-user-menu.open .nav-user-btn {
+  background: var(--navy-3);
+  border-color: var(--primary);
+}
+
+.nav-user-name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-user-caret {
+  transition: transform .2s;
+}
+
+.nav-user-menu.open .nav-user-caret {
+  transform: rotate(180deg);
+}
+
+.nav-user-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 200px;
+  background: var(--navy);
+  border: 1px solid var(--border-color);
+  border-radius: var(--card-radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,.45);
+  z-index: 1100;
+  overflow: hidden;
+}
+
+.nav-user-menu.open .nav-user-dropdown {
+  display: block;
+}
+
+.nav-user-info {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.nav-user-display {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.nav-user-role {
+  font-size: 12px;
+  color: var(--text-subtle);
+  margin-top: 2px;
+}
+
+.nav-user-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 16px;
+  font-size: 14px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: background .15s, color .15s;
+}
+
+.nav-user-dropdown-item:hover {
+  background: var(--navy-3);
+  color: var(--text);
+}
+
+.mobile-user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 8px 4px;
+  color: var(--text-muted);
 }
 
 /* =========================================================================

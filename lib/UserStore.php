@@ -1,0 +1,560 @@
+<?php
+declare(strict_types=1);
+
+/**
+ * CodeFoundry – UserStore
+ *
+ * Simple flat-file (JSON) data access layer for user profiles, token history,
+ * projects and payments. All writes use atomic file replacement via a temp file.
+ */
+class UserStore
+{
+    // ── Users ──────────────────────────────────────────────────────────────
+
+    /** Return all user records from data/users.json. */
+    public static function allUsers(): array
+    {
+        return self::readJson(CF_DATA_USERS);
+    }
+
+    /**
+     * Return a single user by username.
+     * Checks CF_USERS first (authoritative for credentials/role), merging extra
+     * fields from data/users.json; falls back to self-registered users stored
+     * only in data/users.json.
+     */
+    public static function findUser(string $username): ?array
+    {
+        // Look up in CF_USERS first
+        $base         = null;
+        $basePassword = null;
+        foreach (CF_USERS as $u) {
+            if (isset($u['username']) && $u['username'] === $username) {
+                $base         = $u;
+                $basePassword = $u['password_hash'];
+                break;
+            }
+        }
+
+        $stored = self::allUsers();
+
+        if ($base !== null) {
+            // Merge in any runtime state from data/users.json
+            foreach ($stored as $row) {
+                if (($row['username'] ?? '') === $username) {
+                    // runtime fields override defaults; credentials come from CF_USERS unless overridden
+                    $base = array_merge($base, $row);
+                    // Prefer data/users.json password_hash if present, otherwise keep CF_USERS hash
+                    if (empty($row['password_hash'])) {
+                        $base['password_hash'] = $basePassword;
+                    }
+                    break;
+                }
+            }
+        } else {
+            // Fall back to self-registered users stored only in data/users.json
+            foreach ($stored as $row) {
+                if (($row['username'] ?? '') === $username && !empty($row['self_registered'])) {
+                    $base = $row;
+                    break;
+                }
+            }
+            if ($base === null) {
+                return null;
+            }
+        }
+
+        // Apply defaults for plan, tokens_used, email
+        $base['plan']        = $base['plan']        ?? 'free';
+        $base['tokens_used'] = $base['tokens_used'] ?? 0;
+        $base['email']       = $base['email']       ?? '';
+
+        return $base;
+    }
+
+    /**
+     * Return a single user by email address (case-insensitive).
+     */
+    public static function findUserByEmail(string $email): ?array
+    {
+        $target = mb_strtolower(trim($email));
+        if ($target === '') {
+            return null;
+        }
+
+        foreach (CF_USERS as $u) {
+            $candidate = mb_strtolower(trim((string)($u['email'] ?? '')));
+            if ($candidate !== '' && $candidate === $target) {
+                return self::findUser((string)$u['username']);
+            }
+        }
+
+        foreach (self::allUsers() as $row) {
+            $candidate = mb_strtolower(trim((string)($row['email'] ?? '')));
+            if ($candidate !== '' && $candidate === $target) {
+                return self::findUser((string)($row['username'] ?? ''));
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Return true if a username is already taken (checks CF_USERS and data/users.json).
+     */
+    public static function usernameExists(string $username): bool
+    {
+        foreach (CF_USERS as $u) {
+            if (($u['username'] ?? '') === $username) {
+                return true;
+            }
+        }
+        foreach (self::allUsers() as $row) {
+            if (($row['username'] ?? '') === $username) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Create a new self-registered user in data/users.json.
+     * Returns false if the username is already taken.
+     *
+     * @param string $role Optional role override (default 'user'). Use 'admin' only when creating via the admin panel.
+     * @param string $plan Optional plan override (default 'free').
+     */
+    public static function createUser(
+        string $username,
+        string $display,
+        string $email,
+        string $passwordHash,
+        string $role = 'user',
+        string $plan = 'free'
+    ): bool {
+        if (self::usernameExists($username)) {
+            return false;
+        }
+        $users   = self::allUsers();
+        $users[] = [
+            'username'        => $username,
+            'display'         => $display,
+            'email'           => $email,
+            'password_hash'   => $passwordHash,
+            'role'            => $role,
+            'plan'            => $plan,
+            'tokens_used'     => 0,
+            'self_registered' => true,
+            'created_at'      => date('c'),
+        ];
+        self::saveUsers($users);
+        self::ensureUserConfig($username);
+        return true;
+    }
+
+    /**
+     * Find a user by OAuth provider + provider user ID.
+     * Returns the user array or null.
+     */
+    public static function findUserByOAuth(string $provider, string $providerId): ?array
+    {
+        foreach (self::allUsers() as $row) {
+            if (
+                ($row['oauth_provider'] ?? '') === $provider &&
+                ($row['oauth_id']       ?? '') === $providerId
+            ) {
+                $row['plan']        = $row['plan']        ?? 'free';
+                $row['tokens_used'] = $row['tokens_used'] ?? 0;
+                $row['email']       = $row['email']       ?? '';
+                return $row;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Create a new user authenticated via a social OAuth provider.
+     * The username is derived from the provider (e.g. "github_12345") and is
+     * guaranteed unique.  Returns the created user array.
+     */
+    public static function createOAuthUser(
+        string $provider,
+        string $providerId,
+        string $display,
+        string $email
+    ): array {
+        // Derive a unique username from provider + provider user ID
+        $username = $provider . '_' . $providerId;
+
+        // Fallback to base_N if the derived name is taken
+        if (self::usernameExists($username)) {
+            $suffix   = 2;
+            $original = $username;
+            while (self::usernameExists($username)) {
+                $username = $original . '_' . $suffix++;
+            }
+        }
+
+        $user    = [
+            'username'        => $username,
+            'display'         => $display ?: $email,
+            'email'           => $email,
+            'password_hash'   => '',          // no password for OAuth users
+            'role'            => 'user',
+            'plan'            => 'free',
+            'tokens_used'     => 0,
+            'oauth_provider'  => $provider,
+            'oauth_id'        => $providerId,
+            'self_registered' => true,
+            'created_at'      => date('c'),
+        ];
+        $users   = self::allUsers();
+        $users[] = $user;
+        self::saveUsers($users);
+        self::ensureUserConfig($username);
+        return $user;
+    }
+
+    /** Ensure a per-user config folder exists under Cf-Config-keys/Users/<username>/. */
+    public static function ensureUserConfig(string $username): void
+    {
+        $dir = cf_user_config_dir($username);
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0700, true);
+        }
+    }
+
+    /** Save a user-specific API key file under Cf-Config-keys/Users/<username>/. */
+    public static function saveUserApiKey(string $username, string $keyName, string $value): void
+    {
+        self::ensureUserConfig($username);
+        cf_save_user_key($username, $keyName, $value);
+    }
+
+    /** Load a user-specific API key from the user's own key file only (no global fallback). */
+    public static function getUserApiKeyOverride(string $username, string $keyName): string
+    {
+        self::ensureUserConfig($username);
+        $safeName = cf_normalize_key_name($keyName);
+        if ($safeName === '') {
+            return '';
+        }
+        $file = cf_user_config_dir($username) . '/' . $safeName;
+        if (!is_file($file) || !is_readable($file)) {
+            return '';
+        }
+        return trim((string)file_get_contents($file));
+    }
+
+    /** Remove a user-specific key override file for the given key name. */
+    public static function clearUserApiKey(string $username, string $keyName): bool
+    {
+        self::ensureUserConfig($username);
+        $safeName = cf_normalize_key_name($keyName);
+        if ($safeName === '') {
+            throw new \InvalidArgumentException('Key name cannot be empty or contain invalid characters.');
+        }
+        $file = cf_user_config_dir($username) . '/' . $safeName;
+        if (!is_file($file)) {
+            return true;
+        }
+        return unlink($file);
+    }
+
+    /** Load a user-specific API key; falls back to global key lookup. */
+    public static function getUserApiKey(string $username, string $keyName, string $default = ''): string
+    {
+        self::ensureUserConfig($username);
+        return cf_load_user_key($username, $keyName, $default);
+    }
+
+    /** Persist all user records to data/users.json. */
+    public static function saveUsers(array $users): void
+    {
+        self::writeJson(CF_DATA_USERS, $users);
+    }
+
+    /**
+     * Update mutable fields of a single user in data/users.json.
+     * Only allows: display, email, plan, tokens_used, password_hash, role, frozen, failed_login_attempts.
+     */
+    public static function updateUser(string $username, array $fields): bool
+    {
+        $allowed = ['display', 'email', 'plan', 'tokens_used', 'password_hash', 'github_token', 'github_username', 'role', 'frozen', 'failed_login_attempts', 'password_reset_otp_hash', 'password_reset_expires_at', 'password_reset_attempts', 'password_reset_requested_at'];
+        $clean   = [];
+        foreach ($allowed as $key) {
+            if (array_key_exists($key, $fields)) {
+                $clean[$key] = $fields[$key];
+            }
+        }
+        if (empty($clean)) {
+            return false;
+        }
+
+        $users   = self::allUsers();
+        $updated = false;
+        foreach ($users as &$row) {
+            if (($row['username'] ?? '') === $username) {
+                $row    = array_merge($row, $clean);
+                $updated = true;
+                break;
+            }
+        }
+        unset($row);
+
+        if (!$updated) {
+            // User not yet in data/users.json – create a minimal record
+            $users[] = array_merge(['username' => $username], $clean);
+        }
+
+        self::saveUsers($users);
+        return true;
+    }
+
+    /**
+     * Increment the failed-login counter for a user.
+     * Automatically freezes the account when the count reaches 3.
+     * Returns the new failed_login_attempts value.
+     */
+    public static function incrementFailedLogin(string $username): int
+    {
+        $users    = self::allUsers();
+        $newCount = 1;
+        $found    = false;
+        foreach ($users as &$row) {
+            if (($row['username'] ?? '') === $username) {
+                $newCount                    = ((int)($row['failed_login_attempts'] ?? 0)) + 1;
+                $row['failed_login_attempts'] = $newCount;
+                if ($newCount >= 3) {
+                    $row['frozen'] = true;
+                }
+                $found = true;
+                break;
+            }
+        }
+        unset($row);
+
+        if (!$found) {
+            // Create a minimal record to track attempts for CF_USERS accounts too
+            $users[] = ['username' => $username, 'failed_login_attempts' => 1];
+        }
+
+        self::saveUsers($users);
+        return $newCount;
+    }
+
+    /**
+     * Reset the failed-login counter for a user after a successful login.
+     */
+    public static function resetFailedLogin(string $username): void
+    {
+        $users = self::allUsers();
+        $found = false;
+        foreach ($users as &$row) {
+            if (($row['username'] ?? '') === $username) {
+                $row['failed_login_attempts'] = 0;
+                $found = true;
+                break;
+            }
+        }
+        unset($row);
+
+        if ($found) {
+            self::saveUsers($users);
+        }
+    }
+
+    /** Add $tokens to a user's running total in data/users.json. */
+    public static function addTokensUsed(string $username, int $tokens): void
+    {
+        $users   = self::allUsers();
+        $found   = false;
+        foreach ($users as &$row) {
+            if (($row['username'] ?? '') === $username) {
+                $row['tokens_used'] = ((int)($row['tokens_used'] ?? 0)) + $tokens;
+                $found = true;
+                break;
+            }
+        }
+        unset($row);
+
+        if (!$found) {
+            $users[] = ['username' => $username, 'tokens_used' => $tokens];
+        }
+
+        self::saveUsers($users);
+    }
+
+    // ── Token history ──────────────────────────────────────────────────────
+
+    /** Append one CodeGen usage record to data/token_history.json. */
+    public static function appendTokenHistory(array $record): void
+    {
+        $all   = self::readJson(CF_DATA_TOKEN_HISTORY);
+        $all[] = $record;
+        self::writeJson(CF_DATA_TOKEN_HISTORY, $all);
+    }
+
+    /**
+     * Return token history for a user (newest first), limited to $limit entries.
+     */
+    public static function tokenHistoryForUser(string $username, int $limit = 100): array
+    {
+        $all      = self::readJson(CF_DATA_TOKEN_HISTORY);
+        $filtered = array_filter($all, fn($r) => ($r['username'] ?? '') === $username);
+        $filtered = array_reverse(array_values($filtered));
+        return array_slice($filtered, 0, $limit);
+    }
+
+    // ── Projects ───────────────────────────────────────────────────────────
+
+    /** Return projects for a user (newest first). */
+    public static function projectsForUser(string $username): array
+    {
+        $all      = self::readJson(CF_DATA_PROJECTS);
+        $filtered = array_filter($all, fn($p) => ($p['username'] ?? '') === $username);
+        $filtered = array_reverse(array_values($filtered));
+        return array_values($filtered);
+    }
+
+    /**
+     * Save a new project record to data/projects.json.
+     * Returns the generated UUID.
+     */
+    public static function saveProject(array $project): string
+    {
+        $id             = self::uuid();
+        $project['id']  = $id;
+        if (!isset($project['created_at'])) {
+            $project['created_at'] = date('c');
+        }
+        $all   = self::readJson(CF_DATA_PROJECTS);
+        $all[] = $project;
+        self::writeJson(CF_DATA_PROJECTS, $all);
+        return $id;
+    }
+
+    /**
+     * Delete a project by id and owner username.
+     * Returns true if a record was removed.
+     */
+    public static function deleteProject(string $id, string $username): bool
+    {
+        $all     = self::readJson(CF_DATA_PROJECTS);
+        $before  = count($all);
+        $all     = array_values(array_filter(
+            $all,
+            fn($p) => !($p['id'] === $id && ($p['username'] ?? '') === $username)
+        ));
+        if (count($all) === $before) {
+            return false;
+        }
+        self::writeJson(CF_DATA_PROJECTS, $all);
+        return true;
+    }
+
+    // ── Payments ───────────────────────────────────────────────────────────
+
+    /** Return payments for a user (newest first). */
+    public static function paymentsForUser(string $username): array
+    {
+        $all      = self::readJson(CF_DATA_PAYMENTS);
+        $filtered = array_filter($all, fn($p) => ($p['username'] ?? '') === $username);
+        $filtered = array_reverse(array_values($filtered));
+        return array_values($filtered);
+    }
+
+    /**
+     * Append a payment record to data/payments.json and update the user's plan.
+     *
+     * @param string $username
+     * @param string $plan        Plan key (e.g. 'starter', 'pro')
+     * @param float  $amount      Amount charged in dollars
+     * @param string $method      Payment method ('stripe', 'paypal')
+     * @param string $txnId       Provider transaction / order ID
+     * @param string $description Human-readable description
+     */
+    public static function savePayment(
+        string $username,
+        string $plan,
+        float  $amount,
+        string $method,
+        string $txnId,
+        string $description
+    ): void {
+        $all   = self::readJson(CF_DATA_PAYMENTS);
+        $all[] = [
+            'username'    => $username,
+            'plan'        => $plan,
+            'amount'      => $amount,
+            'method'      => $method,
+            'txn_id'      => $txnId,
+            'description' => $description,
+            'status'      => 'paid',
+            'created_at'  => date('c'),
+        ];
+        self::writeJson(CF_DATA_PAYMENTS, $all);
+
+        // Upgrade the user's plan
+        self::updateUser($username, ['plan' => $plan]);
+    }
+
+    // ── Internal helpers ───────────────────────────────────────────────────
+
+    private static function readJson(string $path): array
+    {
+        if (!file_exists($path)) {
+            return [];
+        }
+        $fp = fopen($path, 'r');
+        if ($fp === false) {
+            return [];
+        }
+        flock($fp, LOCK_SH);
+        $content = stream_get_contents($fp);
+        flock($fp, LOCK_UN);
+        fclose($fp);
+
+        if ($content === false || $content === '') {
+            return [];
+        }
+        $decoded = json_decode($content, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /** Atomic write using temp file in sys_get_temp_dir() + rename. */
+    private static function writeJson(string $path, array $data): void
+    {
+        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        $tmpPath = tempnam(sys_get_temp_dir(), 'cf_store_');
+        if ($tmpPath === false) {
+            throw new \RuntimeException('UserStore: unable to create temporary file.');
+        }
+
+        $fp = fopen($tmpPath, 'w');
+        if ($fp === false) {
+            @unlink($tmpPath);
+            throw new \RuntimeException("UserStore: cannot open temp file for writing: {$tmpPath}");
+        }
+        flock($fp, LOCK_EX);
+        fwrite($fp, $json);
+        fflush($fp);
+        flock($fp, LOCK_UN);
+        fclose($fp);
+
+        if (!rename($tmpPath, $path)) {
+            @unlink($tmpPath);
+            throw new \RuntimeException("UserStore: failed to atomically replace {$path}.");
+        }
+    }
+
+    /** Return a UUID v4 formatted string. */
+    private static function uuid(): string
+    {
+        $bytes = random_bytes(16);
+        $bytes[6] = chr((ord($bytes[6]) & 0x0f) | 0x40); // version 4
+        $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80); // variant RFC 4122
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
+    }
+}

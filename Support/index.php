@@ -1,4 +1,49 @@
 <?php
+/**
+ * CodeFoundry – Support Page with contact form.
+ */
+declare(strict_types=1);
+require_once dirname(__DIR__) . '/config.php';
+require_once dirname(__DIR__) . '/lib/AuditStore.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$_cf_user      = $_SESSION['cf_user'] ?? null;
+$ticket_errors = [];
+$ticket_sent   = false;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['support_submit'])) {
+    // CSRF
+    if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+        $ticket_errors[] = 'Invalid request. Please try again.';
+    } else {
+        $t_name    = trim($_POST['name']    ?? '');
+        $t_email   = trim($_POST['email']   ?? '');
+        $t_subject = trim($_POST['subject'] ?? '');
+        $t_message = trim($_POST['message'] ?? '');
+
+        if ($t_name    === '') { $ticket_errors[] = 'Name is required.'; }
+        if ($t_email   === '' || !filter_var($t_email, FILTER_VALIDATE_EMAIL)) {
+            $ticket_errors[] = 'A valid email address is required.';
+        }
+        if ($t_subject === '') { $ticket_errors[] = 'Subject is required.'; }
+        if (mb_strlen($t_message) < 10) { $ticket_errors[] = 'Message must be at least 10 characters.'; }
+
+        if (empty($ticket_errors)) {
+            $username = $_cf_user['username'] ?? '';
+            AuditStore::createSupportTicket($username, $t_name, $t_email, $t_subject, $t_message);
+            $ticket_sent = true;
+        }
+    }
+}
+
+// Generate CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $page_title  = 'Support - CodeFoundry';
 $active_page = '';
 $page_styles = <<<'PAGECSS'
@@ -436,6 +481,93 @@ $page_styles = <<<'PAGECSS'
         padding: 23px 20px 0 20px;
       }
     }
+    .contact-form-section {
+      max-width: 640px;
+      margin: 48px auto 0;
+      padding: 0 20px 60px;
+    }
+    .contact-form-section h2 {
+      font-size: 22px;
+      font-weight: 800;
+      margin: 0 0 8px;
+      color: var(--text);
+    }
+    .contact-form-section > p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin: 0 0 24px;
+    }
+    .ticket-success {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(24,179,255,.1);
+      border: 1px solid rgba(24,179,255,.25);
+      border-radius: 10px;
+      padding: 16px 20px;
+      color: var(--primary);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .ticket-errors {
+      background: rgba(239,68,68,.1);
+      border: 1px solid rgba(239,68,68,.3);
+      border-radius: 10px;
+      padding: 14px 18px;
+      color: #f87171;
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+    .ticket-errors div + div { margin-top: 4px; }
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .cf-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .cf-field label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .cf-field input,
+    .cf-field textarea {
+      background: var(--navy);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .2s;
+      resize: vertical;
+    }
+    .cf-field input:focus,
+    .cf-field textarea:focus {
+      border-color: var(--primary);
+    }
+    .cf-btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 24px;
+      background: var(--primary);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 14px;
+      border-radius: var(--button-radius);
+      border: none;
+      cursor: pointer;
+      transition: background .2s;
+      text-decoration: none;
+      align-self: flex-start;
+    }
+    .cf-btn-primary:hover { background: var(--primary-hover); }
 PAGECSS;
 $page_scripts = <<<'PAGEJS'
 const menuBtn = document.getElementById('mobileMenuBtn');
@@ -461,10 +593,8 @@ require_once __DIR__ . '/../includes/header.php';
       <a href="/#industries" class="nav-link" onclick="closeMobileNav()">Industries</a>
       <a href="/CaseStudies/" class="nav-link" onclick="closeMobileNav()">Case Studies</a>
       <a href="/AboutUs/" class="nav-link" onclick="closeMobileNav()">About</a>
-      <a href="/Careers/" class="nav-link" onclick="closeMobileNav()">Careers</a>
     </div>
     <div class="mobile-menu-actions">
-      <a href="/Contact/" class="nav-btn secondary" style="font-weight:800;">Contact Us</a>
       <a href="/#services" class="nav-btn primary">Get Started</a>
     </div>
   </div>
@@ -488,7 +618,7 @@ require_once __DIR__ . '/../includes/header.php';
       <p class="support-desc">
         Connect with our support team instantly through live chat for immediate assistance with your questions.
       </p>
-      <a href="#" class="support-link">
+      <a href="mailto:support@codefoundry.cloud" class="support-link">
         Start Chat
         <iconify-icon icon="lucide:arrow-right"></iconify-icon>
       </a>
@@ -544,7 +674,7 @@ require_once __DIR__ . '/../includes/header.php';
       <p class="support-desc">
         Join our community to discuss best practices and connect with other CodeFoundry users.
       </p>
-      <a href="#" class="support-link">
+      <a href="/Blog/" class="support-link">
         Visit Forum
         <iconify-icon icon="lucide:arrow-right"></iconify-icon>
       </a>
@@ -558,7 +688,7 @@ require_once __DIR__ . '/../includes/header.php';
       <p class="support-desc">
         Watch step-by-step video tutorials covering various features and common workflows.
       </p>
-      <a href="#" class="support-link">
+      <a href="/Training/" class="support-link">
         Watch Videos
         <iconify-icon icon="lucide:arrow-right"></iconify-icon>
       </a>
@@ -594,6 +724,50 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="contact-method-value">24/7 Support</div>
       </div>
     </div>
+  </div>
+
+  <!-- Contact Form -->
+  <div class="contact-form-section">
+    <h2>Submit a Support Request</h2>
+    <p>Fill out the form below and our team will get back to you as soon as possible.</p>
+
+    <?php if ($ticket_sent): ?>
+      <div class="ticket-success">
+        <iconify-icon icon="lucide:check-circle-2"></iconify-icon>
+        Your support request has been submitted. We'll be in touch shortly.
+      </div>
+    <?php else: ?>
+      <?php if (!empty($ticket_errors)): ?>
+        <div class="ticket-errors">
+          <?php foreach ($ticket_errors as $e): ?>
+            <div><?= cf_e($e) ?></div>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
+      <form class="contact-form" method="post" action="/Support/">
+        <input type="hidden" name="csrf_token" value="<?= cf_e($_SESSION['csrf_token']) ?>">
+        <input type="hidden" name="support_submit" value="1">
+        <div class="cf-field">
+          <label for="t_name">Name</label>
+          <input type="text" id="t_name" name="name" value="<?= cf_e($_cf_user['display'] ?? '') ?>" placeholder="Your name" required>
+        </div>
+        <div class="cf-field">
+          <label for="t_email">Email</label>
+          <input type="email" id="t_email" name="email" placeholder="you@example.com" required>
+        </div>
+        <div class="cf-field">
+          <label for="t_subject">Subject</label>
+          <input type="text" id="t_subject" name="subject" placeholder="Brief summary of your issue" required>
+        </div>
+        <div class="cf-field">
+          <label for="t_message">Message</label>
+          <textarea id="t_message" name="message" rows="5" placeholder="Describe your issue in detail…" required></textarea>
+        </div>
+        <button type="submit" class="cf-btn-primary">
+          <iconify-icon icon="lucide:send"></iconify-icon> Send Request
+        </button>
+      </form>
+    <?php endif; ?>
   </div>
 </main>
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

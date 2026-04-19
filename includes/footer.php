@@ -9,6 +9,7 @@
  * any page-specific scripts, and closes </body></html>.
  */
 $page_scripts = $page_scripts ?? '';
+$_cf_user = $_cf_user ?? null;
 ?>
 <footer class="footer-section">
   <div class="footer-row">
@@ -38,15 +39,18 @@ $page_scripts = $page_scripts ?? '';
       <ul class="footer-link-list">
         <li><a href="/AboutUs/"     class="footer-link">About Us</a></li>
         <li><a href="/CaseStudies/" class="footer-link">Case Studies</a></li>
-        <li><a href="/Careers/"     class="footer-link">Careers</a></li>
-        <li><a href="/Contact/"     class="footer-link">Contact</a></li>
+
       </ul>
     </div>
     <div class="footer-col">
       <div class="footer-col-title">Resources</div>
       <ul class="footer-link-list">
         <li><a href="/Blog/"          class="footer-link">Blog</a></li>
+        <?php if ($_cf_user): ?>
+        <li><a href="/Tools/"         class="footer-link">Developer Tools</a></li>
+        <?php endif; ?>
         <li><a href="/IDE/"           class="footer-link">Online IDE</a></li>
+        <li><a href="/Pricing/"       class="footer-link">Pricing</a></li>
         <li><a href="/Documentation/" class="footer-link">Documentation</a></li>
         <li><a href="/Training/"      class="footer-link">Training</a></li>
         <li><a href="/Support/"       class="footer-link">Support</a></li>
@@ -60,6 +64,39 @@ $page_scripts = $page_scripts ?? '';
   </div>
 </footer>
 <script src="/assets/js/site.js"></script>
+<script>
+(function () {
+  var _cfPageLoad = Date.now();
+  var _cfCurrentPage = window.location.pathname;
+
+  function _cfSendView(page, referrer, timeOnPage) {
+    try {
+      var payload = JSON.stringify({ page: page, referrer: referrer, time_on_page: timeOnPage });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/track.php', new Blob([payload], { type: 'application/json' }));
+      } else {
+        fetch('/track.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+          keepalive: true
+        });
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  // Record the current page view on load
+  _cfSendView(_cfCurrentPage, document.referrer ? new URL(document.referrer).pathname : '', 0);
+
+  // On unload, send the time spent on the current page
+  window.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') {
+      var spent = Math.round((Date.now() - _cfPageLoad) / 1000);
+      _cfSendView(_cfCurrentPage, '', spent);
+    }
+  });
+}());
+</script>
 <?php if ($page_scripts !== ''): ?>
 <script>
 <?= $page_scripts ?>
