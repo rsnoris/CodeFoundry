@@ -403,6 +403,245 @@ kbd {
   color: var(--text-subtle);
   margin: 0;
 }
+
+/* ── Pro toggle ─────────────────────────────────────── */
+.pro-toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.pro-toggle {
+  position: relative;
+  width: 32px;
+  height: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.pro-toggle input { display: none; }
+
+.pro-toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #1e293b;
+  border: 1px solid var(--border-color);
+  border-radius: 9px;
+  transition: background .2s, border-color .2s;
+}
+
+.pro-toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  top: 2px;
+  left: 2px;
+  background: #475569;
+  border-radius: 50%;
+  transition: transform .2s, background .2s;
+}
+
+.pro-toggle input:checked + .pro-toggle-slider {
+  background: rgba(14,165,233,.15);
+  border-color: var(--primary);
+}
+
+.pro-toggle input:checked + .pro-toggle-slider::before {
+  transform: translateX(14px);
+  background: var(--primary);
+}
+
+/* ── CodeGen controls row ────────────────────────────── */
+.codegen-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ── Chat history ────────────────────────────────────── */
+.chat-history {
+  max-height: 200px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scrollbar-width: thin;
+}
+
+.chat-history:empty { display: none; }
+
+.chat-bubble {
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 8px 11px;
+  border-radius: 8px;
+  max-width: 96%;
+  word-break: break-word;
+}
+
+.chat-bubble.user {
+  background: #1e293b;
+  color: var(--text);
+  align-self: flex-end;
+  border: 1px solid var(--border-color);
+}
+
+.chat-bubble.assistant {
+  background: #0d1117;
+  color: #4ade80;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 11.5px;
+  align-self: flex-start;
+  border: 1px solid rgba(22,163,74,.25);
+  white-space: pre-wrap;
+}
+
+/* ── History dropdown ────────────────────────────────── */
+.codegen-history-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.history-select {
+  flex: 1;
+  background: #0d1117;
+  color: var(--text);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  outline: none;
+}
+
+.history-select:focus { border-color: var(--primary); }
+.history-select option { background: #0d1117; }
+
+.chat-clear-btn {
+  font-size: 11px;
+  color: var(--text-subtle);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.chat-clear-btn:hover { color: var(--text-muted); }
+
+/* ── Inline-edit modal ───────────────────────────────── */
+.inline-edit-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 1100;
+  align-items: center;
+  justify-content: center;
+}
+
+.inline-edit-overlay.open { display: flex; }
+
+.inline-edit-modal {
+  background: var(--navy-2);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  width: min(520px, 95vw);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+
+.inline-edit-modal h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.inline-edit-modal h2 iconify-icon { color: #a78bfa; }
+
+.inline-edit-preview {
+  background: #0d1117;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 11.5px;
+  color: #94a3b8;
+  max-height: 80px;
+  overflow: auto;
+  white-space: pre;
+  word-break: break-all;
+}
+
+/* ── Explain modal ───────────────────────────────────── */
+.explain-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 1050;
+  align-items: center;
+  justify-content: center;
+}
+
+.explain-overlay.open { display: flex; }
+
+.explain-modal {
+  background: var(--navy-2);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  width: min(640px, 95vw);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+
+.explain-modal h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.explain-modal h2 iconify-icon { color: #34d399; }
+
+.explain-content {
+  flex: 1;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text);
+  white-space: pre-wrap;
+  min-height: 60px;
+  scrollbar-width: thin;
+}
+
+.explain-content.loading {
+  color: var(--text-subtle);
+  font-style: italic;
+}
 PAGECSS;
 
 require_once dirname(__DIR__) . '/includes/header.php';
@@ -481,6 +720,18 @@ require_once dirname(__DIR__) . '/includes/header.php';
       Reset
     </button>
 
+    <!-- Download -->
+    <button id="downloadBtn" class="ide-btn ghost" title="Download code as file">
+      <iconify-icon icon="lucide:download" aria-hidden="true"></iconify-icon>
+      Download
+    </button>
+
+    <!-- Explain -->
+    <button id="explainBtn" class="ide-btn ghost" title="Explain code with AI">
+      <iconify-icon icon="lucide:book-open" aria-hidden="true"></iconify-icon>
+      Explain
+    </button>
+
     <!-- Keyboard hint -->
     <div class="toolbar-hint" aria-hidden="true">
       <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run
@@ -522,6 +773,10 @@ require_once dirname(__DIR__) . '/includes/header.php';
           <span>Output</span>
           <div class="pane-header-right">
             <span id="statusBadge" class="pane-badge" style="display:none;" aria-live="polite"></span>
+            <button id="fixAiBtn" class="ide-btn ghost pane-clear-btn" title="Fix runtime error with AI" style="display:none;">
+              <iconify-icon icon="lucide:wrench" aria-hidden="true"></iconify-icon>
+              Fix with AI
+            </button>
             <button class="ide-btn ghost pane-clear-btn" id="clearOutputBtn"
                     aria-label="Clear output">Clear</button>
           </div>
@@ -543,16 +798,77 @@ require_once dirname(__DIR__) . '/includes/header.php';
       <iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon>
       Generate Code with AI
     </h2>
+
+    <!-- Chat history (multi-turn) -->
+    <div id="chatHistory" class="chat-history" aria-live="polite"></div>
+
+    <!-- Prompt history dropdown -->
+    <div class="codegen-history-row" id="historyRow" style="display:none;">
+      <select id="historySelect" class="history-select" aria-label="Recent prompts">
+        <option value="">↑ Recent prompts…</option>
+      </select>
+    </div>
+
     <textarea id="codegenPrompt" class="codegen-prompt"
-              placeholder="Describe the code you want to generate…&#10;e.g. "Write a function that sorts a list of dictionaries by a given key.""
+              placeholder="Describe the code you want to generate…&#10;e.g. &quot;Write a function that sorts a list of dictionaries by a given key.&quot;"
               rows="4" aria-label="Code generation prompt"></textarea>
-    <p class="codegen-hint">The generated code will replace the current editor content.</p>
+
+    <!-- Controls row: Pro toggle + hint -->
+    <div class="codegen-controls">
+      <div class="pro-toggle-wrap">
+        <label class="pro-toggle" title="GPT-4o for higher quality (uses more quota)">
+          <input type="checkbox" id="proToggle" aria-label="Use Pro model (GPT-4o)">
+          <span class="pro-toggle-slider"></span>
+        </label>
+        <span>Pro <span style="color:var(--primary);font-size:11px;">(GPT-4o)</span></span>
+      </div>
+      <p class="codegen-hint">Replaces editor content · <kbd>Ctrl</kbd>+<kbd>Enter</kbd></p>
+    </div>
+
     <div class="codegen-actions">
+      <button id="chatClearBtn" class="chat-clear-btn" style="display:none;" aria-label="Clear conversation">Clear chat</button>
       <button id="codegenCancelBtn" class="ide-btn ghost">Cancel</button>
       <button id="codegenSubmitBtn" class="ide-btn primary">
         <iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon>
         Generate
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Inline-edit modal ─────────────────────────────────────────────── -->
+<div id="inlineEditOverlay" class="inline-edit-overlay" role="dialog"
+     aria-modal="true" aria-labelledby="inlineEditTitle">
+  <div class="inline-edit-modal">
+    <h2 id="inlineEditTitle">
+      <iconify-icon icon="lucide:wand-2" aria-hidden="true"></iconify-icon>
+      Edit Selection with AI
+    </h2>
+    <pre id="inlineEditPreview" class="inline-edit-preview"></pre>
+    <textarea id="inlineEditPrompt" class="codegen-prompt"
+              placeholder="How should the AI modify this selection?&#10;e.g. &quot;Make this async&quot; or &quot;Add input validation&quot;"
+              rows="3" aria-label="Edit instruction"></textarea>
+    <div class="codegen-actions">
+      <button id="inlineEditCancelBtn" class="ide-btn ghost">Cancel</button>
+      <button id="inlineEditSubmitBtn" class="ide-btn primary" style="background:#7c3aed;">
+        <iconify-icon icon="lucide:wand-2" aria-hidden="true"></iconify-icon>
+        Apply Edit
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Explain modal ──────────────────────────────────────────────────── -->
+<div id="explainOverlay" class="explain-overlay" role="dialog"
+     aria-modal="true" aria-labelledby="explainTitle">
+  <div class="explain-modal">
+    <h2 id="explainTitle">
+      <iconify-icon icon="lucide:book-open" aria-hidden="true"></iconify-icon>
+      Code Explanation
+    </h2>
+    <div id="explainContent" class="explain-content loading">Analyzing…</div>
+    <div class="codegen-actions">
+      <button id="explainCloseBtn" class="ide-btn ghost">Close</button>
     </div>
   </div>
 </div>
@@ -685,6 +1001,7 @@ const LANGUAGES = {
 let editor     = null;
 let currentLang = 'python';
 let isRunning   = false;
+let lastError   = null; // tracks last run error for "Fix with AI"
 
 /* ── Init Monaco ────────────────────────────────────────── */
 require.config({
@@ -735,6 +1052,20 @@ require(['vs/editor/editor.main'], function () {
     monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
     runCode,
   );
+
+  // Ctrl/Cmd + Shift + I → inline AI edit
+  editor.addAction({
+    id:    'cf-inline-edit',
+    label: 'Edit with AI',
+    keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyI],
+    contextMenuGroupId: '1_modification',
+    contextMenuOrder:   1.5,
+    run: function (ed) {
+      const sel          = ed.getSelection();
+      const selectedText = ed.getModel().getValueInRange(sel);
+      openInlineEdit(selectedText || '', sel);
+    },
+  });
 });
 
 /* ── Language switch ────────────────────────────────────── */
@@ -804,6 +1135,22 @@ document.getElementById('resetBtn').addEventListener('click', function () {
   }
 });
 
+/* ── Download ───────────────────────────────────────────── */
+document.getElementById('downloadBtn').addEventListener('click', function () {
+  if (!editor) return;
+  const code = editor.getValue();
+  if (!code) return;
+  const lang     = LANGUAGES[currentLang];
+  const filename = 'main.' + lang.ext;
+  const blob     = new Blob([code], { type: 'text/plain' });
+  const url      = URL.createObjectURL(blob);
+  const a        = document.createElement('a');
+  a.href         = url;
+  a.download     = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
 document.getElementById('clearStdinBtn').addEventListener('click', function () {
   document.getElementById('stdinInput').value = '';
 });
@@ -861,8 +1208,9 @@ async function runCode() {
 
 /* ── Output rendering ───────────────────────────────────── */
 function showOutput(stdout, stderr, exitCode, errorMsg) {
-  const panel = document.getElementById('outputPanel');
-  const badge = document.getElementById('statusBadge');
+  const panel    = document.getElementById('outputPanel');
+  const badge    = document.getElementById('statusBadge');
+  const fixBtn   = document.getElementById('fixAiBtn');
 
   panel.className = 'output-content';
   panel.innerHTML = '';
@@ -872,7 +1220,9 @@ function showOutput(stdout, stderr, exitCode, errorMsg) {
     el.className   = 'output-stderr';
     el.textContent = '⚠ ' + errorMsg;
     panel.appendChild(el);
-    badge.style.display = 'none';
+    badge.style.display  = 'none';
+    fixBtn.style.display = 'none';
+    lastError = null;
     return;
   }
 
@@ -920,22 +1270,33 @@ function showOutput(stdout, stderr, exitCode, errorMsg) {
   if (exitCode === 0) {
     badge.className   = 'pane-badge exit-ok';
     badge.textContent = 'Exit 0 ✓';
+    fixBtn.style.display = 'none';
+    lastError = null;
   } else if (exitCode !== null) {
     badge.className   = 'pane-badge exit-err';
     badge.textContent = 'Exit ' + exitCode;
+    // Show fix button and record error context
+    lastError = { code: editor ? editor.getValue() : '', stderr: stderr || '', exitCode };
+    fixBtn.style.display = '';
   } else {
-    badge.style.display = 'none';
+    badge.style.display  = 'none';
+    fixBtn.style.display = 'none';
+    lastError = null;
   }
 }
 
 function clearOutput() {
-  const panel = document.getElementById('outputPanel');
+  const panel  = document.getElementById('outputPanel');
+  const badge  = document.getElementById('statusBadge');
+  const fixBtn = document.getElementById('fixAiBtn');
+
   panel.textContent = 'Run your code to see output here.';
   panel.className   = 'output-content empty';
 
-  const badge = document.getElementById('statusBadge');
-  badge.style.display = 'none';
-  badge.className     = 'pane-badge';
+  badge.style.display  = 'none';
+  badge.className      = 'pane-badge';
+  fixBtn.style.display = 'none';
+  lastError = null;
 }
 
 function setRunning(on) {
@@ -960,18 +1321,138 @@ function setRunning(on) {
   }
 }
 
-/* ── CodeGen ────────────────────────────────────────────── */
-(function () {
-  const overlay    = document.getElementById('codegenOverlay');
-  const prompt     = document.getElementById('codegenPrompt');
-  const submitBtn  = document.getElementById('codegenSubmitBtn');
-  const cancelBtn  = document.getElementById('codegenCancelBtn');
-  const codegenBtn = document.getElementById('codegenBtn');
+/* ── Shared SSE streaming helper ────────────────────────── */
+/**
+ * Stream a codegen.php SSE response, calling onDelta(str) for each token.
+ * Returns the full accumulated text, stripped of markdown fences.
+ */
+async function streamCodegen(payload, onDelta) {
+  const res = await fetch('/IDE/codegen.php', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ ...payload, stream: true }),
+  });
 
+  if (!res.ok) {
+    let errMsg = 'Unknown error';
+    try { errMsg = (await res.json()).error || errMsg; } catch (_) {}
+    throw new Error(errMsg);
+  }
+
+  const reader  = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let accumulated = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop(); // keep incomplete last line
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const raw = line.slice(6).trim();
+      if (raw === '[DONE]') break;
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed.error) throw new Error(parsed.error.message || String(parsed.error));
+        const delta = parsed.choices?.[0]?.delta?.content;
+        if (delta) {
+          accumulated += delta;
+          onDelta(accumulated);
+        }
+      } catch (parseErr) {
+        if (parseErr.message && !parseErr.message.startsWith('JSON')) throw parseErr;
+      }
+    }
+  }
+
+  // Strip accidental markdown fences
+  return accumulated
+    .replace(/^```[a-zA-Z]*\n?/, '')
+    .replace(/\n?```$/, '')
+    .trim();
+}
+
+/* ── CodeGen (multi-turn, streaming, history, Pro toggle) ── */
+(function () {
+  const HISTORY_KEY = 'cf_codegen_history';
+  const HISTORY_MAX = 20;
+
+  const overlay      = document.getElementById('codegenOverlay');
+  const promptEl     = document.getElementById('codegenPrompt');
+  const submitBtn    = document.getElementById('codegenSubmitBtn');
+  const cancelBtn    = document.getElementById('codegenCancelBtn');
+  const codegenBtn   = document.getElementById('codegenBtn');
+  const historyRow   = document.getElementById('historyRow');
+  const histSelect   = document.getElementById('historySelect');
+  const chatHistEl   = document.getElementById('chatHistory');
+  const chatClearBtn = document.getElementById('chatClearBtn');
+  const proToggle    = document.getElementById('proToggle');
+
+  // Conversation history (user/assistant turns, no system message stored here)
+  let conversation = [];
+
+  // ── localStorage history helpers ──────────────────────────
+  function loadHistory() {
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+    catch (_) { return []; }
+  }
+
+  function saveToHistory(text) {
+    const hist = loadHistory().filter(h => h !== text);
+    hist.unshift(text);
+    if (hist.length > HISTORY_MAX) hist.length = HISTORY_MAX;
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(hist)); } catch (_) {}
+  }
+
+  function refreshHistoryDropdown() {
+    const hist = loadHistory();
+    histSelect.innerHTML = '<option value="">↑ Recent prompts…</option>';
+    hist.forEach(h => {
+      const opt = document.createElement('option');
+      opt.value = h;
+      opt.textContent = h.length > 65 ? h.slice(0, 62) + '…' : h;
+      histSelect.appendChild(opt);
+    });
+    historyRow.style.display = hist.length > 0 ? '' : 'none';
+  }
+
+  histSelect.addEventListener('change', function () {
+    if (this.value) { promptEl.value = this.value; promptEl.focus(); this.value = ''; }
+  });
+
+  // ── Chat history rendering ────────────────────────────────
+  function renderChatHistory() {
+    chatHistEl.innerHTML = '';
+    conversation.forEach(msg => {
+      const div = document.createElement('div');
+      div.className = 'chat-bubble ' + (msg.role === 'user' ? 'user' : 'assistant');
+      const preview = msg.content.length > 220 ? msg.content.slice(0, 217) + '…' : msg.content;
+      div.textContent = preview;
+      chatHistEl.appendChild(div);
+    });
+    if (chatHistEl.children.length > 0) {
+      chatHistEl.scrollTop = chatHistEl.scrollHeight;
+      chatClearBtn.style.display = '';
+    } else {
+      chatClearBtn.style.display = 'none';
+    }
+  }
+
+  chatClearBtn.addEventListener('click', function () {
+    conversation = [];
+    renderChatHistory();
+  });
+
+  // ── Open / close ──────────────────────────────────────────
   function openModal() {
-    prompt.value = '';
+    refreshHistoryDropdown();
+    renderChatHistory();
+    promptEl.value = '';
     overlay.classList.add('open');
-    prompt.focus();
+    promptEl.focus();
   }
 
   function closeModal() {
@@ -990,49 +1471,217 @@ function setRunning(on) {
     if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
   });
 
+  // ── Generate ──────────────────────────────────────────────
   async function generateCode() {
-    const text = prompt.value.trim();
-    if (!text) { prompt.focus(); return; }
+    const text = promptEl.value.trim();
+    if (!text) { promptEl.focus(); return; }
 
-    submitBtn.disabled = true;
+    saveToHistory(text);
+
+    submitBtn.disabled  = true;
     submitBtn.innerHTML = '<span class="spinner"></span> Generating…';
 
+    // Build payload
+    const payload = { language: currentLang, mode: 'generate', pro: proToggle.checked };
+
+    if (conversation.length > 0) {
+      // Send full conversation + new user turn
+      payload.messages = [...conversation, { role: 'user', content: text }];
+    } else {
+      payload.prompt = text;
+    }
+
     try {
-      const res = await fetch('/IDE/codegen.php', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ prompt: text, language: currentLang }),
+      if (editor) editor.setValue('');
+      const clean = await streamCodegen(payload, (acc) => {
+        if (editor) editor.setValue(acc);
       });
+      if (editor) { editor.setValue(clean); editor.focus(); }
 
-      const data = await res.json();
+      // Record exchange in conversation history
+      conversation.push({ role: 'user',      content: text  });
+      conversation.push({ role: 'assistant', content: clean });
+      renderChatHistory();
 
-      if (!res.ok) {
-        alert(`CodeGen error: ${data.error || 'Unknown error'}`);
-        return;
-      }
-
-      if (editor) {
-        editor.setValue(data.code);
-        editor.focus();
-      }
-
+      promptEl.value = '';
       closeModal();
     } catch (err) {
-      alert(`Network error: ${err.message}`);
+      alert('CodeGen error: ' + err.message);
     } finally {
-      submitBtn.disabled = false;
+      submitBtn.disabled  = false;
       submitBtn.innerHTML = '<iconify-icon icon="lucide:sparkles" aria-hidden="true"></iconify-icon> Generate';
     }
   }
 
   submitBtn.addEventListener('click', generateCode);
 
-  prompt.addEventListener('keydown', function (e) {
+  promptEl.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       generateCode();
     }
   });
+}());
+
+/* ── Fix with AI ────────────────────────────────────────── */
+(function () {
+  const fixBtn = document.getElementById('fixAiBtn');
+  const origLabel = '<iconify-icon icon="lucide:wrench" aria-hidden="true"></iconify-icon> Fix with AI';
+
+  fixBtn.addEventListener('click', async function () {
+    if (!lastError || !editor) return;
+
+    fixBtn.disabled  = true;
+    fixBtn.innerHTML = '<span class="spinner"></span> Fixing…';
+
+    const { code, stderr } = lastError;
+
+    try {
+      editor.setValue('');
+      const clean = await streamCodegen({
+        language:     currentLang,
+        mode:         'fix',
+        prompt:       code,
+        error_output: stderr,
+      }, (acc) => {
+        editor.setValue(acc);
+      });
+      editor.setValue(clean);
+      editor.focus();
+      clearOutput();
+    } catch (err) {
+      alert('Fix error: ' + err.message);
+    } finally {
+      fixBtn.disabled  = false;
+      fixBtn.innerHTML = origLabel;
+    }
+  });
+}());
+
+/* ── Explain ────────────────────────────────────────────── */
+(function () {
+  const explainBtn   = document.getElementById('explainBtn');
+  const overlay      = document.getElementById('explainOverlay');
+  const contentEl    = document.getElementById('explainContent');
+  const closeBtn     = document.getElementById('explainCloseBtn');
+
+  function closeModal() { overlay.classList.remove('open'); }
+
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+  });
+
+  explainBtn.addEventListener('click', async function () {
+    if (!editor) return;
+
+    // Use selected text if any, otherwise full editor content
+    const sel      = editor.getSelection();
+    const selText  = editor.getModel().getValueInRange(sel).trim();
+    const codeText = selText || editor.getValue().trim();
+    if (!codeText) return;
+
+    contentEl.textContent = 'Analyzing…';
+    contentEl.className   = 'explain-content loading';
+    overlay.classList.add('open');
+
+    try {
+      let fullText = '';
+      const clean = await streamCodegen({
+        language: currentLang,
+        mode:     'explain',
+        prompt:   codeText,
+      }, (acc) => {
+        contentEl.textContent = acc;
+        contentEl.className   = 'explain-content';
+        fullText = acc;
+      });
+      contentEl.textContent = clean || fullText;
+      contentEl.className   = 'explain-content';
+    } catch (err) {
+      contentEl.textContent = '⚠ ' + err.message;
+      contentEl.className   = 'explain-content';
+    }
+  });
+}());
+
+/* ── Inline edit ────────────────────────────────────────── */
+let _inlineSel = null; // current Monaco selection for inline edit
+
+function openInlineEdit(selectedText, selection) {
+  _inlineSel = selection;
+  const preview  = document.getElementById('inlineEditPreview');
+  const promptEl = document.getElementById('inlineEditPrompt');
+  const overlay  = document.getElementById('inlineEditOverlay');
+
+  preview.textContent = selectedText.length > 0
+    ? (selectedText.length > 400 ? selectedText.slice(0, 397) + '…' : selectedText)
+    : '(entire file)';
+  promptEl.value = '';
+  overlay.classList.add('open');
+  promptEl.focus();
+}
+
+(function () {
+  const overlay   = document.getElementById('inlineEditOverlay');
+  const promptEl  = document.getElementById('inlineEditPrompt');
+  const submitBtn = document.getElementById('inlineEditSubmitBtn');
+  const cancelBtn = document.getElementById('inlineEditCancelBtn');
+  const origLabel = '<iconify-icon icon="lucide:wand-2" aria-hidden="true"></iconify-icon> Apply Edit';
+
+  function closeModal() {
+    overlay.classList.remove('open');
+    if (editor) editor.focus();
+  }
+
+  cancelBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+  });
+
+  promptEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      applyEdit();
+    }
+  });
+
+  submitBtn.addEventListener('click', applyEdit);
+
+  async function applyEdit() {
+    const instruction = promptEl.value.trim();
+    if (!instruction || !editor) return;
+
+    const sel          = _inlineSel;
+    const selectedText = sel ? editor.getModel().getValueInRange(sel).trim() : '';
+
+    submitBtn.disabled  = true;
+    submitBtn.innerHTML = '<span class="spinner"></span> Applying…';
+
+    try {
+      const clean = await streamCodegen({
+        language:  currentLang,
+        mode:      'edit',
+        selection: selectedText || editor.getValue(),
+        prompt:    instruction,
+      }, () => {});
+
+      if (selectedText && sel) {
+        editor.executeEdits('cf-inline-edit', [{ range: sel, text: clean }]);
+      } else {
+        editor.setValue(clean);
+      }
+      editor.focus();
+      closeModal();
+    } catch (err) {
+      alert('Edit error: ' + err.message);
+    } finally {
+      submitBtn.disabled  = false;
+      submitBtn.innerHTML = origLabel;
+    }
+  }
 }());
 
 /* ── Resizable divider ──────────────────────────────────── */
