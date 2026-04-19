@@ -41,6 +41,51 @@ program finishes.
 
 ---
 
+## Admin Docker Monitoring tab
+
+Administrators can manage the execution engine entirely from the Admin Control
+Panel without touching a terminal.  Navigate to:
+
+```
+/Admin/?tab=docker_instances
+```
+
+### Requirements
+
+The web-server process (`www-data` or equivalent) must be able to run `docker`
+commands without a password prompt:
+
+```bash
+sudo usermod -aG docker www-data
+# then restart the web server / PHP-FPM
+```
+
+### Features
+
+| Feature | Description |
+|---------|-------------|
+| **Status cards** | Real-time: daemon ready, running containers, cached images, recent execution stats |
+| **Initialize / Prewarm Runtime** | Runs `IDE/docker/setup-runtime.sh` in the background — pulls official images and builds custom `codefoundry/*` images |
+| **Containers table** | Lists all containers (`docker ps -a`) with Stop and Remove actions |
+| **Images table** | Lists all locally cached images (`docker images`) |
+| **Recent Executions** | Last 50 entries from `/tmp/codefoundry-exec.log` (language, exit code, duration, timed-out, container name, IP) |
+| **Runtime Setup Log** | Last 80 lines of `/tmp/codefoundry-runtime-setup.log` — auto-updated while setup is running |
+| **Auto-refresh** | Status cards refresh every 15 seconds while the tab is open |
+
+### Security controls
+
+* Access requires `role = admin` — a 403 is returned to any other user.
+* All write operations (Init Runtime, Stop, Remove) require a matching
+  session CSRF token.
+* Container names are validated against a strict allowlist regex before being
+  passed to the Docker CLI.
+* Only `stop` and `rm` container operations are permitted.
+* All admin Docker actions are recorded in the Audit Trail
+  (`admin.docker_container_stop`, `admin.docker_container_rm`,
+  `admin.docker_runtime_init`).
+
+---
+
 ## Persistent runtime management (systemd)
 
 The execution engine must be operational **before** users arrive, not
