@@ -254,6 +254,7 @@ const MAX_OUTPUT_BYTES          = 524288; // 512 KB per stream (stdout / stderr)
 const PIPE_READ_BUFFER_SIZE     = 8192;   // bytes read per fread() call
 const STREAM_SELECT_TIMEOUT_USEC = 100000; // 100 ms poll interval for stream_select
 const STREAM_DRAIN_GRACE_PERIOD = 4;      // extra seconds to drain pipes after container timeout
+const DOCKER_SETUP_HINT         = 'Docker runtime is not available. Run: bash IDE/docker/setup-runtime.sh';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -412,12 +413,35 @@ function removeDir(string $dir): void
     rmdir($dir);
 }
 
+/**
+ * Return true when docker CLI is present on the host.
+ */
+function dockerCliAvailable(): bool
+{
+    $dockerPath = shell_exec('command -v docker 2>/dev/null');
+    return is_string($dockerPath) && trim($dockerPath) !== '';
+}
+
 // ---------------------------------------------------------------------------
 // Prepare execution sandbox directory
 // ---------------------------------------------------------------------------
 
 $config  = LANG_CONFIG[$language];
 $execDir = sys_get_temp_dir() . '/cf_exec_' . bin2hex(random_bytes(8));
+
+if (!dockerCliAvailable()) {
+    echo json_encode([
+        'language' => $language,
+        'run'      => [
+            'stdout' => '',
+            'stderr' => DOCKER_SETUP_HINT,
+            'code'   => 1,
+            'signal' => null,
+            'output' => DOCKER_SETUP_HINT,
+        ],
+    ]);
+    exit;
+}
 
 if (!mkdir($execDir, 0755, true)) {
     http_response_code(500);
