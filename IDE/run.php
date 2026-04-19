@@ -20,6 +20,7 @@
 declare(strict_types=1);
 
 header('Content-Type: application/json');
+require_once __DIR__ . '/runtime_bootstrap.php';
 
 // ---------------------------------------------------------------------------
 // Request validation
@@ -254,7 +255,8 @@ const MAX_OUTPUT_BYTES          = 524288; // 512 KB per stream (stdout / stderr)
 const PIPE_READ_BUFFER_SIZE     = 8192;   // bytes read per fread() call
 const STREAM_SELECT_TIMEOUT_USEC = 100000; // 100 ms poll interval for stream_select
 const STREAM_DRAIN_GRACE_PERIOD = 4;      // extra seconds to drain pipes after container timeout
-const DOCKER_SETUP_HINT         = 'Docker runtime is not available. Run: bash IDE/docker/setup-runtime.sh';
+const DOCKER_SETUP_HINT         = 'Docker runtime is not available yet. Run: bash IDE/docker/setup-runtime.sh';
+const DOCKER_BOOTSTRAP_MESSAGE  = 'Docker runtime is initializing in the background. Please retry in about a minute.';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -413,15 +415,6 @@ function removeDir(string $dir): void
     rmdir($dir);
 }
 
-/**
- * Return true when docker CLI is present on the host.
- */
-function dockerCliAvailable(): bool
-{
-    $dockerPath = shell_exec('command -v docker 2>/dev/null');
-    return is_string($dockerPath) && trim($dockerPath) !== '';
-}
-
 // ---------------------------------------------------------------------------
 // Prepare execution sandbox directory
 // ---------------------------------------------------------------------------
@@ -429,15 +422,24 @@ function dockerCliAvailable(): bool
 $config  = LANG_CONFIG[$language];
 $execDir = sys_get_temp_dir() . '/cf_exec_' . bin2hex(random_bytes(8));
 
-if (!dockerCliAvailable()) {
+if (!cfDockerCliAvailable() || !cfDockerDaemonAvailable()) {
+    $setupTriggered = false;
+    if (!cfRuntimeSetupInProgress()) {
+        $setupTriggered = cfStartRuntimeSetup();
+    }
+
+    $runtimeMsg = ($setupTriggered || cfRuntimeSetupInProgress())
+        ? DOCKER_BOOTSTRAP_MESSAGE
+        : DOCKER_SETUP_HINT;
+
     echo json_encode([
         'language' => $language,
         'run'      => [
             'stdout' => '',
-            'stderr' => DOCKER_SETUP_HINT,
+            'stderr' => $runtimeMsg,
             'code'   => 1,
             'signal' => null,
-            'output' => DOCKER_SETUP_HINT,
+            'output' => $runtimeMsg,
         ],
     ]);
     exit;
