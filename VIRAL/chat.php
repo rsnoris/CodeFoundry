@@ -126,6 +126,7 @@ $providerIdRequested = isset($body['provider']) ? trim((string)$body['provider']
 $modelRequested      = isset($body['model']) ? trim((string)$body['model']) : '';
 $taskCategory        = isset($body['task_category']) ? trim((string)$body['task_category']) : '';
 $taskType            = isset($body['task']) ? trim((string)$body['task']) : '';
+$designContext       = isset($body['design_context']) && is_array($body['design_context']) ? $body['design_context'] : null;
 
 if ($role === '') {
     http_response_code(400);
@@ -257,6 +258,20 @@ foreach (array_slice($history, -VIRAL_MAX_HISTORY_TURNS) as $turn) {
     }
 }
 $messages = array_merge($messages, $sanitizedHistory);
+
+// For the UI Design Agentic Tool: inject the current design state so the model
+// can apply targeted patches rather than regenerating from scratch.
+if ($role === 'ui-design-agentic-tool' && $designContext !== null) {
+    $contextJson = json_encode($designContext, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if ($contextJson !== false) {
+        $messages[] = [
+            'role'    => 'system',
+            'content' => 'Current design state (do NOT regenerate screens that are not changing; '
+                . 'use op:"patch" and only include updated screens in "patches"): ' . $contextJson,
+        ];
+    }
+}
+
 $messages[] = ['role' => 'user', 'content' => $message];
 
 // ── Call the provider ─────────────────────────────────────────────────────
@@ -274,6 +289,22 @@ try {
     http_response_code(502);
     echo json_encode(['error' => $e->getMessage()]);
     exit;
+}
+
+// ── Extract structured design payload for UI Design Agentic Tool ─────────
+$designPayload = null;
+if ($role === 'ui-design-agentic-tool') {
+    // Look for a ```json ... ``` block that contains a cf-ui-design/1 schema.
+    // Use a greedy quantifier so nested JSON objects are captured in full.
+    if (preg_match('/```json\s*(\{.*\})\s*```/s', $reply, $jsonMatch)) {
+        $candidate = json_decode($jsonMatch[1], true);
+        if (is_array($candidate) && ($candidate['schema'] ?? '') === 'cf-ui-design/1') {
+            $designPayload = $candidate;
+            // Remove the JSON block from the narrative reply so the chat bubble
+            // only shows the human-readable text.
+            $reply = trim(str_replace($jsonMatch[0], '', $reply));
+        }
+    }
 }
 
 // ── Record token usage ────────────────────────────────────────────────────
@@ -305,4 +336,8 @@ if ($_sessionUser !== null) {
 }
 
 http_response_code(200);
-echo json_encode(['reply' => $reply]);
+$responseData = ['reply' => $reply];
+if ($designPayload !== null) {
+    $responseData['design'] = $designPayload;
+}
+echo json_encode($responseData);
