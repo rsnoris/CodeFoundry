@@ -96,6 +96,16 @@ function mergeComponentPack(componentPack, components) {
   return merged;
 }
 
+function formatComponentTypeLabel(type, maxChars) {
+  const value = String(type || '').toLowerCase();
+  if (value.length <= maxChars) return value;
+  return value.slice(0, maxChars - 1) + '…';
+}
+
+function canCopyComponent(comp) {
+  return !!(comp && comp.html);
+}
+
 /**
  * Validate flow completeness: every transition's from/to references a real screen ID.
  * Returns an array of error strings (empty = valid).
@@ -472,6 +482,17 @@ test('appends custom component types not in the baseline pack', function () {
   ]);
   assert.strictEqual(merged.length, 4);
   assert.ok(merged.some(function (c) { return c.type === 'timeline'; }));
+});
+
+test('truncates long type labels with ellipsis for sidebar chips', function () {
+  assert.strictEqual(formatComponentTypeLabel('command-palette', 14), 'command-palet…');
+  assert.strictEqual(formatComponentTypeLabel('table', 14), 'table');
+});
+
+test('copy button should be disabled when component html is missing', function () {
+  assert.strictEqual(canCopyComponent({ id: 'a', type: 'badge', html: '<span>New</span>' }), true);
+  assert.strictEqual(canCopyComponent({ id: 'b', type: 'badge', html: '' }), false);
+  assert.strictEqual(canCopyComponent({ id: 'c', type: 'badge' }), false);
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────

@@ -1859,6 +1859,7 @@ $page_scripts = <<<PAGEJS
   let dwActivePanelTab = 'canvas';
   let dwActiveSideTab  = 'components';
   let dwSelectedComp   = null;
+  const DW_COMP_TYPE_LABEL_MAX_CHARS = 14;
   const DW_COMPONENT_PACK = [
     { id: 'pack_button_primary', type: 'button', name: 'Primary Button', html: '<button class="btn-primary">Primary action</button>', css: '.btn-primary{padding:10px 16px;border:none;border-radius:8px;background:var(--primary,#2563eb);color:#fff;font-weight:600;}' },
     { id: 'pack_button_secondary', type: 'button-secondary', name: 'Secondary Button', html: '<button class="btn-secondary">Secondary action</button>', css: '.btn-secondary{padding:10px 16px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#0f172a;font-weight:600;}' },
@@ -1906,11 +1907,6 @@ $page_scripts = <<<PAGEJS
     { id: 'pack_comment', type: 'comment', name: 'Comment Thread', html: '<div class="comment"><strong>Ava</strong><p>Let’s ship this in v2.</p></div>', css: '.comment{padding:10px;border:1px solid #e2e8f0;border-radius:10px;}' },
     { id: 'pack_empty_state', type: 'empty-state', name: 'Empty State', html: '<section class="empty"><h4>No projects yet</h4><p>Create your first project to get started.</p></section>', css: '.empty{text-align:center;padding:24px;border:1px dashed #cbd5e1;border-radius:12px;color:#64748b;}' },
     { id: 'pack_footer', type: 'footer', name: 'Footer', html: '<footer class="footer">© 2026 CodeFoundry · Privacy · Terms</footer>', css: '.footer{padding:12px 0;color:#64748b;font-size:12px;}' }
-  ];
-  const DW_HIFI_THEME_TEMPLATES = [
-    'Neo Banking Dark', 'Minimal SaaS Light', 'Cyber Neon Contrast', 'Glassmorphism Aurora',
-    'Brutalist Mono', 'Fintech Trust Blue', 'Healthcare Calm', 'Ecommerce Warm',
-    'Editorial Premium', 'Playful Gradient', 'Enterprise Slate', 'Nature Soft'
   ];
 
   function dwShowToast(msg, type) {
@@ -1977,6 +1973,16 @@ $page_scripts = <<<PAGEJS
       if (!exists) merged.push(comp);
     });
     return merged;
+  }
+
+  function dwFormatComponentTypeLabel(type) {
+    var value = String(type || '').toLowerCase();
+    if (value.length <= DW_COMP_TYPE_LABEL_MAX_CHARS) return value;
+    return value.slice(0, DW_COMP_TYPE_LABEL_MAX_CHARS - 1) + '…';
+  }
+
+  function dwCanCopyComponent(comp) {
+    return !!(comp && comp.html);
   }
 
   function dwBuildIframeDoc(html, css, tokens) {
@@ -2080,17 +2086,16 @@ $page_scripts = <<<PAGEJS
 
       var typeSpan = document.createElement('span');
       typeSpan.className = 'dw-comp-item-type';
-      typeSpan.textContent = String(comp.type || '').toLowerCase().slice(0, 14);
+      typeSpan.textContent = dwFormatComponentTypeLabel(comp.type);
 
       var copyBtn = document.createElement('button');
       copyBtn.type = 'button';
       copyBtn.className = 'dw-comp-copy-btn';
       copyBtn.title = 'Copy HTML';
       copyBtn.innerHTML = '<iconify-icon icon="lucide:copy"></iconify-icon>';
-      copyBtn.disabled = !comp.html;
+      copyBtn.disabled = !dwCanCopyComponent(comp);
       copyBtn.addEventListener('click', function (e) {
         e.stopPropagation();
-        if (!comp.html) return;
         dwCopyToClipboard(comp.html || '', 'Component HTML copied');
       });
 
@@ -2483,7 +2488,7 @@ $page_scripts = <<<PAGEJS
     if (badge && badgeName) {
       var projectName = (designState.project && designState.project.name) ? designState.project.name : '';
       if (projectName) {
-        badgeName.textContent  = projectName + ' · ' + DW_HIFI_THEME_TEMPLATES.length + ' themes';
+        badgeName.textContent  = projectName;
         badge.style.display    = 'inline-flex';
       }
     }
