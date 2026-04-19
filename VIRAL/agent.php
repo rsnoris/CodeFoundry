@@ -1964,7 +1964,7 @@ $page_scripts = <<<PAGEJS
 
     var html = isMobile ? (screen.mobileHtml || screen.html || '') : (screen.html || '');
     var css  = isMobile
-      ? (String(screen.css || '') + '\n' + String(screen.mobileCss || ''))
+      ? (String(screen.css || '') + '\\n' + String(screen.mobileCss || ''))
       : String(screen.css || '');
 
     iframe.srcdoc = dwBuildIframeDoc(html, css, designState.styleTokens);
