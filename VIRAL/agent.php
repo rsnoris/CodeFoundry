@@ -541,6 +541,464 @@ $page_styles = <<<PAGECSS
   @media (min-width: 901px) {
     .mobile-sidebar-btn { display: none !important; }
   }
+
+  /* ── UI Design Agentic Tool – View Mode Tabs ──────────────────────── */
+  .dw-view-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+  .dw-view-tab {
+    background: #0e1828;
+    border: 1px solid #1e2e48;
+    color: var(--text-muted);
+    border-radius: 8px;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dw-view-tab.active {
+    background: var(--accent)22;
+    border-color: var(--accent)66;
+    color: var(--accent);
+  }
+  .dw-view-tab iconify-icon { font-size: 14px; }
+  .dw-iterate-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--accent)18;
+    border: 1px solid var(--accent)44;
+    color: var(--accent);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11.5px;
+    font-weight: 600;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .dw-iterate-badge iconify-icon { font-size: 12px; }
+
+  /* ── Design Workspace Panel ───────────────────────────────────────── */
+  .design-workspace {
+    background: #0a1220;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+  .dw-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-color);
+    background: #060d1a;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .dw-toolbar-left  { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .dw-toolbar-right { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .dw-tab-group { display: flex; gap: 3px; }
+  .dw-tab {
+    background: none;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    border-radius: 7px;
+    padding: 5px 13px;
+    font-size: 12.5px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .dw-tab.active, .dw-tab:hover {
+    background: var(--accent)18;
+    border-color: var(--accent)55;
+    color: var(--accent);
+  }
+  .dw-tab iconify-icon { font-size: 13px; }
+  .dw-divider { width: 1px; height: 20px; background: var(--border-color); margin: 0 2px; }
+  .dw-bp-group {
+    display: flex;
+    background: #0e1828;
+    border: 1px solid #1e2e48;
+    border-radius: 8px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .dw-bp {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    border-radius: 5px;
+    padding: 4px 11px;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all .15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .dw-bp.active { background: var(--accent)22; color: var(--accent); }
+  .dw-bp iconify-icon { font-size: 13px; }
+  .dw-action-btn {
+    background: #0e1828;
+    border: 1px solid #1e2e48;
+    color: var(--text-muted);
+    border-radius: 7px;
+    padding: 5px 13px;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .dw-action-btn:hover { border-color: var(--accent)66; color: var(--accent); }
+  .dw-action-btn iconify-icon { font-size: 13px; }
+
+  /* ── Workspace Body ───────────────────────────────────────────────── */
+  .dw-body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* ── Canvas Panel ─────────────────────────────────────────────────── */
+  .dw-canvas-panel {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .dw-screen-bar {
+    display: flex;
+    gap: 4px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-color);
+    overflow-x: auto;
+    flex-shrink: 0;
+    background: #060d1a;
+    align-items: center;
+  }
+  .dw-screen-bar::-webkit-scrollbar { height: 4px; }
+  .dw-screen-bar::-webkit-scrollbar-thumb { background: #1e2e48; border-radius: 3px; }
+  .dw-screen-tab {
+    background: #0e1828;
+    border: 1px solid #1e2e48;
+    color: var(--text-muted);
+    border-radius: 6px;
+    padding: 5px 13px;
+    font-size: 12px;
+    white-space: nowrap;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .15s;
+    flex-shrink: 0;
+  }
+  .dw-screen-tab.active {
+    background: var(--accent)22;
+    border-color: var(--accent)66;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .dw-canvas-area {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    background: #060d1a;
+    padding: 20px;
+    overflow: auto;
+    position: relative;
+  }
+  .dw-canvas-area::-webkit-scrollbar { width: 5px; height: 5px; }
+  .dw-canvas-area::-webkit-scrollbar-thumb { background: #1e2e48; border-radius: 3px; }
+  .dw-frame-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .dw-frame-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: .04em;
+  }
+  .dw-canvas-iframe {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 32px rgba(0,0,0,.5);
+    background: #fff;
+    transition: width .3s ease, height .3s ease;
+    display: block;
+  }
+  .dw-canvas-iframe.bp-web    { width: 1280px; height: 720px; }
+  .dw-canvas-iframe.bp-mobile { width: 390px;  height: 844px; }
+  .dw-empty-canvas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 14px;
+    flex: 1;
+  }
+  .dw-empty-canvas iconify-icon { font-size: 48px; opacity: .3; }
+
+  /* ── Right Side Panel ─────────────────────────────────────────────── */
+  .dw-side-panel {
+    width: 250px;
+    flex-shrink: 0;
+    border-left: 1px solid var(--border-color);
+    background: #080f1e;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .dw-side-tab-bar {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+  }
+  .dw-side-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: 9px 6px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .15s;
+  }
+  .dw-side-tab.active { border-bottom-color: var(--accent); color: var(--accent); }
+  .dw-side-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+  }
+  .dw-side-content::-webkit-scrollbar { width: 4px; }
+  .dw-side-content::-webkit-scrollbar-thumb { background: #1e2e48; border-radius: 3px; }
+  .dw-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text-muted);
+    padding: 4px 2px 6px;
+  }
+  .dw-comp-item {
+    background: #0d1626;
+    border: 1px solid #1e2e48;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all .15s;
+    user-select: none;
+  }
+  .dw-comp-item:hover { border-color: var(--accent)55; color: var(--text); }
+  .dw-comp-item.selected { border-color: var(--accent); background: var(--accent)0e; }
+  .dw-comp-item iconify-icon { font-size: 14px; flex-shrink: 0; color: var(--accent); }
+  .dw-comp-item-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dw-comp-item-type {
+    font-size: 10px;
+    background: var(--accent)18;
+    color: var(--accent);
+    border-radius: 4px;
+    padding: 1px 5px;
+    flex-shrink: 0;
+  }
+  .dw-comp-copy-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    transition: color .15s;
+    flex-shrink: 0;
+    font-size: 12px;
+  }
+  .dw-comp-copy-btn:hover { color: var(--accent); }
+  .dw-comp-preview {
+    background: #060d1a;
+    border: 1px solid #1e2e48;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .dw-comp-preview iframe {
+    width: 100%;
+    height: 60px;
+    border: none;
+    display: block;
+    pointer-events: none;
+  }
+  /* Properties panel */
+  .dw-prop-row { margin-bottom: 10px; }
+  .dw-prop-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .dw-prop-input {
+    width: 100%;
+    background: #0d1626;
+    border: 1px solid #1e2e48;
+    color: var(--text);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 12px;
+    font-family: inherit;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color .15s;
+    resize: vertical;
+  }
+  .dw-prop-input:focus { border-color: var(--accent); }
+  .dw-prop-copy-btn {
+    width: 100%;
+    background: var(--accent)18;
+    border: 1px solid var(--accent)44;
+    color: var(--accent);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: background .15s;
+  }
+  .dw-prop-copy-btn:hover { background: var(--accent)2c; }
+  .dw-prop-copy-btn iconify-icon { font-size: 13px; }
+
+  /* ── Flow Graph Panel ─────────────────────────────────────────────── */
+  .dw-flow-panel {
+    flex: 1;
+    overflow: auto;
+    padding: 20px;
+    background: #060d1a;
+    position: relative;
+  }
+  .dw-flow-panel::-webkit-scrollbar { width: 5px; height: 5px; }
+  .dw-flow-panel::-webkit-scrollbar-thumb { background: #1e2e48; border-radius: 3px; }
+  .flow-screen-node { cursor: pointer; }
+  .flow-screen-node rect { rx: 8; }
+  .flow-screen-node text { font-family: inherit; fill: #92a3bb; font-size: 12px; }
+  .flow-screen-node.entry rect { stroke-width: 2; }
+  .flow-edge { fill: none; stroke-width: 1.5; }
+  .flow-edge.success { stroke: #4ade80; }
+  .flow-edge.error   { stroke: #f87171; }
+  .flow-edge.branch  { stroke: #fbbf24; }
+  .flow-edge.neutral { stroke: #3b5a80; }
+  .flow-edge-label   { font-size: 10px; font-family: inherit; }
+
+  /* ── Tokens Panel ─────────────────────────────────────────────────── */
+  .dw-tokens-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    background: #060d1a;
+  }
+  .dw-tokens-panel::-webkit-scrollbar { width: 5px; }
+  .dw-tokens-panel::-webkit-scrollbar-thumb { background: #1e2e48; border-radius: 3px; }
+  .dw-tok-section { margin-bottom: 24px; }
+  .dw-tok-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .dw-color-grid { display: flex; flex-wrap: wrap; gap: 12px 16px; }
+  .dw-color-swatch-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .dw-color-swatch {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.1);
+    cursor: pointer;
+    transition: transform .15s;
+  }
+  .dw-color-swatch:hover { transform: scale(1.1); }
+  .dw-color-swatch-name { font-size: 9.5px; color: var(--text-muted); text-align: center; }
+  .dw-tok-table { width: 100%; border-collapse: collapse; }
+  .dw-tok-table td {
+    padding: 6px 4px;
+    border-bottom: 1px solid #0e1828;
+    font-size: 12px;
+    vertical-align: middle;
+  }
+  .dw-tok-key { color: var(--text-muted); width: 40%; }
+  .dw-tok-val { color: var(--text); font-family: monospace; }
+
+  /* ── Status Toast ─────────────────────────────────────────────────── */
+  .dw-status-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111b30;
+    border: 1px solid var(--border-color);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 13px;
+    z-index: 2000;
+    box-shadow: 0 4px 20px rgba(0,0,0,.4);
+    display: none;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+  .dw-status-toast.success { border-color: #4ade8066; color: #4ade80; }
+  .dw-status-toast.error   { border-color: #f8717166; color: #f87171; }
+
+  /* ── Responsive overrides for workspace ──────────────────────────── */
+  @media (max-width: 900px) {
+    .dw-side-panel { width: 200px; }
+    .dw-canvas-iframe.bp-web { width: 100%; min-width: 320px; height: 480px; }
+  }
 PAGECSS;
 
 require_once dirname(__DIR__) . '/includes/header.php';
@@ -624,6 +1082,24 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
       <div id="errorToast" class="error-toast"></div>
 
+<?php if ($role === 'ui-design-agentic-tool'): ?>
+      <!-- View-mode switcher: Chat ↔ Design Workspace -->
+      <div class="dw-view-tabs" id="dwViewTabs">
+        <button class="dw-view-tab active" data-view="chat" id="dwViewChat">
+          <iconify-icon icon="lucide:message-square"></iconify-icon>
+          Chat
+        </button>
+        <button class="dw-view-tab" data-view="workspace" id="dwViewWorkspace">
+          <iconify-icon icon="lucide:layout"></iconify-icon>
+          Design Workspace
+        </button>
+        <span class="dw-iterate-badge" id="dwIterateBadge" style="display:none;">
+          <iconify-icon icon="lucide:layers"></iconify-icon>
+          <span id="dwIterateName"></span>
+        </span>
+      </div>
+<?php endif; ?>
+
       <div class="chat-window">
         <div class="chat-messages" id="chatMessages">
           <div class="welcome-hint" id="welcomeHint">
@@ -656,6 +1132,113 @@ require_once dirname(__DIR__) . '/includes/header.php';
       </div>
 
     </div><!-- /.viral-chat-wrap -->
+
+<?php if ($role === 'ui-design-agentic-tool'): ?>
+    <!-- ── Design Workspace (UI Design Agentic Tool only) ──────────────── -->
+    <div class="design-workspace" id="designWorkspace" style="display:none;">
+
+      <!-- Toolbar -->
+      <div class="dw-toolbar">
+        <div class="dw-toolbar-left">
+          <div class="dw-tab-group" id="dwPanelTabs">
+            <button class="dw-tab active" data-panel="canvas">
+              <iconify-icon icon="lucide:monitor"></iconify-icon> Canvas
+            </button>
+            <button class="dw-tab" data-panel="flow">
+              <iconify-icon icon="lucide:git-branch"></iconify-icon> Flow
+            </button>
+            <button class="dw-tab" data-panel="tokens">
+              <iconify-icon icon="lucide:palette"></iconify-icon> Tokens
+            </button>
+          </div>
+        </div>
+        <div class="dw-toolbar-right">
+          <div class="dw-bp-group">
+            <button class="dw-bp active" id="dwBpWeb" data-bp="web">
+              <iconify-icon icon="lucide:monitor"></iconify-icon> Web
+            </button>
+            <button class="dw-bp" id="dwBpMobile" data-bp="mobile">
+              <iconify-icon icon="lucide:smartphone"></iconify-icon> Mobile
+            </button>
+          </div>
+          <div class="dw-divider"></div>
+          <button class="dw-action-btn" id="dwExportBtn" title="Export design as JSON">
+            <iconify-icon icon="lucide:download"></iconify-icon> Export
+          </button>
+          <label class="dw-action-btn" style="cursor:pointer;" title="Import design JSON">
+            <iconify-icon icon="lucide:upload"></iconify-icon> Import
+            <input type="file" id="dwImportInput" accept=".json" style="display:none;">
+          </label>
+        </div>
+      </div>
+
+      <!-- Canvas Panel -->
+      <div class="dw-body" id="dwPanelCanvas">
+        <div class="dw-canvas-panel">
+          <div class="dw-screen-bar" id="dwScreenBar">
+            <span style="font-size:11px;color:var(--text-muted);flex-shrink:0;padding-right:6px;">Screens:</span>
+          </div>
+          <div class="dw-canvas-area" id="dwCanvasArea">
+            <div class="dw-empty-canvas" id="dwEmptyCanvas">
+              <iconify-icon icon="lucide:figma"></iconify-icon>
+              <div>Describe your UI in the chat — your designs will appear here.</div>
+            </div>
+            <div class="dw-frame-container" id="dwFrameContainer" style="display:none;">
+              <div class="dw-frame-label" id="dwFrameLabel">Web · 1280px</div>
+              <iframe
+                class="dw-canvas-iframe bp-web"
+                id="dwCanvasIframe"
+                sandbox="allow-scripts allow-same-origin"
+                title="Design preview"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+        <!-- Component Library + Properties side panel -->
+        <div class="dw-side-panel">
+          <div class="dw-side-tab-bar" id="dwSideTabBar">
+            <button class="dw-side-tab active" data-side="components">Components</button>
+            <button class="dw-side-tab" data-side="props">Properties</button>
+          </div>
+          <div class="dw-side-content" id="dwSideContent">
+            <div class="dw-section-label">Component Library</div>
+            <div id="dwCompList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flow Panel -->
+      <div class="dw-body" id="dwPanelFlow" style="display:none;">
+        <div class="dw-flow-panel">
+          <svg id="dwFlowSvg" style="width:100%;overflow:visible;" aria-label="User flow diagram">
+            <defs>
+              <marker id="dwArrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <polygon points="0 0, 8 3, 0 6" fill="#3b5a80"></polygon>
+              </marker>
+              <marker id="dwArrowSuccess" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <polygon points="0 0, 8 3, 0 6" fill="#4ade80"></polygon>
+              </marker>
+              <marker id="dwArrowError" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <polygon points="0 0, 8 3, 0 6" fill="#f87171"></polygon>
+              </marker>
+              <marker id="dwArrowBranch" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <polygon points="0 0, 8 3, 0 6" fill="#fbbf24"></polygon>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Tokens Panel -->
+      <div class="dw-body" id="dwPanelTokens" style="display:none;">
+        <div class="dw-tokens-panel" id="dwTokensPanel"></div>
+      </div>
+
+    </div><!-- /#designWorkspace -->
+
+    <!-- Status toast for copy/export/import feedback -->
+    <div id="dwStatusToast" class="dw-status-toast" role="status" aria-live="polite"></div>
+<?php endif; ?>
 
     <aside class="prompt-examples-panel" id="examplesPanel">
       <button class="examples-toggle" id="examplesToggle" aria-label="Toggle prompt examples" aria-expanded="true">
@@ -1230,14 +1813,22 @@ $page_scripts = <<<PAGEJS
     typingInd.style.display = 'flex';
     scrollDown();
 
+    var payload = Object.assign(
+      { role: ROLE, message: text, history: history.slice(0, -1) },
+      getAiSelection(),
+      getTaskSelection()
+    );
+
+    // For the UI Design Agentic Tool, pass the current design state so the
+    // model can issue targeted patches instead of regenerating everything.
+    if (IS_DESIGN_ROLE && designState) {
+      payload.design_context = designState;
+    }
+
     fetch('/VIRAL/chat.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(Object.assign(
-        { role: ROLE, message: text, history: history.slice(0, -1) },
-        getAiSelection(),
-        getTaskSelection()
-      )),
+      body: JSON.stringify(payload),
     })
     .then(function (res) { return res.json(); })
     .then(function (data) {
@@ -1248,6 +1839,11 @@ $page_scripts = <<<PAGEJS
         const reply = data.reply || '';
         appendMessage('assistant', reply);
         history.push({ role: 'assistant', content: reply });
+
+        // Render the design workspace if a structured design payload was returned.
+        if (IS_DESIGN_ROLE && data.design) {
+          dwRenderWorkspace(data.design);
+        }
       }
     })
     .catch(function (err) {
@@ -1278,6 +1874,683 @@ $page_scripts = <<<PAGEJS
 
   sendBtn.disabled = true;
   chatInput.focus();
+
+  // ── UI Design Agentic Tool – Design Workspace ─────────────────────────
+  const IS_DESIGN_ROLE = ROLE === 'ui-design-agentic-tool';
+  let designState  = null;
+  let dwActiveBp   = 'web';
+  let dwActiveScreen = null;
+  let dwActivePanelTab = 'canvas';
+  let dwActiveSideTab  = 'components';
+  let dwSelectedComp   = null;
+
+  function dwShowToast(msg, type) {
+    var toast = document.getElementById('dwStatusToast');
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.className = 'dw-status-toast ' + (type || '');
+    toast.style.display = 'flex';
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(function () { toast.style.display = 'none'; }, 3000);
+  }
+
+  function dwSetBp(bp) {
+    dwActiveBp = bp;
+    document.querySelectorAll('.dw-bp').forEach(function (btn) {
+      btn.classList.toggle('active', btn.dataset.bp === bp);
+    });
+    dwRenderCanvas(dwActiveScreen);
+  }
+
+  function dwSetPanelTab(tab) {
+    dwActivePanelTab = tab;
+    document.querySelectorAll('#dwPanelTabs [data-panel]').forEach(function (btn) {
+      btn.classList.toggle('active', btn.dataset.panel === tab);
+    });
+    var panels = {
+      canvas: document.getElementById('dwPanelCanvas'),
+      flow:   document.getElementById('dwPanelFlow'),
+      tokens: document.getElementById('dwPanelTokens'),
+    };
+    Object.keys(panels).forEach(function (key) {
+      if (panels[key]) panels[key].style.display = key === tab ? 'flex' : 'none';
+    });
+    if (tab === 'flow'   && designState) dwRenderFlow(designState);
+    if (tab === 'tokens' && designState) dwRenderTokens(designState.styleTokens);
+  }
+
+  function dwSetSideTab(tab) {
+    dwActiveSideTab = tab;
+    document.querySelectorAll('#dwSideTabBar [data-side]').forEach(function (btn) {
+      btn.classList.toggle('active', btn.dataset.side === tab);
+    });
+    dwRenderSidePanel();
+  }
+
+  function dwBuildIframeDoc(html, css, tokens) {
+    var bg = (tokens && tokens.colors && tokens.colors.background) ? tokens.colors.background : '#ffffff';
+    var ff = (tokens && tokens.typography && tokens.typography.fontFamily) ? tokens.typography.fontFamily : 'system-ui, sans-serif';
+    return '<!DOCTYPE html><html><head>'
+      + '<meta charset="utf-8">'
+      + '<meta name="viewport" content="width=device-width,initial-scale=1">'
+      + '<style>'
+      + '*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}'
+      + 'html,body{width:100%;min-height:100%;overflow-x:hidden}'
+      + 'body{font-family:' + String(ff).replace(/"/g, "'") + ';background:' + bg + ';}'
+      + String(css || '')
+      + '</style></head><body>'
+      + String(html || '')
+      + '</body></html>';
+  }
+
+  function dwRenderCanvas(screenId) {
+    if (!designState || !Array.isArray(designState.screens) || !designState.screens.length) return;
+    var screen = designState.screens.find(function (s) { return s.id === screenId; });
+    if (!screen) screen = designState.screens[0];
+    dwActiveScreen = screen.id;
+
+    var iframe        = document.getElementById('dwCanvasIframe');
+    var emptyCanvas   = document.getElementById('dwEmptyCanvas');
+    var frameContainer = document.getElementById('dwFrameContainer');
+    var frameLabel    = document.getElementById('dwFrameLabel');
+    if (!iframe) return;
+
+    emptyCanvas.style.display    = 'none';
+    frameContainer.style.display = 'flex';
+
+    var isMobile = dwActiveBp === 'mobile';
+    iframe.className = 'dw-canvas-iframe ' + (isMobile ? 'bp-mobile' : 'bp-web');
+    if (frameLabel) frameLabel.textContent = isMobile ? 'Mobile · 390px' : 'Web · 1280px';
+
+    var html = isMobile ? (screen.mobileHtml || screen.html || '') : (screen.html || '');
+    var css  = isMobile
+      ? (String(screen.css || '') + '\n' + String(screen.mobileCss || ''))
+      : String(screen.css || '');
+
+    iframe.srcdoc = dwBuildIframeDoc(html, css, designState.styleTokens);
+
+    document.querySelectorAll('.dw-screen-tab').forEach(function (tab) {
+      tab.classList.toggle('active', tab.dataset.screenId === screen.id);
+    });
+  }
+
+  function dwRenderScreenBar(screens) {
+    var bar = document.getElementById('dwScreenBar');
+    if (!bar) return;
+    Array.from(bar.querySelectorAll('.dw-screen-tab')).forEach(function (t) { t.remove(); });
+    screens.forEach(function (screen) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'dw-screen-tab';
+      btn.dataset.screenId = screen.id;
+      btn.textContent = screen.name;
+      btn.addEventListener('click', function () { dwRenderCanvas(screen.id); });
+      bar.appendChild(btn);
+    });
+  }
+
+  function dwRenderComponents(components) {
+    var list = document.getElementById('dwCompList');
+    if (!list) return;
+    list.innerHTML = '';
+    if (!Array.isArray(components) || !components.length) {
+      list.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:8px 2px;">No components defined.</div>';
+      return;
+    }
+    var COMP_ICONS = {
+      button: 'lucide:square', card: 'lucide:credit-card', nav: 'lucide:navigation',
+      input: 'lucide:square-pen', form: 'lucide:clipboard-list', table: 'lucide:table',
+      modal: 'lucide:panel-top', tab: 'lucide:layout-template', badge: 'lucide:tag',
+      hero: 'lucide:layout', select: 'lucide:list', checkbox: 'lucide:check-square',
+      radio: 'lucide:circle-dot', toggle: 'lucide:toggle-left', avatar: 'lucide:user-circle',
+      alert: 'lucide:alert-circle', tooltip: 'lucide:info',
+    };
+    components.forEach(function (comp) {
+      var item = document.createElement('div');
+      item.className = 'dw-comp-item';
+      item.dataset.compId = comp.id;
+
+      var icon = document.createElement('iconify-icon');
+      icon.setAttribute('icon', COMP_ICONS[String(comp.type || '').toLowerCase()] || 'lucide:box');
+
+      var nameSpan = document.createElement('span');
+      nameSpan.className = 'dw-comp-item-name';
+      nameSpan.textContent = comp.name || comp.type || comp.id;
+
+      var typeSpan = document.createElement('span');
+      typeSpan.className = 'dw-comp-item-type';
+      typeSpan.textContent = String(comp.type || '').toLowerCase().slice(0, 8);
+
+      var copyBtn = document.createElement('button');
+      copyBtn.type = 'button';
+      copyBtn.className = 'dw-comp-copy-btn';
+      copyBtn.title = 'Copy HTML';
+      copyBtn.innerHTML = '<iconify-icon icon="lucide:copy"></iconify-icon>';
+      copyBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        dwCopyToClipboard(comp.html || '', 'Component HTML copied');
+      });
+
+      item.appendChild(icon);
+      item.appendChild(nameSpan);
+      item.appendChild(typeSpan);
+      item.appendChild(copyBtn);
+      item.addEventListener('click', function () {
+        dwSelectedComp = comp;
+        document.querySelectorAll('.dw-comp-item').forEach(function (el) {
+          el.classList.toggle('selected', el.dataset.compId === comp.id);
+        });
+        dwSetSideTab('props');
+      });
+      list.appendChild(item);
+    });
+  }
+
+  function dwRenderSidePanel() {
+    var content = document.getElementById('dwSideContent');
+    if (!content || !designState) return;
+    if (dwActiveSideTab === 'components') {
+      content.innerHTML = '<div class="dw-section-label">Component Library</div><div id="dwCompList"></div>';
+      dwRenderComponents(designState.components);
+    } else if (dwActiveSideTab === 'props') {
+      content.innerHTML = '';
+      if (!dwSelectedComp) {
+        content.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:8px 2px;">Click a component to view its properties.</div>';
+        return;
+      }
+      var comp = dwSelectedComp;
+      var heading = document.createElement('div');
+      heading.className = 'dw-section-label';
+      heading.textContent = comp.name || comp.type;
+      content.appendChild(heading);
+
+      if (Array.isArray(comp.props) && comp.props.length) {
+        comp.props.forEach(function (prop) {
+          var row = document.createElement('div');
+          row.className = 'dw-prop-row';
+          var label = document.createElement('div');
+          label.className = 'dw-prop-label';
+          label.textContent = prop.name;
+          var input = document.createElement('input');
+          input.className = 'dw-prop-input';
+          input.type = 'text';
+          input.value = prop.default !== undefined ? String(prop.default) : '';
+          input.placeholder = prop.name;
+          row.appendChild(label);
+          row.appendChild(input);
+          content.appendChild(row);
+        });
+      }
+
+      if (comp.html) {
+        var previewRow = document.createElement('div');
+        previewRow.className = 'dw-prop-row';
+        var previewLabel = document.createElement('div');
+        previewLabel.className = 'dw-prop-label';
+        previewLabel.textContent = 'Preview';
+        var previewWrap = document.createElement('div');
+        previewWrap.className = 'dw-comp-preview';
+        var previewFrame = document.createElement('iframe');
+        previewFrame.sandbox = 'allow-scripts allow-same-origin';
+        previewFrame.srcdoc = dwBuildIframeDoc(comp.html, comp.css || '', designState ? designState.styleTokens : null);
+        previewWrap.appendChild(previewFrame);
+        previewRow.appendChild(previewLabel);
+        previewRow.appendChild(previewWrap);
+        content.appendChild(previewRow);
+
+        var copyRow = document.createElement('div');
+        copyRow.className = 'dw-prop-row';
+        var copyBtn = document.createElement('button');
+        copyBtn.type = 'button';
+        copyBtn.className = 'dw-prop-copy-btn';
+        copyBtn.innerHTML = '<iconify-icon icon="lucide:copy"></iconify-icon> Copy HTML';
+        copyBtn.addEventListener('click', function () {
+          dwCopyToClipboard(comp.html, 'Component HTML copied');
+        });
+        copyRow.appendChild(copyBtn);
+        content.appendChild(copyRow);
+      }
+    }
+  }
+
+  function dwRenderFlow(design) {
+    var svg = document.getElementById('dwFlowSvg');
+    if (!svg) return;
+    // Remove children after <defs>
+    while (svg.childNodes.length > 1) svg.removeChild(svg.lastChild);
+
+    var screens = Array.isArray(design.screens) ? design.screens : [];
+    var flow    = design.flow || {};
+    var transitions = Array.isArray(flow.transitions) ? flow.transitions : [];
+
+    if (!screens.length) {
+      svg.setAttribute('height', '80');
+      var emptyTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      emptyTxt.setAttribute('x', '20');
+      emptyTxt.setAttribute('y', '44');
+      emptyTxt.setAttribute('fill', '#627193');
+      emptyTxt.setAttribute('font-size', '13');
+      emptyTxt.textContent = 'No screens defined yet.';
+      svg.appendChild(emptyTxt);
+      return;
+    }
+
+    var COLS = Math.min(screens.length, 4);
+    var BOX_W = 160, BOX_H = 80, PAD_X = 210, PAD_Y = 140, OX = 30, OY = 40;
+    var positions = {};
+    screens.forEach(function (screen, i) {
+      positions[screen.id] = {
+        x: OX + (i % COLS) * PAD_X,
+        y: OY + Math.floor(i / COLS) * PAD_Y,
+      };
+    });
+    var totalW = OX * 2 + Math.min(screens.length, COLS) * PAD_X;
+    var totalH = OY * 2 + Math.ceil(screens.length / COLS) * PAD_Y;
+    svg.setAttribute('width', String(totalW));
+    svg.setAttribute('height', String(totalH));
+    svg.style.minHeight = totalH + 'px';
+
+    var MARKERS = { success:'url(#dwArrowSuccess)', error:'url(#dwArrowError)', branch:'url(#dwArrowBranch)', neutral:'url(#dwArrowhead)' };
+    var COLORS  = { success:'#4ade80', error:'#f87171', branch:'#fbbf24', neutral:'#3b5a80' };
+
+    // Edges
+    transitions.forEach(function (t) {
+      var from = positions[t.from];
+      var to   = positions[t.to];
+      if (!from || !to) return;
+      var type = (t.type || 'neutral').toLowerCase();
+      var color = COLORS[type] || COLORS.neutral;
+      var x1 = from.x + BOX_W / 2, y1 = from.y + BOX_H;
+      var x2 = to.x + BOX_W / 2,   y2 = to.y;
+      var cy1 = y1 + (y2 - y1) * 0.45, cy2 = y2 - (y2 - y1) * 0.45;
+      var d = 'M ' + x1 + ' ' + y1 + ' C ' + x1 + ' ' + cy1 + ', ' + x2 + ' ' + cy2 + ', ' + x2 + ' ' + y2;
+      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', d);
+      path.setAttribute('class', 'flow-edge ' + type);
+      path.setAttribute('stroke', color);
+      path.setAttribute('marker-end', MARKERS[type] || MARKERS.neutral);
+      svg.appendChild(path);
+      if (t.label) {
+        var lx = (x1 + x2) / 2, ly = (y1 + y2) / 2 - 4;
+        var lt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        lt.setAttribute('x', String(lx));
+        lt.setAttribute('y', String(ly));
+        lt.setAttribute('text-anchor', 'middle');
+        lt.setAttribute('fill', '#92a3bb');
+        lt.setAttribute('font-size', '10');
+        lt.setAttribute('class', 'flow-edge-label');
+        lt.textContent = t.label;
+        svg.appendChild(lt);
+      }
+    });
+
+    // Screen nodes
+    screens.forEach(function (screen) {
+      var pos = positions[screen.id];
+      if (!pos) return;
+      var isEntry = flow.entryScreen === screen.id;
+      var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('class', 'flow-screen-node' + (isEntry ? ' entry' : ''));
+      g.setAttribute('transform', 'translate(' + pos.x + ',' + pos.y + ')');
+      g.setAttribute('tabindex', '0');
+      g.setAttribute('role', 'button');
+      g.setAttribute('aria-label', 'Screen: ' + screen.name);
+
+      var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('width', String(BOX_W));
+      rect.setAttribute('height', String(BOX_H));
+      rect.setAttribute('rx', '8');
+      rect.setAttribute('fill', '#0d1626');
+      rect.setAttribute('stroke', isEntry ? 'var(--accent, #ec4899)' : '#1e2e48');
+      rect.setAttribute('stroke-width', isEntry ? '2' : '1.5');
+      g.appendChild(rect);
+
+      var titleTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      titleTxt.setAttribute('x', String(BOX_W / 2));
+      titleTxt.setAttribute('y', '26');
+      titleTxt.setAttribute('text-anchor', 'middle');
+      titleTxt.setAttribute('fill', '#dce7f8');
+      titleTxt.setAttribute('font-size', '13');
+      titleTxt.setAttribute('font-weight', '700');
+      titleTxt.textContent = screen.name;
+      g.appendChild(titleTxt);
+
+      if (screen.description) {
+        var desc = String(screen.description);
+        var descTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        descTxt.setAttribute('x', String(BOX_W / 2));
+        descTxt.setAttribute('y', '44');
+        descTxt.setAttribute('text-anchor', 'middle');
+        descTxt.setAttribute('fill', '#627193');
+        descTxt.setAttribute('font-size', '10');
+        descTxt.textContent = desc.length > 30 ? desc.slice(0, 30) + '\u2026' : desc;
+        g.appendChild(descTxt);
+      }
+
+      if (isEntry) {
+        var entryLbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        entryLbl.setAttribute('x', String(BOX_W / 2));
+        entryLbl.setAttribute('y', String(BOX_H - 8));
+        entryLbl.setAttribute('text-anchor', 'middle');
+        entryLbl.setAttribute('fill', 'var(--accent, #ec4899)');
+        entryLbl.setAttribute('font-size', '9');
+        entryLbl.setAttribute('font-weight', '700');
+        entryLbl.textContent = 'ENTRY';
+        g.appendChild(entryLbl);
+      }
+
+      g.addEventListener('click', function () {
+        dwSetPanelTab('canvas');
+        dwRenderCanvas(screen.id);
+      });
+      g.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          dwSetPanelTab('canvas');
+          dwRenderCanvas(screen.id);
+        }
+      });
+      svg.appendChild(g);
+    });
+  }
+
+  function dwRenderTokens(tokens) {
+    var panel = document.getElementById('dwTokensPanel');
+    if (!panel || !tokens) return;
+    panel.innerHTML = '';
+
+    if (tokens.colors && typeof tokens.colors === 'object') {
+      var colorSec = document.createElement('div');
+      colorSec.className = 'dw-tok-section';
+      var colorTitle = document.createElement('div');
+      colorTitle.className = 'dw-tok-title';
+      colorTitle.textContent = 'Colors';
+      colorSec.appendChild(colorTitle);
+      var grid = document.createElement('div');
+      grid.className = 'dw-color-grid';
+      Object.keys(tokens.colors).forEach(function (key) {
+        var val = tokens.colors[key];
+        var wrap = document.createElement('div');
+        wrap.className = 'dw-color-swatch-wrap';
+        var swatch = document.createElement('div');
+        swatch.className = 'dw-color-swatch';
+        swatch.style.background = String(val);
+        swatch.title = key + ': ' + val;
+        swatch.addEventListener('click', function () { dwCopyToClipboard(String(val), 'Copied ' + val); });
+        var nameEl = document.createElement('div');
+        nameEl.className = 'dw-color-swatch-name';
+        nameEl.textContent = key;
+        wrap.appendChild(swatch);
+        wrap.appendChild(nameEl);
+        grid.appendChild(wrap);
+      });
+      colorSec.appendChild(grid);
+      panel.appendChild(colorSec);
+    }
+
+    if (tokens.typography) {
+      var typSec = document.createElement('div');
+      typSec.className = 'dw-tok-section';
+      var typTitle = document.createElement('div');
+      typTitle.className = 'dw-tok-title';
+      typTitle.textContent = 'Typography';
+      typSec.appendChild(typTitle);
+      var tbl = document.createElement('table');
+      tbl.className = 'dw-tok-table';
+      var addRow = function (k, v) {
+        var tr = document.createElement('tr');
+        var td1 = document.createElement('td');
+        td1.className = 'dw-tok-key';
+        td1.textContent = k;
+        var td2 = document.createElement('td');
+        td2.className = 'dw-tok-val';
+        td2.textContent = String(v);
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tbl.appendChild(tr);
+      };
+      if (tokens.typography.fontFamily) addRow('Font Family', tokens.typography.fontFamily);
+      if (tokens.typography.scale && typeof tokens.typography.scale === 'object') {
+        Object.keys(tokens.typography.scale).forEach(function (k) {
+          addRow('Scale / ' + k, tokens.typography.scale[k]);
+        });
+      }
+      typSec.appendChild(tbl);
+      panel.appendChild(typSec);
+    }
+
+    var extraSections = [
+      { key: 'spacing',   title: 'Spacing' },
+      { key: 'radius',    title: 'Border Radius' },
+      { key: 'elevation', title: 'Elevation' },
+    ];
+    extraSections.forEach(function (s) {
+      var obj = tokens[s.key];
+      if (!obj || typeof obj !== 'object') return;
+      var sec = document.createElement('div');
+      sec.className = 'dw-tok-section';
+      var secTitle = document.createElement('div');
+      secTitle.className = 'dw-tok-title';
+      secTitle.textContent = s.title;
+      sec.appendChild(secTitle);
+      var t2 = document.createElement('table');
+      t2.className = 'dw-tok-table';
+      Object.keys(obj).forEach(function (k) {
+        var tr = document.createElement('tr');
+        var td1 = document.createElement('td');
+        td1.className = 'dw-tok-key';
+        td1.textContent = k;
+        var td2 = document.createElement('td');
+        td2.className = 'dw-tok-val';
+        td2.textContent = String(obj[k]);
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        t2.appendChild(tr);
+      });
+      sec.appendChild(t2);
+      panel.appendChild(sec);
+    });
+  }
+
+  function dwApplyPatch(patchList) {
+    if (!designState || !Array.isArray(patchList)) return;
+    patchList.forEach(function (patch) {
+      var idx = designState.screens.findIndex(function (s) { return s.id === patch.screenId; });
+      if (idx === -1) return;
+      if (patch.html        !== undefined) designState.screens[idx].html        = patch.html;
+      if (patch.css         !== undefined) designState.screens[idx].css         = patch.css;
+      if (patch.mobileHtml  !== undefined) designState.screens[idx].mobileHtml  = patch.mobileHtml;
+      if (patch.mobileCss   !== undefined) designState.screens[idx].mobileCss   = patch.mobileCss;
+      if (patch.name        !== undefined) designState.screens[idx].name        = patch.name;
+      if (patch.description !== undefined) designState.screens[idx].description = patch.description;
+    });
+  }
+
+  function dwRenderWorkspace(design) {
+    var workspace = document.getElementById('designWorkspace');
+    if (!workspace) return;
+
+    var isCreate = !designState || design.op === 'create';
+
+    if (isCreate) {
+      designState = {
+        schema:      'cf-ui-design/1',
+        op:          'create',
+        project:     design.project     || {},
+        styleTokens: design.styleTokens || {},
+        components:  design.components  || [],
+        screens:     design.screens     || [],
+        flow:        design.flow        || { transitions: [] },
+        patches:     [],
+      };
+      // Auto-switch to workspace on first design
+      dwSwitchView('workspace');
+    } else {
+      // Patch mode: merge updates into existing state
+      if (design.project)     designState.project     = design.project;
+      if (design.styleTokens) designState.styleTokens = design.styleTokens;
+      if (design.components)  designState.components  = design.components;
+      if (design.flow)        designState.flow        = design.flow;
+      if (Array.isArray(design.patches) && design.patches.length) {
+        dwApplyPatch(design.patches);
+      }
+      if (Array.isArray(design.screens)) {
+        design.screens.forEach(function (ns) {
+          var idx = designState.screens.findIndex(function (s) { return s.id === ns.id; });
+          if (idx === -1) designState.screens.push(ns);
+          else designState.screens[idx] = ns;
+        });
+      }
+    }
+
+    workspace.style.display = 'flex';
+
+    // Update iterate badge
+    var badge     = document.getElementById('dwIterateBadge');
+    var badgeName = document.getElementById('dwIterateName');
+    if (badge && badgeName) {
+      var projectName = (designState.project && designState.project.name) ? designState.project.name : '';
+      if (projectName) {
+        badgeName.textContent  = projectName;
+        badge.style.display    = 'inline-flex';
+      }
+    }
+
+    dwRenderScreenBar(designState.screens);
+    var firstScreen = designState.screens.length ? designState.screens[0].id : null;
+    if (firstScreen) {
+      dwActiveScreen = firstScreen;
+      dwRenderCanvas(firstScreen);
+    }
+    dwRenderSidePanel();
+    if (dwActivePanelTab === 'flow')   dwRenderFlow(designState);
+    if (dwActivePanelTab === 'tokens') dwRenderTokens(designState.styleTokens);
+  }
+
+  function dwSwitchView(view) {
+    var chatWindow  = document.querySelector('.chat-window');
+    var workspace   = document.getElementById('designWorkspace');
+    var viewChatBtn = document.getElementById('dwViewChat');
+    var viewWsBtn   = document.getElementById('dwViewWorkspace');
+    if (view === 'workspace') {
+      if (chatWindow)  chatWindow.style.display  = 'none';
+      if (workspace)   workspace.style.display   = 'flex';
+      if (viewChatBtn) viewChatBtn.classList.remove('active');
+      if (viewWsBtn)   viewWsBtn.classList.add('active');
+    } else {
+      if (chatWindow)  chatWindow.style.display  = 'flex';
+      if (workspace && !designState) workspace.style.display = 'none';
+      if (viewChatBtn) viewChatBtn.classList.add('active');
+      if (viewWsBtn)   viewWsBtn.classList.remove('active');
+    }
+  }
+
+  function dwCopyToClipboard(text, successMsg) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(function () { dwShowToast(successMsg || 'Copied!', 'success'); })
+        .catch(function () { dwShowToast('Copy failed.', 'error'); });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        dwShowToast(successMsg || 'Copied!', 'success');
+      } catch (e) {
+        dwShowToast('Copy not supported in this browser.', 'error');
+      }
+      document.body.removeChild(ta);
+    }
+  }
+
+  function dwInitViewTabs() {
+    var viewChatBtn = document.getElementById('dwViewChat');
+    var viewWsBtn   = document.getElementById('dwViewWorkspace');
+    if (viewChatBtn) viewChatBtn.addEventListener('click', function () { dwSwitchView('chat'); });
+    if (viewWsBtn)   viewWsBtn.addEventListener('click',   function () { dwSwitchView('workspace'); });
+  }
+
+  function dwInitToolbar() {
+    // Panel tabs (Canvas / Flow / Tokens)
+    var panelTabGroup = document.getElementById('dwPanelTabs');
+    if (panelTabGroup) {
+      panelTabGroup.querySelectorAll('[data-panel]').forEach(function (btn) {
+        btn.addEventListener('click', function () { dwSetPanelTab(btn.dataset.panel); });
+      });
+    }
+
+    // Breakpoint switcher
+    var bpWeb    = document.getElementById('dwBpWeb');
+    var bpMobile = document.getElementById('dwBpMobile');
+    if (bpWeb)    bpWeb.addEventListener('click',    function () { dwSetBp('web'); });
+    if (bpMobile) bpMobile.addEventListener('click', function () { dwSetBp('mobile'); });
+
+    // Side panel tabs (Components / Properties)
+    var sideTabBar = document.getElementById('dwSideTabBar');
+    if (sideTabBar) {
+      sideTabBar.querySelectorAll('[data-side]').forEach(function (btn) {
+        btn.addEventListener('click', function () { dwSetSideTab(btn.dataset.side); });
+      });
+    }
+
+    // Export button
+    var exportBtn = document.getElementById('dwExportBtn');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', function () {
+        if (!designState) { dwShowToast('No design to export yet.', ''); return; }
+        var json = JSON.stringify(designState, null, 2);
+        var blob = new Blob([json], { type: 'application/json' });
+        var url  = URL.createObjectURL(blob);
+        var a    = document.createElement('a');
+        var safeName = (designState.project && designState.project.name)
+          ? String(designState.project.name).toLowerCase().replace(/[^a-z0-9]+/g, '-')
+          : 'design';
+        a.href     = url;
+        a.download = safeName + '.fig.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        dwShowToast('Exported ' + a.download, 'success');
+      });
+    }
+
+    // Import file input
+    var importInput = document.getElementById('dwImportInput');
+    if (importInput) {
+      importInput.addEventListener('change', function () {
+        var file = this.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (evt) {
+          try {
+            var parsed = JSON.parse(evt.target.result);
+            if (typeof parsed !== 'object' || parsed.schema !== 'cf-ui-design/1') {
+              dwShowToast('Invalid design file: expected cf-ui-design/1 schema.', 'error');
+              return;
+            }
+            designState = null;
+            dwRenderWorkspace(parsed);
+            dwSwitchView('workspace');
+            dwShowToast('Design imported successfully.', 'success');
+          } catch (err) {
+            dwShowToast('Import failed: ' + String(err.message), 'error');
+          }
+        };
+        reader.readAsText(file);
+        importInput.value = '';
+      });
+    }
+  }
+
+  if (IS_DESIGN_ROLE) {
+    dwInitViewTabs();
+    dwInitToolbar();
+  }
+
 }());
 PAGEJS;
 
