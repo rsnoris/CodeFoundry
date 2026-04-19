@@ -2062,6 +2062,8 @@ function filterTable(tblId, query, colFilter, colKey) {
 }());
 </script>
 
+<script src="/assets/js/site.js"></script>
+
 <script>
 // ── Docker Instances monitoring ────────────────────────────────────────────
 (function () {
@@ -2375,4 +2377,3 @@ function filterTable(tblId, query, colFilter, colKey) {
   autoRefreshTimer = setInterval(window.dockerLoadStatus, AUTO_REFRESH_MS);
 }());
 </script>
-
