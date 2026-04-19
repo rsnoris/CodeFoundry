@@ -23,11 +23,11 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/lib/CodeGenProvider.php';
 
-header('Content-Type: application/json');
 header('X-Content-Type-Options: nosniff');
 
 // ── Method guard ──────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Content-Type: application/json');
     http_response_code(405);
     echo json_encode(['error' => 'Method not allowed.']);
     exit;
@@ -48,8 +48,12 @@ $currentCode = isset($body['currentCode']) ? trim((string)$body['currentCode']) 
 $errorOutput = isset($body['errorOutput']) ? trim((string)$body['errorOutput']) : '';
 $providerId  = isset($body['provider'])    ? trim((string)$body['provider'])    : '';
 $model       = isset($body['model'])       ? trim((string)$body['model'])       : '';
+$stream      = !empty($body['stream']);
+// Alias: multi-turn messages array (for chat-style continuity)
+$msgHistory  = (!empty($body['messages']) && is_array($body['messages'])) ? $body['messages'] : [];
 
 if ($providerId !== '' && !array_key_exists($providerId, CF_CODEGEN_PROVIDERS)) {
+    header('Content-Type: application/json');
     http_response_code(400);
     echo json_encode(['error' => 'Unknown provider: ' . $providerId]);
     exit;
@@ -58,24 +62,28 @@ if ($providerId !== '' && !array_key_exists($providerId, CF_CODEGEN_PROVIDERS)) 
 // ── Validate action ───────────────────────────────────────────────────────
 $validActions = ['generate', 'improve', 'explain', 'fix'];
 if (!in_array($action, $validActions, true)) {
+    header('Content-Type: application/json');
     http_response_code(400);
     echo json_encode(['error' => 'Invalid action.']);
     exit;
 }
 
 if ($language === '') {
+    header('Content-Type: application/json');
     http_response_code(400);
     echo json_encode(['error' => '"language" is required.']);
     exit;
 }
 
-if (in_array($action, ['generate', 'improve'], true) && $prompt === '') {
+if (in_array($action, ['generate', 'improve'], true) && $prompt === '' && empty($msgHistory)) {
+    header('Content-Type: application/json');
     http_response_code(400);
     echo json_encode(['error' => '"prompt" is required for generate and improve actions.']);
     exit;
 }
 
-if (in_array($action, ['improve', 'explain', 'fix'], true) && $currentCode === '') {
+if (in_array($action, ['improve', 'explain', 'fix'], true) && $currentCode === '' && empty($msgHistory)) {
+    header('Content-Type: application/json');
     http_response_code(400);
     echo json_encode(['error' => '"currentCode" is required for improve, explain, and fix actions.']);
     exit;
@@ -87,6 +95,7 @@ $langLabel = preg_replace('/[^a-zA-Z0-9 \+\#\-]/', '', $language);
 // ── Resolve provider candidates ────────────────────────────────────────────
 $providerCandidates = CodeGenProvider::candidateProviderIds($providerId);
 if (empty($providerCandidates)) {
+    header('Content-Type: application/json');
     http_response_code(503);
     echo json_encode([
         'error'      => 'No AI providers are configured. Please add at least one provider key in account/admin settings and try again.',
@@ -100,6 +109,7 @@ if (function_exists('apcu_fetch')) {
     $ip       = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
     $cacheKey = 'cf_codegen_' . md5($ip);
     if (apcu_fetch($cacheKey) !== false) {
+        header('Content-Type: application/json');
         http_response_code(429);
         echo json_encode(['error' => 'Too many requests. Please wait a moment and try again.']);
         exit;
@@ -109,13 +119,26 @@ if (function_exists('apcu_fetch')) {
 
 // ── Token limits ──────────────────────────────────────────────────────────
 const MAX_TOKENS_EXPLAIN    = 1024;
-const MAX_TOKENS_CODE       = 2048;
+const MAX_TOKENS_CODE       = 4096;
 const MAX_CODE_OUTPUT_LENGTH = 20000;
 
 // ── Build messages ────────────────────────────────────────────────────────
 $messages = [];
 
-if ($action === 'generate') {
+// Multi-turn: if the client supplied a full history array, use it directly
+// (client ensures system message is first; we just validate the array).
+if (!empty($msgHistory)) {
+    $messages = array_values(array_filter($msgHistory, function ($m) {
+        return isset($m['role'], $m['content'])
+            && in_array($m['role'], ['system', 'user', 'assistant'], true)
+            && is_string($m['content'])
+            && trim($m['content']) !== '';
+    }));
+    // Cap to avoid token overflow
+    if (count($messages) > 40) {
+        $messages = array_slice($messages, -40);
+    }
+} elseif ($action === 'generate') {
     $messages = [
         [
             'role'    => 'system',
@@ -166,7 +189,61 @@ if ($action === 'generate') {
 
 $maxTokens = ($action === 'explain') ? MAX_TOKENS_EXPLAIN : MAX_TOKENS_CODE;
 
-// ── Call the provider ─────────────────────────────────────────────────────
+// ── Streaming response (SSE forwarded from OpenAI-compatible provider) ────
+if ($stream) {
+    // Resolve the primary provider and API key for streaming
+    $streamProvider = CodeGenProvider::resolveForStream($providerCandidates, $model);
+    if ($streamProvider === null) {
+        header('Content-Type: application/json');
+        http_response_code(503);
+        echo json_encode(['error' => 'No provider available for streaming. Configure an OpenAI-compatible provider.']);
+        exit;
+    }
+
+    header('Content-Type: text/event-stream');
+    header('Cache-Control: no-cache');
+    header('X-Accel-Buffering: no');
+
+    if (!function_exists('curl_init')) {
+        echo "data: " . json_encode(['error' => 'Streaming requires the cURL PHP extension.']) . "\n\n";
+        flush();
+        exit;
+    }
+
+    $streamPayload = [
+        'model'      => $streamProvider['model'],
+        'max_tokens' => $maxTokens,
+        'messages'   => $messages,
+        'stream'     => true,
+    ];
+
+    $ch = curl_init($streamProvider['endpoint']);
+    curl_setopt_array($ch, [
+        CURLOPT_POST          => true,
+        CURLOPT_HTTPHEADER    => [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $streamProvider['api_key'],
+        ],
+        CURLOPT_POSTFIELDS    => json_encode($streamPayload),
+        CURLOPT_TIMEOUT       => 90,
+        CURLOPT_WRITEFUNCTION => static function ($ch, $data) {
+            echo $data;
+            if (ob_get_level() > 0) ob_flush();
+            flush();
+            return strlen($data);
+        },
+    ]);
+    curl_exec($ch);
+    if (curl_errno($ch) !== 0) {
+        echo "data: " . json_encode(['error' => 'Streaming request failed.']) . "\n\n";
+        flush();
+    }
+    curl_close($ch);
+    exit;
+}
+
+// ── Non-streaming: call the provider ─────────────────────────────────────
+header('Content-Type: application/json');
 try {
     $result     = CodeGenProvider::callWithFallback($providerCandidates, $model, $messages, $maxTokens);
     $content    = $result['content'];

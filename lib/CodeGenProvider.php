@@ -343,6 +343,60 @@ class CodeGenProvider
     // ── Private helpers ────────────────────────────────────────────────────
 
     /**
+     * Resolve provider details for SSE streaming.
+     * Only OpenAI-format providers support the standard SSE streaming protocol.
+     *
+     * @param  array<int,string> $providerIds  Ordered candidates from candidateProviderIds()
+     * @param  string            $requestedModel  Optional explicit model id
+     * @return array{endpoint:string,api_key:string,model:string}|null  null when no streamable provider found
+     */
+    public static function resolveForStream(array $providerIds, string $requestedModel = ''): ?array
+    {
+        foreach ($providerIds as $providerId) {
+            if (!self::isProviderAvailable($providerId)) {
+                continue;
+            }
+            $cfg    = CF_CODEGEN_PROVIDERS[$providerId] ?? null;
+            if ($cfg === null) {
+                continue;
+            }
+            $format = strtolower((string)($cfg['format'] ?? 'openai'));
+            // Only OpenAI-compatible endpoints support the SSE streaming protocol
+            if ($format !== 'openai') {
+                continue;
+            }
+
+            $model = ($requestedModel !== '' && self::isValidModel($providerId, $requestedModel))
+                ? $requestedModel
+                : self::defaultModelForProvider($providerId);
+
+            if ($model === '') {
+                continue;
+            }
+
+            // Resolve API key
+            $apiKey = '';
+            if (!empty($cfg['api_key_env'])) {
+                $keyName = (string)$cfg['api_key_env'];
+                $apiKey  = defined('CF_ROOT')
+                    ? trim(cf_load_key($keyName))
+                    : trim((string)(getenv($keyName) ?: ''));
+            }
+            if ($apiKey === '') {
+                continue;
+            }
+
+            $endpoint = (string)($cfg['api_url'] ?? '');
+            return [
+                'endpoint' => $endpoint,
+                'api_key'  => $apiKey,
+                'model'    => $model,
+            ];
+        }
+        return null;
+    }
+
+    /**
      * Look up provider config and resolve optional URL override from env.
      *
      * @return array<string, mixed>

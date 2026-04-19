@@ -570,6 +570,80 @@ kbd {
   border-color: var(--primary);
   color: var(--text);
 }
+
+/* ── Inline-edit modal ───────────────────────────────────── */
+.inline-edit-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 1100;
+  align-items: center;
+  justify-content: center;
+}
+
+.inline-edit-overlay.open { display: flex; }
+
+.inline-edit-modal {
+  background: var(--navy-2);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  width: min(520px, 95vw);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+
+.inline-edit-modal h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.inline-edit-modal h2 iconify-icon { color: #a78bfa; }
+
+.inline-edit-preview {
+  background: #0d1117;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 11.5px;
+  color: #94a3b8;
+  max-height: 80px;
+  overflow: auto;
+  white-space: pre;
+  word-break: break-all;
+}
+
+/* ── Prompt history dropdown ─────────────────────────────── */
+.codegen-history-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.history-select {
+  flex: 1;
+  background: #0d1117;
+  color: var(--text);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  outline: none;
+}
+
+.history-select:focus { border-color: var(--primary); }
+.history-select option { background: #0d1117; }
 PAGECSS;
 
 require_once dirname(__DIR__) . '/includes/header.php';
@@ -669,6 +743,12 @@ require_once dirname(__DIR__) . '/includes/header.php';
       Reset
     </button>
 
+    <!-- Download -->
+    <button id="downloadBtn" class="ide-btn ghost" title="Download code as file">
+      <iconify-icon icon="lucide:download" aria-hidden="true"></iconify-icon>
+      Download
+    </button>
+
     <!-- Keyboard hint -->
     <div class="toolbar-hint" aria-hidden="true">
       <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run
@@ -749,9 +829,15 @@ require_once dirname(__DIR__) . '/includes/header.php';
         Improve existing
       </button>
     </div>
+    <!-- Prompt history dropdown -->
+    <div class="codegen-history-row" id="historyRow" style="display:none;">
+      <select id="historySelect" class="history-select" aria-label="Recent prompts">
+        <option value="">↑ Recent prompts…</option>
+      </select>
+    </div>
     <div id="codegenTabPanel">
       <textarea id="codegenPrompt" class="codegen-prompt"
-                placeholder="Describe the code you want to generate…&#10;e.g. "Write a function that sorts a list of dictionaries by a given key.""
+                placeholder="Describe the code you want to generate…&#10;e.g. &quot;Write a function that sorts a list of dictionaries by a given key.&quot;"
                 rows="4" aria-label="Code generation prompt"></textarea>
     </div>
     <!-- Insert mode -->
@@ -792,6 +878,28 @@ require_once dirname(__DIR__) . '/includes/header.php';
     </div>
     <div class="codegen-actions">
       <button id="explainCloseBtn" class="ide-btn ghost">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Inline-edit modal ─────────────────────────────────────────── -->
+<div id="inlineEditOverlay" class="inline-edit-overlay" role="dialog"
+     aria-modal="true" aria-labelledby="inlineEditTitle">
+  <div class="inline-edit-modal">
+    <h2 id="inlineEditTitle">
+      <iconify-icon icon="lucide:wand-2" aria-hidden="true"></iconify-icon>
+      Edit Selection with AI
+    </h2>
+    <pre id="inlineEditPreview" class="inline-edit-preview"></pre>
+    <textarea id="inlineEditPrompt" class="codegen-prompt"
+              placeholder="How should the AI modify this selection?&#10;e.g. &quot;Make this async&quot; or &quot;Add input validation&quot;"
+              rows="3" aria-label="Edit instruction"></textarea>
+    <div class="codegen-actions">
+      <button id="inlineEditCancelBtn" class="ide-btn ghost">Cancel</button>
+      <button id="inlineEditSubmitBtn" class="ide-btn primary" style="background:#7c3aed;">
+        <iconify-icon icon="lucide:wand-2" aria-hidden="true"></iconify-icon>
+        Apply Edit
+      </button>
     </div>
   </div>
 </div>
@@ -1058,6 +1166,20 @@ require(['vs/editor/editor.main'], function () {
     runCode,
   );
 
+  // Ctrl/Cmd + Shift + I → inline AI edit
+  editor.addAction({
+    id:    'cf-inline-edit',
+    label: 'Edit with AI',
+    keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyI],
+    contextMenuGroupId: '1_modification',
+    contextMenuOrder:   1.5,
+    run: function (ed) {
+      const sel          = ed.getSelection();
+      const selectedText = ed.getModel().getValueInRange(sel);
+      openInlineEdit(selectedText || '', sel);
+    },
+  });
+
   // ── Restore generated code from Generate page ──────────
   (function () {
     const savedCode = sessionStorage.getItem('cf_generated_code');
@@ -1140,6 +1262,22 @@ document.getElementById('resetBtn').addEventListener('click', function () {
     editor.setValue(starter);
     clearOutput();
   }
+});
+
+/* ── Download ───────────────────────────────────────────────── */
+document.getElementById('downloadBtn').addEventListener('click', function () {
+  if (!editor) return;
+  const code = editor.getValue();
+  if (!code) return;
+  const lang     = LANGUAGES[currentLang];
+  const filename = 'main.' + lang.ext;
+  const blob     = new Blob([code], { type: 'text/plain' });
+  const url      = URL.createObjectURL(blob);
+  const a        = document.createElement('a');
+  a.href         = url;
+  a.download     = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 });
 
 document.getElementById('clearStdinBtn').addEventListener('click', function () {
@@ -1304,6 +1442,58 @@ function setRunning(on) {
   }
 }
 
+/* ── Shared SSE streaming helper ────────────────────────── */
+/**
+ * POST to codegen.php with stream:true and call onChunk(accumulatedText)
+ * for every delta. Returns the final trimmed text (fences stripped).
+ */
+async function streamCodegen(payload, onChunk) {
+  const aiSel = getAiSelection();
+  const res = await fetch('/IDE/codegen.php', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ ...aiSel, ...payload, stream: true }),
+  });
+
+  if (!res.ok) {
+    let errMsg = 'Unknown error';
+    try { const d = await res.json(); errMsg = d.error || errMsg; } catch (_) {}
+    if (errMsg.includes('subscription_required')) { window.location.href = '/Pricing/'; throw new Error('redirect'); }
+    throw new Error(errMsg);
+  }
+
+  const reader  = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let accumulated = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const raw = line.slice(6).trim();
+      if (raw === '[DONE]') break;
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed.error) throw new Error(parsed.error.message || String(parsed.error));
+        const delta = parsed.choices?.[0]?.delta?.content;
+        if (delta) { accumulated += delta; onChunk(accumulated); }
+      } catch (parseErr) {
+        if (parseErr.message && !parseErr.message.includes('JSON')) throw parseErr;
+      }
+    }
+  }
+
+  return accumulated
+    .replace(/^```[a-zA-Z]*\n?/, '')
+    .replace(/\n?```$/, '')
+    .trim();
+}
+
 /* ── CodeGen / Improve / Explain / Fix ─────────────────────────── */
 (function () {
   /* ── Shared helper ─────────────────────────────────────────────── */
@@ -1315,6 +1505,46 @@ function setRunning(on) {
     }
     return code;
   }
+
+  /* ── Prompt history (localStorage) ────────────────────────────── */
+  const HISTORY_KEY = 'cf_prompt_history';
+  const HISTORY_MAX = 20;
+
+  function loadHistory() {
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+    catch (_) { return []; }
+  }
+
+  function saveToHistory(text) {
+    const hist = loadHistory().filter(h => h !== text);
+    hist.unshift(text);
+    if (hist.length > HISTORY_MAX) hist.length = HISTORY_MAX;
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(hist)); } catch (_) {}
+  }
+
+  function refreshHistoryDropdown() {
+    const hist     = loadHistory();
+    const histRow  = document.getElementById('historyRow');
+    const histSel  = document.getElementById('historySelect');
+    if (!histRow || !histSel) return;
+    histSel.innerHTML = '<option value="">↑ Recent prompts…</option>';
+    hist.forEach(function (h) {
+      const opt = document.createElement('option');
+      opt.value = h;
+      opt.textContent = h.length > 65 ? h.slice(0, 62) + '…' : h;
+      histSel.appendChild(opt);
+    });
+    histRow.style.display = hist.length > 0 ? '' : 'none';
+  }
+
+  const histSel = document.getElementById('historySelect');
+  if (histSel) {
+    histSel.addEventListener('change', function () {
+      const promptTA = document.getElementById('codegenPrompt');
+      if (this.value && promptTA) { promptTA.value = this.value; promptTA.focus(); this.value = ''; }
+    });
+  }
+
   /* ── CodeGen & Improve modal ───────────────────────────────────── */
   const overlay     = document.getElementById('codegenOverlay');
   const promptTA    = document.getElementById('codegenPrompt');
@@ -1373,6 +1603,7 @@ function setRunning(on) {
 
   function openModal(mode) {
     setMode(mode || 'generate');
+    refreshHistoryDropdown();
     promptTA.value = '';
     overlay.classList.add('open');
     promptTA.focus();
@@ -1403,37 +1634,33 @@ function setRunning(on) {
     const code = (currentMode === 'improve') ? requireEditorCode('improve') : null;
     if (currentMode === 'improve' && code === null) return;
 
+    saveToHistory(text);
+
     submitBtn.disabled  = true;
     const originalLabel = submitBtn.innerHTML;
     submitBtn.innerHTML = '<span class="spinner"></span> ' +
       (currentMode === 'improve' ? 'Improving…' : 'Generating…');
 
     try {
-      const body = {
+      const payload = {
         action:   currentMode,
         prompt:   text,
         language: currentLang,
-        ...getAiSelection(),
       };
       if (currentMode === 'improve') {
-        body.currentCode = code;
+        payload.currentCode = code;
       }
 
-      const res  = await fetch('/IDE/codegen.php', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(body),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        if (data.error_code === 'subscription_required') {
-          window.location.href = '/Pricing/';
-          return;
+      if (editor) editor.setValue('');
+      const clean = await streamCodegen(payload, function (acc) {
+        if (editor) {
+          if (currentMode === 'generate' && getInsertMode() === 'cursor') {
+            // For cursor-insert mode we accumulate and insert once at the end
+          } else {
+            editor.setValue(acc);
+          }
         }
-        alert('CodeGen error: ' + (data.error || 'Unknown error'));
-        return;
-      }
+      });
 
       if (editor) {
         if (currentMode === 'generate' && getInsertMode() === 'cursor') {
@@ -1443,17 +1670,19 @@ function setRunning(on) {
               position.lineNumber, position.column,
               position.lineNumber, position.column
             ),
-            text: data.code,
+            text: clean,
           }]);
         } else {
-          editor.setValue(data.code);
+          editor.setValue(clean);
         }
         editor.focus();
       }
 
       closeModal();
     } catch (err) {
-      alert('Network error: ' + err.message);
+      if (err.message !== 'redirect') {
+        alert('CodeGen error: ' + err.message);
+      }
     } finally {
       submitBtn.disabled  = false;
       submitBtn.innerHTML = originalLabel;
@@ -1481,38 +1710,28 @@ function setRunning(on) {
   }
 
   explainBtnEl.addEventListener('click', async function () {
-    const code = requireEditorCode('explain');
+    // Use selection if present, else full editor
+    const sel     = editor ? editor.getSelection() : null;
+    const selText = (sel && editor) ? editor.getModel().getValueInRange(sel).trim() : '';
+    const code    = selText || requireEditorCode('explain');
     if (code === null) return;
 
     explainBody.innerHTML = '<div class="explain-loading"><span class="spinner"></span> Generating explanation…</div>';
     explainOverlay.classList.add('open');
 
     try {
-      const body = {
+      const clean = await streamCodegen({
         action:      'explain',
         language:    currentLang,
         currentCode: code,
-        ...getAiSelection(),
-      };
-      const res  = await fetch('/IDE/codegen.php', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(body),
+      }, function (acc) {
+        explainBody.textContent = acc;
       });
-      const data = await res.json();
-
-      if (!res.ok) {
-        if (data.error_code === 'subscription_required') {
-          window.location.href = '/Pricing/';
-          return;
-        }
-        explainBody.textContent = 'Error: ' + (data.error || 'Unknown error');
-        return;
-      }
-
-      explainBody.textContent = data.explanation || '(No explanation returned.)';
+      explainBody.textContent = clean || '(No explanation returned.)';
     } catch (err) {
-      explainBody.textContent = 'Network error: ' + err.message;
+      if (err.message !== 'redirect') {
+        explainBody.textContent = 'Error: ' + err.message;
+      }
     }
   });
 
@@ -1542,43 +1761,107 @@ function setRunning(on) {
     fixBtn.innerHTML = '<span class="spinner"></span> Fixing…';
 
     try {
-      const body = {
+      const payload = {
         action:      'fix',
         language:    currentLang,
         currentCode: code,
-        ...getAiSelection(),
       };
       if (errorText !== '' && !outputPanel.classList.contains('empty')) {
-        body.errorOutput = errorText;
+        payload.errorOutput = errorText;
       }
 
-      const res  = await fetch('/IDE/codegen.php', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(body),
+      if (editor) editor.setValue('');
+      const clean = await streamCodegen(payload, function (acc) {
+        if (editor) editor.setValue(acc);
       });
-      const data = await res.json();
-
-      if (!res.ok) {
-        if (data.error_code === 'subscription_required') {
-          window.location.href = '/Pricing/';
-          return;
-        }
-        alert('Fix error: ' + (data.error || 'Unknown error'));
-        return;
-      }
-
       if (editor) {
-        editor.setValue(data.code);
+        editor.setValue(clean);
         editor.focus();
       }
     } catch (err) {
-      alert('Network error: ' + err.message);
+      if (err.message !== 'redirect') {
+        alert('Fix error: ' + err.message);
+      }
     } finally {
       fixBtn.disabled  = false;
       fixBtn.innerHTML = origLabel;
     }
   });
+}());
+
+/* ── Inline Edit ────────────────────────────────────────────────── */
+let _inlineSel = null;
+
+function openInlineEdit(selectedText, selection) {
+  _inlineSel = selection;
+  const preview  = document.getElementById('inlineEditPreview');
+  const promptEl = document.getElementById('inlineEditPrompt');
+  const overlay  = document.getElementById('inlineEditOverlay');
+  if (!preview || !promptEl || !overlay) return;
+  preview.textContent = selectedText.length > 0
+    ? (selectedText.length > 400 ? selectedText.slice(0, 397) + '…' : selectedText)
+    : '(entire file)';
+  promptEl.value = '';
+  overlay.classList.add('open');
+  promptEl.focus();
+}
+
+(function () {
+  const overlay   = document.getElementById('inlineEditOverlay');
+  const promptEl  = document.getElementById('inlineEditPrompt');
+  const submitBtn = document.getElementById('inlineEditSubmitBtn');
+  const cancelBtn = document.getElementById('inlineEditCancelBtn');
+  if (!overlay) return;
+
+  const origLabel = submitBtn ? submitBtn.innerHTML : '';
+
+  function closeModal() {
+    overlay.classList.remove('open');
+    if (editor) editor.focus();
+  }
+
+  cancelBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+  });
+  promptEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); applyEdit(); }
+  });
+  submitBtn.addEventListener('click', applyEdit);
+
+  async function applyEdit() {
+    const instruction = promptEl.value.trim();
+    if (!instruction || !editor) return;
+
+    const sel          = _inlineSel;
+    const selectedText = sel ? editor.getModel().getValueInRange(sel).trim() : '';
+
+    submitBtn.disabled  = true;
+    submitBtn.innerHTML = '<span class="spinner"></span> Applying…';
+
+    try {
+      const clean = await streamCodegen({
+        action:      'improve',
+        language:    currentLang,
+        currentCode: selectedText || editor.getValue(),
+        prompt:      instruction,
+      }, function () {});
+
+      if (selectedText && sel) {
+        editor.executeEdits('cf-inline-edit', [{ range: sel, text: clean }]);
+      } else {
+        editor.setValue(clean);
+      }
+      editor.focus();
+      closeModal();
+    } catch (err) {
+      if (err.message !== 'redirect') alert('Edit error: ' + err.message);
+    } finally {
+      submitBtn.disabled  = false;
+      submitBtn.innerHTML = origLabel;
+    }
+  }
 }());
 
 /* ── Resizable divider ──────────────────────────────────── */
