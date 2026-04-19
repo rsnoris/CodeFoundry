@@ -1036,20 +1036,80 @@ let editor     = null;
 let currentLang = 'python';
 let isRunning   = false;
 
-/* ── Runtime bootstrap on page load ─────────────────────── */
-(function runtimeBootstrapOnLoad() {
-  fetch('/IDE/runtime-init.php', { method: 'POST', keepalive: true })
-    .then(function (res) { return res.json(); })
-    .then(function (data) {
-      if (!data || data.ready) return;
-      const panel = document.getElementById('outputPanel');
-      if (!panel || !panel.classList.contains('empty')) return;
-      panel.classList.remove('empty');
-      panel.textContent = 'Preparing Docker runtime in the background. You can start coding now; code execution will be available shortly.';
-    })
-    .catch(function () {
-      // No-op: IDE remains usable; runtime check will happen on Run.
-    });
+/* ── Runtime health polling ──────────────────────────────────
+ *
+ * Polls /IDE/runtime-health.php every 5 seconds until Docker
+ * reports "ready".  Shows an inline banner in the (empty) output
+ * panel while warming up, and clears it automatically once ready.
+ * Stops polling on terminal states (ready / failed / unavailable)
+ * or after MAX_POLLS intervals to avoid polling forever.
+ */
+(function runtimeHealthPoller() {
+  var POLL_MS    = 5000;
+  var MAX_WAIT_MS = 6 * 60 * 1000;                      // 6 minutes maximum wait
+  var MAX_POLLS   = Math.floor(MAX_WAIT_MS / POLL_MS);  // = 72 intervals
+  var pollCount = 0;
+  var pollTimer = null;
+
+  function setBanner(text, isError) {
+    var panel = document.getElementById('outputPanel');
+    if (!panel || !panel.classList.contains('empty')) return;
+    panel.classList.remove('empty');
+    panel.innerHTML = '';
+    var span = document.createElement('span');
+    span.id        = 'cfRuntimeBanner';
+    span.className = isError ? 'output-stderr' : '';
+    span.style.cssText = 'font-style:italic;';
+    span.textContent   = text;
+    panel.appendChild(span);
+  }
+
+  function clearBanner() {
+    var panel = document.getElementById('outputPanel');
+    if (!panel) return;
+    if (document.getElementById('cfRuntimeBanner')) {
+      panel.textContent = 'Run your code to see output here.';
+      panel.className   = 'output-content empty';
+    }
+  }
+
+  function poll() {
+    fetch('/IDE/runtime-health.php')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data) return;
+
+        if (data.status === 'ready') {
+          clearBanner();
+          return; // stop polling – runtime is operational
+        }
+
+        if (data.status === 'warming') {
+          setBanner('⏳ Docker runtime is warming up. You can write code now; code execution will be available shortly.', false);
+          pollCount++;
+          if (pollCount < MAX_POLLS) {
+            pollTimer = setTimeout(poll, POLL_MS);
+          } else {
+            setBanner('⚠ Docker runtime is taking longer than expected. Please contact an administrator if execution remains unavailable.', true);
+          }
+          return;
+        }
+
+        if (data.status === 'failed') {
+          setBanner('✗ Docker runtime setup failed. Please contact an administrator.', true);
+          return; // terminal – stop polling
+        }
+
+        // 'unavailable' or unexpected value
+        setBanner('⚠ Docker runtime is not available. Please contact an administrator.', true);
+        // terminal – stop polling
+      })
+      .catch(function () {
+        // Network error – IDE remains usable; suppress the banner.
+      });
+  }
+
+  poll();
 })();
 
 /* ── AI model selector ──────────────────────────────────── */

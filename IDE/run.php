@@ -299,6 +299,10 @@ function dockerRun(
         '--cap-drop=ALL',
         '--security-opt=no-new-privileges',
         '--stop-timeout=0',
+        // Writable tmpfs for /tmp so language runtimes (JVM, dotnet, rustc)
+        // have a scratch area without being able to persist data to the host.
+        // nosuid prevents privilege escalation via setuid binaries placed there.
+        '--tmpfs', '/tmp:rw,nosuid,size=128m',
         '-v', $workDir . ':/sandbox',
         '-w', '/sandbox',
         '-i',            // keep stdin open so we can pipe data in
@@ -397,6 +401,7 @@ function dockerRun(
         'stderr'    => $stderr,
         'code'      => $code,
         'timed_out' => ($code === 124), // GNU timeout exits 124 on expiry
+        'container' => $containerName,
     ];
 }
 
@@ -419,16 +424,12 @@ function removeDir(string $dir): void
 // Prepare execution sandbox directory
 // ---------------------------------------------------------------------------
 
-$config  = LANG_CONFIG[$language];
-$execDir = sys_get_temp_dir() . '/cf_exec_' . bin2hex(random_bytes(8));
+$config   = LANG_CONFIG[$language];
+$execDir  = sys_get_temp_dir() . '/cf_exec_' . bin2hex(random_bytes(8));
+$clientIp = $_SERVER['REMOTE_ADDR'] ?? '';
 
 if (!cfDockerCliAvailable() || !cfDockerDaemonAvailable()) {
-    $setupTriggered = false;
-    if (!cfRuntimeSetupInProgress()) {
-        $setupTriggered = cfStartRuntimeSetup();
-    }
-
-    $runtimeMsg = ($setupTriggered || cfRuntimeSetupInProgress())
+    $runtimeMsg = cfRuntimeSetupInProgress()
         ? DOCKER_BOOTSTRAP_MESSAGE
         : DOCKER_SETUP_HINT;
 
@@ -445,7 +446,34 @@ if (!cfDockerCliAvailable() || !cfDockerDaemonAvailable()) {
     exit;
 }
 
-if (!mkdir($execDir, 0755, true)) {
+// ---------------------------------------------------------------------------
+// Rate limiting  (per source IP, sliding window)
+// ---------------------------------------------------------------------------
+
+if (!cfCheckRateLimit($clientIp)) {
+    http_response_code(429);
+    header('Retry-After: 60');
+    echo json_encode(['error' => 'Rate limit exceeded. Please wait before running more code.']);
+    exit;
+}
+
+// ---------------------------------------------------------------------------
+// Concurrent-execution cap
+// ---------------------------------------------------------------------------
+
+$concurrentSlot = cfAcquireConcurrentSlot();
+if ($concurrentSlot === null) {
+    http_response_code(429);
+    echo json_encode(['error' => 'The execution engine is busy. Please try again in a moment.']);
+    exit;
+}
+
+// Release the slot whenever this request ends (normal exit, die, or fatal).
+register_shutdown_function(static function () use ($concurrentSlot): void {
+    cfReleaseConcurrentSlot($concurrentSlot);
+});
+
+if (!mkdir($execDir, 0777, true)) {
     http_response_code(500);
     echo json_encode(['error' => 'Failed to create execution sandbox.']);
     exit;
@@ -521,6 +549,7 @@ if ($config['compile'] !== null) {
 $runCmd = $config['run'];
 
 if ($runCmd !== null) {
+    $runStart  = microtime(true);
     $runResult = dockerRun(
         $config['image'],
         $execDir,
@@ -528,9 +557,11 @@ if ($runCmd !== null) {
         $runCmd,
         RUN_TIMEOUT
     );
+    $runMs = (microtime(true) - $runStart) * 1000.0;
 } else {
     // Language uses only the compile command to produce output (no separate
     // run step).  Promote the compile result to the run slot.
+    $runMs         = 0.0;
     $runResult     = $compileResult;
     $compileResult = null;
 }
@@ -541,6 +572,16 @@ if ($runResult['timed_out']) {
     $runResult['stderr'] .= "\nExecution timed out after " . RUN_TIMEOUT . ' seconds.';
     $runResult['code']    = 1;
 }
+
+// Log execution statistics for operational visibility.
+cfLogExecution(
+    $language,
+    $runResult['code'],
+    $runMs,
+    $runResult['timed_out'],
+    $runResult['container'],
+    $clientIp
+);
 
 // ---------------------------------------------------------------------------
 // Response – Piston-compatible shape so the frontend needs no changes
