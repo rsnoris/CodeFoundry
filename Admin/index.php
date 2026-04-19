@@ -2062,6 +2062,7 @@ function filterTable(tblId, query, colFilter, colKey) {
 }());
 </script>
 
+<script>
 // ── Docker Instances monitoring ────────────────────────────────────────────
 (function () {
   // Only run on the docker_instances tab
@@ -2373,5 +2374,5 @@ function filterTable(tblId, query, colFilter, colKey) {
   // Auto-refresh status card every 15 s while on this tab
   autoRefreshTimer = setInterval(window.dockerLoadStatus, AUTO_REFRESH_MS);
 }());
-
+</script>
 
