@@ -32,7 +32,9 @@ program finishes.
 
 ## Prerequisites
 
-- Docker Engine 20.10+ installed on the host
+- Docker Engine 20.10+ installed on the host, **or** installable by the runtime
+  bootstrap script (`apt-get`, `apt`, `dnf`, `microdnf`, `yum`, `apk`, `zypper`,
+  `pacman`)
 - The web-server user (e.g. `www-data`) must be able to run `docker` commands:
   ```bash
   sudo usermod -aG docker www-data
@@ -59,6 +61,9 @@ commands without a password prompt:
 sudo usermod -aG docker www-data
 # then restart the web server / PHP-FPM
 ```
+
+If Docker is not installed, **Initialize / Prewarm Runtime** will attempt to
+install it automatically using the supported package managers above.
 
 ### Features
 
