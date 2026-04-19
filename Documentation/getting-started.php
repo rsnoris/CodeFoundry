@@ -409,13 +409,6 @@ require_once __DIR__ . '/../includes/header.php';
       <li>
         <iconify-icon icon="lucide:check-circle-2" class="check-icon"></iconify-icon>
         <div>
-          <strong>Explore the Tools Dashboard</strong>
-          <span>Visit the Tools section to discover developer utilities — code formatters, schema validators, regex testers, and more — all available directly in the browser.</span>
-        </div>
-      </li>
-      <li>
-        <iconify-icon icon="lucide:check-circle-2" class="check-icon"></iconify-icon>
-        <div>
           <strong>Run Your First Code Snippet</strong>
           <span>Use the IDE's built-in runner to execute a "Hello, World!" program in your preferred language. Verify that output, errors, and the terminal all work as expected.</span>
         </div>

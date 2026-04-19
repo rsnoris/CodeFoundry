@@ -78,7 +78,6 @@ function cf_active_any(array $ids): string {
       </div>
       <?php if ($_cf_user): ?>
       <a href="/VIRAL/"       class="nav-link<?= cf_active('viral') ?>">VIRAL Agents</a>
-      <a href="/Tools/"       class="nav-link<?= cf_active('tools') ?>">Tools</a>
       <?php endif; ?>
       <a href="/Pricing/"     class="nav-link<?= cf_active('pricing') ?>">Pricing</a>
       <a href="/AboutUs/"     class="nav-link<?= cf_active('about') ?>">About</a>
@@ -141,7 +140,6 @@ function cf_active_any(array $ids): string {
         </div>
         <?php if ($_cf_user): ?>
         <a href="/VIRAL/"       class="nav-link" onclick="closeMobileNav()">VIRAL Agents</a>
-        <a href="/Tools/"       class="nav-link" onclick="closeMobileNav()">Tools</a>
         <?php endif; ?>
         <a href="/Pricing/"     class="nav-link" onclick="closeMobileNav()">Pricing</a>
         <a href="/AboutUs/"     class="nav-link" onclick="closeMobileNav()">About</a>
