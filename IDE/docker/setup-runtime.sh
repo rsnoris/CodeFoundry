@@ -99,12 +99,12 @@ ensure_docker_cli() {
 
   echo "Docker CLI not found. Installing Docker Engine..."
 
-  if [[ -n "$SUDO" ]] && ! have_cmd sudo; then
+  if [[ "$(id -u)" -ne 0 ]] && ! have_cmd sudo; then
     echo "Docker install requires root privileges, but sudo is not available for user '${USER:-unknown}'." >&2
     echo "Run this setup as root or install Docker manually, then retry Initialize / Prewarm Runtime." >&2
     exit 1
   fi
-  if [[ -n "$SUDO" ]] && ! sudo -n true >/dev/null 2>&1; then
+  if [[ "$(id -u)" -ne 0 ]] && ! $SUDO -n true >/dev/null 2>&1; then
     echo "Docker install requires passwordless sudo for user '${USER:-unknown}'." >&2
     echo "Grant non-interactive sudo access for package installation, run setup as root, or install Docker manually first." >&2
     exit 1
