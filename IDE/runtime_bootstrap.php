@@ -50,7 +50,7 @@ function cfIsProcessRunning(int $pid): bool
     if ($pid <= 0) {
         return false;
     }
-    exec('ps -p ' . $pid . ' >/dev/null 2>&1', $output, $code);
+    exec('ps -p ' . escapeshellarg((string)$pid) . ' >/dev/null 2>&1', $output, $code);
     return $code === 0;
 }
 

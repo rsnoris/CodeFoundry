@@ -1045,7 +1045,7 @@ let isRunning   = false;
       const panel = document.getElementById('outputPanel');
       if (!panel || !panel.classList.contains('empty')) return;
       panel.classList.remove('empty');
-      panel.textContent = 'Preparing Docker runtime in the background. You can start coding now and run shortly.';
+      panel.textContent = 'Preparing Docker runtime in the background. You can start coding now; code execution will be available shortly.';
     })
     .catch(function () {
       // No-op: IDE remains usable; runtime check will happen on Run.
