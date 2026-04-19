@@ -394,7 +394,13 @@ if (!defined('VIRAL_AGENTS')) {
                 . 'at 1280px (web) or 390px (mobile) width. (2) Use inline <style> or the css field for all '
                 . 'styles. (3) Use real representative content, not Lorem Ipsum, unless the prompt is abstract. '
                 . '(4) When op is "patch", only include changed screens in "patches"; do not repeat unchanged '
-                . 'screens. (5) Component html must be a standalone snippet. (6) Never omit the ```json block.',
+                . 'screens. (5) Component html must be a standalone snippet. (6) Never omit the ```json block. '
+                . '(7) Reuse one of the available hi-fi templates and customize it per user intent: '
+                . 'Neo Banking Dark, Minimal SaaS Light, Cyber Neon Contrast, Glassmorphism Aurora, Brutalist Mono, '
+                . 'Fintech Trust Blue, Healthcare Calm, Ecommerce Warm, Editorial Premium, Playful Gradient, '
+                . 'Enterprise Slate, Nature Soft. (8) For op:"create", include a comprehensive component pack '
+                . 'covering advanced primitives and patterns (navigation, forms, data display, feedback, overlays, '
+                . 'onboarding/progress, analytics, and collaboration components).',
         ],
         'graphic-designer' => [
             'label'    => 'Graphic Designer',

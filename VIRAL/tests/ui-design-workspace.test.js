@@ -73,6 +73,39 @@ function getScreenContent(screen, breakpoint) {
   return { html, css };
 }
 
+function normalizeType(value) {
+  return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+}
+
+function mergeComponentPack(componentPack, components) {
+  const incoming = Array.isArray(components) ? components : [];
+  const byType = {};
+  incoming.forEach(function (comp) {
+    const key = normalizeType(comp && comp.type ? comp.type : comp && comp.id ? comp.id : '');
+    if (key && !byType[key]) byType[key] = comp;
+  });
+  const merged = componentPack.map(function (preset) {
+    const match = byType[normalizeType(preset.type)];
+    return match ? Object.assign({}, preset, match) : Object.assign({}, preset);
+  });
+  incoming.forEach(function (comp) {
+    const compType = normalizeType(comp && comp.type ? comp.type : comp && comp.id ? comp.id : '');
+    const exists = componentPack.some(function (preset) { return normalizeType(preset.type) === compType; });
+    if (!exists) merged.push(comp);
+  });
+  return merged;
+}
+
+function formatComponentTypeLabel(type, maxChars) {
+  const value = String(type || '').toLowerCase();
+  if (value.length <= maxChars) return value;
+  return value.slice(0, maxChars - 1) + '…';
+}
+
+function canCopyComponent(comp) {
+  return !!(comp && comp.html);
+}
+
 /**
  * Validate flow completeness: every transition's from/to references a real screen ID.
  * Returns an array of error strings (empty = valid).
@@ -414,6 +447,52 @@ test('all transition types are handled (success, error, branch, neutral)', funct
   };
   const errors = validateFlowCompleteness(design);
   assert.strictEqual(errors.length, 0, 'All transition types should be valid: ' + errors.join(', '));
+});
+
+// ── 5. Component Pack Merge ────────────────────────────────────────────────────
+
+console.log('\n5. Component Pack Merge');
+
+const PACK = [
+  { id: 'pack_button', type: 'button', name: 'Primary Button', html: '<button>Save</button>' },
+  { id: 'pack_card', type: 'card', name: 'Card', html: '<article>Card</article>' },
+  { id: 'pack_modal', type: 'modal', name: 'Modal', html: '<div>Modal</div>' },
+];
+
+test('keeps full component pack even when AI returns an empty list', function () {
+  const merged = mergeComponentPack(PACK, []);
+  assert.strictEqual(merged.length, 3);
+  assert.strictEqual(merged[0].type, 'button');
+  assert.strictEqual(merged[2].type, 'modal');
+});
+
+test('overrides pack component with AI-provided component of same type', function () {
+  const merged = mergeComponentPack(PACK, [
+    { id: 'comp_custom_btn', type: 'button', name: 'CTA', html: '<button class="cta">Buy</button>' },
+  ]);
+  const button = merged.find(function (c) { return c.type === 'button'; });
+  assert.ok(button);
+  assert.strictEqual(button.id, 'comp_custom_btn');
+  assert.strictEqual(button.name, 'CTA');
+});
+
+test('appends custom component types not in the baseline pack', function () {
+  const merged = mergeComponentPack(PACK, [
+    { id: 'comp_timeline', type: 'timeline', name: 'Timeline' },
+  ]);
+  assert.strictEqual(merged.length, 4);
+  assert.ok(merged.some(function (c) { return c.type === 'timeline'; }));
+});
+
+test('truncates long type labels with ellipsis for sidebar chips', function () {
+  assert.strictEqual(formatComponentTypeLabel('command-palette', 14), 'command-palet…');
+  assert.strictEqual(formatComponentTypeLabel('table', 14), 'table');
+});
+
+test('copy button should be disabled when component html is missing', function () {
+  assert.strictEqual(canCopyComponent({ id: 'a', type: 'badge', html: '<span>New</span>' }), true);
+  assert.strictEqual(canCopyComponent({ id: 'b', type: 'badge', html: '' }), false);
+  assert.strictEqual(canCopyComponent({ id: 'c', type: 'badge' }), false);
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────────
