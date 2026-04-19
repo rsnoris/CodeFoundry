@@ -2,7 +2,7 @@
 
 ## Overview
 
-`IDE/run.php` now executes submitted code locally inside **sandboxed Docker
+`IDE/run.php` executes submitted code locally inside **sandboxed Docker
 containers** instead of proxying to the external Piston API.  Each execution
 gets its own short-lived container that is destroyed immediately after the
 program finishes.
@@ -18,7 +18,15 @@ program finishes.
 | `--cap-drop=ALL` | Drops all Linux capabilities |
 | `--security-opt=no-new-privileges` | Blocks setuid / privilege escalation |
 | `--stop-timeout=0` | SIGKILL sent instantly on container stop |
+| `--tmpfs /tmp:rw,nosuid,size=128m` | Writable scratch space in the container; never persists to the host |
 | Named container + `docker rm -f` | Force-removes the container after a timeout even if the docker client was killed |
+
+### Per-request guards (in `IDE/run.php`)
+
+| Guard | Limit | Response |
+|-------|-------|----------|
+| Per-IP rate limit | 20 requests / 60 seconds | HTTP 429 + `Retry-After: 60` |
+| Concurrent-run cap | 10 simultaneous executions (all users) | HTTP 429 |
 
 ---
 
@@ -31,26 +39,61 @@ program finishes.
   # then restart the web server / PHP-FPM
   ```
 
-The IDE now attempts runtime bootstrap automatically on page load via
-`/IDE/runtime-init.php`, which starts `IDE/docker/setup-runtime.sh` in the
-background when Docker is not ready.
+---
 
-### Recommended one-command bootstrap
+## Persistent runtime management (systemd)
 
-Run this once on a fresh host to install/start Docker (when supported), pre-pull
-official runtime images, and build custom CodeFoundry images:
+The execution engine must be operational **before** users arrive, not
+triggered by the first page load.  A systemd one-shot service is provided:
 
-```bash
-cd /path/to/CodeFoundry
-bash IDE/docker/setup-runtime.sh
 ```
+IDE/docker/codefoundry-runtime.service
+```
+
+### Install
+
+1. Edit the `ExecStart=` path inside the unit file to match your deployment
+   root (default: `/opt/CodeFoundry`).
+2. Copy (or symlink) the unit to systemd's unit directory:
+   ```bash
+   sudo cp IDE/docker/codefoundry-runtime.service /etc/systemd/system/
+   sudo systemctl daemon-reload
+   sudo systemctl enable --now codefoundry-runtime
+   ```
+3. Check status at any time:
+   ```bash
+   sudo systemctl status codefoundry-runtime
+   journalctl -u codefoundry-runtime -f
+   ```
+
+The service runs `setup-runtime.sh --skip-install` on every boot, which:
+- Ensures Docker daemon is started
+- Pulls all official language runtime images
+- Builds the six custom `codefoundry/*` images
+
+---
+
+## Runtime health endpoint
+
+`GET /IDE/runtime-health.php` returns a JSON status object:
+
+```json
+{ "status": "ready" | "warming" | "failed" | "unavailable",
+  "message": "<human-readable string>",
+  "log_tail": "<last 30 lines of setup log (warming/failed only)>" }
+```
+
+The IDE front-end polls this endpoint every 5 seconds and updates the output
+panel banner automatically—no more permanent "Preparing Docker runtime…"
+messages.
 
 ---
 
 ## One-time image setup
 
-Most languages use **official Docker Hub images** that are pulled automatically
-on first use.  Six languages require custom images that must be built once:
+Most languages use **official Docker Hub images** that are pulled
+automatically by the systemd service on first boot.  Six languages require
+custom images:
 
 | Language   | Image                          | Dockerfile |
 |------------|--------------------------------|------------|
@@ -74,29 +117,11 @@ Or rebuild a single image:
 bash IDE/docker/build.sh typescript
 ```
 
-### Pre-pull official images (optional but recommended)
-
-To avoid latency on first execution, pre-pull the images your users are likely
-to use:
+### Manual bootstrap (without systemd)
 
 ```bash
-docker pull python:3.12-slim
-docker pull node:20-slim
-docker pull eclipse-temurin:21-jdk-alpine
-docker pull gcc:13
-docker pull mcr.microsoft.com/dotnet/sdk:8.0
-docker pull golang:1.22-alpine
-docker pull rust:slim
-docker pull php:8.3-cli
-docker pull ruby:3.3-slim
-docker pull swift:5.10-slim
-docker pull r-base:4.4
-docker pull bash:5.2
-docker pull perl:5.38-slim
-docker pull haskell:9.8
-docker pull virtuslab/scala-cli:latest
-docker pull dart:stable
-docker pull gnuoctave/octave:9.2.0
+cd /path/to/CodeFoundry
+bash IDE/docker/setup-runtime.sh
 ```
 
 ---
@@ -143,3 +168,18 @@ docker pull gnuoctave/octave:9.2.0
 | `RUN_TIMEOUT` | `10` s | Maximum execution time |
 | `COMPILE_TIMEOUT` | `30` s | Maximum compile time |
 | `MAX_OUTPUT_BYTES` | `524288` | 512 KB cap per output stream |
+
+---
+
+## Operational log files
+
+| File | Contents |
+|------|----------|
+| `/tmp/codefoundry-runtime-setup.log` | Output of `setup-runtime.sh` |
+| `/tmp/codefoundry-exec.log` | JSONL execution records (lang, exit code, duration, IP) |
+
+Tail the execution log in real time:
+
+```bash
+tail -f /tmp/codefoundry-exec.log | python3 -m json.tool
+```

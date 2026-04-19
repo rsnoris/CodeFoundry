@@ -1,0 +1,24 @@
+[Unit]
+Description=CodeFoundry IDE – Docker Runtime Prewarm
+# Edit the path below to match your deployment root, then run:
+#   sudo systemctl daemon-reload && sudo systemctl enable --now codefoundry-runtime
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+# Keep the "active" state after the script exits so systemd reports success.
+RemainAfterExit=yes
+
+# ── Replace /opt/CodeFoundry with your actual deployment path ───────────────
+ExecStart=/bin/bash /opt/CodeFoundry/IDE/docker/setup-runtime.sh --skip-install
+
+# Allow up to 10 minutes for image pulls + custom builds on a cold start.
+TimeoutStartSec=600
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=codefoundry-runtime
+
+[Install]
+WantedBy=multi-user.target
