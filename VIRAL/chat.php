@@ -295,8 +295,8 @@ try {
 $designPayload = null;
 if ($role === 'ui-design-agentic-tool') {
     // Look for a ```json ... ``` block that contains a cf-ui-design/1 schema.
-    // The pattern is greedy but bounded by the closing fence.
-    if (preg_match('/```json\s*(\{.*?\})\s*```/s', $reply, $jsonMatch)) {
+    // Use a greedy quantifier so nested JSON objects are captured in full.
+    if (preg_match('/```json\s*(\{.*\})\s*```/s', $reply, $jsonMatch)) {
         $candidate = json_decode($jsonMatch[1], true);
         if (is_array($candidate) && ($candidate['schema'] ?? '') === 'cf-ui-design/1') {
             $designPayload = $candidate;

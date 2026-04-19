@@ -2394,11 +2394,19 @@ $page_scripts = <<<PAGEJS
       if (Array.isArray(design.patches) && design.patches.length) {
         dwApplyPatch(design.patches);
       }
+      // Merge new screens into existing state: add new ones, merge fields of existing ones
+      // to preserve any fields not provided by the patch.
       if (Array.isArray(design.screens)) {
         design.screens.forEach(function (ns) {
           var idx = designState.screens.findIndex(function (s) { return s.id === ns.id; });
-          if (idx === -1) designState.screens.push(ns);
-          else designState.screens[idx] = ns;
+          if (idx === -1) {
+            designState.screens.push(ns);
+          } else {
+            // Merge: copy all provided fields without dropping existing ones
+            Object.keys(ns).forEach(function (k) {
+              designState.screens[idx][k] = ns[k];
+            });
+          }
         });
       }
     }
@@ -2439,7 +2447,7 @@ $page_scripts = <<<PAGEJS
       if (viewWsBtn)   viewWsBtn.classList.add('active');
     } else {
       if (chatWindow)  chatWindow.style.display  = 'flex';
-      if (workspace && !designState) workspace.style.display = 'none';
+      if (workspace)   workspace.style.display   = 'none';
       if (viewChatBtn) viewChatBtn.classList.add('active');
       if (viewWsBtn)   viewWsBtn.classList.remove('active');
     }
@@ -2528,7 +2536,7 @@ $page_scripts = <<<PAGEJS
         reader.onload = function (evt) {
           try {
             var parsed = JSON.parse(evt.target.result);
-            if (typeof parsed !== 'object' || parsed.schema !== 'cf-ui-design/1') {
+            if (!parsed || typeof parsed !== 'object' || parsed.schema !== 'cf-ui-design/1') {
               dwShowToast('Invalid design file: expected cf-ui-design/1 schema.', 'error');
               return;
             }
