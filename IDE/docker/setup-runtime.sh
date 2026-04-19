@@ -112,11 +112,17 @@ ensure_docker_cli() {
 
   local installed=0
   if have_cmd apt-get; then
-    run_pm_install "apt-get" $SUDO apt-get update
-    run_pm_install "apt-get" $SUDO apt-get install -y docker.io && installed=1
+    if run_pm_install "apt-get" $SUDO apt-get update; then
+      run_pm_install "apt-get" $SUDO apt-get install -y docker.io && installed=1
+    else
+      exit 1
+    fi
   elif have_cmd apt; then
-    run_pm_install "apt" $SUDO apt update
-    run_pm_install "apt" $SUDO apt install -y docker.io && installed=1
+    if run_pm_install "apt" $SUDO apt update; then
+      run_pm_install "apt" $SUDO apt install -y docker.io && installed=1
+    else
+      exit 1
+    fi
   elif have_cmd dnf; then
     run_pm_install "dnf" $SUDO dnf install -y docker && installed=1
   elif have_cmd microdnf; then
