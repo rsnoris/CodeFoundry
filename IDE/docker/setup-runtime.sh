@@ -70,6 +70,23 @@ if [[ "$(id -u)" -ne 0 ]]; then
   SUDO="sudo"
 fi
 
+have_cmd() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+run_pm_install() {
+  local label="$1"
+  shift
+
+  echo "Installing Docker via ${label}..."
+  if "$@"; then
+    return 0
+  fi
+
+  echo "Docker installation via ${label} failed." >&2
+  return 1
+}
+
 ensure_docker_cli() {
   if command -v docker >/dev/null 2>&1; then
     return 0
@@ -82,15 +99,46 @@ ensure_docker_cli() {
 
   echo "Docker CLI not found. Installing Docker Engine..."
 
-  if command -v apt-get >/dev/null 2>&1; then
-    $SUDO apt-get update
-    $SUDO apt-get install -y docker.io
-  elif command -v dnf >/dev/null 2>&1; then
-    $SUDO dnf install -y docker
-  elif command -v yum >/dev/null 2>&1; then
-    $SUDO yum install -y docker
-  else
-    echo "Unsupported package manager. Install Docker manually first." >&2
+  if [[ "$(id -u)" -ne 0 ]] && ! have_cmd sudo; then
+    echo "Docker install requires root privileges, but sudo is not available for user '${USER:-unknown}'." >&2
+    echo "Run this setup as root or install Docker manually, then retry Initialize / Prewarm Runtime." >&2
+    exit 1
+  fi
+  if [[ "$(id -u)" -ne 0 ]] && ! $SUDO -n true >/dev/null 2>&1; then
+    echo "Docker install requires passwordless sudo for user '${USER:-unknown}'." >&2
+    echo "Grant non-interactive sudo access for package installation, run setup as root, or install Docker manually first." >&2
+    exit 1
+  fi
+
+  local installed=0
+  if have_cmd apt-get; then
+    if run_pm_install "apt-get" $SUDO apt-get update; then
+      run_pm_install "apt-get" $SUDO apt-get install -y docker.io && installed=1
+    else
+      exit 1
+    fi
+  elif have_cmd apt; then
+    if run_pm_install "apt" $SUDO apt update; then
+      run_pm_install "apt" $SUDO apt install -y docker.io && installed=1
+    else
+      exit 1
+    fi
+  elif have_cmd dnf; then
+    run_pm_install "dnf" $SUDO dnf install -y docker && installed=1
+  elif have_cmd microdnf; then
+    run_pm_install "microdnf" $SUDO microdnf install -y docker && installed=1
+  elif have_cmd yum; then
+    run_pm_install "yum" $SUDO yum install -y docker && installed=1
+  elif have_cmd apk; then
+    run_pm_install "apk" $SUDO apk add --no-cache docker docker-cli containerd && installed=1
+  elif have_cmd zypper; then
+    run_pm_install "zypper" $SUDO zypper --non-interactive install docker && installed=1
+  elif have_cmd pacman; then
+    run_pm_install "pacman" $SUDO pacman -Sy --noconfirm docker && installed=1
+  fi
+
+  if [[ "$installed" -ne 1 ]] || ! command -v docker >/dev/null 2>&1; then
+    echo "Unsupported package manager or Docker installation failed. Install Docker manually first." >&2
     exit 1
   fi
 }
