@@ -104,6 +104,11 @@ ensure_docker_cli() {
     echo "Run this setup as root or install Docker manually, then retry Initialize / Prewarm Runtime." >&2
     exit 1
   fi
+  if [[ -n "$SUDO" ]] && ! sudo -n true >/dev/null 2>&1; then
+    echo "Docker install requires passwordless sudo for user '${USER:-unknown}'." >&2
+    echo "Grant non-interactive sudo access for package installation, run setup as root, or install Docker manually first." >&2
+    exit 1
+  fi
 
   local installed=0
   if have_cmd apt-get; then
