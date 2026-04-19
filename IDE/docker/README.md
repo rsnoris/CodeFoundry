@@ -31,6 +31,16 @@ program finishes.
   # then restart the web server / PHP-FPM
   ```
 
+### Recommended one-command bootstrap
+
+Run this once on a fresh host to install/start Docker (when supported), pre-pull
+official runtime images, and build custom CodeFoundry images:
+
+```bash
+cd /path/to/CodeFoundry
+bash IDE/docker/setup-runtime.sh
+```
+
 ---
 
 ## One-time image setup
