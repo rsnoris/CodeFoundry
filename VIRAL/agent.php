@@ -346,20 +346,31 @@ $page_styles = <<<PAGECSS
   }
   .chip:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* ── Prompt examples right panel ─────────────────────────────────────── */
+  /* ── Prompt examples drawer + ideas FAB ─────────────────────────────── */
   .prompt-examples-panel {
+    position: fixed;
+    top: calc(var(--header-height) + 14px);
+    right: 14px;
+    bottom: 14px;
     width: 320px;
-    flex-shrink: 0;
-    border-left: 1px solid var(--border-color);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
     display: flex;
     flex-direction: column;
     background: #080f1e;
-    position: relative;
+    z-index: 1200;
     overflow: hidden;
-    transition: width .25s ease;
-    height: 100%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+    transform: translateX(calc(100% + 20px));
+    opacity: 0;
+    pointer-events: none;
+    transition: transform .25s ease, opacity .2s ease;
   }
-  .prompt-examples-panel.collapsed { width: 0; border-left: none; }
+  .prompt-examples-panel.open {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
   .examples-header {
     display: flex;
     align-items: center;
@@ -427,50 +438,30 @@ $page_styles = <<<PAGECSS
     flex-shrink: 0;
     white-space: nowrap;
   }
-  .examples-toggle {
-    position: absolute;
-    top: 14px;
-    left: -14px;
-    z-index: 10;
-    width: 28px;
-    height: 28px;
+  .examples-fab {
+    position: fixed;
+    right: 14px;
+    bottom: 20px;
+    z-index: 1210;
+    width: 46px;
+    height: 46px;
     background: #0d1626;
     border: 1px solid var(--border-color);
-    border-radius: 50%;
+    border-radius: 999px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     color: var(--text-muted);
     transition: background .2s, color .2s;
-    flex-shrink: 0;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.34);
   }
-  .examples-toggle:hover { background: #111b30; color: var(--accent); }
-  .examples-reopen {
-    position: fixed;
-    right: 12px;
-    top: calc(var(--header-height) + var(--sidebar-reopen-offset));
-    z-index: 1100;
-    width: 40px;
-    height: 40px;
-    border-radius: 999px;
-    border: 1px solid var(--border-color);
-    background: #0d1626;
-    color: var(--text-muted);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.31);
-    transition: background .2s, color .2s, border-color .2s;
-  }
-  .examples-reopen:hover {
+  .examples-fab:hover {
     background: #111b30;
     color: var(--accent);
     border-color: var(--accent);
   }
-  .examples-reopen iconify-icon { font-size: 18px; }
-  .prompt-examples-panel.collapsed + .examples-reopen { display: flex; }
+  .examples-fab iconify-icon { font-size: 19px; }
 
   /* ── Mobile ──────────────────────────────────────────────────────────── */
   /* ── Settings toggle + collapsible dropdowns ─────────────────────────── */
@@ -526,17 +517,24 @@ $page_styles = <<<PAGECSS
     .viral-layout { flex-direction: column; height: auto; min-height: calc(100vh - var(--header-height)); }
     .prompt-sidebar  { width: 100% !important; border-right: none; border-bottom: 1px solid var(--border-color); max-height: 260px; }
     .prompt-sidebar.collapsed { max-height: 0; overflow: hidden; border-bottom: none; }
-    .prompt-examples-panel { width: 100% !important; border-left: none; border-top: 1px solid var(--border-color); max-height: 280px; }
-    .prompt-examples-panel.collapsed { max-height: 0; overflow: hidden; border-top: none; }
+    .prompt-examples-panel {
+      left: 12px;
+      right: 12px;
+      top: auto;
+      bottom: 72px;
+      width: auto;
+      max-height: min(56vh, 420px);
+      transform: translateY(calc(100% + 20px));
+    }
+    .prompt-examples-panel.open { transform: translateY(0); }
     .sidebar-toggle  { display: none; }
     .sidebar-reopen  { display: none !important; }
-    .examples-toggle { display: none; }
-    .examples-reopen { display: none !important; }
     .mobile-sidebar-btn { display: inline-flex !important; }
     .viral-chat-wrap { padding: 16px 14px 80px; }
     .chat-messages   { min-height: 340px; }
     .msg             { max-width: 96%; }
     .agent-selection { grid-template-columns: 1fr; }
+    .examples-fab { width: 42px; height: 42px; right: 12px; bottom: 14px; }
   }
   @media (min-width: 901px) {
     .mobile-sidebar-btn { display: none !important; }
@@ -1240,10 +1238,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
     <div id="dwStatusToast" class="dw-status-toast" role="status" aria-live="polite"></div>
 <?php endif; ?>
 
-    <aside class="prompt-examples-panel" id="examplesPanel">
-      <button class="examples-toggle" id="examplesToggle" aria-label="Toggle prompt examples" aria-expanded="true">
-        <iconify-icon icon="lucide:chevron-right" id="examplesToggleIcon"></iconify-icon>
-      </button>
+    <aside class="prompt-examples-panel" id="examplesPanel" aria-hidden="true">
       <div class="examples-header">
         <span class="examples-title">Prompt Examples</span>
       </div>
@@ -1253,8 +1248,8 @@ require_once dirname(__DIR__) . '/includes/header.php';
       <div class="examples-list" id="exampleList"></div>
       <div class="examples-count" id="exampleCount"></div>
     </aside>
-    <button class="examples-reopen" id="examplesReopen" type="button" aria-label="Reopen prompt examples">
-      <iconify-icon icon="lucide:panel-right-open"></iconify-icon>
+    <button class="examples-fab" id="examplesFab" type="button" aria-label="Open prompt ideas" aria-controls="examplesPanel" aria-expanded="false">
+      <iconify-icon icon="lucide:lightbulb"></iconify-icon>
     </button>
   </div><!-- /.viral-layout -->
 </main>
@@ -1413,9 +1408,7 @@ $page_scripts = <<<PAGEJS
   const exampleList   = document.getElementById('exampleList');
   const exampleCount  = document.getElementById('exampleCount');
   const exampleSearch = document.getElementById('exampleSearch');
-  const examplesToggle = document.getElementById('examplesToggle');
-  const examplesToggleIcon = document.getElementById('examplesToggleIcon');
-  const examplesReopen = document.getElementById('examplesReopen');
+  const examplesFab = document.getElementById('examplesFab');
   const settingsToggle = document.getElementById('settingsToggle');
   const agentSelection = document.getElementById('agentSelection');
   const settingsSummary = document.getElementById('settingsSummary');
@@ -1655,18 +1648,12 @@ $page_scripts = <<<PAGEJS
   renderAgentNav('');
   updateSidebarIcon();
 
-  function updateExamplesIcon() {
-    if (!examplesToggleIcon || !examplesPanel || !examplesToggle) return;
-    const collapsed = examplesPanel.classList.contains('collapsed');
-    examplesToggleIcon.setAttribute('icon', collapsed ? 'lucide:chevron-left' : 'lucide:chevron-right');
-    examplesToggle.setAttribute('aria-expanded', String(!collapsed));
-    if (examplesReopen) {
-      if (collapsed) {
-        examplesReopen.removeAttribute('aria-hidden');
-      } else {
-        examplesReopen.setAttribute('aria-hidden', 'true');
-      }
-    }
+  function setExamplesOpen(isOpen) {
+    if (!examplesPanel || !examplesFab) return;
+    examplesPanel.classList.toggle('open', !!isOpen);
+    examplesPanel.setAttribute('aria-hidden', String(!isOpen));
+    examplesFab.setAttribute('aria-expanded', String(!!isOpen));
+    examplesFab.setAttribute('aria-label', isOpen ? 'Close prompt ideas' : 'Open prompt ideas');
   }
 
   function renderPromptExamples(searchTerm) {
@@ -1693,7 +1680,7 @@ $page_scripts = <<<PAGEJS
   }
 
   renderPromptExamples('');
-  updateExamplesIcon();
+  setExamplesOpen(false);
 
   if (promptSearch) {
     promptSearch.addEventListener('input', function () {
@@ -1740,22 +1727,11 @@ $page_scripts = <<<PAGEJS
     });
   }
 
-  if (examplesToggle && examplesPanel) {
-    examplesToggle.addEventListener('click', function () {
-      examplesPanel.classList.toggle('collapsed');
-      updateExamplesIcon();
-      const expanded = !examplesPanel.classList.contains('collapsed');
-      if (expanded && exampleSearch) {
-        exampleSearch.focus();
-      }
-    });
-  }
-
-  if (examplesReopen && examplesPanel) {
-    examplesReopen.addEventListener('click', function () {
-      examplesPanel.classList.remove('collapsed');
-      updateExamplesIcon();
-      if (exampleSearch) exampleSearch.focus();
+  if (examplesFab && examplesPanel) {
+    examplesFab.addEventListener('click', function () {
+      var isOpen = !examplesPanel.classList.contains('open');
+      setExamplesOpen(isOpen);
+      if (isOpen && exampleSearch) exampleSearch.focus();
     });
   }
 
@@ -1883,6 +1859,59 @@ $page_scripts = <<<PAGEJS
   let dwActivePanelTab = 'canvas';
   let dwActiveSideTab  = 'components';
   let dwSelectedComp   = null;
+  const DW_COMPONENT_PACK = [
+    { id: 'pack_button_primary', type: 'button', name: 'Primary Button', html: '<button class="btn-primary">Primary action</button>', css: '.btn-primary{padding:10px 16px;border:none;border-radius:8px;background:var(--primary,#2563eb);color:#fff;font-weight:600;}' },
+    { id: 'pack_button_secondary', type: 'button-secondary', name: 'Secondary Button', html: '<button class="btn-secondary">Secondary action</button>', css: '.btn-secondary{padding:10px 16px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#0f172a;font-weight:600;}' },
+    { id: 'pack_button_icon', type: 'icon-button', name: 'Icon Button', html: '<button class="btn-icon" aria-label="Settings">⚙️</button>', css: '.btn-icon{width:36px;height:36px;border-radius:999px;border:1px solid #cbd5e1;background:#fff;}' },
+    { id: 'pack_input_text', type: 'input', name: 'Text Input', html: '<input class="field" placeholder="Email address" />', css: '.field{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;}' },
+    { id: 'pack_input_search', type: 'search', name: 'Search Input', html: '<input class="search" placeholder="Search..." />', css: '.search{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:999px;}' },
+    { id: 'pack_input_textarea', type: 'textarea', name: 'Textarea', html: '<textarea class="textarea" rows="4" placeholder="Write your notes"></textarea>', css: '.textarea{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;resize:vertical;}' },
+    { id: 'pack_select', type: 'select', name: 'Select Dropdown', html: '<select class="select"><option>Option 1</option></select>', css: '.select{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;}' },
+    { id: 'pack_checkbox', type: 'checkbox', name: 'Checkbox', html: '<label><input type="checkbox" checked /> Remember me</label>', css: 'label{display:flex;gap:8px;align-items:center;font:500 14px system-ui;}' },
+    { id: 'pack_radio', type: 'radio', name: 'Radio Group', html: '<label><input type="radio" name="plan" checked /> Basic</label>', css: 'label{display:flex;gap:8px;align-items:center;font:500 14px system-ui;}' },
+    { id: 'pack_toggle', type: 'toggle', name: 'Toggle Switch', html: '<button class="toggle on" aria-label="Enable notifications"></button>', css: '.toggle{width:46px;height:26px;border-radius:999px;border:none;background:#cbd5e1;position:relative}.toggle::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff}.toggle.on{background:#22c55e}.toggle.on::after{left:23px}' },
+    { id: 'pack_slider', type: 'slider', name: 'Range Slider', html: '<input type="range" min="0" max="100" value="40" />', css: 'input[type="range"]{width:100%;}' },
+    { id: 'pack_card', type: 'card', name: 'Card', html: '<article class="card"><h4>Card title</h4><p>Card description</p></article>', css: '.card{padding:16px;border:1px solid #e2e8f0;border-radius:12px;background:#fff;}' },
+    { id: 'pack_stats_card', type: 'stats-card', name: 'Stats Card', html: '<article class="stat"><p>Revenue</p><h3>$42,800</h3></article>', css: '.stat{padding:16px;border-radius:12px;background:#0f172a;color:#fff;}' },
+    { id: 'pack_table', type: 'table', name: 'Data Table', html: '<table class="table"><thead><tr><th>Name</th><th>Status</th></tr></thead><tbody><tr><td>Order #123</td><td>Paid</td></tr></tbody></table>', css: '.table{width:100%;border-collapse:collapse}.table th,.table td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left;font-size:13px;}' },
+    { id: 'pack_list', type: 'list', name: 'List', html: '<ul class="list"><li>List item one</li><li>List item two</li></ul>', css: '.list{padding-left:18px;display:grid;gap:6px;}' },
+    { id: 'pack_avatar', type: 'avatar', name: 'Avatar', html: '<div class="avatar">RS</div>', css: '.avatar{width:40px;height:40px;border-radius:999px;background:#c7d2fe;color:#3730a3;display:grid;place-items:center;font-weight:700;}' },
+    { id: 'pack_badge', type: 'badge', name: 'Badge', html: '<span class="badge">New</span>', css: '.badge{display:inline-flex;padding:2px 8px;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:700;}' },
+    { id: 'pack_chip', type: 'chip', name: 'Chip', html: '<button class="chip">Filter: Active ✕</button>', css: '.chip{border:1px solid #cbd5e1;background:#fff;border-radius:999px;padding:6px 10px;font-size:12px;}' },
+    { id: 'pack_tooltip', type: 'tooltip', name: 'Tooltip', html: '<span class="tooltip">Hover me<span class="tip">Helpful hint</span></span>', css: '.tooltip{position:relative;display:inline-flex}.tip{position:absolute;bottom:125%;left:50%;transform:translateX(-50%);padding:6px 8px;border-radius:6px;background:#0f172a;color:#fff;font-size:11px;white-space:nowrap;}' },
+    { id: 'pack_alert', type: 'alert', name: 'Alert Banner', html: '<div class="alert success">Payment method updated successfully.</div>', css: '.alert{padding:10px 12px;border-radius:8px;font-size:13px}.alert.success{background:#dcfce7;color:#166534;border:1px solid #86efac;}' },
+    { id: 'pack_toast', type: 'toast', name: 'Toast', html: '<div class="toast">Profile saved</div>', css: '.toast{display:inline-flex;padding:10px 12px;border-radius:8px;background:#0f172a;color:#fff;font-size:13px;}' },
+    { id: 'pack_modal', type: 'modal', name: 'Modal Dialog', html: '<div class="modal"><div class="modal-card"><h3>Confirm action</h3><p>Are you sure?</p></div></div>', css: '.modal{padding:16px;background:rgba(15,23,42,.5)}.modal-card{max-width:360px;padding:16px;border-radius:12px;background:#fff;}' },
+    { id: 'pack_drawer', type: 'drawer', name: 'Drawer', html: '<aside class="drawer"><h3>Filters</h3></aside>', css: '.drawer{width:280px;padding:16px;border-left:1px solid #e2e8f0;background:#fff;}' },
+    { id: 'pack_sheet', type: 'sheet', name: 'Bottom Sheet', html: '<section class="sheet"><h3>Actions</h3></section>', css: '.sheet{padding:16px;border-top-left-radius:16px;border-top-right-radius:16px;background:#fff;box-shadow:0 -6px 20px rgba(0,0,0,.2);}' },
+    { id: 'pack_nav_top', type: 'nav', name: 'Top Navigation', html: '<nav class="top-nav"><strong>Brand</strong><a href="#">Docs</a><a href="#">Pricing</a></nav>', css: '.top-nav{display:flex;gap:16px;align-items:center;padding:12px 16px;border-bottom:1px solid #e2e8f0;}' },
+    { id: 'pack_nav_side', type: 'side-nav', name: 'Side Navigation', html: '<aside class="side-nav"><a href="#">Dashboard</a><a href="#">Analytics</a></aside>', css: '.side-nav{display:grid;gap:8px;padding:12px;min-width:180px;border-right:1px solid #e2e8f0;}' },
+    { id: 'pack_nav_bottom', type: 'bottom-nav', name: 'Bottom Navigation', html: '<nav class="bottom-nav"><button>Home</button><button>Explore</button><button>Profile</button></nav>', css: '.bottom-nav{display:flex;justify-content:space-around;padding:10px;border-top:1px solid #e2e8f0;background:#fff;}' },
+    { id: 'pack_breadcrumbs', type: 'breadcrumbs', name: 'Breadcrumbs', html: '<nav class="crumbs">Home / Dashboard / Overview</nav>', css: '.crumbs{font-size:12px;color:#64748b;}' },
+    { id: 'pack_pagination', type: 'pagination', name: 'Pagination', html: '<nav class="pagination"><button>Prev</button><span>2 / 8</span><button>Next</button></nav>', css: '.pagination{display:flex;gap:10px;align-items:center;}' },
+    { id: 'pack_tabs', type: 'tab', name: 'Tabs', html: '<div class="tabs"><button class="active">Overview</button><button>Activity</button></div>', css: '.tabs{display:flex;gap:6px}.tabs button{padding:8px 12px;border:1px solid #e2e8f0;background:#fff;border-radius:8px}.tabs .active{background:#dbeafe;border-color:#93c5fd;}' },
+    { id: 'pack_accordion', type: 'accordion', name: 'Accordion', html: '<details class="accordion" open><summary>Section title</summary><p>Expandable content</p></details>', css: '.accordion{border:1px solid #e2e8f0;border-radius:10px;padding:10px;}' },
+    { id: 'pack_stepper', type: 'stepper', name: 'Stepper', html: '<ol class="stepper"><li class="done">Info</li><li class="active">Billing</li><li>Review</li></ol>', css: '.stepper{display:flex;gap:8px;list-style:none;padding:0}.stepper li{padding:6px 10px;border-radius:999px;background:#e2e8f0;font-size:12px}.stepper .active{background:#bfdbfe}.stepper .done{background:#bbf7d0}' },
+    { id: 'pack_progress', type: 'progress', name: 'Progress Bar', html: '<div class="progress"><span style="width:64%"></span></div>', css: '.progress{height:10px;background:#e2e8f0;border-radius:999px;overflow:hidden}.progress span{display:block;height:100%;background:#2563eb;}' },
+    { id: 'pack_skeleton', type: 'skeleton', name: 'Skeleton Loader', html: '<div class="skeleton"></div>', css: '.skeleton{height:14px;border-radius:8px;background:linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 40%,#e2e8f0 65%);background-size:200% 100%;animation:shimmer 1.2s infinite}@keyframes shimmer{to{background-position:-200% 0}}' },
+    { id: 'pack_hero', type: 'hero', name: 'Hero Section', html: '<section class="hero"><h1>Build faster with CodeFoundry</h1><p>Ship polished products in days.</p></section>', css: '.hero{padding:32px 20px;border-radius:18px;background:linear-gradient(135deg,#1d4ed8,#7c3aed);color:#fff;}' },
+    { id: 'pack_pricing', type: 'pricing-card', name: 'Pricing Card', html: '<article class="pricing"><h3>Pro</h3><p class="price">$29/mo</p><ul><li>Unlimited projects</li></ul></article>', css: '.pricing{padding:18px;border:1px solid #cbd5e1;border-radius:14px;background:#fff}.price{font-size:24px;font-weight:800;}' },
+    { id: 'pack_timeline', type: 'timeline', name: 'Timeline', html: '<ol class="timeline"><li>Idea</li><li>Prototype</li><li>Launch</li></ol>', css: '.timeline{display:grid;gap:8px;padding-left:18px;}' },
+    { id: 'pack_calendar', type: 'calendar', name: 'Calendar', html: '<div class="calendar">Mon Tue Wed Thu Fri Sat Sun</div>', css: '.calendar{padding:12px;border:1px solid #e2e8f0;border-radius:10px;font-size:12px;}' },
+    { id: 'pack_chart', type: 'chart', name: 'Chart Container', html: '<div class="chart-box">Chart area</div>', css: '.chart-box{height:180px;border:1px dashed #94a3b8;border-radius:12px;display:grid;place-items:center;color:#64748b;}' },
+    { id: 'pack_file_upload', type: 'file-upload', name: 'File Upload', html: '<label class="upload">Drop files here or browse<input type="file" hidden /></label>', css: '.upload{display:grid;place-items:center;padding:18px;border:1px dashed #94a3b8;border-radius:12px;font-size:13px;color:#475569;cursor:pointer;}' },
+    { id: 'pack_command', type: 'command-palette', name: 'Command Palette', html: '<div class="command"><input placeholder="Type a command…" /></div>', css: '.command{padding:12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;}' },
+    { id: 'pack_kpi', type: 'kpi-tile', name: 'KPI Tile', html: '<article class="kpi"><p>Active users</p><h3>18,420</h3><small>+8.2%</small></article>', css: '.kpi{padding:14px;border:1px solid #e2e8f0;border-radius:12px;background:#fff;} .kpi h3{margin:4px 0 2px;}' },
+    { id: 'pack_feed_item', type: 'feed-item', name: 'Feed Item', html: '<article class="feed-item"><strong>Design review completed</strong><p>2m ago</p></article>', css: '.feed-item{padding:12px;border-bottom:1px solid #e2e8f0;}' },
+    { id: 'pack_comment', type: 'comment', name: 'Comment Thread', html: '<div class="comment"><strong>Ava</strong><p>Let’s ship this in v2.</p></div>', css: '.comment{padding:10px;border:1px solid #e2e8f0;border-radius:10px;}' },
+    { id: 'pack_empty_state', type: 'empty-state', name: 'Empty State', html: '<section class="empty"><h4>No projects yet</h4><p>Create your first project to get started.</p></section>', css: '.empty{text-align:center;padding:24px;border:1px dashed #cbd5e1;border-radius:12px;color:#64748b;}' },
+    { id: 'pack_footer', type: 'footer', name: 'Footer', html: '<footer class="footer">© 2026 CodeFoundry · Privacy · Terms</footer>', css: '.footer{padding:12px 0;color:#64748b;font-size:12px;}' }
+  ];
+  const DW_HIFI_THEME_TEMPLATES = [
+    'Neo Banking Dark', 'Minimal SaaS Light', 'Cyber Neon Contrast', 'Glassmorphism Aurora',
+    'Brutalist Mono', 'Fintech Trust Blue', 'Healthcare Calm', 'Ecommerce Warm',
+    'Editorial Premium', 'Playful Gradient', 'Enterprise Slate', 'Nature Soft'
+  ];
 
   function dwShowToast(msg, type) {
     var toast = document.getElementById('dwStatusToast');
@@ -1925,6 +1954,29 @@ $page_scripts = <<<PAGEJS
       btn.classList.toggle('active', btn.dataset.side === tab);
     });
     dwRenderSidePanel();
+  }
+
+  function dwNormalizeType(value) {
+    return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  }
+
+  function dwMergeComponentPack(components) {
+    var incoming = Array.isArray(components) ? components : [];
+    var byType = {};
+    incoming.forEach(function (comp) {
+      var key = dwNormalizeType(comp && comp.type ? comp.type : comp && comp.id ? comp.id : '');
+      if (key && !byType[key]) byType[key] = comp;
+    });
+    var merged = DW_COMPONENT_PACK.map(function (preset) {
+      var match = byType[dwNormalizeType(preset.type)];
+      return match ? Object.assign({}, preset, match) : Object.assign({}, preset);
+    });
+    incoming.forEach(function (comp) {
+      var compType = dwNormalizeType(comp && comp.type ? comp.type : comp && comp.id ? comp.id : '');
+      var exists = DW_COMPONENT_PACK.some(function (preset) { return dwNormalizeType(preset.type) === compType; });
+      if (!exists) merged.push(comp);
+    });
+    return merged;
   }
 
   function dwBuildIframeDoc(html, css, tokens) {
@@ -2003,7 +2055,16 @@ $page_scripts = <<<PAGEJS
       modal: 'lucide:panel-top', tab: 'lucide:layout-template', badge: 'lucide:tag',
       hero: 'lucide:layout', select: 'lucide:list', checkbox: 'lucide:check-square',
       radio: 'lucide:circle-dot', toggle: 'lucide:toggle-left', avatar: 'lucide:user-circle',
-      alert: 'lucide:alert-circle', tooltip: 'lucide:info',
+      alert: 'lucide:alert-circle', tooltip: 'lucide:info', drawer: 'lucide:panel-right',
+      timeline: 'lucide:history', chart: 'lucide:chart-column', 'pricing-card': 'lucide:wallet-cards',
+      'kpi-tile': 'lucide:gauge', 'empty-state': 'lucide:inbox', progress: 'lucide:loader',
+      accordion: 'lucide:chevrons-up-down', stepper: 'lucide:list-checks', skeleton: 'lucide:rows-3',
+      'side-nav': 'lucide:panel-left', 'bottom-nav': 'lucide:panel-bottom', breadcrumbs: 'lucide:waypoints',
+      pagination: 'lucide:chevrons-left-right', toast: 'lucide:message-circle', sheet: 'lucide:panel-bottom-open',
+      slider: 'lucide:sliders-horizontal', textarea: 'lucide:file-text', search: 'lucide:search',
+      'file-upload': 'lucide:upload-cloud', 'command-palette': 'lucide:terminal-square',
+      'feed-item': 'lucide:rss', comment: 'lucide:message-square', footer: 'lucide:panel-bottom',
+      'icon-button': 'lucide:circle', 'button-secondary': 'lucide:square-dashed',
     };
     components.forEach(function (comp) {
       var item = document.createElement('div');
@@ -2019,15 +2080,17 @@ $page_scripts = <<<PAGEJS
 
       var typeSpan = document.createElement('span');
       typeSpan.className = 'dw-comp-item-type';
-      typeSpan.textContent = String(comp.type || '').toLowerCase().slice(0, 8);
+      typeSpan.textContent = String(comp.type || '').toLowerCase().slice(0, 14);
 
       var copyBtn = document.createElement('button');
       copyBtn.type = 'button';
       copyBtn.className = 'dw-comp-copy-btn';
       copyBtn.title = 'Copy HTML';
       copyBtn.innerHTML = '<iconify-icon icon="lucide:copy"></iconify-icon>';
+      copyBtn.disabled = !comp.html;
       copyBtn.addEventListener('click', function (e) {
         e.stopPropagation();
+        if (!comp.html) return;
         dwCopyToClipboard(comp.html || '', 'Component HTML copied');
       });
 
@@ -2050,7 +2113,8 @@ $page_scripts = <<<PAGEJS
     var content = document.getElementById('dwSideContent');
     if (!content || !designState) return;
     if (dwActiveSideTab === 'components') {
-      content.innerHTML = '<div class="dw-section-label">Component Library</div><div id="dwCompList"></div>';
+      var count = Array.isArray(designState.components) ? designState.components.length : 0;
+      content.innerHTML = '<div class="dw-section-label">Component Library · Full Pack (' + count + ')</div><div id="dwCompList"></div>';
       dwRenderComponents(designState.components);
     } else if (dwActiveSideTab === 'props') {
       content.innerHTML = '';
@@ -2378,7 +2442,7 @@ $page_scripts = <<<PAGEJS
         op:          'create',
         project:     design.project     || {},
         styleTokens: design.styleTokens || {},
-        components:  design.components  || [],
+        components:  dwMergeComponentPack(design.components || []),
         screens:     design.screens     || [],
         flow:        design.flow        || { transitions: [] },
         patches:     [],
@@ -2389,7 +2453,7 @@ $page_scripts = <<<PAGEJS
       // Patch mode: merge updates into existing state
       if (design.project)     designState.project     = design.project;
       if (design.styleTokens) designState.styleTokens = design.styleTokens;
-      if (design.components)  designState.components  = design.components;
+      if (design.components)  designState.components  = dwMergeComponentPack(design.components);
       if (design.flow)        designState.flow        = design.flow;
       if (Array.isArray(design.patches) && design.patches.length) {
         dwApplyPatch(design.patches);
@@ -2419,7 +2483,7 @@ $page_scripts = <<<PAGEJS
     if (badge && badgeName) {
       var projectName = (designState.project && designState.project.name) ? designState.project.name : '';
       if (projectName) {
-        badgeName.textContent  = projectName;
+        badgeName.textContent  = projectName + ' · ' + DW_HIFI_THEME_TEMPLATES.length + ' themes';
         badge.style.display    = 'inline-flex';
       }
     }

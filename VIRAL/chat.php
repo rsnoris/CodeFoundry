@@ -43,6 +43,28 @@ const VIRAL_MAX_HISTORY_TURNS = 20;
 const VIRAL_RATE_LIMIT_SECONDS = 5;
 const VIRAL_FREE_DAILY_PROMPT_LIMIT = 10;
 const VIRAL_FREE_DAILY_TOKEN_LIMIT  = 1000;
+const VIRAL_UI_HIFI_THEMES = [
+    'Neo Banking Dark',
+    'Minimal SaaS Light',
+    'Cyber Neon Contrast',
+    'Glassmorphism Aurora',
+    'Brutalist Mono',
+    'Fintech Trust Blue',
+    'Healthcare Calm',
+    'Ecommerce Warm',
+    'Editorial Premium',
+    'Playful Gradient',
+    'Enterprise Slate',
+    'Nature Soft',
+];
+const VIRAL_UI_COMPONENT_PACK = [
+    'button-primary','button-secondary','icon-button','input-text','input-search','textarea','select','checkbox',
+    'radio-group','toggle-switch','range-slider','card','stats-card','table','list','avatar','badge','chip',
+    'tooltip','alert-banner','toast','modal-dialog','drawer','bottom-sheet','top-navigation','side-navigation',
+    'bottom-navigation','breadcrumbs','pagination','tabs','accordion','stepper','progress-bar','skeleton-loader',
+    'hero-section','pricing-card','timeline','calendar','chart-container','file-upload','command-palette',
+    'kpi-tile','feed-item','comment-thread','empty-state','footer',
+];
 
 /**
  * Daily usage for authenticated users, based on token history.
@@ -270,6 +292,20 @@ if ($role === 'ui-design-agentic-tool' && $designContext !== null) {
                 . 'use op:"patch" and only include updated screens in "patches"): ' . $contextJson,
         ];
     }
+}
+if ($role === 'ui-design-agentic-tool') {
+    $messages[] = [
+        'role' => 'system',
+        'content' => 'Hi-fi theme templates available for reuse/customization: '
+            . implode(', ', VIRAL_UI_HIFI_THEMES)
+            . '. Pick the best matching template for each request and adapt style tokens/components while preserving consistency across screens.',
+    ];
+    $messages[] = [
+        'role' => 'system',
+        'content' => 'Component library full pack to include in design outputs (especially on op:"create"): '
+            . implode(', ', VIRAL_UI_COMPONENT_PACK)
+            . '. Keep component IDs/types stable across follow-up patches.',
+    ];
 }
 
 $messages[] = ['role' => 'user', 'content' => $message];
