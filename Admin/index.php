@@ -362,6 +362,18 @@ $page_styles = <<<'CSS'
   .btn-key-clear:hover { border-color:#f87171; }
   @media(max-width:900px){ .stat-grid{grid-template-columns:repeat(2,1fr);} .arch-grid{grid-template-columns:1fr;} }
   @media(max-width:700px){ .adm-layout{flex-direction:column;padding:0;} .adm-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border-color);padding:12px 0;display:flex;overflow-x:auto;} .adm-sidebar-title{display:none;} .adm-main{padding:20px 14px 48px;} .stat-grid{grid-template-columns:repeat(2,1fr);} }
+  /* ── Docker Instances tab ─── */
+  .docker-banner { display:flex; align-items:center; gap:10px; padding:12px 16px; border-radius:8px; font-size:13px; margin-bottom:20px; }
+  .docker-banner-warn { background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.25); color:#fbbf24; }
+  .docker-banner-err  { background:rgba(239,68,68,.08);  border:1px solid rgba(239,68,68,.25);  color:#f87171; }
+  .docker-banner iconify-icon { font-size:18px; flex-shrink:0; }
+  .docker-log-pre { background:var(--navy-3); border:1px solid var(--border-color); border-radius:8px; padding:14px 16px; font-family:monospace; font-size:11px; color:var(--text-muted); white-space:pre-wrap; word-break:break-all; max-height:320px; overflow-y:auto; margin:0; line-height:1.6; }
+  .docker-action-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  .btn-docker-init { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; border:1px solid rgba(24,179,255,.35); background:rgba(24,179,255,.12); color:var(--primary); transition:background .2s,border-color .2s; }
+  .btn-docker-init:hover:not(:disabled) { background:rgba(24,179,255,.22); border-color:var(--primary); }
+  .btn-docker-init:disabled { opacity:.5; cursor:not-allowed; }
+  .btn-docker-refresh { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; border:1px solid var(--border-color); background:var(--navy-3); color:var(--text-muted); transition:border-color .15s,color .15s; }
+  .btn-docker-refresh:hover { border-color:var(--primary); color:var(--primary); }
 CSS;
 
 require_once dirname(__DIR__) . '/includes/header.php';
@@ -380,9 +392,10 @@ require_once dirname(__DIR__) . '/includes/header.php';
         'support'        => ['icon' => 'lucide:life-buoy',         'label' => 'Support'],
         'live_chat'      => ['icon' => 'lucide:message-circle',    'label' => 'Live Chat'],
         'analytics'      => ['icon' => 'lucide:bar-chart-2',       'label' => 'Analytics'],
-        'api_keys'       => ['icon' => 'lucide:key-round',         'label' => 'API Keys'],
-        'architecture'   => ['icon' => 'lucide:layout',            'label' => 'Architecture'],
-        'workflows'      => ['icon' => 'lucide:git-pull-request',  'label' => 'Workflows'],
+        'api_keys'         => ['icon' => 'lucide:key-round',         'label' => 'API Keys'],
+        'docker_instances' => ['icon' => 'lucide:container',        'label' => 'Docker'],
+        'architecture'     => ['icon' => 'lucide:layout',            'label' => 'Architecture'],
+        'workflows'        => ['icon' => 'lucide:git-pull-request',  'label' => 'Workflows'],
     ];
     foreach ($tabs as $key => $meta): ?>
     <a href="/Admin/?tab=<?= cf_e($key) ?>"
@@ -1664,12 +1677,114 @@ require_once dirname(__DIR__) . '/includes/header.php';
       </div>
     </div>
 
-    <?php endif; ?>
+    <?php elseif ($active_tab === 'docker_instances'): ?>
+    <!-- ═══ DOCKER INSTANCES ════════════════════════════════════════════════ -->
+    <div id="dockerMonitorPanel">
+    <div class="adm-header">
+      <h1><iconify-icon icon="lucide:container" style="vertical-align:middle;margin-right:8px"></iconify-icon>Docker Instances</h1>
+      <p>Monitor and manage the Docker execution engine — initiate, prewarm, inspect, and stop containers and images.</p>
+    </div>
 
-  </main>
+    <!-- Runtime status banner (populated by JS) -->
+    <div id="dockerStatusBanner" class="docker-banner" style="display:none">
+      <iconify-icon icon="lucide:loader-2"></iconify-icon>
+      <span id="dockerStatusBannerText"></span>
+    </div>
+
+    <!-- Status cards -->
+    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card">
+        <div class="stat-card-label">Daemon Status</div>
+        <div class="stat-card-value" id="dkDaemonStatus">–</div>
+        <div class="stat-card-sub" id="dkDaemonSub">checking…</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Running Containers</div>
+        <div class="stat-card-value" id="dkRunningContainers">–</div>
+        <div class="stat-card-sub">active right now</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Cached Images</div>
+        <div class="stat-card-value" id="dkTotalImages">–</div>
+        <div class="stat-card-sub">available locally</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Recent Executions</div>
+        <div class="stat-card-value" id="dkExecStats">–</div>
+        <div class="stat-card-sub" id="dkExecStatsSub">last 100 records</div>
+      </div>
+    </div>
+
+    <!-- Action bar -->
+    <div class="docker-action-bar">
+      <button class="btn-docker-init" id="dockerInitBtn" onclick="dockerInitRuntime()">
+        <iconify-icon icon="lucide:play-circle"></iconify-icon>
+        Initialize / Prewarm Runtime
+      </button>
+      <button class="btn-docker-refresh" onclick="dockerRefreshAll()">
+        <iconify-icon icon="lucide:refresh-cw"></iconify-icon>
+        Refresh All
+      </button>
+      <span id="dockerLastRefreshed" style="font-size:11px;color:var(--text-subtle);margin-left:4px"></span>
+    </div>
+
+    <!-- Active Containers -->
+    <div class="adm-section" style="margin-bottom:20px">
+      <div class="adm-section-header">
+        <h2><iconify-icon icon="lucide:box" style="vertical-align:middle;margin-right:6px"></iconify-icon>Containers</h2>
+        <button class="btn-sm" onclick="dockerLoadContainers()"><iconify-icon icon="lucide:refresh-cw"></iconify-icon> Refresh</button>
+      </div>
+      <div class="adm-section-body">
+        <div id="dockerContainersContent">
+          <div class="empty-state"><iconify-icon icon="lucide:loader-2"></iconify-icon>Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cached Images -->
+    <div class="adm-section" style="margin-bottom:20px">
+      <div class="adm-section-header">
+        <h2><iconify-icon icon="lucide:layers" style="vertical-align:middle;margin-right:6px"></iconify-icon>Cached Images</h2>
+        <button class="btn-sm" onclick="dockerLoadImages()"><iconify-icon icon="lucide:refresh-cw"></iconify-icon> Refresh</button>
+      </div>
+      <div class="adm-section-body">
+        <div id="dockerImagesContent">
+          <div class="empty-state"><iconify-icon icon="lucide:loader-2"></iconify-icon>Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Executions -->
+    <div class="adm-section" style="margin-bottom:20px">
+      <div class="adm-section-header">
+        <h2><iconify-icon icon="lucide:terminal" style="vertical-align:middle;margin-right:6px"></iconify-icon>Recent Executions</h2>
+        <button class="btn-sm" onclick="dockerLoadExecLog()"><iconify-icon icon="lucide:refresh-cw"></iconify-icon> Refresh</button>
+      </div>
+      <div class="adm-section-body">
+        <div id="dockerExecLogContent">
+          <div class="empty-state"><iconify-icon icon="lucide:loader-2"></iconify-icon>Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Runtime Setup Log -->
+    <div class="adm-section">
+      <div class="adm-section-header">
+        <h2><iconify-icon icon="lucide:file-text" style="vertical-align:middle;margin-right:6px"></iconify-icon>Runtime Setup Log</h2>
+        <button class="btn-sm" onclick="dockerLoadSetupLog()"><iconify-icon icon="lucide:refresh-cw"></iconify-icon> Refresh</button>
+      </div>
+      <div class="adm-section-body">
+        <pre class="docker-log-pre" id="dockerSetupLogContent">(No setup log available — click Initialize / Prewarm Runtime to start.)</pre>
+      </div>
+    </div>
+
+    </div><!-- #dockerMonitorPanel -->
+
+    <?php endif; ?>
 </div>
 
 <script>
+var DOCKER_ADMIN_CSRF = <?= json_encode($csrf) ?>;
 // data-confirm handler for clear-key buttons
 document.addEventListener('click', function(e) {
   var btn = e.target.closest('[data-confirm]');
@@ -1947,4 +2062,316 @@ function filterTable(tblId, query, colFilter, colKey) {
 }());
 </script>
 
-<?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
+// ── Docker Instances monitoring ────────────────────────────────────────────
+(function () {
+  // Only run on the docker_instances tab
+  if (!document.getElementById('dockerMonitorPanel')) return;
+
+  var AUTO_REFRESH_MS = 15000;
+  var autoRefreshTimer = null;
+
+  // ── API wrapper ────────────────────────────────────────────────────────
+  function dockerApi(action, extra) {
+    var body = Object.assign({ action: action }, extra || {});
+    if (action === 'init_runtime' || action === 'container_action') {
+      body.csrf_token = DOCKER_ADMIN_CSRF;
+    }
+    return fetch('/Admin/docker_api.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) { return r.json(); });
+  }
+
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // ── Status cards ────────────────────────────────────────────────────────
+  window.dockerLoadStatus = function () {
+    dockerApi('status').then(function (data) {
+      if (!data) return;
+
+      var daemonEl     = document.getElementById('dkDaemonStatus');
+      var daemonSubEl  = document.getElementById('dkDaemonSub');
+      var containersEl = document.getElementById('dkRunningContainers');
+      var imagesEl     = document.getElementById('dkTotalImages');
+      var execEl       = document.getElementById('dkExecStats');
+      var execSubEl    = document.getElementById('dkExecStatsSub');
+
+      if (daemonEl) {
+        if (data.daemon_ready) {
+          daemonEl.textContent = 'Ready';
+          daemonEl.style.color = '#4ade80';
+        } else if (data.setup_running) {
+          daemonEl.textContent = 'Warming up';
+          daemonEl.style.color = '#fbbf24';
+        } else {
+          daemonEl.textContent = 'Unavailable';
+          daemonEl.style.color = '#f87171';
+        }
+      }
+      if (daemonSubEl) {
+        daemonSubEl.textContent = data.setup_running ? 'setup in progress' : (data.daemon_ready ? 'Docker daemon running' : 'daemon not reachable');
+      }
+      if (containersEl) {
+        containersEl.textContent = data.running_containers || 0;
+        containersEl.style.color = (data.running_containers > 0) ? '#fbbf24' : '';
+      }
+      if (imagesEl) {
+        imagesEl.textContent = data.total_images || 0;
+        imagesEl.style.color = (data.total_images > 0) ? '#4ade80' : '#fbbf24';
+      }
+      if (execEl) {
+        var stats = data.exec_stats || {};
+        execEl.textContent = (stats.total || 0) + ' total';
+      }
+      if (execSubEl) {
+        var stats = data.exec_stats || {};
+        execSubEl.textContent = (stats.failed || 0) + ' failed · avg ' + (stats.avg_ms || 0) + 'ms';
+      }
+
+      // Runtime banner
+      var banner   = document.getElementById('dockerStatusBanner');
+      var bannerTx = document.getElementById('dockerStatusBannerText');
+      if (banner && bannerTx) {
+        if (!data.daemon_ready && data.setup_running) {
+          banner.style.display = 'flex';
+          banner.className = 'docker-banner docker-banner-warn';
+          bannerTx.textContent = 'Docker runtime is warming up — setup is running in the background. This may take a few minutes.';
+        } else if (!data.daemon_ready) {
+          banner.style.display = 'flex';
+          banner.className = 'docker-banner docker-banner-err';
+          bannerTx.innerHTML = 'Docker daemon is not available. Click <strong>Initialize / Prewarm Runtime</strong> to pull language images and start the engine.';
+        } else {
+          banner.style.display = 'none';
+        }
+      }
+
+      // Init button state
+      var initBtn = document.getElementById('dockerInitBtn');
+      if (initBtn) {
+        initBtn.disabled    = !!data.setup_running;
+        initBtn.textContent = data.setup_running ? 'Setup Running…' : 'Initialize / Prewarm Runtime';
+        if (!data.setup_running) {
+          var icon = document.createElement('iconify-icon');
+          icon.setAttribute('icon', 'lucide:play-circle');
+          initBtn.prepend(icon);
+        }
+      }
+
+      // Refresh setup log automatically when warming
+      if (!data.daemon_ready && data.setup_log_tail) {
+        var logEl = document.getElementById('dockerSetupLogContent');
+        if (logEl) logEl.textContent = data.setup_log_tail;
+      }
+
+      var ts = document.getElementById('dockerLastRefreshed');
+      if (ts) ts.textContent = 'Updated ' + new Date().toLocaleTimeString();
+
+    }).catch(function () {});
+  };
+
+  // ── Container list ──────────────────────────────────────────────────────
+  window.dockerLoadContainers = function () {
+    var el = document.getElementById('dockerContainersContent');
+    if (!el) return;
+    el.innerHTML = '<div class="empty-state" style="padding:20px"><iconify-icon icon="lucide:loader-2"></iconify-icon> Loading…</div>';
+
+    dockerApi('list_containers').then(function (data) {
+      if (data.error && !data.containers) {
+        el.innerHTML = '<div class="empty-state"><iconify-icon icon="lucide:alert-triangle"></iconify-icon>' + escHtml(data.error) + '</div>';
+        return;
+      }
+      var containers = data.containers || [];
+      if (!containers.length) {
+        el.innerHTML = '<div class="empty-state"><iconify-icon icon="lucide:inbox"></iconify-icon>No containers found on this host.</div>';
+        return;
+      }
+
+      var html = '<table class="adm-table" id="dockerContainersTbl">'
+        + '<thead><tr><th>Name</th><th>Image</th><th>State</th><th>Status</th><th>Running For</th><th>Actions</th></tr></thead>'
+        + '<tbody>';
+
+      containers.forEach(function (c) {
+        var name    = c.Names || c.ID || '';
+        var state   = (c.State || '').toLowerCase();
+        var bcls    = state === 'running' ? 'badge-green'
+                    : (state === 'exited' || state === 'dead') ? 'badge-red'
+                    : 'badge-gray';
+        var actions = '';
+        if (state === 'running') {
+          actions += '<button class="btn-sm btn-danger" style="margin-right:4px" '
+            + 'onclick="dockerContainerAction(\'stop\',\'' + escHtml(name) + '\',this)">Stop</button>';
+        }
+        actions += '<button class="btn-sm" '
+          + 'data-confirm="Remove container \'' + escHtml(name) + '\'?" '
+          + 'onclick="dockerContainerAction(\'rm\',\'' + escHtml(name) + '\',this)">Remove</button>';
+
+        html += '<tr>'
+          + '<td style="font-family:monospace;font-size:11px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escHtml(name) + '</td>'
+          + '<td style="font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escHtml(c.Image || '') + '</td>'
+          + '<td><span class="badge ' + bcls + '">' + escHtml(c.State || '') + '</span></td>'
+          + '<td style="font-size:11px;color:var(--text-subtle)">' + escHtml(c.Status || '') + '</td>'
+          + '<td style="font-size:11px;color:var(--text-subtle)">' + escHtml(c.RunningFor || '') + '</td>'
+          + '<td style="white-space:nowrap">' + actions + '</td>'
+          + '</tr>';
+      });
+      html += '</tbody></table>';
+      html += '<div class="filter-bar" style="margin-top:10px">'
+        + '<input type="text" class="filter-input" placeholder="Filter containers…" '
+        + 'oninput="filterTable(\'dockerContainersTbl\',this.value)">'
+        + '</div>';
+      el.innerHTML = html;
+    }).catch(function () {
+      el.innerHTML = '<div class="empty-state"><iconify-icon icon="lucide:wifi-off"></iconify-icon>Request failed.</div>';
+    });
+  };
+
+  // ── Image list ──────────────────────────────────────────────────────────
+  window.dockerLoadImages = function () {
+    var el = document.getElementById('dockerImagesContent');
+    if (!el) return;
+    el.innerHTML = '<div class="empty-state" style="padding:20px"><iconify-icon icon="lucide:loader-2"></iconify-icon> Loading…</div>';
+
+    dockerApi('list_images').then(function (data) {
+      if (data.error && !data.images) {
+        el.innerHTML = '<div class="empty-state"><iconify-icon icon="lucide:alert-triangle"></iconify-icon>' + escHtml(data.error) + '</div>';
+        return;
+      }
+      var images = data.images || [];
+      if (!images.length) {
+        el.innerHTML = '<div class="empty-state"><iconify-icon icon="lucide:inbox"></iconify-icon>'
+          + 'No images found. Click <strong>Initialize / Prewarm Runtime</strong> to pull language images.</div>';
+        return;
+      }
+
+      var html = '<table class="adm-table" id="dockerImagesTbl">'
+        + '<thead><tr><th>Repository</th><th>Tag</th><th>Size</th><th>Created</th></tr></thead>'
+        + '<tbody>';
+      images.forEach(function (img) {
+        html += '<tr>'
+          + '<td style="font-family:monospace;font-size:11px">' + escHtml(img.Repository || img.repository || '') + '</td>'
+          + '<td><span class="badge badge-blue">' + escHtml(img.Tag || img.tag || '') + '</span></td>'
+          + '<td style="font-size:11px;color:var(--text-subtle)">' + escHtml(img.Size || img.VirtualSize || '') + '</td>'
+          + '<td style="font-size:11px;color:var(--text-subtle)">' + escHtml(img.CreatedSince || img.CreatedAt || '') + '</td>'
+          + '</tr>';
+      });
+      html += '</tbody></table>';
+      html += '<div class="filter-bar" style="margin-top:10px">'
+        + '<input type="text" class="filter-input" placeholder="Filter images…" '
+        + 'oninput="filterTable(\'dockerImagesTbl\',this.value)">'
+        + '</div>';
+      el.innerHTML = html;
+    }).catch(function () {
+      el.innerHTML = '<div class="empty-state"><iconify-icon icon="lucide:wifi-off"></iconify-icon>Request failed.</div>';
+    });
+  };
+
+  // ── Execution log ───────────────────────────────────────────────────────
+  window.dockerLoadExecLog = function () {
+    var el = document.getElementById('dockerExecLogContent');
+    if (!el) return;
+    el.innerHTML = '<div class="empty-state" style="padding:20px"><iconify-icon icon="lucide:loader-2"></iconify-icon> Loading…</div>';
+
+    dockerApi('logs', { lines: 50 }).then(function (data) {
+      var entries = data.exec_log || [];
+      if (!entries.length) {
+        el.innerHTML = '<div class="empty-state"><iconify-icon icon="lucide:inbox"></iconify-icon>No execution records yet.</div>';
+        return;
+      }
+      var html = '<table class="adm-table"><thead><tr>'
+        + '<th>Time</th><th>Language</th><th>Exit</th><th>Duration</th><th>Timed Out</th><th>Container</th><th>IP</th>'
+        + '</tr></thead><tbody>';
+      entries.forEach(function (e) {
+        var exitOk = (e.exit === 0 || e.exit === '0') && !e.timed_out;
+        html += '<tr>'
+          + '<td style="white-space:nowrap;font-size:11px">' + escHtml(e.ts || '') + '</td>'
+          + '<td><span class="badge badge-blue">' + escHtml(e.lang || '') + '</span></td>'
+          + '<td><span class="badge ' + (exitOk ? 'badge-green' : 'badge-red') + '">' + escHtml(String(e.exit !== undefined ? e.exit : '')) + '</span></td>'
+          + '<td style="font-size:11px">' + escHtml(String(e.ms || 0)) + 'ms</td>'
+          + '<td>' + (e.timed_out ? '<span class="badge badge-red">Yes</span>' : '<span style="color:var(--text-subtle);font-size:11px">–</span>') + '</td>'
+          + '<td style="font-family:monospace;font-size:10px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + escHtml(e.container || '') + '">' + escHtml(e.container || '') + '</td>'
+          + '<td style="font-family:monospace;font-size:11px">' + escHtml(e.ip || '') + '</td>'
+          + '</tr>';
+      });
+      html += '</tbody></table>';
+      el.innerHTML = html;
+    }).catch(function () {
+      el.innerHTML = '<div class="empty-state"><iconify-icon icon="lucide:wifi-off"></iconify-icon>Request failed.</div>';
+    });
+  };
+
+  // ── Setup log ───────────────────────────────────────────────────────────
+  window.dockerLoadSetupLog = function () {
+    dockerApi('logs', { lines: 80 }).then(function (data) {
+      var logEl = document.getElementById('dockerSetupLogContent');
+      if (!logEl) return;
+      var txt = (data.setup_log || '').trim();
+      logEl.textContent = txt || '(No setup log available — click Initialize / Prewarm Runtime to start.)';
+      // Auto-scroll to bottom to show latest output
+      logEl.scrollTop = logEl.scrollHeight;
+    }).catch(function () {});
+  };
+
+  // ── Container action (stop / rm) ────────────────────────────────────────
+  window.dockerContainerAction = function (op, name, btn) {
+    if (btn && btn.getAttribute('data-confirm')) {
+      if (!window.confirm(btn.getAttribute('data-confirm'))) return;
+    }
+    if (btn) {
+      btn.disabled    = true;
+      btn.textContent = op === 'stop' ? 'Stopping…' : 'Removing…';
+    }
+
+    dockerApi('container_action', { op: op, name: name }).then(function (data) {
+      if (data.error) {
+        window.alert('Error: ' + data.error);
+        if (btn) { btn.disabled = false; btn.textContent = op === 'stop' ? 'Stop' : 'Remove'; }
+      } else {
+        window.dockerLoadContainers();
+        window.dockerLoadStatus();
+      }
+    }).catch(function () {
+      if (btn) { btn.disabled = false; btn.textContent = op === 'stop' ? 'Stop' : 'Remove'; }
+    });
+  };
+
+  // ── Initialize / prewarm runtime ────────────────────────────────────────
+  window.dockerInitRuntime = function () {
+    var btn = document.getElementById('dockerInitBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Starting…'; }
+
+    dockerApi('init_runtime').then(function (data) {
+      if (data.error) {
+        window.alert('Error: ' + data.error);
+        if (btn) { btn.disabled = false; btn.textContent = 'Initialize / Prewarm Runtime'; }
+      } else {
+        // Poll status and log after a short delay to let the process start
+        setTimeout(window.dockerLoadStatus,   2000);
+        setTimeout(window.dockerLoadSetupLog, 3000);
+      }
+    }).catch(function () {
+      if (btn) { btn.disabled = false; btn.textContent = 'Initialize / Prewarm Runtime'; }
+    });
+  };
+
+  // ── Refresh all sections ────────────────────────────────────────────────
+  window.dockerRefreshAll = function () {
+    window.dockerLoadStatus();
+    window.dockerLoadContainers();
+    window.dockerLoadImages();
+    window.dockerLoadExecLog();
+    window.dockerLoadSetupLog();
+  };
+
+  // Initial load
+  window.dockerRefreshAll();
+
+  // Auto-refresh status card every 15 s while on this tab
+  autoRefreshTimer = setInterval(window.dockerLoadStatus, AUTO_REFRESH_MS);
+}());
+
+
