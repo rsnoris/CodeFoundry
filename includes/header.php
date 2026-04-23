@@ -47,28 +47,7 @@ function cf_active_any(array $ids): string {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?= htmlspecialchars($page_title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></title>
-  <script>
-    (function () {
-      var config = {
-        storageKey: 'cf-theme',
-        defaultTheme: 'dark',
-        themes: ['dark', 'light', 'ocean']
-      };
-      window.CF_THEME_CONFIG = config;
-
-      var allowedThemes = {};
-      config.themes.forEach(function (theme) {
-        allowedThemes[theme] = true;
-      });
-      try {
-        var savedTheme = localStorage.getItem(config.storageKey);
-        var theme = allowedThemes[savedTheme] ? savedTheme : config.defaultTheme;
-        document.documentElement.setAttribute('data-theme', theme);
-      } catch (e) {
-        document.documentElement.setAttribute('data-theme', config.defaultTheme);
-      }
-    }());
-  </script>
+  <script src="/assets/js/theme-init.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/site.css" />
 <?php if ($page_styles !== ''): ?>
