@@ -159,15 +159,69 @@
     });
   }
 
+  /**
+   * Initialise shared theme selector(s) and persistence.
+   */
+  function initThemeSelector() {
+    const themeConfig = window.CF_THEME_CONFIG || {};
+    const storageKey = themeConfig.storageKey || 'cf-theme';
+    const allowedThemes = Array.isArray(themeConfig.themes) && themeConfig.themes.length
+      ? themeConfig.themes
+      : ['dark', 'light', 'ocean'];
+    const defaultTheme = themeConfig.defaultTheme && allowedThemes.indexOf(themeConfig.defaultTheme) !== -1
+      ? themeConfig.defaultTheme
+      : 'dark';
+    const desktopSelect = document.getElementById('themeSelect');
+    const mobileSelect = document.getElementById('mobileThemeSelect');
+    const selects = [desktopSelect, mobileSelect].filter(Boolean);
+
+    if (!selects.length) {
+      return;
+    }
+
+    function isThemeAllowed(theme) {
+      return allowedThemes.indexOf(theme) !== -1;
+    }
+
+    function applyTheme(theme) {
+      const nextTheme = isThemeAllowed(theme) ? theme : defaultTheme;
+      document.documentElement.setAttribute('data-theme', nextTheme);
+      selects.forEach(function (select) {
+        if (select.value !== nextTheme) {
+          select.value = nextTheme;
+        }
+      });
+      try {
+        localStorage.setItem(storageKey, nextTheme);
+      } catch (e) {
+        // ignore storage errors
+      }
+    }
+
+    var currentTheme = document.documentElement.getAttribute('data-theme');
+    if (!isThemeAllowed(currentTheme)) {
+      currentTheme = defaultTheme;
+    }
+    applyTheme(currentTheme);
+
+    selects.forEach(function (select) {
+      select.addEventListener('change', function () {
+        applyTheme(select.value);
+      });
+    });
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       initMobileNav();
       initUserMenu();
       initNavDropdowns();
+      initThemeSelector();
     });
   } else {
     initMobileNav();
     initUserMenu();
     initNavDropdowns();
+    initThemeSelector();
   }
 }());
