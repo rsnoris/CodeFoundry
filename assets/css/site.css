@@ -30,6 +30,8 @@ html[data-theme="dark"] {
   --footer-divider:#1a2942;
   --footer-title:  #ffffff;
   --footer-legal:  #6e7b97;
+  --fab-shadow:    0 10px 30px rgba(0, 0, 0, .28);
+  --z-theme-fab:   1200;
 }
 
 html[data-theme="light"] {
@@ -49,6 +51,7 @@ html[data-theme="light"] {
   --footer-divider:#d4dfed;
   --footer-title:  #0f1f35;
   --footer-legal:  #607089;
+  --fab-shadow:    0 10px 30px rgba(16, 24, 40, .16);
 }
 
 html[data-theme="ocean"] {
@@ -68,6 +71,7 @@ html[data-theme="ocean"] {
   --footer-divider:#11556b;
   --footer-title:  #eafcff;
   --footer-legal:  #73a7b2;
+  --fab-shadow:    0 10px 30px rgba(3, 35, 48, .28);
 }
 
 /* =========================================================================
@@ -199,41 +203,103 @@ header {
   color: var(--text);
 }
 
+html[data-theme] header {
+  background: var(--navy);
+  color: var(--text);
+  border-bottom-color: var(--header-border);
+}
+
+html[data-theme] .nav-link {
+  color: var(--text-muted);
+}
+
+html[data-theme] .nav-link:hover,
+html[data-theme] .nav-link.active {
+  color: var(--text);
+}
+
+html[data-theme] .nav-submenu {
+  background: var(--navy);
+  border-color: var(--border-color);
+}
+
+html[data-theme] .nav-submenu .nav-link.nav-sub-link:hover,
+html[data-theme] .nav-submenu .nav-link.nav-sub-link.active {
+  background: var(--navy-3);
+  color: var(--text);
+}
+
+html[data-theme] .nav-login-btn,
+html[data-theme] .nav-user-btn {
+  border-color: var(--border-color);
+  color: var(--text);
+}
+
+html[data-theme] .nav-user-btn:hover,
+html[data-theme] .nav-user-menu.open .nav-user-btn {
+  background: var(--navy-3);
+  border-color: var(--primary);
+}
+
+html[data-theme] .nav-user-dropdown {
+  background: var(--navy);
+  border-color: var(--border-color);
+}
+
+html[data-theme] .nav-user-dropdown-item {
+  color: var(--text-muted);
+}
+
+html[data-theme] .nav-user-dropdown-item:hover {
+  background: var(--navy-3);
+  color: var(--text);
+}
+
 .nav-actions {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.theme-switcher {
+.theme-fab {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: var(--z-theme-fab);
   display: inline-flex;
   align-items: center;
   gap: 8px;
-}
-
-.theme-switcher-label {
-  color: var(--text-subtle);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-}
-
-.theme-switcher-select {
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
   border: 1px solid var(--border-color);
-  border-radius: var(--button-radius);
-  padding: 7px 10px;
-  background: var(--navy-3);
+  border-radius: 999px;
+  padding: 10px 12px;
+  background: var(--navy);
   color: var(--text);
-  min-width: 94px;
+  box-shadow: var(--fab-shadow);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  transition: transform .15s ease, background .2s, border-color .2s, color .2s;
 }
 
-.theme-switcher-select:focus {
+.theme-fab:hover {
+  transform: translateY(-1px);
+  border-color: var(--primary);
+  background: var(--navy-3);
+}
+
+.theme-fab:focus-visible {
   outline: 2px solid var(--primary);
-  outline-offset: 1px;
+  outline-offset: 2px;
+}
+
+.theme-fab iconify-icon {
+  font-size: 18px;
+  color: var(--primary);
+}
+
+.theme-fab-label {
+  line-height: 1;
 }
 
 .nav-btn {
@@ -295,6 +361,10 @@ header {
   backdrop-filter: blur(10px);
 }
 
+html[data-theme] .mobile-nav-overlay {
+  background: var(--mobile-menu-bg);
+}
+
 .mobile-nav-overlay.open {
   display: block;
 }
@@ -308,6 +378,11 @@ header {
   display: flex;
   flex-direction: column;
   border-left: 1px solid var(--border-color);
+}
+
+html[data-theme] .mobile-nav-panel {
+  background: var(--navy);
+  border-left-color: var(--border-color);
 }
 
 .mobile-menu-close {
@@ -602,22 +677,6 @@ header {
   color: var(--text-muted);
 }
 
-.mobile-theme-switcher {
-  width: 100%;
-  padding: 6px 4px 10px;
-}
-
-.mobile-theme-switcher .theme-switcher-label {
-  display: block;
-  margin-bottom: 6px;
-}
-
-.mobile-theme-switcher .theme-switcher-select {
-  width: 100%;
-  padding: 10px 12px;
-  font-size: 15px;
-}
-
 /* =========================================================================
    Responsive – Mobile Breakpoint
    ========================================================================= */
@@ -633,5 +692,19 @@ header {
 
   .mobile-hamburger {
     display: inline-flex;
+  }
+
+  .theme-fab {
+    right: 14px;
+    bottom: 14px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .theme-fab-label {
+    display: none;
   }
 }
