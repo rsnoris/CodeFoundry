@@ -160,9 +160,9 @@
   }
 
   /**
-   * Initialise shared theme selector(s) and persistence.
+   * Initialise shared floating theme toggle and persistence.
    */
-  function initThemeSelector() {
+  function initThemeControls() {
     const themeConfig = window.CF_THEME_CONFIG || {};
     const storageKey = themeConfig.storageKey || 'cf-theme';
     const allowedThemes = Array.isArray(themeConfig.themes) && themeConfig.themes.length
@@ -171,13 +171,17 @@
     const defaultTheme = themeConfig.defaultTheme && allowedThemes.indexOf(themeConfig.defaultTheme) !== -1
       ? themeConfig.defaultTheme
       : 'dark';
-    const desktopSelect = document.getElementById('themeSelect');
-    const mobileSelect = document.getElementById('mobileThemeSelect');
-    const selects = [desktopSelect, mobileSelect].filter(Boolean);
-
-    if (!selects.length) {
+    const toggleBtn = document.getElementById('themeToggleBtn');
+    const toggleIcon = document.getElementById('themeToggleIcon');
+    const toggleLabel = document.getElementById('themeToggleLabel');
+    if (!toggleBtn) {
       return;
     }
+    const themeMeta = {
+      dark: { label: 'Dark', icon: 'lucide:moon-star' },
+      light: { label: 'Light', icon: 'lucide:sun' },
+      ocean: { label: 'Ocean', icon: 'lucide:waves' }
+    };
 
     function isThemeAllowed(theme) {
       return allowedThemes.indexOf(theme) !== -1;
@@ -186,11 +190,15 @@
     function applyTheme(theme) {
       const nextTheme = isThemeAllowed(theme) ? theme : defaultTheme;
       document.documentElement.setAttribute('data-theme', nextTheme);
-      selects.forEach(function (select) {
-        if (select.value !== nextTheme) {
-          select.value = nextTheme;
-        }
-      });
+      const meta = themeMeta[nextTheme] || { label: nextTheme, icon: 'lucide:palette' };
+      if (toggleLabel) {
+        toggleLabel.textContent = meta.label;
+      }
+      if (toggleIcon) {
+        toggleIcon.setAttribute('icon', meta.icon);
+      }
+      toggleBtn.setAttribute('aria-label', 'Switch theme (current: ' + meta.label + ')');
+      toggleBtn.setAttribute('title', 'Theme: ' + meta.label);
       try {
         localStorage.setItem(storageKey, nextTheme);
       } catch (e) {
@@ -204,10 +212,11 @@
     }
     applyTheme(currentTheme);
 
-    selects.forEach(function (select) {
-      select.addEventListener('change', function () {
-        applyTheme(select.value);
-      });
+    toggleBtn.addEventListener('click', function () {
+      const current = document.documentElement.getAttribute('data-theme');
+      const currentIndex = allowedThemes.indexOf(current);
+      const nextTheme = allowedThemes[(currentIndex + 1) % allowedThemes.length];
+      applyTheme(nextTheme);
     });
   }
 
@@ -216,12 +225,12 @@
       initMobileNav();
       initUserMenu();
       initNavDropdowns();
-      initThemeSelector();
+      initThemeControls();
     });
   } else {
     initMobileNav();
     initUserMenu();
     initNavDropdowns();
-    initThemeSelector();
+    initThemeControls();
   }
 }());
