@@ -30,6 +30,7 @@ html[data-theme="dark"] {
   --footer-divider:#1a2942;
   --footer-title:  #ffffff;
   --footer-legal:  #6e7b97;
+  --fab-shadow:    0 10px 30px rgba(0, 0, 0, .28);
 }
 
 html[data-theme="light"] {
@@ -49,6 +50,7 @@ html[data-theme="light"] {
   --footer-divider:#d4dfed;
   --footer-title:  #0f1f35;
   --footer-legal:  #607089;
+  --fab-shadow:    0 10px 30px rgba(16, 24, 40, .16);
 }
 
 html[data-theme="ocean"] {
@@ -68,6 +70,7 @@ html[data-theme="ocean"] {
   --footer-divider:#11556b;
   --footer-title:  #eafcff;
   --footer-legal:  #73a7b2;
+  --fab-shadow:    0 10px 30px rgba(3, 35, 48, .28);
 }
 
 /* =========================================================================
@@ -270,7 +273,7 @@ html[data-theme] .nav-user-dropdown-item:hover {
   padding: 10px 12px;
   background: var(--navy);
   color: var(--text);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, .28);
+  box-shadow: var(--fab-shadow);
   cursor: pointer;
   font: inherit;
   font-size: 13px;

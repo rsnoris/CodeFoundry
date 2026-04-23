@@ -190,15 +190,19 @@
     function applyTheme(theme) {
       const nextTheme = isThemeAllowed(theme) ? theme : defaultTheme;
       document.documentElement.setAttribute('data-theme', nextTheme);
-      const meta = themeMeta[nextTheme] || { label: nextTheme, icon: 'lucide:palette' };
+      const meta = themeMeta[nextTheme];
+      if (!meta && typeof console !== 'undefined' && typeof console.warn === 'function') {
+        console.warn('[CodeFoundry] Unknown theme metadata for:', nextTheme);
+      }
+      const activeMeta = meta || { label: nextTheme, icon: 'lucide:paintbrush' };
       if (toggleLabel) {
-        toggleLabel.textContent = meta.label;
+        toggleLabel.textContent = activeMeta.label;
       }
       if (toggleIcon) {
-        toggleIcon.setAttribute('icon', meta.icon);
+        toggleIcon.setAttribute('icon', activeMeta.icon);
       }
-      toggleBtn.setAttribute('aria-label', 'Switch theme (current: ' + meta.label + ')');
-      toggleBtn.setAttribute('title', 'Theme: ' + meta.label);
+      toggleBtn.setAttribute('aria-label', 'Switch theme (current: ' + activeMeta.label + ')');
+      toggleBtn.setAttribute('title', 'Theme: ' + activeMeta.label);
       try {
         localStorage.setItem(storageKey, nextTheme);
       } catch (e) {
