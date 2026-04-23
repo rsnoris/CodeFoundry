@@ -339,6 +339,38 @@ define('CF_OAUTH_GOOGLE_CLIENT_SECRET', cf_load_key('GOOGLE_CLIENT_SECRET'));
 define('CF_OAUTH_LINKEDIN_CLIENT_ID',     cf_load_key('LINKEDIN_CLIENT_ID'));
 define('CF_OAUTH_LINKEDIN_CLIENT_SECRET', cf_load_key('LINKEDIN_CLIENT_SECRET'));
 
+/**
+ * Social auth runtime controls (managed from Admin → Social Auth).
+ */
+$cf_social_auth_landing_path = cf_load_key('SOCIAL_AUTH_LANDING_PATH', '/Generate/');
+if (!preg_match('#^/[^/\\\\]#', $cf_social_auth_landing_path) || str_contains($cf_social_auth_landing_path, '..')) {
+    $cf_social_auth_landing_path = '/Generate/';
+}
+define('CF_SOCIAL_AUTH_LANDING_PATH', $cf_social_auth_landing_path);
+
+$cf_social_auth_session_limit_minutes = (int)cf_load_key('SOCIAL_AUTH_SESSION_LIMIT_MINUTES', '720');
+if ($cf_social_auth_session_limit_minutes < 15 || $cf_social_auth_session_limit_minutes > 10080) {
+    $cf_social_auth_session_limit_minutes = 720;
+}
+define('CF_SOCIAL_AUTH_SESSION_LIMIT_MINUTES', $cf_social_auth_session_limit_minutes);
+define('CF_SOCIAL_AUTH_SESSION_LIMIT_SECONDS', CF_SOCIAL_AUTH_SESSION_LIMIT_MINUTES * 60);
+
+$cf_social_auth_rate_limit_max_attempts = (int)cf_load_key('SOCIAL_AUTH_RATE_LIMIT_MAX_ATTEMPTS', '12');
+if ($cf_social_auth_rate_limit_max_attempts < 1 || $cf_social_auth_rate_limit_max_attempts > 200) {
+    $cf_social_auth_rate_limit_max_attempts = 12;
+}
+define('CF_SOCIAL_AUTH_RATE_LIMIT_MAX_ATTEMPTS', $cf_social_auth_rate_limit_max_attempts);
+
+$cf_social_auth_rate_limit_window_seconds = (int)cf_load_key('SOCIAL_AUTH_RATE_LIMIT_WINDOW_SECONDS', '300');
+if ($cf_social_auth_rate_limit_window_seconds < 30 || $cf_social_auth_rate_limit_window_seconds > 86400) {
+    $cf_social_auth_rate_limit_window_seconds = 300;
+}
+define('CF_SOCIAL_AUTH_RATE_LIMIT_WINDOW_SECONDS', $cf_social_auth_rate_limit_window_seconds);
+
+define('CF_SOCIAL_AUTH_GITHUB_SCOPE',  cf_load_key('SOCIAL_AUTH_GITHUB_SCOPE', 'read:user user:email'));
+define('CF_SOCIAL_AUTH_GOOGLE_SCOPE',  cf_load_key('SOCIAL_AUTH_GOOGLE_SCOPE', 'openid email profile'));
+define('CF_SOCIAL_AUTH_LINKEDIN_SCOPE', cf_load_key('SOCIAL_AUTH_LINKEDIN_SCOPE', 'openid profile email'));
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------

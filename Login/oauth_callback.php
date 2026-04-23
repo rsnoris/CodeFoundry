@@ -43,7 +43,7 @@ function cf_oauth_fail(string $message, int $status = 400): never
 
 $provider     = $_SESSION['oauth_provider'] ?? '';
 $savedState   = $_SESSION['oauth_state']    ?? '';
-$safeRedirect = $_SESSION['oauth_redirect'] ?? '/Generate/';
+$safeRedirect = $_SESSION['oauth_redirect'] ?? CF_SOCIAL_AUTH_LANDING_PATH;
 
 // Clean up session state immediately (replay-protection)
 unset($_SESSION['oauth_state'], $_SESSION['oauth_provider'], $_SESSION['oauth_redirect']);

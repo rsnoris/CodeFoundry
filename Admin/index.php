@@ -39,12 +39,122 @@ $payment_managed_keys = [
     'APPLE_PAY_MERCHANT_ID'  => ['label' => 'Apple Pay Merchant ID',  'hint' => 'Merchant identifier used for Apple Pay setup', 'icon' => 'lucide:smartphone', 'is_secret' => false],
     'APPLE_PAY_DOMAIN'       => ['label' => 'Apple Pay Domain',       'hint' => 'Verified Apple Pay domain (for example: codefoundry.cloud)', 'icon' => 'lucide:globe', 'is_secret' => false],
 ];
+
+$social_auth_managed_settings = [
+    'GITHUB_CLIENT_ID' => [
+        'label' => 'GitHub Client ID',
+        'hint' => 'OAuth app client ID used for GitHub login/signup',
+        'icon' => 'mdi:github',
+        'is_secret' => false,
+        'category' => 'providers',
+    ],
+    'GITHUB_CLIENT_SECRET' => [
+        'label' => 'GitHub Client Secret',
+        'hint' => 'OAuth app client secret for GitHub token exchange',
+        'icon' => 'lucide:lock-keyhole',
+        'is_secret' => true,
+        'category' => 'providers',
+    ],
+    'GOOGLE_CLIENT_ID' => [
+        'label' => 'Google Client ID',
+        'hint' => 'OAuth client ID from Google Cloud Console',
+        'icon' => 'flat-color-icons:google',
+        'is_secret' => false,
+        'category' => 'providers',
+    ],
+    'GOOGLE_CLIENT_SECRET' => [
+        'label' => 'Google Client Secret',
+        'hint' => 'OAuth client secret for Google token exchange',
+        'icon' => 'lucide:lock-keyhole',
+        'is_secret' => true,
+        'category' => 'providers',
+    ],
+    'LINKEDIN_CLIENT_ID' => [
+        'label' => 'LinkedIn Client ID',
+        'hint' => 'OAuth app client ID for LinkedIn OpenID Connect',
+        'icon' => 'mdi:linkedin',
+        'is_secret' => false,
+        'category' => 'providers',
+    ],
+    'LINKEDIN_CLIENT_SECRET' => [
+        'label' => 'LinkedIn Client Secret',
+        'hint' => 'OAuth app client secret for LinkedIn token exchange',
+        'icon' => 'lucide:lock-keyhole',
+        'is_secret' => true,
+        'category' => 'providers',
+    ],
+    'SOCIAL_AUTH_LANDING_PATH' => [
+        'label' => 'Target Landing Path',
+        'hint' => 'Relative path used after successful login/signup, e.g. /Generate/',
+        'icon' => 'lucide:move-right',
+        'is_secret' => false,
+        'category' => 'policy',
+        'type' => 'path',
+    ],
+    'SOCIAL_AUTH_SESSION_LIMIT_MINUTES' => [
+        'label' => 'Session Limit (minutes)',
+        'hint' => 'Maximum authenticated session duration before re-login is required',
+        'icon' => 'lucide:timer',
+        'is_secret' => false,
+        'category' => 'policy',
+        'type' => 'int',
+        'min' => 15,
+        'max' => 10080,
+    ],
+    'SOCIAL_AUTH_RATE_LIMIT_MAX_ATTEMPTS' => [
+        'label' => 'Rate Limit Max Attempts',
+        'hint' => 'Maximum login attempts per rate-limit window',
+        'icon' => 'lucide:shield-alert',
+        'is_secret' => false,
+        'category' => 'policy',
+        'type' => 'int',
+        'min' => 1,
+        'max' => 200,
+    ],
+    'SOCIAL_AUTH_RATE_LIMIT_WINDOW_SECONDS' => [
+        'label' => 'Rate Limit Window (seconds)',
+        'hint' => 'Time window for login rate limiting',
+        'icon' => 'lucide:gauge',
+        'is_secret' => false,
+        'category' => 'policy',
+        'type' => 'int',
+        'min' => 30,
+        'max' => 86400,
+    ],
+    'SOCIAL_AUTH_GITHUB_SCOPE' => [
+        'label' => 'GitHub OAuth Scope',
+        'hint' => 'Authorization scope string sent to GitHub',
+        'icon' => 'mdi:github',
+        'is_secret' => false,
+        'category' => 'policy',
+    ],
+    'SOCIAL_AUTH_GOOGLE_SCOPE' => [
+        'label' => 'Google OAuth Scope',
+        'hint' => 'Authorization scope string sent to Google',
+        'icon' => 'flat-color-icons:google',
+        'is_secret' => false,
+        'category' => 'policy',
+    ],
+    'SOCIAL_AUTH_LINKEDIN_SCOPE' => [
+        'label' => 'LinkedIn OAuth Scope',
+        'hint' => 'Authorization scope string sent to LinkedIn',
+        'icon' => 'mdi:linkedin',
+        'is_secret' => false,
+        'category' => 'policy',
+    ],
+];
 const ADMIN_PAYMENT_KEY_VALUE_MAX_LENGTH = 4096;
 const ADMIN_PAYMENT_SECRET_PREFIX_LENGTH = 4;
 const ADMIN_PAYMENT_SECRET_MAX_MASK_LENGTH = 20;
 const ADMIN_PAYMENT_SECRET_MIN_MASK_LENGTH = 8;
 const ADMIN_PAYMENT_VISIBLE_VALUE_MAX_LENGTH = 60;
 const ADMIN_PAYMENT_VISIBLE_VALUE_TRUNCATE_LENGTH = 57;
+const ADMIN_SOCIAL_AUTH_VALUE_MAX_LENGTH = 4096;
+const ADMIN_SOCIAL_AUTH_SECRET_PREFIX_LENGTH = 4;
+const ADMIN_SOCIAL_AUTH_SECRET_MAX_MASK_LENGTH = 20;
+const ADMIN_SOCIAL_AUTH_SECRET_MIN_MASK_LENGTH = 8;
+const ADMIN_SOCIAL_AUTH_VISIBLE_VALUE_MAX_LENGTH = 80;
+const ADMIN_SOCIAL_AUTH_VISIBLE_VALUE_TRUNCATE_LENGTH = 77;
 
 // ── Handle ticket status update ───────────────────────────────────────────
 if (
@@ -165,6 +275,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 AuditStore::log('admin.api_key_cleared', $admin_user['username'], ['key' => $key_name]);
             }
             header('Location: /Admin/?tab=api_keys&cleared=' . urlencode($key_name));
+            exit;
+        }
+
+        if ($action === 'save_social_auth_setting') {
+            $key_name  = trim((string)($_POST['key_name'] ?? ''));
+            $key_value = trim((string)($_POST['key_value'] ?? ''));
+            $redirect_base = '/Admin/?tab=social_auth';
+
+            if (!isset($social_auth_managed_settings[$key_name])) {
+                header('Location: ' . $redirect_base . '&error=invalid_key');
+                exit;
+            }
+            if (strlen($key_value) > ADMIN_SOCIAL_AUTH_VALUE_MAX_LENGTH) {
+                header('Location: ' . $redirect_base . '&error=value_too_long&key=' . urlencode($key_name));
+                exit;
+            }
+
+            $meta = $social_auth_managed_settings[$key_name];
+            $type = (string)($meta['type'] ?? '');
+            if ($type === 'path') {
+                $valid_path = preg_match('#^/[^/\\\\]#', $key_value) && strpos($key_value, '..') === false;
+                if (!$valid_path) {
+                    header('Location: ' . $redirect_base . '&error=invalid_path&key=' . urlencode($key_name));
+                    exit;
+                }
+            } elseif ($type === 'int') {
+                if (!preg_match('/^\d+$/', $key_value)) {
+                    header('Location: ' . $redirect_base . '&error=invalid_number&key=' . urlencode($key_name));
+                    exit;
+                }
+                $num = (int)$key_value;
+                $min = (int)($meta['min'] ?? PHP_INT_MIN);
+                $max = (int)($meta['max'] ?? PHP_INT_MAX);
+                if ($num < $min || $num > $max) {
+                    header('Location: ' . $redirect_base . '&error=out_of_range&key=' . urlencode($key_name));
+                    exit;
+                }
+                $key_value = (string)$num;
+            }
+
+            cf_save_key($key_name, $key_value);
+            AuditStore::log('admin.social_auth_setting_saved', $admin_user['username'], ['key' => $key_name]);
+            header('Location: ' . $redirect_base . '&saved=' . urlencode($key_name));
+            exit;
+        }
+
+        if ($action === 'clear_social_auth_setting') {
+            $key_name = trim((string)($_POST['key_name'] ?? ''));
+            if (!isset($social_auth_managed_settings[$key_name])) {
+                header('Location: /Admin/?tab=social_auth&error=invalid_key');
+                exit;
+            }
+            cf_save_key($key_name, '');
+            AuditStore::log('admin.social_auth_setting_cleared', $admin_user['username'], ['key' => $key_name]);
+            header('Location: /Admin/?tab=social_auth&cleared=' . urlencode($key_name));
             exit;
         }
 
@@ -488,6 +653,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
         'live_chat'      => ['icon' => 'lucide:message-circle',    'label' => 'Live Chat'],
         'analytics'      => ['icon' => 'lucide:bar-chart-2',       'label' => 'Analytics'],
         'api_keys'         => ['icon' => 'lucide:key-round',         'label' => 'API Keys'],
+        'social_auth'      => ['icon' => 'lucide:users-round',       'label' => 'Social Auth'],
         'payment_api_keys' => ['icon' => 'lucide:credit-card',       'label' => 'Payment API Keys'],
         'docker_instances' => ['icon' => 'lucide:container',        'label' => 'Docker'],
         'architecture'     => ['icon' => 'lucide:layout',            'label' => 'Architecture'],
@@ -1770,6 +1936,264 @@ require_once dirname(__DIR__) . '/includes/header.php';
           <li>Keys are stored as plain-text files in <code><?= cf_e(CF_KEYS_DIR) ?>/</code>, which is outside the webroot and never returned over HTTP.</li>
           <li>All save and clear actions are recorded in the Audit Trail with the admin's username.</li>
         </ol>
+      </div>
+    </div>
+
+    <?php elseif ($active_tab === 'social_auth'): ?>
+    <!-- ═══ SOCIAL AUTH ═══════════════════════════════════════════════════════ -->
+    <?php
+      $saved_social_key   = trim((string)($_GET['saved'] ?? ''));
+      $cleared_social_key = trim((string)($_GET['cleared'] ?? ''));
+      $social_error       = trim((string)($_GET['error'] ?? ''));
+      $social_error_key   = trim((string)($_GET['key'] ?? ''));
+      $social_error_messages = [
+        'invalid_key'    => 'Unsupported social auth setting.',
+        'value_too_long' => 'Setting value is too long.',
+        'invalid_path'   => 'Target landing path must be a safe relative path (example: /Generate/).',
+        'invalid_number' => 'This setting requires a numeric value.',
+        'out_of_range'   => 'Numeric setting is outside the allowed range.',
+      ];
+      $social_key_label = $social_error_key !== '' && isset($social_auth_managed_settings[$social_error_key])
+        ? $social_auth_managed_settings[$social_error_key]['label']
+        : $social_error_key;
+    ?>
+    <div class="adm-header">
+      <h1><iconify-icon icon="lucide:users-round" style="vertical-align:middle;margin-right:8px"></iconify-icon>Social Auth</h1>
+      <p>Configure social login/signup providers, authentication/authorization attributes, landing page behavior, session limits, and rate limits.</p>
+    </div>
+
+    <?php if ($saved_social_key !== ''):
+      $saved_label = $social_auth_managed_settings[$saved_social_key]['label'] ?? $saved_social_key;
+    ?>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;padding:12px 16px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:13px;color:#4ade80">
+        <iconify-icon icon="lucide:check-circle"></iconify-icon>
+        <strong><?= cf_e($saved_label) ?></strong> saved successfully.
+      </div>
+    <?php elseif ($cleared_social_key !== ''):
+      $cleared_label = $social_auth_managed_settings[$cleared_social_key]['label'] ?? $cleared_social_key;
+    ?>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;padding:12px 16px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:8px;font-size:13px;color:#fbbf24">
+        <iconify-icon icon="lucide:info"></iconify-icon>
+        <strong><?= cf_e($cleared_label) ?></strong> cleared. Runtime will fall back to defaults.
+      </div>
+    <?php elseif ($social_error !== '' && isset($social_error_messages[$social_error])): ?>
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:18px;padding:12px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:8px;font-size:13px;color:#f87171">
+        <iconify-icon icon="lucide:alert-triangle"></iconify-icon>
+        <div>
+          <?= cf_e($social_error_messages[$social_error]) ?>
+          <?php if ($social_key_label !== ''): ?>
+            <div style="font-size:11px;color:#fca5a5;margin-top:3px">Setting: <?= cf_e($social_key_label) ?></div>
+          <?php endif; ?>
+        </div>
+      </div>
+    <?php endif; ?>
+
+    <div class="adm-section">
+      <div class="adm-section-header">
+        <h2><iconify-icon icon="lucide:key-round" style="vertical-align:middle;margin-right:6px"></iconify-icon>Provider Credentials</h2>
+        <span style="font-size:11px;color:var(--text-subtle)">Stored in <code><?= cf_e(CF_KEYS_DIR) ?></code></span>
+      </div>
+      <div class="adm-section-body">
+        <div class="key-grid">
+          <?php foreach ($social_auth_managed_settings as $key_name => $key_meta):
+            if (($key_meta['category'] ?? '') !== 'providers') {
+              continue;
+            }
+            $current_val = cf_load_key($key_name);
+            $is_set      = $current_val !== '';
+            $is_secret   = !empty($key_meta['is_secret']);
+            $display_val = '';
+            if ($is_set) {
+              if ($is_secret) {
+                $current_len = strlen($current_val);
+                if ($current_len <= ADMIN_SOCIAL_AUTH_SECRET_PREFIX_LENGTH) {
+                  $display_val = str_repeat('•', max(ADMIN_SOCIAL_AUTH_SECRET_MIN_MASK_LENGTH, $current_len));
+                } else {
+                  $mask_length = min(
+                    ADMIN_SOCIAL_AUTH_SECRET_MAX_MASK_LENGTH,
+                    max(ADMIN_SOCIAL_AUTH_SECRET_MIN_MASK_LENGTH, $current_len - ADMIN_SOCIAL_AUTH_SECRET_PREFIX_LENGTH)
+                  );
+                  $display_val = substr($current_val, 0, ADMIN_SOCIAL_AUTH_SECRET_PREFIX_LENGTH) . str_repeat('•', $mask_length);
+                }
+              } else {
+                $display_val = strlen($current_val) > ADMIN_SOCIAL_AUTH_VISIBLE_VALUE_MAX_LENGTH
+                  ? (substr($current_val, 0, ADMIN_SOCIAL_AUTH_VISIBLE_VALUE_TRUNCATE_LENGTH) . '...')
+                  : $current_val;
+              }
+            }
+          ?>
+          <div class="key-card">
+            <div class="key-card-header">
+              <div class="key-card-icon"><iconify-icon icon="<?= cf_e($key_meta['icon']) ?>"></iconify-icon></div>
+              <div>
+                <div class="key-card-title"><?= cf_e($key_meta['label']) ?></div>
+                <div class="key-card-hint"><?= cf_e($key_meta['hint']) ?></div>
+              </div>
+            </div>
+
+            <div>
+              <?php if ($is_set): ?>
+                <span class="key-status-set"><iconify-icon icon="lucide:check-circle-2"></iconify-icon> Configured</span>
+                <div class="key-masked"><?= cf_e($display_val) ?></div>
+              <?php else: ?>
+                <span class="key-status-unset"><iconify-icon icon="lucide:circle-dashed"></iconify-icon> Not configured</span>
+              <?php endif; ?>
+            </div>
+
+            <form method="POST" action="/Admin/?tab=social_auth" autocomplete="off">
+              <input type="hidden" name="csrf_token" value="<?= cf_e($csrf) ?>">
+              <input type="hidden" name="action" value="save_social_auth_setting">
+              <input type="hidden" name="key_name" value="<?= cf_e($key_name) ?>">
+              <div class="key-input-row">
+                <input
+                  type="<?= $is_secret ? 'password' : 'text' ?>"
+                  name="key_value"
+                  class="key-input"
+                  placeholder="<?= $is_set ? 'Enter replacement value…' : 'Enter value…' ?>"
+                  autocomplete="new-password"
+                  maxlength="<?= (string)ADMIN_SOCIAL_AUTH_VALUE_MAX_LENGTH ?>"
+                  required
+                >
+              </div>
+              <div class="key-actions" style="margin-top:8px">
+                <button type="submit" class="btn-key-save">
+                  <iconify-icon icon="lucide:save"></iconify-icon>
+                  <?= $is_set ? 'Update Value' : 'Save Value' ?>
+                </button>
+              </div>
+            </form>
+
+            <?php if ($is_set): ?>
+              <form method="POST" action="/Admin/?tab=social_auth" autocomplete="off">
+                <input type="hidden" name="csrf_token" value="<?= cf_e($csrf) ?>">
+                <input type="hidden" name="action" value="clear_social_auth_setting">
+                <input type="hidden" name="key_name" value="<?= cf_e($key_name) ?>">
+                <button type="submit" class="btn-key-clear" data-confirm="Clear <?= cf_e($key_meta['label']) ?>?">
+                  <iconify-icon icon="lucide:trash-2"></iconify-icon> Clear
+                </button>
+              </form>
+            <?php endif; ?>
+          </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="adm-section">
+      <div class="adm-section-header">
+        <h2><iconify-icon icon="lucide:shield-check" style="vertical-align:middle;margin-right:6px"></iconify-icon>Authentication & Authorization Controls</h2>
+      </div>
+      <div class="adm-section-body">
+        <div class="key-grid">
+          <?php foreach ($social_auth_managed_settings as $key_name => $key_meta):
+            if (($key_meta['category'] ?? '') !== 'policy') {
+              continue;
+            }
+            $current_val = cf_load_key($key_name);
+            $is_set      = $current_val !== '';
+            $type        = (string)($key_meta['type'] ?? '');
+            $display_val = $current_val;
+            if (strlen($display_val) > ADMIN_SOCIAL_AUTH_VISIBLE_VALUE_MAX_LENGTH) {
+              $display_val = substr($display_val, 0, ADMIN_SOCIAL_AUTH_VISIBLE_VALUE_TRUNCATE_LENGTH) . '...';
+            }
+          ?>
+          <div class="key-card">
+            <div class="key-card-header">
+              <div class="key-card-icon"><iconify-icon icon="<?= cf_e($key_meta['icon']) ?>"></iconify-icon></div>
+              <div>
+                <div class="key-card-title"><?= cf_e($key_meta['label']) ?></div>
+                <div class="key-card-hint"><?= cf_e($key_meta['hint']) ?></div>
+              </div>
+            </div>
+
+            <div>
+              <?php if ($is_set): ?>
+                <span class="key-status-set"><iconify-icon icon="lucide:check-circle-2"></iconify-icon> Configured override</span>
+                <div class="key-masked"><?= cf_e($display_val) ?></div>
+              <?php else: ?>
+                <span class="key-status-unset"><iconify-icon icon="lucide:circle-dashed"></iconify-icon> Using runtime default</span>
+              <?php endif; ?>
+            </div>
+
+            <form method="POST" action="/Admin/?tab=social_auth" autocomplete="off">
+              <input type="hidden" name="csrf_token" value="<?= cf_e($csrf) ?>">
+              <input type="hidden" name="action" value="save_social_auth_setting">
+              <input type="hidden" name="key_name" value="<?= cf_e($key_name) ?>">
+              <div class="key-input-row">
+                <input
+                  type="<?= $type === 'int' ? 'number' : 'text' ?>"
+                  name="key_value"
+                  class="key-input"
+                  placeholder="Enter value…"
+                  <?= $type === 'int' ? 'inputmode="numeric"' : '' ?>
+                  <?= $type === 'int' && isset($key_meta['min']) ? 'min="' . (int)$key_meta['min'] . '"' : '' ?>
+                  <?= $type === 'int' && isset($key_meta['max']) ? 'max="' . (int)$key_meta['max'] . '"' : '' ?>
+                  maxlength="<?= (string)ADMIN_SOCIAL_AUTH_VALUE_MAX_LENGTH ?>"
+                  required
+                >
+              </div>
+              <div class="key-actions" style="margin-top:8px">
+                <button type="submit" class="btn-key-save">
+                  <iconify-icon icon="lucide:save"></iconify-icon>
+                  <?= $is_set ? 'Update Value' : 'Save Value' ?>
+                </button>
+              </div>
+            </form>
+
+            <?php if ($is_set): ?>
+              <form method="POST" action="/Admin/?tab=social_auth" autocomplete="off">
+                <input type="hidden" name="csrf_token" value="<?= cf_e($csrf) ?>">
+                <input type="hidden" name="action" value="clear_social_auth_setting">
+                <input type="hidden" name="key_name" value="<?= cf_e($key_name) ?>">
+                <button type="submit" class="btn-key-clear" data-confirm="Clear <?= cf_e($key_meta['label']) ?>?">
+                  <iconify-icon icon="lucide:trash-2"></iconify-icon> Clear
+                </button>
+              </form>
+            <?php endif; ?>
+          </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="adm-section">
+      <div class="adm-section-header"><h2><iconify-icon icon="lucide:activity" style="vertical-align:middle;margin-right:6px"></iconify-icon>Current Runtime Values</h2></div>
+      <div class="adm-section-body">
+        <table class="adm-table">
+          <thead><tr><th>Attribute</th><th>Effective Value</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Landing path</td>
+              <td><code><?= cf_e(CF_SOCIAL_AUTH_LANDING_PATH) ?></code></td>
+              <td>Post-login/post-signup redirect destination</td>
+            </tr>
+            <tr>
+              <td>Session limit</td>
+              <td><?= (int)CF_SOCIAL_AUTH_SESSION_LIMIT_MINUTES ?> minutes</td>
+              <td>Max session age before forced re-authentication</td>
+            </tr>
+            <tr>
+              <td>Rate limit</td>
+              <td><?= (int)CF_SOCIAL_AUTH_RATE_LIMIT_MAX_ATTEMPTS ?> attempts / <?= (int)CF_SOCIAL_AUTH_RATE_LIMIT_WINDOW_SECONDS ?> seconds</td>
+              <td>Password login throttling window</td>
+            </tr>
+            <tr>
+              <td>GitHub scope</td>
+              <td><code><?= cf_e(CF_SOCIAL_AUTH_GITHUB_SCOPE) ?></code></td>
+              <td>OAuth authorization scope string</td>
+            </tr>
+            <tr>
+              <td>Google scope</td>
+              <td><code><?= cf_e(CF_SOCIAL_AUTH_GOOGLE_SCOPE) ?></code></td>
+              <td>OAuth authorization scope string</td>
+            </tr>
+            <tr>
+              <td>LinkedIn scope</td>
+              <td><code><?= cf_e(CF_SOCIAL_AUTH_LINKEDIN_SCOPE) ?></code></td>
+              <td>OAuth authorization scope string</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 

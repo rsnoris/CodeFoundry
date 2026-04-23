@@ -14,7 +14,12 @@ class AuthValidationServer
 
     public static function consumeLoginAttempt(string $username, string $ip): bool
     {
-        return self::consumeRateLimit('login_attempt', $username . '|' . $ip, 12, 300);
+        return self::consumeRateLimit(
+            'login_attempt',
+            $username . '|' . $ip,
+            CF_SOCIAL_AUTH_RATE_LIMIT_MAX_ATTEMPTS,
+            CF_SOCIAL_AUTH_RATE_LIMIT_WINDOW_SECONDS
+        );
     }
 
     public static function consumeOtpRequest(string $identifier, string $ip): bool
