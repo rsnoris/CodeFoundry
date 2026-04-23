@@ -163,7 +163,14 @@ function cf_active_any(array $ids): string {
     </div>
   </div>
   <button class="theme-fab" id="themeToggleBtn" type="button" aria-label="Switch theme" aria-describedby="themeToggleLabel" title="Theme: Dark">
-    <iconify-icon id="themeToggleIcon" icon="lucide:moon-star"></iconify-icon>
+    <img
+      id="themeToggleIcon"
+      class="theme-fab-icon-image"
+      src="https://github.com/user-attachments/assets/f693f1b8-d8c2-4792-8d07-9a4b154cfcc9"
+      alt=""
+      loading="lazy"
+      decoding="async"
+    />
     <span class="theme-fab-label" id="themeToggleLabel" aria-live="polite" aria-atomic="true">Dark</span>
   </button>
 </header>

@@ -263,7 +263,7 @@ html[data-theme] .nav-user-dropdown-item:hover {
 
 .theme-fab {
   position: fixed;
-  right: 18px;
+  left: 18px;
   bottom: 18px;
   z-index: var(--z-theme-fab);
   display: inline-flex;
@@ -293,9 +293,12 @@ html[data-theme] .nav-user-dropdown-item:hover {
   outline-offset: 2px;
 }
 
-.theme-fab iconify-icon {
-  font-size: 18px;
-  color: var(--primary);
+.theme-fab-icon-image {
+  width: 22px;
+  height: 22px;
+  display: block;
+  object-fit: contain;
+  border-radius: 50%;
 }
 
 .theme-fab-label {
@@ -695,7 +698,7 @@ html[data-theme] .mobile-nav-panel {
   }
 
   .theme-fab {
-    right: 14px;
+    left: 14px;
     bottom: 14px;
     width: 44px;
     height: 44px;
