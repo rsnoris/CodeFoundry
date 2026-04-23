@@ -186,12 +186,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 header('Location: ' . $redirect_base . '&error=value_too_long&key=' . urlencode($key_name));
                 exit;
             }
-            if ($key_name === 'PAYPAL_MODE' && !in_array(strtolower($key_value), ['sandbox', 'live'], true)) {
-                header('Location: ' . $redirect_base . '&error=invalid_paypal_mode&key=' . urlencode($key_name));
-                exit;
-            }
             if ($key_name === 'PAYPAL_MODE') {
-                $key_value = strtolower($key_value);
+                $normalized_mode = strtolower($key_value);
+                if (!in_array($normalized_mode, ['sandbox', 'live'], true)) {
+                    header('Location: ' . $redirect_base . '&error=invalid_paypal_mode&key=' . urlencode($key_name));
+                    exit;
+                }
+                $key_value = $normalized_mode;
             }
 
             $had_existing = cf_load_key($key_name) !== '';
@@ -1843,12 +1844,13 @@ require_once dirname(__DIR__) . '/includes/header.php';
                 if ($current_len <= ADMIN_PAYMENT_SECRET_PREFIX_LENGTH) {
                   $display_val = str_repeat('•', max(ADMIN_PAYMENT_SECRET_MIN_MASK_LENGTH, $current_len));
                 } else {
+                  $mask_length = min(
+                    ADMIN_PAYMENT_SECRET_MAX_MASK_LENGTH,
+                    max(ADMIN_PAYMENT_SECRET_MIN_MASK_LENGTH, $current_len - ADMIN_PAYMENT_SECRET_PREFIX_LENGTH)
+                  );
                   $display_val = substr($current_val, 0, ADMIN_PAYMENT_SECRET_PREFIX_LENGTH) . str_repeat(
                     '•',
-                    min(
-                      ADMIN_PAYMENT_SECRET_MAX_MASK_LENGTH,
-                      max(ADMIN_PAYMENT_SECRET_MIN_MASK_LENGTH, $current_len - ADMIN_PAYMENT_SECRET_PREFIX_LENGTH)
-                    )
+                    $mask_length
                   );
                 }
               } else {
