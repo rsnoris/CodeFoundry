@@ -170,7 +170,7 @@
       : ['dark', 'light', 'ocean'];
     const defaultTheme = themeConfig.defaultTheme && allowedThemes.indexOf(themeConfig.defaultTheme) !== -1
       ? themeConfig.defaultTheme
-      : allowedThemes[0];
+      : 'dark';
     const desktopSelect = document.getElementById('themeSelect');
     const mobileSelect = document.getElementById('mobileThemeSelect');
     const selects = [desktopSelect, mobileSelect].filter(Boolean);
