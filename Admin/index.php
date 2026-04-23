@@ -504,6 +504,7 @@ $page_styles = <<<'CSS'
   .adm-nav-item:hover { background:var(--navy-3); color:var(--text); }
   .adm-nav-item.active { background:rgba(24,179,255,.12); color:var(--primary); }
   .adm-nav-item iconify-icon { font-size:16px; flex-shrink:0; }
+  .adm-nav-group-title { font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-subtle); padding:14px 16px 6px; }
   .adm-main { flex:1; padding:32px 32px 60px; min-width:0; }
   .adm-header { margin-bottom:24px; }
   .adm-header h1 { font-size:24px; font-weight:800; margin:0 0 4px; }
@@ -513,6 +514,14 @@ $page_styles = <<<'CSS'
   .stat-card-label { font-size:11px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
   .stat-card-value { font-size:26px; font-weight:800; color:var(--text); line-height:1; margin-bottom:3px; }
   .stat-card-sub { font-size:11px; color:var(--text-subtle); }
+  .overview-categories-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+  .overview-category-card { background:var(--navy-3); border:1px solid var(--border-color); border-radius:10px; padding:14px; }
+  .overview-category-head { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--text); margin-bottom:4px; }
+  .overview-category-head iconify-icon { color:var(--primary); font-size:15px; }
+  .overview-category-desc { font-size:11px; color:var(--text-subtle); margin:0 0 10px; line-height:1.5; }
+  .overview-category-links { display:flex; flex-wrap:wrap; gap:7px; }
+  .overview-category-link { display:inline-flex; align-items:center; gap:5px; padding:5px 9px; border-radius:999px; border:1px solid var(--border-color); background:var(--navy); color:var(--text-muted); font-size:11px; font-weight:600; text-decoration:none; transition:border-color .15s,color .15s; }
+  .overview-category-link:hover { border-color:var(--primary); color:var(--primary); }
   .adm-section { background:var(--navy); border:1px solid var(--border-color); border-radius:var(--card-radius); margin-bottom:20px; }
   .adm-section-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border-color); }
   .adm-section-header h2 { font-size:14px; font-weight:700; margin:0; }
@@ -620,7 +629,7 @@ $page_styles = <<<'CSS'
   .btn-key-save:hover { border-color:var(--primary); background:rgba(24,179,255,.2); }
   .btn-key-clear { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; border:1px solid rgba(239,68,68,.25); background:rgba(239,68,68,.07); color:#f87171; transition:border-color .15s; }
   .btn-key-clear:hover { border-color:#f87171; }
-  @media(max-width:900px){ .stat-grid{grid-template-columns:repeat(2,1fr);} .arch-grid{grid-template-columns:1fr;} }
+  @media(max-width:900px){ .stat-grid{grid-template-columns:repeat(2,1fr);} .arch-grid{grid-template-columns:1fr;} .overview-categories-grid{grid-template-columns:1fr;} }
   @media(max-width:700px){ .adm-layout{flex-direction:column;padding:0;} .adm-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border-color);padding:12px 0;display:flex;overflow-x:auto;} .adm-sidebar-title{display:none;} .adm-main{padding:20px 14px 48px;} .stat-grid{grid-template-columns:repeat(2,1fr);} }
   /* ── Docker Instances tab ─── */
   .docker-banner { display:flex; align-items:center; gap:10px; padding:12px 16px; border-radius:8px; font-size:13px; margin-bottom:20px; }
@@ -659,7 +668,43 @@ require_once dirname(__DIR__) . '/includes/header.php';
         'architecture'     => ['icon' => 'lucide:layout',            'label' => 'Architecture'],
         'workflows'        => ['icon' => 'lucide:git-pull-request',  'label' => 'Workflows'],
     ];
-    foreach ($tabs as $key => $meta): ?>
+    $tab_categories = [
+        [
+            'title' => 'Security & Monitoring',
+            'icon' => 'lucide:shield-check',
+            'description' => 'Track access, audits, and platform activity.',
+            'tabs' => ['audit', 'login_history', 'analytics'],
+        ],
+        [
+            'title' => 'User Operations',
+            'icon' => 'lucide:users',
+            'description' => 'Manage users, support tickets, and live conversations.',
+            'tabs' => ['users', 'support', 'live_chat'],
+        ],
+        [
+            'title' => 'Integrations & Access',
+            'icon' => 'lucide:key-round',
+            'description' => 'Configure provider credentials and authentication settings.',
+            'tabs' => ['api_keys', 'social_auth', 'payment_api_keys'],
+        ],
+        [
+            'title' => 'Infrastructure',
+            'icon' => 'lucide:container',
+            'description' => 'Review architecture, workflows, and runtime services.',
+            'tabs' => ['docker_instances', 'architecture', 'workflows'],
+        ],
+    ];
+    ?>
+    <a href="/Admin/?tab=overview" class="adm-nav-item <?= $active_tab === 'overview' ? 'active' : '' ?>">
+      <iconify-icon icon="<?= cf_e($tabs['overview']['icon']) ?>"></iconify-icon>
+      <?= cf_e($tabs['overview']['label']) ?>
+    </a>
+    <?php foreach ($tab_categories as $group): ?>
+      <div class="adm-nav-group-title"><?= cf_e($group['title']) ?></div>
+      <?php foreach ($group['tabs'] as $key):
+        if (!isset($tabs[$key])) { continue; }
+        $meta = $tabs[$key];
+      ?>
     <a href="/Admin/?tab=<?= cf_e($key) ?>"
        class="adm-nav-item <?= $active_tab === $key ? 'active' : '' ?>">
       <iconify-icon icon="<?= cf_e($meta['icon']) ?>"></iconify-icon>
@@ -670,6 +715,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
         <span class="nav-badge" id="adminChatBadge" style="display:none">0</span>
       <?php endif; ?>
     </a>
+      <?php endforeach; ?>
     <?php endforeach; ?>
     <div style="margin-top:auto;padding:20px 16px 0;border-top:1px solid var(--border-color);margin-top:20px">
       <a href="/Dashboard/" class="adm-nav-item">
@@ -727,6 +773,36 @@ require_once dirname(__DIR__) . '/includes/header.php';
         <div class="stat-card-label">Providers</div>
         <div class="stat-card-value"><?= count(CF_CODEGEN_PROVIDERS) ?></div>
         <div class="stat-card-sub">AI codegen backends</div>
+      </div>
+    </div>
+
+    <div class="adm-section">
+      <div class="adm-section-header">
+        <h2>Control Panel Dashboard</h2>
+      </div>
+      <div class="adm-section-body">
+        <div class="overview-categories-grid">
+          <?php foreach ($tab_categories as $category): ?>
+          <div class="overview-category-card">
+            <div class="overview-category-head">
+              <iconify-icon icon="<?= cf_e($category['icon']) ?>"></iconify-icon>
+              <?= cf_e($category['title']) ?>
+            </div>
+            <p class="overview-category-desc"><?= cf_e($category['description']) ?></p>
+            <div class="overview-category-links">
+              <?php foreach ($category['tabs'] as $tab_key):
+                if (!isset($tabs[$tab_key])) { continue; }
+                $tab_meta = $tabs[$tab_key];
+              ?>
+              <a href="/Admin/?tab=<?= cf_e($tab_key) ?>" class="overview-category-link">
+                <iconify-icon icon="<?= cf_e($tab_meta['icon']) ?>"></iconify-icon>
+                <?= cf_e($tab_meta['label']) ?>
+              </a>
+              <?php endforeach; ?>
+            </div>
+          </div>
+          <?php endforeach; ?>
+        </div>
       </div>
     </div>
 
