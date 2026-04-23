@@ -625,6 +625,12 @@ $page_styles = <<<'CSS'
   .key-input:focus { border-color:var(--primary); }
   .key-masked { font-size:11px; color:var(--text-subtle); font-family:monospace; letter-spacing:.05em; margin-top:2px; }
   .key-actions { display:flex; gap:6px; flex-wrap:wrap; }
+  .adm-pagination { display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:12px; flex-wrap:wrap; }
+  .adm-pagination-info { font-size:11px; color:var(--text-subtle); }
+  .adm-pagination-controls { display:inline-flex; align-items:center; gap:6px; }
+  .adm-pagination-btn { display:inline-flex; align-items:center; gap:4px; padding:6px 10px; border-radius:7px; border:1px solid var(--border-color); background:var(--navy-3); color:var(--text-muted); font-size:11px; font-weight:600; cursor:pointer; }
+  .adm-pagination-btn:hover:not(:disabled) { border-color:var(--primary); color:var(--primary); }
+  .adm-pagination-btn:disabled { opacity:.45; cursor:not-allowed; }
   .btn-key-save { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; border:1px solid rgba(24,179,255,.3); background:rgba(24,179,255,.12); color:var(--primary); transition:border-color .15s,background .15s; }
   .btn-key-save:hover { border-color:var(--primary); background:rgba(24,179,255,.2); }
   .btn-key-clear { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; border:1px solid rgba(239,68,68,.25); background:rgba(239,68,68,.07); color:#f87171; transition:border-color .15s; }
@@ -921,6 +927,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
               <?php endforeach; ?>
             </tbody>
           </table>
+          <div class="adm-pagination" id="auditPagination"></div>
         <?php endif; ?>
       </div>
     </div>
@@ -1020,6 +1027,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
               <?php endforeach; ?>
             </tbody>
           </table>
+          <div class="adm-pagination" id="loginPagination"></div>
         <?php endif; ?>
       </div>
     </div>
@@ -1141,6 +1149,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
               <?php endforeach; ?>
             </tbody>
           </table>
+          <div class="adm-pagination" id="usersPagination"></div>
         <?php endif; ?>
       </div>
     </div>
@@ -1522,6 +1531,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
               <?php endforeach; ?>
             </tbody>
           </table>
+          <div class="adm-pagination" id="ticketsPagination"></div>
         <?php endif; ?>
       </div>
     </div>
@@ -1542,6 +1552,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
         <div class="chat-sessions-list" id="adminSessionsList">
           <div style="padding:16px;text-align:center;color:var(--text-subtle);font-size:12px">Loading…</div>
         </div>
+        <div class="adm-pagination" id="adminSessionsPagination"></div>
       </div>
 
       <!-- Messages panel -->
@@ -1679,7 +1690,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
     <div class="adm-section">
       <div class="adm-section-header"><h2>Payment History</h2></div>
       <div class="adm-section-body">
-        <table class="adm-table">
+        <table class="adm-table" id="analyticsPaymentsTbl">
           <thead><tr><th>Date</th><th>User</th><th>Plan</th><th>Amount</th><th>Method</th><th>Txn ID</th></tr></thead>
           <tbody>
             <?php foreach (array_reverse($all_payments_raw) as $pm): ?>
@@ -1694,6 +1705,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
             <?php endforeach; ?>
           </tbody>
         </table>
+        <div class="adm-pagination" id="analyticsPaymentsPagination"></div>
       </div>
     </div>
     <?php endif; ?>
@@ -2569,11 +2581,90 @@ document.addEventListener('click', function(e) {
   }
 });
 // Table client-side filtering
+var ADMIN_TABLE_PAGINATION = {};
+
+function renderPaginationUi(container, label, hasPrev, hasNext, onPrev, onNext) {
+  if (!container) return;
+  container.innerHTML = ''
+    + '<span class="adm-pagination-info">' + label + '</span>'
+    + '<div class="adm-pagination-controls">'
+    +   '<button type="button" class="adm-pagination-btn" ' + (hasPrev ? '' : 'disabled') + ' data-page-action="prev">'
+    +     '<iconify-icon icon="lucide:chevron-left"></iconify-icon> Prev'
+    +   '</button>'
+    +   '<button type="button" class="adm-pagination-btn" ' + (hasNext ? '' : 'disabled') + ' data-page-action="next">'
+    +     'Next <iconify-icon icon="lucide:chevron-right"></iconify-icon>'
+    +   '</button>'
+    + '</div>';
+
+  var prevBtn = container.querySelector('[data-page-action="prev"]');
+  var nextBtn = container.querySelector('[data-page-action="next"]');
+  if (prevBtn && hasPrev) prevBtn.addEventListener('click', onPrev);
+  if (nextBtn && hasNext) nextBtn.addEventListener('click', onNext);
+}
+
+function applyTablePagination(tblId) {
+  var state = ADMIN_TABLE_PAGINATION[tblId];
+  var tbl = document.getElementById(tblId);
+  if (!state || !tbl || !tbl.tBodies || !tbl.tBodies[0]) return;
+
+  var rows = tbl.tBodies[0].rows;
+  var filteredRows = [];
+  for (var i = 0; i < rows.length; i++) {
+    if ((rows[i].dataset.filterHidden || '0') !== '1') {
+      filteredRows.push(rows[i]);
+    }
+  }
+
+  var total = filteredRows.length;
+  var totalPages = Math.max(1, Math.ceil(total / state.pageSize));
+  if (state.page > totalPages) state.page = totalPages;
+  if (state.page < 1) state.page = 1;
+
+  var start = (state.page - 1) * state.pageSize;
+  var end = start + state.pageSize;
+
+  for (var j = 0; j < rows.length; j++) {
+    rows[j].style.display = 'none';
+  }
+  for (var k = 0; k < filteredRows.length; k++) {
+    filteredRows[k].style.display = (k >= start && k < end) ? '' : 'none';
+  }
+
+  var from = total === 0 ? 0 : (start + 1);
+  var to = Math.min(end, total);
+  var info = 'Showing ' + from + '–' + to + ' of ' + total + ' · Page ' + state.page + ' / ' + totalPages;
+  var pagerEl = document.getElementById(state.pagerId);
+  renderPaginationUi(
+    pagerEl,
+    info,
+    state.page > 1,
+    state.page < totalPages,
+    function () { state.page -= 1; applyTablePagination(tblId); },
+    function () { state.page += 1; applyTablePagination(tblId); }
+  );
+}
+
+function initTablePagination(tblId, pagerId, pageSize) {
+  var tbl = document.getElementById(tblId);
+  var pager = document.getElementById(pagerId);
+  if (!tbl || !pager || !tbl.tBodies || !tbl.tBodies[0]) return;
+  var rows = tbl.tBodies[0].rows;
+  for (var i = 0; i < rows.length; i++) {
+    if (!rows[i].dataset.filterHidden) rows[i].dataset.filterHidden = '0';
+  }
+  ADMIN_TABLE_PAGINATION[tblId] = {
+    page: 1,
+    pageSize: pageSize,
+    pagerId: pagerId
+  };
+  applyTablePagination(tblId);
+}
+
 function filterTable(tblId, query, colFilter, colKey) {
   var tbl = document.getElementById(tblId);
   if (!tbl) return;
   tbl.dataset.q = query;
-  var q = query.toLowerCase();
+  var q = (query || '').toLowerCase();
   var rows = tbl.tBodies[0].rows;
   for (var i = 0; i < rows.length; i++) {
     var text = rows[i].innerText.toLowerCase();
@@ -2581,9 +2672,22 @@ function filterTable(tblId, query, colFilter, colKey) {
     if (visible && colFilter) {
       visible = !colFilter || text.includes(colFilter.toLowerCase());
     }
-    rows[i].style.display = visible ? '' : 'none';
+    rows[i].dataset.filterHidden = visible ? '0' : '1';
+    if (!ADMIN_TABLE_PAGINATION[tblId]) {
+      rows[i].style.display = visible ? '' : 'none';
+    }
+  }
+  if (ADMIN_TABLE_PAGINATION[tblId]) {
+    ADMIN_TABLE_PAGINATION[tblId].page = 1;
+    applyTablePagination(tblId);
   }
 }
+
+initTablePagination('auditTbl', 'auditPagination', 25);
+initTablePagination('lhTbl', 'loginPagination', 25);
+initTablePagination('usersTbl', 'usersPagination', 25);
+initTablePagination('ticketsTbl', 'ticketsPagination', 25);
+initTablePagination('analyticsPaymentsTbl', 'analyticsPaymentsPagination', 20);
 
 // ── Admin Live Chat ────────────────────────────────────────────────────────
 (function () {
@@ -2594,6 +2698,8 @@ function filterTable(tblId, query, colFilter, colKey) {
   var lastMessageId    = '';
   var pollTimer        = null;
   var sessions         = [];
+  var sessionsPage     = 1;
+  var SESSIONS_PER_PAGE = 10;
   var POLL_INTERVAL    = 4000;
 
   function api(action, extra, cb) {
@@ -2638,13 +2744,33 @@ function filterTable(tblId, query, colFilter, colKey) {
   function renderSessionsList() {
     var el = document.getElementById('adminSessionsList');
     var countEl = document.getElementById('adminSessionCount');
+    var pagerEl = document.getElementById('adminSessionsPagination');
     if (countEl) countEl.textContent = '(' + sessions.length + ')';
     if (!sessions.length) {
       el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-subtle);font-size:11px">No conversations yet.</div>';
+      if (pagerEl) pagerEl.innerHTML = '';
       return;
     }
+
+    var selectedIndex = -1;
+    for (var idx = 0; idx < sessions.length; idx++) {
+      if (sessions[idx].id === currentSessionId) {
+        selectedIndex = idx;
+        break;
+      }
+    }
+    if (selectedIndex >= 0) {
+      sessionsPage = Math.floor(selectedIndex / SESSIONS_PER_PAGE) + 1;
+    }
+
+    var totalPages = Math.max(1, Math.ceil(sessions.length / SESSIONS_PER_PAGE));
+    if (sessionsPage > totalPages) sessionsPage = totalPages;
+    if (sessionsPage < 1) sessionsPage = 1;
+    var start = (sessionsPage - 1) * SESSIONS_PER_PAGE;
+    var end = start + SESSIONS_PER_PAGE;
+
     var html = '';
-    sessions.forEach(function (s) {
+    sessions.slice(start, end).forEach(function (s) {
       var active = s.id === currentSessionId ? ' active' : '';
       var statusIcon = s.status === 'closed'
         ? '<span class="badge-status-closed">Closed</span>'
@@ -2659,9 +2785,20 @@ function filterTable(tblId, query, colFilter, colKey) {
             + unreadBadge
             + '</div>'
             + '<div style="font-size:9px;color:var(--text-subtle);margin-top:1px">' + fmtDate(s.updated_at || s.created_at) + '</div>'
-            + '</div>';
+             + '</div>';
     });
     el.innerHTML = html;
+
+    var from = sessions.length ? (start + 1) : 0;
+    var to = Math.min(end, sessions.length);
+    renderPaginationUi(
+      pagerEl,
+      'Showing ' + from + '–' + to + ' of ' + sessions.length + ' · Page ' + sessionsPage + ' / ' + totalPages,
+      sessionsPage > 1,
+      sessionsPage < totalPages,
+      function () { sessionsPage -= 1; renderSessionsList(); },
+      function () { sessionsPage += 1; renderSessionsList(); }
+    );
   }
 
   function updateAdminBadge(count) {
