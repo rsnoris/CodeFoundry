@@ -167,7 +167,7 @@ function cf_active_any(array $ids): string {
       id="themeToggleIcon"
       class="theme-fab-icon-image"
       src="https://github.com/user-attachments/assets/f693f1b8-d8c2-4792-8d07-9a4b154cfcc9"
-      alt=""
+      alt="Theme toggle icon"
       loading="lazy"
       decoding="async"
     />

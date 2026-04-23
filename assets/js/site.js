@@ -214,8 +214,7 @@
     toggleBtn.addEventListener('click', function () {
       const current = document.documentElement.getAttribute('data-theme');
       const currentIndex = allowedThemes.indexOf(current);
-      const safeCurrentIndex = currentIndex === -1 ? 0 : currentIndex;
-      const nextTheme = allowedThemes[(safeCurrentIndex + 1) % allowedThemes.length];
+      const nextTheme = allowedThemes[(currentIndex + 1) % allowedThemes.length];
       applyTheme(nextTheme);
     });
   }
