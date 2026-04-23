@@ -694,15 +694,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
             'tabs' => ['docker_instances', 'architecture', 'workflows'],
         ],
     ];
-    $overview_dashboard_categories = array_merge(
-        [[
-            'title' => 'Overview',
-            'icon' => 'lucide:layout-dashboard',
-            'description' => 'High-level metrics and recent activity snapshots.',
-            'tabs' => ['overview'],
-        ]],
-        $tab_categories
-    );
+    $overview_dashboard_categories = $tab_categories;
     ?>
     <a href="/Admin/?tab=overview" class="adm-nav-item <?= $active_tab === 'overview' ? 'active' : '' ?>">
       <iconify-icon icon="<?= cf_e($tabs['overview']['icon']) ?>"></iconify-icon>
