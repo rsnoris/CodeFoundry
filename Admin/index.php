@@ -40,6 +40,9 @@ $payment_managed_keys = [
     'APPLE_PAY_DOMAIN'       => ['label' => 'Apple Pay Domain',       'hint' => 'Verified Apple Pay domain (for example: codefoundry.cloud)', 'icon' => 'lucide:globe', 'is_secret' => false],
 ];
 const ADMIN_PAYMENT_KEY_VALUE_MAX_LENGTH = 4096;
+const ADMIN_PAYMENT_SECRET_PREFIX_LENGTH = 4;
+const ADMIN_PAYMENT_SECRET_MAX_MASK_LENGTH = 20;
+const ADMIN_PAYMENT_SECRET_MIN_MASK_LENGTH = 8;
 
 // ── Handle ticket status update ───────────────────────────────────────────
 if (
@@ -1831,7 +1834,13 @@ require_once dirname(__DIR__) . '/includes/header.php';
             $display_val = '';
             if ($is_set) {
               if ($is_secret) {
-                $display_val = substr($current_val, 0, 4) . str_repeat('•', min(20, max(8, strlen($current_val) - 4)));
+                $display_val = substr($current_val, 0, ADMIN_PAYMENT_SECRET_PREFIX_LENGTH) . str_repeat(
+                  '•',
+                  min(
+                    ADMIN_PAYMENT_SECRET_MAX_MASK_LENGTH,
+                    max(ADMIN_PAYMENT_SECRET_MIN_MASK_LENGTH, strlen($current_val) - ADMIN_PAYMENT_SECRET_PREFIX_LENGTH)
+                  )
+                );
               } else {
                 $display_val = strlen($current_val) > 60 ? (substr($current_val, 0, 57) . '...') : $current_val;
               }
