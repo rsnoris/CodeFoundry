@@ -49,14 +49,23 @@ function cf_active_any(array $ids): string {
   <title><?= htmlspecialchars($page_title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></title>
   <script>
     (function () {
-      var fallbackTheme = 'dark';
-      var allowedThemes = { dark: true, light: true, ocean: true };
+      var config = {
+        storageKey: 'cf-theme',
+        defaultTheme: 'dark',
+        themes: ['dark', 'light', 'ocean']
+      };
+      window.CF_THEME_CONFIG = config;
+
+      var allowedThemes = {};
+      config.themes.forEach(function (theme) {
+        allowedThemes[theme] = true;
+      });
       try {
-        var savedTheme = localStorage.getItem('cf-theme');
-        var theme = allowedThemes[savedTheme] ? savedTheme : fallbackTheme;
+        var savedTheme = localStorage.getItem(config.storageKey);
+        var theme = allowedThemes[savedTheme] ? savedTheme : config.defaultTheme;
         document.documentElement.setAttribute('data-theme', theme);
       } catch (e) {
-        document.documentElement.setAttribute('data-theme', fallbackTheme);
+        document.documentElement.setAttribute('data-theme', config.defaultTheme);
       }
     }());
   </script>

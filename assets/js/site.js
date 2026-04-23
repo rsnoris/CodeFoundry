@@ -163,8 +163,14 @@
    * Initialise shared theme selector(s) and persistence.
    */
   function initThemeSelector() {
-    const storageKey = 'cf-theme';
-    const allowedThemes = ['dark', 'light', 'ocean'];
+    const themeConfig = window.CF_THEME_CONFIG || {};
+    const storageKey = themeConfig.storageKey || 'cf-theme';
+    const allowedThemes = Array.isArray(themeConfig.themes) && themeConfig.themes.length
+      ? themeConfig.themes
+      : ['dark', 'light', 'ocean'];
+    const defaultTheme = themeConfig.defaultTheme && allowedThemes.indexOf(themeConfig.defaultTheme) !== -1
+      ? themeConfig.defaultTheme
+      : allowedThemes[0];
     const desktopSelect = document.getElementById('themeSelect');
     const mobileSelect = document.getElementById('mobileThemeSelect');
     const selects = [desktopSelect, mobileSelect].filter(Boolean);
@@ -178,7 +184,7 @@
     }
 
     function applyTheme(theme) {
-      const nextTheme = isThemeAllowed(theme) ? theme : 'dark';
+      const nextTheme = isThemeAllowed(theme) ? theme : defaultTheme;
       document.documentElement.setAttribute('data-theme', nextTheme);
       selects.forEach(function (select) {
         if (select.value !== nextTheme) {
@@ -194,7 +200,7 @@
 
     var currentTheme = document.documentElement.getAttribute('data-theme');
     if (!isThemeAllowed(currentTheme)) {
-      currentTheme = 'dark';
+      currentTheme = defaultTheme;
     }
     applyTheme(currentTheme);
 
