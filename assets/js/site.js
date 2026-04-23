@@ -172,15 +172,14 @@
       ? themeConfig.defaultTheme
       : 'dark';
     const toggleBtn = document.getElementById('themeToggleBtn');
-    const toggleIcon = document.getElementById('themeToggleIcon');
     const toggleLabel = document.getElementById('themeToggleLabel');
     if (!toggleBtn) {
       return;
     }
     const themeMeta = {
-      dark: { label: 'Dark', icon: 'lucide:moon-star' },
-      light: { label: 'Light', icon: 'lucide:sun' },
-      ocean: { label: 'Ocean', icon: 'lucide:waves' }
+      dark: { label: 'Dark' },
+      light: { label: 'Light' },
+      ocean: { label: 'Ocean' }
     };
 
     function isThemeAllowed(theme) {
@@ -194,12 +193,9 @@
       if (!meta) {
         console.warn('[CodeFoundry] Unknown theme metadata for:', nextTheme);
       }
-      const activeMeta = meta || { label: nextTheme, icon: 'lucide:paintbrush' };
+      const activeMeta = meta || { label: nextTheme };
       if (toggleLabel) {
         toggleLabel.textContent = activeMeta.label;
-      }
-      if (toggleIcon) {
-        toggleIcon.setAttribute('icon', activeMeta.icon);
       }
       toggleBtn.setAttribute('title', 'Theme: ' + activeMeta.label);
       try {
