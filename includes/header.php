@@ -47,6 +47,19 @@ function cf_active_any(array $ids): string {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?= htmlspecialchars($page_title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></title>
+  <script>
+    (function () {
+      var fallbackTheme = 'dark';
+      var allowedThemes = { dark: true, light: true, ocean: true };
+      try {
+        var savedTheme = localStorage.getItem('cf-theme');
+        var theme = allowedThemes[savedTheme] ? savedTheme : fallbackTheme;
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', fallbackTheme);
+      }
+    }());
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/site.css" />
 <?php if ($page_styles !== ''): ?>
@@ -84,6 +97,14 @@ function cf_active_any(array $ids): string {
 
     </nav>
     <div class="nav-actions">
+      <div class="theme-switcher">
+        <label for="themeSelect" class="theme-switcher-label">Theme</label>
+        <select id="themeSelect" class="theme-switcher-select" aria-label="Select theme">
+          <option value="dark">Dark</option>
+          <option value="light">Light</option>
+          <option value="ocean">Ocean</option>
+        </select>
+      </div>
       <?php if ($_cf_user): ?>
         <div class="nav-user-menu" id="navUserMenu">
           <button class="nav-user-btn" id="navUserBtn" aria-haspopup="true" aria-expanded="false" aria-label="User menu">
@@ -146,6 +167,14 @@ function cf_active_any(array $ids): string {
 
       </div>
       <div class="mobile-menu-actions">
+        <div class="theme-switcher mobile-theme-switcher">
+          <label for="mobileThemeSelect" class="theme-switcher-label">Theme</label>
+          <select id="mobileThemeSelect" class="theme-switcher-select" aria-label="Select theme">
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+            <option value="ocean">Ocean</option>
+          </select>
+        </div>
         <?php if ($_cf_user): ?>
           <div class="mobile-user-info">
             <iconify-icon icon="lucide:user-circle-2"></iconify-icon>
