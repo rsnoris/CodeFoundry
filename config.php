@@ -315,8 +315,16 @@ define('CF_PAYPAL_MODE',          cf_load_key('PAYPAL_MODE', 'sandbox'));
  * Store keys in Cf-Config-keys/GITHUB_CLIENT_ID and Cf-Config-keys/GITHUB_CLIENT_SECRET,
  * or set them as environment variables.
  */
-define('CF_OAUTH_GITHUB_CLIENT_ID',     cf_load_key('GITHUB_CLIENT_ID'));
-define('CF_OAUTH_GITHUB_CLIENT_SECRET', cf_load_key('GITHUB_CLIENT_SECRET'));
+$cf_load_oauth_value = static function (string $primary_key, string $legacy_key): string {
+    $value = cf_load_key($primary_key);
+    if ($value === '') {
+        $value = cf_load_key($legacy_key);
+    }
+    return $value;
+};
+
+define('CF_OAUTH_GITHUB_CLIENT_ID', $cf_load_oauth_value('GITHUB_CLIENT_ID', 'CF_OAUTH_GITHUB_CLIENT_ID'));
+define('CF_OAUTH_GITHUB_CLIENT_SECRET', $cf_load_oauth_value('GITHUB_CLIENT_SECRET', 'CF_OAUTH_GITHUB_CLIENT_SECRET'));
 
 /**
  * Google OAuth app credentials.
@@ -325,8 +333,8 @@ define('CF_OAUTH_GITHUB_CLIENT_SECRET', cf_load_key('GITHUB_CLIENT_SECRET'));
  * Store keys in Cf-Config-keys/GOOGLE_CLIENT_ID and Cf-Config-keys/GOOGLE_CLIENT_SECRET,
  * or set them as environment variables.
  */
-define('CF_OAUTH_GOOGLE_CLIENT_ID',     cf_load_key('GOOGLE_CLIENT_ID'));
-define('CF_OAUTH_GOOGLE_CLIENT_SECRET', cf_load_key('GOOGLE_CLIENT_SECRET'));
+define('CF_OAUTH_GOOGLE_CLIENT_ID', $cf_load_oauth_value('GOOGLE_CLIENT_ID', 'CF_OAUTH_GOOGLE_CLIENT_ID'));
+define('CF_OAUTH_GOOGLE_CLIENT_SECRET', $cf_load_oauth_value('GOOGLE_CLIENT_SECRET', 'CF_OAUTH_GOOGLE_CLIENT_SECRET'));
 
 /**
  * LinkedIn OAuth 2.0 / OpenID Connect credentials.
@@ -336,8 +344,8 @@ define('CF_OAUTH_GOOGLE_CLIENT_SECRET', cf_load_key('GOOGLE_CLIENT_SECRET'));
  * Store keys in Cf-Config-keys/LINKEDIN_CLIENT_ID and Cf-Config-keys/LINKEDIN_CLIENT_SECRET,
  * or set them as environment variables.
  */
-define('CF_OAUTH_LINKEDIN_CLIENT_ID',     cf_load_key('LINKEDIN_CLIENT_ID'));
-define('CF_OAUTH_LINKEDIN_CLIENT_SECRET', cf_load_key('LINKEDIN_CLIENT_SECRET'));
+define('CF_OAUTH_LINKEDIN_CLIENT_ID', $cf_load_oauth_value('LINKEDIN_CLIENT_ID', 'CF_OAUTH_LINKEDIN_CLIENT_ID'));
+define('CF_OAUTH_LINKEDIN_CLIENT_SECRET', $cf_load_oauth_value('LINKEDIN_CLIENT_SECRET', 'CF_OAUTH_LINKEDIN_CLIENT_SECRET'));
 
 /**
  * Social auth runtime controls (managed from Admin → Social Auth).
