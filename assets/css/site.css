@@ -31,6 +31,7 @@ html[data-theme="dark"] {
   --footer-title:  #ffffff;
   --footer-legal:  #6e7b97;
   --fab-shadow:    0 10px 30px rgba(0, 0, 0, .28);
+  --z-theme-fab:   2500;
 }
 
 html[data-theme="light"] {
@@ -264,7 +265,7 @@ html[data-theme] .nav-user-dropdown-item:hover {
   position: fixed;
   right: 18px;
   bottom: 18px;
-  z-index: 2500;
+  z-index: var(--z-theme-fab);
   display: inline-flex;
   align-items: center;
   gap: 8px;

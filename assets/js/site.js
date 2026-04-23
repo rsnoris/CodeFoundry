@@ -191,7 +191,7 @@
       const nextTheme = isThemeAllowed(theme) ? theme : defaultTheme;
       document.documentElement.setAttribute('data-theme', nextTheme);
       const meta = themeMeta[nextTheme];
-      if (!meta && typeof console !== 'undefined' && typeof console.warn === 'function') {
+      if (!meta) {
         console.warn('[CodeFoundry] Unknown theme metadata for:', nextTheme);
       }
       const activeMeta = meta || { label: nextTheme, icon: 'lucide:paintbrush' };
