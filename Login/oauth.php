@@ -27,7 +27,7 @@ $safe_redirect = (
     is_string($raw_redirect) &&
     preg_match('#^/[^/\\\\]#', $raw_redirect) &&
     strpos($raw_redirect, '..') === false
-) ? $raw_redirect : '/Generate/';
+) ? $raw_redirect : CF_SOCIAL_AUTH_LANDING_PATH;
 
 // Generate and store an opaque state token (CSRF protection for OAuth)
 $state = bin2hex(random_bytes(24));
@@ -46,7 +46,7 @@ if ($provider === 'github') {
         'redirect_uri' => (isset($_SERVER['HTTPS']) ? 'https' : 'http')
             . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')
             . '/Login/oauth_callback.php',
-        'scope' => 'read:user user:email',
+        'scope' => CF_SOCIAL_AUTH_GITHUB_SCOPE,
         'state' => $state,
     ]);
     header('Location: https://github.com/login/oauth/authorize?' . $params);
@@ -65,7 +65,7 @@ if ($provider === 'google') {
             . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')
             . '/Login/oauth_callback.php',
         'response_type' => 'code',
-        'scope'         => 'openid email profile',
+        'scope'         => CF_SOCIAL_AUTH_GOOGLE_SCOPE,
         'state'         => $state,
         'access_type'   => 'online',
     ]);
@@ -85,7 +85,7 @@ if ($provider === 'linkedin') {
         'redirect_uri'  => (isset($_SERVER['HTTPS']) ? 'https' : 'http')
             . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')
             . '/Login/oauth_callback.php',
-        'scope'         => 'openid profile email',
+        'scope'         => CF_SOCIAL_AUTH_LINKEDIN_SCOPE,
         'state'         => $state,
     ]);
     header('Location: https://www.linkedin.com/oauth/v2/authorization?' . $params);

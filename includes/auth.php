@@ -21,6 +21,32 @@ function cf_require_login(): void
         header('Location: /Login/?redirect=' . $redirect);
         exit;
     }
+
+    $loginAt = (int)($_SESSION['cf_login_at'] ?? 0);
+    if ($loginAt <= 0) {
+        $_SESSION['cf_login_at'] = time();
+        return;
+    }
+
+    if (CF_SOCIAL_AUTH_SESSION_LIMIT_SECONDS > 0 && (time() - $loginAt) > CF_SOCIAL_AUTH_SESSION_LIMIT_SECONDS) {
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params['path'],
+                $params['domain'],
+                $params['secure'],
+                $params['httponly']
+            );
+        }
+        session_destroy();
+        $redirect = urlencode($_SERVER['REQUEST_URI'] ?? '/');
+        header('Location: /Login/?expired=1&redirect=' . $redirect);
+        exit;
+    }
 }
 
 /**
