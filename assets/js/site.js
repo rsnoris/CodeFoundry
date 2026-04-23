@@ -193,7 +193,7 @@
       if (!meta) {
         console.warn('[CodeFoundry] Unknown theme metadata for:', nextTheme);
       }
-      const activeMeta = meta || themeMeta.dark || { label: nextTheme };
+      const activeMeta = meta || { label: nextTheme };
       if (toggleLabel) {
         toggleLabel.textContent = activeMeta.label;
       }
