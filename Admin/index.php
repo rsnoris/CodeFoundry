@@ -694,7 +694,6 @@ require_once dirname(__DIR__) . '/includes/header.php';
             'tabs' => ['docker_instances', 'architecture', 'workflows'],
         ],
     ];
-    $overview_dashboard_categories = $tab_categories;
     ?>
     <a href="/Admin/?tab=overview" class="adm-nav-item <?= $active_tab === 'overview' ? 'active' : '' ?>">
       <iconify-icon icon="<?= cf_e($tabs['overview']['icon']) ?>"></iconify-icon>
@@ -783,7 +782,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
       </div>
       <div class="adm-section-body">
         <div class="overview-categories-grid">
-          <?php foreach ($overview_dashboard_categories as $category): ?>
+          <?php foreach ($tab_categories as $category): ?>
           <div class="overview-category-card">
             <div class="overview-category-head">
               <iconify-icon icon="<?= cf_e($category['icon']) ?>"></iconify-icon>
