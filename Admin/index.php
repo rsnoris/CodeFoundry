@@ -30,6 +30,17 @@ if (($_admin_session['role'] ?? '') !== 'admin') {
     exit;
 }
 
+$payment_managed_keys = [
+    'STRIPE_PUBLISHABLE_KEY' => ['label' => 'Stripe Publishable Key', 'hint' => 'Used by Checkout UI for Stripe and Apple Pay', 'icon' => 'lucide:credit-card', 'is_secret' => false],
+    'STRIPE_SECRET_KEY'      => ['label' => 'Stripe Secret Key',      'hint' => 'Server-side key for creating/verifying Stripe payments', 'icon' => 'lucide:lock-keyhole', 'is_secret' => true],
+    'PAYPAL_CLIENT_ID'       => ['label' => 'PayPal Client ID',       'hint' => 'PayPal SDK client identifier', 'icon' => 'lucide:wallet', 'is_secret' => false],
+    'PAYPAL_CLIENT_SECRET'   => ['label' => 'PayPal Client Secret',   'hint' => 'Server-side PayPal REST API secret', 'icon' => 'lucide:shield', 'is_secret' => true],
+    'PAYPAL_MODE'            => ['label' => 'PayPal Mode',            'hint' => 'Allowed values: sandbox or live', 'icon' => 'lucide:toggle-left', 'is_secret' => false],
+    'APPLE_PAY_MERCHANT_ID'  => ['label' => 'Apple Pay Merchant ID',  'hint' => 'Merchant identifier used for Apple Pay setup', 'icon' => 'lucide:smartphone', 'is_secret' => false],
+    'APPLE_PAY_DOMAIN'       => ['label' => 'Apple Pay Domain',       'hint' => 'Verified Apple Pay domain (for example: codefoundry.cloud)', 'icon' => 'lucide:globe', 'is_secret' => false],
+];
+const ADMIN_PAYMENT_KEY_VALUE_MAX_LENGTH = 4096;
+
 // ── Handle ticket status update ───────────────────────────────────────────
 if (
     $_SERVER['REQUEST_METHOD'] === 'POST' &&
@@ -149,6 +160,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 AuditStore::log('admin.api_key_cleared', $admin_user['username'], ['key' => $key_name]);
             }
             header('Location: /Admin/?tab=api_keys&cleared=' . urlencode($key_name));
+            exit;
+        }
+
+        if ($action === 'save_payment_api_key') {
+            $key_name       = trim((string)($_POST['key_name'] ?? ''));
+            $key_value      = trim((string)($_POST['key_value'] ?? ''));
+            $admin_password = (string)($_POST['admin_password'] ?? '');
+            $redirect_base  = '/Admin/?tab=payment_api_keys';
+
+            if (!isset($payment_managed_keys[$key_name])) {
+                header('Location: ' . $redirect_base . '&error=invalid_key');
+                exit;
+            }
+            if ($key_value === '') {
+                header('Location: ' . $redirect_base . '&error=empty_value&key=' . urlencode($key_name));
+                exit;
+            }
+            if (strlen($key_value) > ADMIN_PAYMENT_KEY_VALUE_MAX_LENGTH) {
+                header('Location: ' . $redirect_base . '&error=value_too_long&key=' . urlencode($key_name));
+                exit;
+            }
+            if ($key_name === 'PAYPAL_MODE' && !in_array(strtolower($key_value), ['sandbox', 'live'], true)) {
+                header('Location: ' . $redirect_base . '&error=invalid_paypal_mode&key=' . urlencode($key_name));
+                exit;
+            }
+
+            $had_existing = cf_load_key($key_name) !== '';
+            if ($had_existing) {
+                if ($admin_password === '') {
+                    header('Location: ' . $redirect_base . '&error=reauth_required&key=' . urlencode($key_name));
+                    exit;
+                }
+                $admin_record = UserStore::findUser((string)($admin_user['username'] ?? ''));
+                $password_hash = (string)($admin_record['password_hash'] ?? '');
+                if ($password_hash === '' || !password_verify($admin_password, $password_hash)) {
+                    AuditStore::log('admin.payment_api_key_reauth_failed', $admin_user['username'], ['key' => $key_name, 'action' => 'save']);
+                    header('Location: ' . $redirect_base . '&error=reauth_failed&key=' . urlencode($key_name));
+                    exit;
+                }
+            }
+
+            cf_save_key($key_name, $key_value);
+            AuditStore::log('admin.payment_api_key_saved', $admin_user['username'], [
+                'key'    => $key_name,
+                'action' => $had_existing ? 'rotated' : 'saved',
+            ]);
+            header('Location: ' . $redirect_base . '&saved=' . urlencode($key_name) . '&mode=' . ($had_existing ? 'rotated' : 'saved'));
+            exit;
+        }
+
+        if ($action === 'delete_payment_api_key') {
+            $key_name       = trim((string)($_POST['key_name'] ?? ''));
+            $admin_password = (string)($_POST['admin_password'] ?? '');
+            $redirect_base  = '/Admin/?tab=payment_api_keys';
+
+            if (!isset($payment_managed_keys[$key_name])) {
+                header('Location: ' . $redirect_base . '&error=invalid_key');
+                exit;
+            }
+            if ($admin_password === '') {
+                header('Location: ' . $redirect_base . '&error=reauth_required&key=' . urlencode($key_name));
+                exit;
+            }
+
+            $admin_record = UserStore::findUser((string)($admin_user['username'] ?? ''));
+            $password_hash = (string)($admin_record['password_hash'] ?? '');
+            if ($password_hash === '' || !password_verify($admin_password, $password_hash)) {
+                AuditStore::log('admin.payment_api_key_reauth_failed', $admin_user['username'], ['key' => $key_name, 'action' => 'delete']);
+                header('Location: ' . $redirect_base . '&error=reauth_failed&key=' . urlencode($key_name));
+                exit;
+            }
+
+            cf_save_key($key_name, '');
+            AuditStore::log('admin.payment_api_key_deleted', $admin_user['username'], ['key' => $key_name]);
+            header('Location: ' . $redirect_base . '&deleted=' . urlencode($key_name));
             exit;
         }
     }
@@ -393,6 +479,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
         'live_chat'      => ['icon' => 'lucide:message-circle',    'label' => 'Live Chat'],
         'analytics'      => ['icon' => 'lucide:bar-chart-2',       'label' => 'Analytics'],
         'api_keys'         => ['icon' => 'lucide:key-round',         'label' => 'API Keys'],
+        'payment_api_keys' => ['icon' => 'lucide:credit-card',       'label' => 'Payment API Keys'],
         'docker_instances' => ['icon' => 'lucide:container',        'label' => 'Docker'],
         'architecture'     => ['icon' => 'lucide:layout',            'label' => 'Architecture'],
         'workflows'        => ['icon' => 'lucide:git-pull-request',  'label' => 'Workflows'],
@@ -1673,6 +1760,170 @@ require_once dirname(__DIR__) . '/includes/header.php';
           <li><strong>Clear</strong> removes the stored file value; the system then falls back to environment variables (<code>getenv()</code>).</li>
           <li>Keys are stored as plain-text files in <code><?= cf_e(CF_KEYS_DIR) ?>/</code>, which is outside the webroot and never returned over HTTP.</li>
           <li>All save and clear actions are recorded in the Audit Trail with the admin's username.</li>
+        </ol>
+      </div>
+    </div>
+
+    <?php elseif ($active_tab === 'payment_api_keys'): ?>
+    <!-- ═══ PAYMENT API KEYS ════════════════════════════════════════════════ -->
+    <?php
+      $saved_payment_key   = trim((string)($_GET['saved'] ?? ''));
+      $deleted_payment_key = trim((string)($_GET['deleted'] ?? ''));
+      $payment_error       = trim((string)($_GET['error'] ?? ''));
+      $payment_error_key   = trim((string)($_GET['key'] ?? ''));
+      $payment_mode        = trim((string)($_GET['mode'] ?? ''));
+
+      $payment_error_messages = [
+        'invalid_key'         => 'Unsupported payment API key.',
+        'empty_value'         => 'Key value cannot be empty. Use Delete Key to remove a stored key.',
+        'value_too_long'      => 'Key value is too long.',
+        'reauth_required'     => 'Re-authentication required. Enter your admin password to continue.',
+        'reauth_failed'       => 'Re-authentication failed. Please verify your admin password and try again.',
+        'invalid_paypal_mode' => 'PayPal Mode must be either "sandbox" or "live".',
+      ];
+      $payment_key_label = $payment_error_key !== '' && isset($payment_managed_keys[$payment_error_key])
+        ? $payment_managed_keys[$payment_error_key]['label']
+        : $payment_error_key;
+    ?>
+    <div class="adm-header">
+      <h1><iconify-icon icon="lucide:credit-card" style="vertical-align:middle;margin-right:8px"></iconify-icon>Payment API Keys</h1>
+      <p>Enter, save, update, rotate, and delete payment integration keys. Updates/rotations/deletions require admin re-authentication.</p>
+    </div>
+
+    <?php if ($saved_payment_key !== ''):
+      $saved_label = $payment_managed_keys[$saved_payment_key]['label'] ?? $saved_payment_key;
+      $saved_action = $payment_mode === 'rotated' ? 'rotated' : 'saved';
+    ?>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;padding:12px 16px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:13px;color:#4ade80">
+        <iconify-icon icon="lucide:check-circle"></iconify-icon>
+        <strong><?= cf_e($saved_label) ?></strong> <?= cf_e($saved_action) ?> successfully.
+      </div>
+    <?php elseif ($deleted_payment_key !== ''):
+      $deleted_label = $payment_managed_keys[$deleted_payment_key]['label'] ?? $deleted_payment_key;
+    ?>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;padding:12px 16px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:8px;font-size:13px;color:#fbbf24">
+        <iconify-icon icon="lucide:info"></iconify-icon>
+        <strong><?= cf_e($deleted_label) ?></strong> deleted successfully.
+      </div>
+    <?php elseif ($payment_error !== '' && isset($payment_error_messages[$payment_error])): ?>
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:18px;padding:12px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:8px;font-size:13px;color:#f87171">
+        <iconify-icon icon="lucide:alert-triangle"></iconify-icon>
+        <div>
+          <?= cf_e($payment_error_messages[$payment_error]) ?>
+          <?php if ($payment_key_label !== ''): ?>
+            <div style="font-size:11px;color:#fca5a5;margin-top:3px">Key: <?= cf_e($payment_key_label) ?></div>
+          <?php endif; ?>
+        </div>
+      </div>
+    <?php endif; ?>
+
+    <div class="adm-section">
+      <div class="adm-section-header">
+        <h2><iconify-icon icon="lucide:wallet-cards" style="vertical-align:middle;margin-right:6px"></iconify-icon>Payment Provider Keys</h2>
+        <span style="font-size:11px;color:var(--text-subtle)">Stored in <code><?= cf_e(CF_KEYS_DIR) ?></code></span>
+      </div>
+      <div class="adm-section-body">
+        <div class="key-grid">
+          <?php foreach ($payment_managed_keys as $key_name => $key_meta):
+            $current_val = cf_load_key($key_name);
+            $is_set      = $current_val !== '';
+            $is_secret   = !empty($key_meta['is_secret']);
+            $display_val = '';
+            if ($is_set) {
+              if ($is_secret) {
+                $display_val = substr($current_val, 0, 4) . str_repeat('•', min(20, max(8, strlen($current_val) - 4)));
+              } else {
+                $display_val = strlen($current_val) > 60 ? (substr($current_val, 0, 57) . '...') : $current_val;
+              }
+            }
+            $save_btn_label = $is_set ? ($is_secret ? 'Rotate Key' : 'Update Value') : 'Save Key';
+          ?>
+          <div class="key-card">
+            <div class="key-card-header">
+              <div class="key-card-icon"><iconify-icon icon="<?= cf_e($key_meta['icon']) ?>"></iconify-icon></div>
+              <div>
+                <div class="key-card-title"><?= cf_e($key_meta['label']) ?></div>
+                <div class="key-card-hint"><?= cf_e($key_meta['hint']) ?></div>
+              </div>
+            </div>
+
+            <div>
+              <?php if ($is_set): ?>
+                <span class="key-status-set"><iconify-icon icon="lucide:check-circle-2"></iconify-icon> Key set</span>
+                <div class="key-masked"><?= cf_e($display_val) ?></div>
+              <?php else: ?>
+                <span class="key-status-unset"><iconify-icon icon="lucide:circle-dashed"></iconify-icon> Not configured</span>
+              <?php endif; ?>
+            </div>
+
+            <form method="POST" action="/Admin/?tab=payment_api_keys" autocomplete="off">
+              <input type="hidden" name="csrf_token" value="<?= cf_e($csrf) ?>">
+              <input type="hidden" name="action" value="save_payment_api_key">
+              <input type="hidden" name="key_name" value="<?= cf_e($key_name) ?>">
+              <div class="key-input-row">
+                <input
+                  type="<?= $is_secret ? 'password' : 'text' ?>"
+                  name="key_value"
+                  class="key-input"
+                  placeholder="<?= $is_set ? 'Enter replacement value…' : 'Enter value…' ?>"
+                  autocomplete="new-password"
+                  maxlength="<?= (string)ADMIN_PAYMENT_KEY_VALUE_MAX_LENGTH ?>"
+                  required
+                >
+              </div>
+              <div class="key-input-row">
+                <input
+                  type="password"
+                  name="admin_password"
+                  class="key-input"
+                  placeholder="<?= $is_set ? 'Admin password (required to update/rotate)' : 'Admin password (required once key is set)' ?>"
+                  autocomplete="current-password"
+                  <?= $is_set ? 'required' : '' ?>
+                >
+              </div>
+              <div class="key-actions" style="margin-top:8px">
+                <button type="submit" class="btn-key-save">
+                  <iconify-icon icon="lucide:save"></iconify-icon>
+                  <?= cf_e($save_btn_label) ?>
+                </button>
+              </div>
+            </form>
+
+            <?php if ($is_set): ?>
+              <form method="POST" action="/Admin/?tab=payment_api_keys" autocomplete="off">
+                <input type="hidden" name="csrf_token" value="<?= cf_e($csrf) ?>">
+                <input type="hidden" name="action" value="delete_payment_api_key">
+                <input type="hidden" name="key_name" value="<?= cf_e($key_name) ?>">
+                <div class="key-input-row">
+                  <input
+                    type="password"
+                    name="admin_password"
+                    class="key-input"
+                    placeholder="Admin password (required to delete)"
+                    autocomplete="current-password"
+                    required
+                  >
+                </div>
+                <button type="submit" class="btn-key-clear"
+                  data-confirm="Delete <?= cf_e($key_meta['label']) ?>?">
+                  <iconify-icon icon="lucide:trash-2"></iconify-icon> Delete Key
+                </button>
+              </form>
+            <?php endif; ?>
+          </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="adm-section">
+      <div class="adm-section-header"><h2><iconify-icon icon="lucide:shield-check" style="vertical-align:middle;margin-right:6px"></iconify-icon>Re-authentication Policy</h2></div>
+      <div class="adm-section-body" style="font-size:13px;color:var(--text-muted);line-height:1.7">
+        <ol style="margin:0;padding-left:20px">
+          <li>Initial key save is allowed without re-authentication when no value exists yet.</li>
+          <li>Updating or rotating an existing payment key requires the admin's current password.</li>
+          <li>Deleting any existing payment key requires the admin's current password.</li>
+          <li>All save/rotate/delete actions are written to the Audit Trail.</li>
         </ol>
       </div>
     </div>
