@@ -43,6 +43,8 @@ const ADMIN_PAYMENT_KEY_VALUE_MAX_LENGTH = 4096;
 const ADMIN_PAYMENT_SECRET_PREFIX_LENGTH = 4;
 const ADMIN_PAYMENT_SECRET_MAX_MASK_LENGTH = 20;
 const ADMIN_PAYMENT_SECRET_MIN_MASK_LENGTH = 8;
+const ADMIN_PAYMENT_VISIBLE_VALUE_MAX_LENGTH = 60;
+const ADMIN_PAYMENT_VISIBLE_VALUE_TRUNCATE_LENGTH = 57;
 
 // ── Handle ticket status update ───────────────────────────────────────────
 if (
@@ -187,6 +189,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if ($key_name === 'PAYPAL_MODE' && !in_array(strtolower($key_value), ['sandbox', 'live'], true)) {
                 header('Location: ' . $redirect_base . '&error=invalid_paypal_mode&key=' . urlencode($key_name));
                 exit;
+            }
+            if ($key_name === 'PAYPAL_MODE') {
+                $key_value = strtolower($key_value);
             }
 
             $had_existing = cf_load_key($key_name) !== '';
@@ -1834,15 +1839,22 @@ require_once dirname(__DIR__) . '/includes/header.php';
             $display_val = '';
             if ($is_set) {
               if ($is_secret) {
-                $display_val = substr($current_val, 0, ADMIN_PAYMENT_SECRET_PREFIX_LENGTH) . str_repeat(
-                  '•',
-                  min(
-                    ADMIN_PAYMENT_SECRET_MAX_MASK_LENGTH,
-                    max(ADMIN_PAYMENT_SECRET_MIN_MASK_LENGTH, strlen($current_val) - ADMIN_PAYMENT_SECRET_PREFIX_LENGTH)
-                  )
-                );
+                $current_len = strlen($current_val);
+                if ($current_len <= ADMIN_PAYMENT_SECRET_PREFIX_LENGTH) {
+                  $display_val = str_repeat('•', max(ADMIN_PAYMENT_SECRET_MIN_MASK_LENGTH, $current_len));
+                } else {
+                  $display_val = substr($current_val, 0, ADMIN_PAYMENT_SECRET_PREFIX_LENGTH) . str_repeat(
+                    '•',
+                    min(
+                      ADMIN_PAYMENT_SECRET_MAX_MASK_LENGTH,
+                      max(ADMIN_PAYMENT_SECRET_MIN_MASK_LENGTH, $current_len - ADMIN_PAYMENT_SECRET_PREFIX_LENGTH)
+                    )
+                  );
+                }
               } else {
-                $display_val = strlen($current_val) > 60 ? (substr($current_val, 0, 57) . '...') : $current_val;
+                $display_val = strlen($current_val) > ADMIN_PAYMENT_VISIBLE_VALUE_MAX_LENGTH
+                  ? (substr($current_val, 0, ADMIN_PAYMENT_VISIBLE_VALUE_TRUNCATE_LENGTH) . '...')
+                  : $current_val;
               }
             }
             $save_btn_label = $is_set ? ($is_secret ? 'Rotate Key' : 'Update Value') : 'Save Key';
