@@ -201,7 +201,6 @@
       if (toggleIcon) {
         toggleIcon.setAttribute('icon', activeMeta.icon);
       }
-      toggleBtn.setAttribute('aria-label', 'Switch theme (current: ' + activeMeta.label + ')');
       toggleBtn.setAttribute('title', 'Theme: ' + activeMeta.label);
       try {
         localStorage.setItem(storageKey, nextTheme);

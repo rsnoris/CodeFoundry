@@ -31,7 +31,7 @@ html[data-theme="dark"] {
   --footer-title:  #ffffff;
   --footer-legal:  #6e7b97;
   --fab-shadow:    0 10px 30px rgba(0, 0, 0, .28);
-  --z-theme-fab:   2500;
+  --z-theme-fab:   1200;
 }
 
 html[data-theme="light"] {
@@ -300,37 +300,6 @@ html[data-theme] .nav-user-dropdown-item:hover {
 
 .theme-fab-label {
   line-height: 1;
-}
-
-.theme-switcher {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.theme-switcher-label {
-  color: var(--text-subtle);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-}
-
-.theme-switcher-select {
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  border: 1px solid var(--border-color);
-  border-radius: var(--button-radius);
-  padding: 7px 10px;
-  background: var(--navy-3);
-  color: var(--text);
-  min-width: 94px;
-}
-
-.theme-switcher-select:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 1px;
 }
 
 .nav-btn {
@@ -706,22 +675,6 @@ html[data-theme] .mobile-nav-panel {
   font-size: 15px;
   padding: 8px 4px;
   color: var(--text-muted);
-}
-
-.mobile-theme-switcher {
-  width: 100%;
-  padding: 6px 4px 10px;
-}
-
-.mobile-theme-switcher .theme-switcher-label {
-  display: block;
-  margin-bottom: 6px;
-}
-
-.mobile-theme-switcher .theme-switcher-select {
-  width: 100%;
-  padding: 10px 12px;
-  font-size: 15px;
 }
 
 /* =========================================================================
