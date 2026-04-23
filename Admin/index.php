@@ -2583,10 +2583,19 @@ document.addEventListener('click', function(e) {
 // Table client-side filtering
 var ADMIN_TABLE_PAGINATION = {};
 
+function escapeHtmlText(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function renderPaginationUi(container, label, hasPrev, hasNext, onPrev, onNext) {
   if (!container) return;
   container.innerHTML = ''
-    + '<span class="adm-pagination-info">' + label + '</span>'
+    + '<span class="adm-pagination-info">' + escapeHtmlText(label) + '</span>'
     + '<div class="adm-pagination-controls">'
     +   '<button type="button" class="adm-pagination-btn" ' + (hasPrev ? '' : 'disabled') + ' data-page-action="prev">'
     +     '<iconify-icon icon="lucide:chevron-left"></iconify-icon> Prev'
@@ -2632,7 +2641,7 @@ function applyTablePagination(tblId) {
 
   var from = total === 0 ? 0 : (start + 1);
   var to = Math.min(end, total);
-  var info = 'Showing ' + from + '–' + to + ' of ' + total + ' · Page ' + state.page + ' / ' + totalPages;
+  var info = 'Showing ' + from + '-' + to + ' of ' + total + ' · Page ' + state.page + ' / ' + totalPages;
   var pagerEl = document.getElementById(state.pagerId);
   renderPaginationUi(
     pagerEl,
@@ -2662,9 +2671,10 @@ function initTablePagination(tblId, pagerId, pageSize) {
 
 function filterTable(tblId, query, colFilter, colKey) {
   var tbl = document.getElementById(tblId);
-  if (!tbl) return;
-  tbl.dataset.q = query;
-  var q = (query || '').toLowerCase();
+  if (!tbl || !tbl.tBodies || !tbl.tBodies[0]) return;
+  var querySafe = String(query || '');
+  tbl.dataset.q = querySafe;
+  var q = querySafe.toLowerCase();
   var rows = tbl.tBodies[0].rows;
   for (var i = 0; i < rows.length; i++) {
     var text = rows[i].innerText.toLowerCase();
@@ -2700,6 +2710,7 @@ initTablePagination('analyticsPaymentsTbl', 'analyticsPaymentsPagination', 20);
   var sessions         = [];
   var sessionsPage     = 1;
   var SESSIONS_PER_PAGE = 10;
+  var focusSelectedSession = true;
   var POLL_INTERVAL    = 4000;
 
   function api(action, extra, cb) {
@@ -2759,8 +2770,9 @@ initTablePagination('analyticsPaymentsTbl', 'analyticsPaymentsPagination', 20);
         break;
       }
     }
-    if (selectedIndex >= 0) {
+    if (focusSelectedSession && selectedIndex >= 0) {
       sessionsPage = Math.floor(selectedIndex / SESSIONS_PER_PAGE) + 1;
+      focusSelectedSession = false;
     }
 
     var totalPages = Math.max(1, Math.ceil(sessions.length / SESSIONS_PER_PAGE));
@@ -2785,7 +2797,7 @@ initTablePagination('analyticsPaymentsTbl', 'analyticsPaymentsPagination', 20);
             + unreadBadge
             + '</div>'
             + '<div style="font-size:9px;color:var(--text-subtle);margin-top:1px">' + fmtDate(s.updated_at || s.created_at) + '</div>'
-             + '</div>';
+            + '</div>';
     });
     el.innerHTML = html;
 
@@ -2793,7 +2805,7 @@ initTablePagination('analyticsPaymentsTbl', 'analyticsPaymentsPagination', 20);
     var to = Math.min(end, sessions.length);
     renderPaginationUi(
       pagerEl,
-      'Showing ' + from + '–' + to + ' of ' + sessions.length + ' · Page ' + sessionsPage + ' / ' + totalPages,
+      'Showing ' + from + '-' + to + ' of ' + sessions.length + ' · Page ' + sessionsPage + ' / ' + totalPages,
       sessionsPage > 1,
       sessionsPage < totalPages,
       function () { sessionsPage -= 1; renderSessionsList(); },
@@ -2815,6 +2827,7 @@ initTablePagination('analyticsPaymentsTbl', 'analyticsPaymentsPagination', 20);
   window.adminSelectSession = function (sessionId) {
     currentSessionId = sessionId;
     lastMessageId    = '';
+    focusSelectedSession = true;
     clearInterval(pollTimer);
 
     var session = null;
