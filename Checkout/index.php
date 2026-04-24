@@ -231,12 +231,11 @@ require_once CF_ROOT . '/includes/header.php';
 
       <?php if (!$stripeConfigured && !$paypalConfigured): ?>
         <div class="not-configured">
-          <iconify-icon icon="lucide:alert-triangle" style="font-size:24px;display:block;margin:0 auto 10px"></iconify-icon>
-          <strong>Payment system not configured.</strong><br>
-          Please set the <code>STRIPE_PUBLISHABLE_KEY</code>, <code>STRIPE_SECRET_KEY</code>,
-          and/or <code>PAYPAL_CLIENT_ID</code> / <code>PAYPAL_CLIENT_SECRET</code> environment
-          variables on the server.<br><br>
-          <a href="/Support/">Contact us</a> to set up your account manually.
+          <iconify-icon icon="lucide:construction" style="font-size:28px;display:block;margin:0 auto 12px"></iconify-icon>
+          <strong>Paid plans are coming soon!</strong><br>
+          We're actively working on our billing system and it will be ready in a future update.
+          In the meantime, <strong>feel free to explore everything CodeFoundry has to offer — completely free</strong>.<br><br>
+          Stay tuned for updates, or <a href="/Support/">contact us</a> if you have any questions.
         </div>
       <?php else: ?>
 
