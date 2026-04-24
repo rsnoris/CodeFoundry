@@ -1083,19 +1083,6 @@ require_once dirname(__DIR__) . '/includes/header.php';
               <option value="">Loading models…</option>
             </select>
             <div id="viralModelHelp" style="font-size:11px;color:var(--text-subtle);margin-top:6px;">Configure provider API keys in Dashboard → Account to enable all model families.</div>
-          </div>
-          <div class="agent-selection-field">
-            <label for="viralTaskCategorySelect">Task Category</label>
-            <select id="viralTaskCategorySelect" aria-label="Task category">
-              <option value="">Any category</option>
-            </select>
-          </div>
-          <div class="agent-selection-field">
-            <label for="viralTaskSelect">Task Type</label>
-            <select id="viralTaskSelect" aria-label="Task type">
-              <option value="">Any task type</option>
-            </select>
-          </div>
         </div>
       </div>
 
@@ -1426,8 +1413,7 @@ $page_scripts = <<<PAGEJS
   const modelField    = document.getElementById('viralModelField');
   const modelSelect   = document.getElementById('viralModelSelect');
   const modelHelp     = document.getElementById('viralModelHelp');
-  const taskCategorySelect = document.getElementById('viralTaskCategorySelect');
-  const taskSelect    = document.getElementById('viralTaskSelect');
+
   const examplesPanel = document.getElementById('examplesPanel');
   const exampleList   = document.getElementById('exampleList');
   const exampleCount  = document.getElementById('exampleCount');
@@ -1498,49 +1484,6 @@ $page_scripts = <<<PAGEJS
     });
   }
 
-  function populateTaskCategories() {
-    if (!taskCategorySelect || !taskSelect) return;
-    const groups = VIRAL_TASK_GROUPS || {};
-    taskCategorySelect.innerHTML = '<option value="">Any category</option>';
-    Object.keys(groups).forEach(function (cat) {
-      const opt = document.createElement('option');
-      opt.value = cat;
-      opt.textContent = cat;
-      taskCategorySelect.appendChild(opt);
-    });
-    const savedCategory = localStorage.getItem('cf_viral_task_category') || '';
-    if (savedCategory && groups[savedCategory]) {
-      taskCategorySelect.value = savedCategory;
-    }
-    populateTasksForCategory(taskCategorySelect.value);
-    const savedTask = localStorage.getItem('cf_viral_task') || '';
-    if (savedTask) {
-      const taskExists = Array.from(taskSelect.options).some(function (o) { return o.value === savedTask; });
-      if (taskExists) taskSelect.value = savedTask;
-    }
-    taskCategorySelect.addEventListener('change', function () {
-      localStorage.setItem('cf_viral_task_category', this.value || '');
-      populateTasksForCategory(this.value || '');
-      updateSettingsSummary();
-    });
-    taskSelect.addEventListener('change', function () {
-      localStorage.setItem('cf_viral_task', this.value || '');
-      updateSettingsSummary();
-    });
-  }
-
-  function populateTasksForCategory(category) {
-    if (!taskSelect) return;
-    const groups = VIRAL_TASK_GROUPS || {};
-    taskSelect.innerHTML = '<option value="">Any task type</option>';
-    const tasks = category && Array.isArray(groups[category]) ? groups[category] : [];
-    tasks.forEach(function (task) {
-      const opt = document.createElement('option');
-      opt.value = task;
-      opt.textContent = task;
-      taskSelect.appendChild(opt);
-    });
-  }
 
   function getAiSelection() {
     const val = modelSelect ? String(modelSelect.value || '') : '';
@@ -1551,15 +1494,8 @@ $page_scripts = <<<PAGEJS
       : {};
   }
 
-  function getTaskSelection() {
-    return {
-      task_category: taskCategorySelect ? String(taskCategorySelect.value || '') : '',
-      task: taskSelect ? String(taskSelect.value || '') : '',
-    };
-  }
 
   populateModelSelector();
-  populateTaskCategories();
   updateSettingsSummary();
 
   // Render suggestion chips
@@ -1605,8 +1541,7 @@ $page_scripts = <<<PAGEJS
       var selectedOpt = modelSelect.options[modelSelect.selectedIndex];
       if (selectedOpt) modelLabel = selectedOpt.textContent;
     }
-    var catVal = taskCategorySelect ? (taskCategorySelect.value || '') : '';
-    var parts = [modelLabel, catVal].filter(Boolean);
+    var parts = [modelLabel].filter(Boolean);
     settingsSummary.textContent = parts.length ? parts.join(' · ') : '';
   }
 
@@ -1822,8 +1757,7 @@ $page_scripts = <<<PAGEJS
 
     var payload = Object.assign(
       { role: ROLE, message: text, history: history.slice(0, -1) },
-      getAiSelection(),
-      getTaskSelection()
+      getAiSelection()
     );
 
     // For the UI Design Agentic Tool, pass the current design state so the
