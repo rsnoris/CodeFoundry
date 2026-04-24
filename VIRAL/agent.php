@@ -441,7 +441,7 @@ $page_styles = <<<PAGECSS
   .examples-fab {
     position: fixed;
     right: 14px;
-    bottom: 20px;
+    top: calc(var(--header-height) + 14px);
     z-index: 1210;
     width: 46px;
     height: 46px;
@@ -462,6 +462,27 @@ $page_styles = <<<PAGECSS
     border-color: var(--accent);
   }
   .examples-fab iconify-icon { font-size: 19px; }
+  .prompt-examples-panel.open ~ .examples-fab {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .examples-close-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 6px;
+    transition: background .15s, color .15s;
+    font-size: 16px;
+  }
+  .examples-close-btn:hover {
+    background: #1a2a44;
+    color: var(--text);
+  }
 
   /* ── Mobile ──────────────────────────────────────────────────────────── */
   /* ── Settings toggle + collapsible dropdowns ─────────────────────────── */
@@ -534,7 +555,7 @@ $page_styles = <<<PAGECSS
     .chat-messages   { min-height: 340px; }
     .msg             { max-width: 96%; }
     .agent-selection { grid-template-columns: 1fr; }
-    .examples-fab { width: 42px; height: 42px; right: 12px; bottom: 14px; }
+    .examples-fab { width: 42px; height: 42px; right: 12px; top: calc(var(--header-height) + 12px); }
   }
   @media (min-width: 901px) {
     .mobile-sidebar-btn { display: none !important; }
@@ -1241,6 +1262,9 @@ require_once dirname(__DIR__) . '/includes/header.php';
     <aside class="prompt-examples-panel" id="examplesPanel" aria-hidden="true">
       <div class="examples-header">
         <span class="examples-title">Prompt Examples</span>
+        <button class="examples-close-btn" id="examplesCloseBtn" type="button" aria-label="Close prompt examples">
+          <iconify-icon icon="lucide:x"></iconify-icon>
+        </button>
       </div>
       <div class="examples-search">
         <input type="text" id="exampleSearch" placeholder="Search examples…" autocomplete="off">
@@ -1409,6 +1433,7 @@ $page_scripts = <<<PAGEJS
   const exampleCount  = document.getElementById('exampleCount');
   const exampleSearch = document.getElementById('exampleSearch');
   const examplesFab = document.getElementById('examplesFab');
+  const examplesCloseBtn = document.getElementById('examplesCloseBtn');
   const settingsToggle = document.getElementById('settingsToggle');
   const agentSelection = document.getElementById('agentSelection');
   const settingsSummary = document.getElementById('settingsSummary');
@@ -1732,6 +1757,12 @@ $page_scripts = <<<PAGEJS
       var isOpen = !examplesPanel.classList.contains('open');
       setExamplesOpen(isOpen);
       if (isOpen && exampleSearch) exampleSearch.focus();
+    });
+  }
+
+  if (examplesCloseBtn && examplesPanel) {
+    examplesCloseBtn.addEventListener('click', function () {
+      setExamplesOpen(false);
     });
   }
 
