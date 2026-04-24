@@ -65,6 +65,9 @@ $page_styles = <<<PAGECSS
     --sidebar-reopen-offset: 14px;
   }
 
+  /* ── Hide footer on full-viewport chat page ─────────────────────────── */
+  .footer-section { display: none; }
+
   /* ── Layout ──────────────────────────────────────────────────────────── */
   .viral-layout {
     display: flex;
