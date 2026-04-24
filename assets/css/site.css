@@ -30,8 +30,6 @@ html[data-theme="dark"] {
   --footer-divider:#1a2942;
   --footer-title:  #ffffff;
   --footer-legal:  #6e7b97;
-  --fab-shadow:    0 10px 30px rgba(0, 0, 0, .28);
-  --z-theme-fab:   1200;
 }
 
 html[data-theme="light"] {
@@ -51,7 +49,6 @@ html[data-theme="light"] {
   --footer-divider:#d4dfed;
   --footer-title:  #0f1f35;
   --footer-legal:  #607089;
-  --fab-shadow:    0 10px 30px rgba(16, 24, 40, .16);
 }
 
 html[data-theme="ocean"] {
@@ -71,7 +68,6 @@ html[data-theme="ocean"] {
   --footer-divider:#11556b;
   --footer-title:  #eafcff;
   --footer-legal:  #73a7b2;
-  --fab-shadow:    0 10px 30px rgba(3, 35, 48, .28);
 }
 
 /* =========================================================================
@@ -259,50 +255,6 @@ html[data-theme] .nav-user-dropdown-item:hover {
   display: flex;
   align-items: center;
   gap: 16px;
-}
-
-.theme-fab {
-  position: fixed;
-  left: 18px;
-  bottom: 18px;
-  z-index: var(--z-theme-fab);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid var(--border-color);
-  border-radius: 999px;
-  padding: 10px 12px;
-  background: var(--navy);
-  color: var(--text);
-  box-shadow: var(--fab-shadow);
-  cursor: pointer;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  transition: transform .15s ease, background .2s, border-color .2s, color .2s;
-}
-
-.theme-fab:hover {
-  transform: translateY(-1px);
-  border-color: var(--primary);
-  background: var(--navy-3);
-}
-
-.theme-fab:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-.theme-fab-icon-image {
-  width: 22px;
-  height: 22px;
-  display: block;
-  object-fit: contain;
-  border-radius: 50%;
-}
-
-.theme-fab-label {
-  line-height: 1;
 }
 
 .nav-btn {
@@ -695,19 +647,5 @@ html[data-theme] .mobile-nav-panel {
 
   .mobile-hamburger {
     display: inline-flex;
-  }
-
-  .theme-fab {
-    left: 14px;
-    bottom: 14px;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    justify-content: center;
-    padding: 0;
-  }
-
-  .theme-fab-label {
-    display: none;
   }
 }

@@ -159,77 +159,15 @@
     });
   }
 
-  /**
-   * Initialise shared floating theme toggle and persistence.
-   */
-  function initThemeControls() {
-    const themeConfig = window.CF_THEME_CONFIG || {};
-    const storageKey = themeConfig.storageKey || 'cf-theme';
-    const allowedThemes = Array.isArray(themeConfig.themes) && themeConfig.themes.length
-      ? themeConfig.themes
-      : ['dark', 'light', 'ocean'];
-    const defaultTheme = themeConfig.defaultTheme && allowedThemes.indexOf(themeConfig.defaultTheme) !== -1
-      ? themeConfig.defaultTheme
-      : 'dark';
-    const toggleBtn = document.getElementById('themeToggleBtn');
-    const toggleLabel = document.getElementById('themeToggleLabel');
-    if (!toggleBtn) {
-      return;
-    }
-    const themeMeta = {
-      dark: { label: 'Dark' },
-      light: { label: 'Light' },
-      ocean: { label: 'Ocean' }
-    };
-
-    function isThemeAllowed(theme) {
-      return allowedThemes.indexOf(theme) !== -1;
-    }
-
-    function applyTheme(theme) {
-      const nextTheme = isThemeAllowed(theme) ? theme : defaultTheme;
-      document.documentElement.setAttribute('data-theme', nextTheme);
-      const meta = themeMeta[nextTheme];
-      if (!meta) {
-        console.warn('[CodeFoundry] Unknown theme metadata for:', nextTheme);
-      }
-      const activeMeta = meta || { label: nextTheme };
-      if (toggleLabel) {
-        toggleLabel.textContent = activeMeta.label;
-      }
-      toggleBtn.setAttribute('title', 'Theme: ' + activeMeta.label);
-      try {
-        localStorage.setItem(storageKey, nextTheme);
-      } catch (e) {
-        // ignore storage errors
-      }
-    }
-
-    var currentTheme = document.documentElement.getAttribute('data-theme');
-    if (!isThemeAllowed(currentTheme)) {
-      currentTheme = defaultTheme;
-    }
-    applyTheme(currentTheme);
-
-    toggleBtn.addEventListener('click', function () {
-      const current = document.documentElement.getAttribute('data-theme');
-      const currentIndex = allowedThemes.indexOf(current);
-      const nextTheme = allowedThemes[(currentIndex + 1) % allowedThemes.length];
-      applyTheme(nextTheme);
-    });
-  }
-
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       initMobileNav();
       initUserMenu();
       initNavDropdowns();
-      initThemeControls();
     });
   } else {
     initMobileNav();
     initUserMenu();
     initNavDropdowns();
-    initThemeControls();
   }
 }());
