@@ -2,6 +2,13 @@
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/config.php';
 require_once dirname(__DIR__) . '/lib/CodeGenProvider.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
+
+if (CF_IDE_VSCODE_ENABLED && CF_IDE_VSCODE_BASE_URL !== '' && (($_GET['mode'] ?? '') !== 'classic')) {
+    cf_require_login();
+    header('Location: /IDE/vscode.php');
+    exit;
+}
 
 // Build a minimal provider/model list for the client-side selector.
 $_cf_providers_js = [];

@@ -121,6 +121,52 @@ define('CF_DATA_CHAT_SESSIONS',   CF_USERS_STORAGE_DIR . '/chat_sessions.json');
 define('CF_DATA_CHAT_MESSAGES',   CF_USERS_STORAGE_DIR . '/chat_messages.json');
 
 // ---------------------------------------------------------------------------
+// IDE (Hosted VS Code foundation)
+// ---------------------------------------------------------------------------
+
+/**
+ * Enable hosted VS Code mode for /IDE/.
+ * Set IDE_VSCODE_ENABLED=1 in Cf-Config-keys or environment to activate.
+ */
+define('CF_IDE_VSCODE_ENABLED', cf_load_bool_key('IDE_VSCODE_ENABLED', false));
+
+/**
+ * Base URL for hosted VS Code (code-server/OpenVSCode Server), e.g.:
+ *   https://codefoundry.cloud/ide-host
+ */
+define('CF_IDE_VSCODE_BASE_URL', rtrim(cf_load_key('IDE_VSCODE_BASE_URL'), '/'));
+
+/**
+ * Optional static token passed to hosted VS Code as `?tkn=...`.
+ * Prefer upstream SSO/reverse-proxy auth in production.
+ */
+define('CF_IDE_VSCODE_TOKEN', cf_load_key('IDE_VSCODE_TOKEN'));
+
+/** Per-user persistent workspace root directory. */
+define('CF_IDE_WORKSPACES_DIR', CF_USERS_STORAGE_DIR . '/ide_workspaces');
+
+/**
+ * Capability registry tracked during the Monaco → hosted VS Code migration.
+ * status values: available | partial | planned
+ */
+define('CF_IDE_CAPABILITIES', [
+    ['id' => 'full_vscode_browser', 'label' => 'Full Visual Studio Code experience in browser', 'status' => 'partial'],
+    ['id' => 'extension_marketplace', 'label' => 'Complete extension marketplace support', 'status' => 'planned'],
+    ['id' => 'integrated_terminal', 'label' => 'Integrated terminal with shell access', 'status' => 'planned'],
+    ['id' => 'git_integration', 'label' => 'Git integration with version control', 'status' => 'planned'],
+    ['id' => 'multi_file_split_view', 'label' => 'Multi-file editing and split views', 'status' => 'partial'],
+    ['id' => 'intellisense', 'label' => 'IntelliSense and code completion', 'status' => 'partial'],
+    ['id' => 'debugger_multi_language', 'label' => 'Built-in debugger for multiple languages', 'status' => 'planned'],
+    ['id' => 'themes_shortcuts', 'label' => 'Customizable themes and keyboard shortcuts', 'status' => 'partial'],
+    ['id' => 'explorer_project_search', 'label' => 'File explorer and project-wide search', 'status' => 'partial'],
+    ['id' => 'collaboration_live_share', 'label' => 'Collaborative Live Share support', 'status' => 'planned'],
+    ['id' => 'ssh_key_management', 'label' => 'SSH key management for Git operations', 'status' => 'planned'],
+    ['id' => 'pwa_installation', 'label' => 'Progressive Web App installation', 'status' => 'partial'],
+    ['id' => 'password_sudo_auth', 'label' => 'Password and sudo authentication', 'status' => 'planned'],
+    ['id' => 'workspace_persistence', 'label' => 'Persistent workspace and settings', 'status' => 'available'],
+]);
+
+// ---------------------------------------------------------------------------
 // AI / CodeGen
 // ---------------------------------------------------------------------------
 
@@ -427,6 +473,16 @@ function cf_load_key(string $name, string $default = ''): string
     }
 
     return $default;
+}
+
+/**
+ * Load a boolean feature flag from key file / env.
+ * Truthy values: 1, true, yes, on (case-insensitive).
+ */
+function cf_load_bool_key(string $name, bool $default = false): bool
+{
+    $raw = trim(strtolower(cf_load_key($name, $default ? '1' : '0')));
+    return in_array($raw, ['1', 'true', 'yes', 'on'], true);
 }
 
 /**
