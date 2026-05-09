@@ -35,11 +35,18 @@ if ($user === null || empty($user['username'])) {
     exit;
 }
 
-$workspace = IdeWorkspace::ensureForUser((string)$user['username']);
-$launchUrl = IdeWorkspace::buildHostedUrl($workspace['workspace_path']);
-if ($launchUrl === '') {
+try {
+    $workspace = IdeWorkspace::ensureForUser((string)$user['username']);
+    if (!is_dir($workspace['workspace_path']) || !is_writable($workspace['workspace_path'])) {
+        throw new \RuntimeException('Workspace directory is unavailable or not writable.');
+    }
+    $launchUrl = IdeWorkspace::buildHostedUrl($workspace['workspace_path']);
+    if ($launchUrl === '') {
+        throw new \RuntimeException('Failed to build hosted IDE URL.');
+    }
+} catch (\RuntimeException $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Failed to build hosted IDE URL.']);
+    echo json_encode(['error' => $e->getMessage()]);
     exit;
 }
 

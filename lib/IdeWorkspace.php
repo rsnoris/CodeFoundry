@@ -82,16 +82,25 @@ final class IdeWorkspace
 
     private static function ensureDir(string $path): void
     {
-        if (!is_dir($path)) {
-            @mkdir($path, 0700, true);
+        if (is_dir($path)) {
+            return;
+        }
+        if (!mkdir($path, 0700, true) && !is_dir($path)) {
+            throw new \RuntimeException('Failed to create IDE workspace directory.');
         }
     }
 
     private static function writeIfMissing(string $path, string $content): void
     {
-        if (!is_file($path)) {
-            @file_put_contents($path, $content, LOCK_EX);
-            @chmod($path, 0600);
+        if (is_file($path)) {
+            return;
+        }
+        $written = file_put_contents($path, $content, LOCK_EX);
+        if ($written === false) {
+            throw new \RuntimeException('Failed to initialize IDE workspace file.');
+        }
+        if (!chmod($path, 0600)) {
+            throw new \RuntimeException('Failed to set IDE workspace file permissions.');
         }
     }
 }

@@ -150,20 +150,20 @@ define('CF_IDE_WORKSPACES_DIR', CF_USERS_STORAGE_DIR . '/ide_workspaces');
  * status values: available | partial | planned
  */
 define('CF_IDE_CAPABILITIES', [
-    ['id' => 'full_vscode_browser',      'label' => 'Full Visual Studio Code experience in browser', 'status' => 'partial'],
-    ['id' => 'extension_marketplace',    'label' => 'Complete extension marketplace support',         'status' => 'planned'],
-    ['id' => 'integrated_terminal',      'label' => 'Integrated terminal with shell access',          'status' => 'planned'],
-    ['id' => 'git_integration',          'label' => 'Git integration with version control',           'status' => 'planned'],
-    ['id' => 'multi_file_split_view',    'label' => 'Multi-file editing and split views',             'status' => 'partial'],
-    ['id' => 'intellisense',             'label' => 'IntelliSense and code completion',               'status' => 'partial'],
-    ['id' => 'debugger_multi_language',  'label' => 'Built-in debugger for multiple languages',       'status' => 'planned'],
-    ['id' => 'themes_shortcuts',         'label' => 'Customizable themes and keyboard shortcuts',     'status' => 'partial'],
-    ['id' => 'explorer_project_search',  'label' => 'File explorer and project-wide search',          'status' => 'partial'],
-    ['id' => 'collaboration_live_share', 'label' => 'Collaborative Live Share support',               'status' => 'planned'],
-    ['id' => 'ssh_key_management',       'label' => 'SSH key management for Git operations',          'status' => 'planned'],
-    ['id' => 'pwa_installation',         'label' => 'Progressive Web App installation',               'status' => 'partial'],
-    ['id' => 'password_sudo_auth',       'label' => 'Password and sudo authentication',               'status' => 'planned'],
-    ['id' => 'workspace_persistence',    'label' => 'Persistent workspace and settings',              'status' => 'available'],
+    ['id' => 'full_vscode_browser', 'label' => 'Full Visual Studio Code experience in browser', 'status' => 'partial'],
+    ['id' => 'extension_marketplace', 'label' => 'Complete extension marketplace support', 'status' => 'planned'],
+    ['id' => 'integrated_terminal', 'label' => 'Integrated terminal with shell access', 'status' => 'planned'],
+    ['id' => 'git_integration', 'label' => 'Git integration with version control', 'status' => 'planned'],
+    ['id' => 'multi_file_split_view', 'label' => 'Multi-file editing and split views', 'status' => 'partial'],
+    ['id' => 'intellisense', 'label' => 'IntelliSense and code completion', 'status' => 'partial'],
+    ['id' => 'debugger_multi_language', 'label' => 'Built-in debugger for multiple languages', 'status' => 'planned'],
+    ['id' => 'themes_shortcuts', 'label' => 'Customizable themes and keyboard shortcuts', 'status' => 'partial'],
+    ['id' => 'explorer_project_search', 'label' => 'File explorer and project-wide search', 'status' => 'partial'],
+    ['id' => 'collaboration_live_share', 'label' => 'Collaborative Live Share support', 'status' => 'planned'],
+    ['id' => 'ssh_key_management', 'label' => 'SSH key management for Git operations', 'status' => 'planned'],
+    ['id' => 'pwa_installation', 'label' => 'Progressive Web App installation', 'status' => 'partial'],
+    ['id' => 'password_sudo_auth', 'label' => 'Password and sudo authentication', 'status' => 'planned'],
+    ['id' => 'workspace_persistence', 'label' => 'Persistent workspace and settings', 'status' => 'available'],
 ]);
 
 // ---------------------------------------------------------------------------

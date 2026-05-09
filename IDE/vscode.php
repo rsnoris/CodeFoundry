@@ -101,7 +101,9 @@ require_once dirname(__DIR__) . '/includes/header.php';
 
 (function registerSw() {
   if (!('serviceWorker' in navigator)) return;
-  navigator.serviceWorker.register('/IDE/sw.js', { scope: '/IDE/' }).catch(function () {});
+  navigator.serviceWorker.register('/IDE/sw.js', { scope: '/IDE/' }).catch(function (err) {
+    console.warn('Service worker registration failed:', err);
+  });
 })();
 
 const frame = document.getElementById('vscodeFrame');
@@ -136,7 +138,11 @@ function showError(message, capabilities) {
 }
 
 fetch('/IDE/vscode-bootstrap.php', { credentials: 'same-origin' })
-  .then(function (r) { return r.json().then(function (body) { return { ok: r.ok, body: body }; }); })
+  .then(function (r) {
+    return r.json().then(function (body) {
+      return { ok: r.ok, body: body };
+    });
+  })
   .then(function (res) {
     if (!res.ok || !res.body || !res.body.launch_url) {
       const msg = (res.body && res.body.error) ? res.body.error : 'Bootstrap endpoint did not return a launch URL.';

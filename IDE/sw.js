@@ -39,7 +39,8 @@ self.addEventListener('fetch', function (event) {
     return;
   }
 
-  if (SHELL_ASSETS.some(function (asset) { return req.url.indexOf(asset) !== -1; })) {
+  const url = new URL(req.url);
+  if (SHELL_ASSETS.includes(url.pathname)) {
     event.respondWith(
       caches.match(req).then(function (cached) {
         return cached || fetch(req);
