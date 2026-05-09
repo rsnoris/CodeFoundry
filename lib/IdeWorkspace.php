@@ -18,7 +18,7 @@ final class IdeWorkspace
         if ($safe === null || $safe === '') {
             $safe = 'user';
         }
-        $hash        = substr(hash('sha256', $raw), 0, 12);
+        $hash        = substr(hash('sha256', $raw), 0, 16);
         $workspaceId = $safe . '_' . $hash;
         $path        = rtrim(CF_IDE_WORKSPACES_DIR, '/') . '/' . $workspaceId;
 
@@ -82,24 +82,20 @@ final class IdeWorkspace
 
     private static function ensureDir(string $path): void
     {
-        if (is_dir($path)) {
-            return;
-        }
-        if (!mkdir($path, 0700, true) && !is_dir($path)) {
+        if (!is_dir($path) && !@mkdir($path, 0750, true) && !is_dir($path)) {
             throw new \RuntimeException('Failed to create IDE workspace directory.');
         }
     }
 
     private static function writeIfMissing(string $path, string $content): void
     {
-        if (is_file($path)) {
-            return;
+        if (!is_file($path)) {
+            $written = @file_put_contents($path, $content, LOCK_EX);
+            if ($written === false && !is_file($path)) {
+                throw new \RuntimeException('Failed to initialize IDE workspace file.');
+            }
         }
-        $written = file_put_contents($path, $content, LOCK_EX);
-        if ($written === false) {
-            throw new \RuntimeException('Failed to initialize IDE workspace file.');
-        }
-        if (!chmod($path, 0600)) {
+        if (!@chmod($path, 0640) && !is_readable($path)) {
             throw new \RuntimeException('Failed to set IDE workspace file permissions.');
         }
     }

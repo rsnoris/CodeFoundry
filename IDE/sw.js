@@ -3,8 +3,8 @@
 
 const CACHE_NAME = 'codefoundry-ide-shell-v1';
 const SHELL_ASSETS = [
-  '/IDE/vscode.php',
   '/IDE/manifest.webmanifest',
+  '/IDE/offline.html',
 ];
 
 self.addEventListener('install', function (event) {
@@ -33,7 +33,7 @@ self.addEventListener('fetch', function (event) {
   if (req.mode === 'navigate' && new URL(req.url).pathname.startsWith('/IDE/')) {
     event.respondWith(
       fetch(req).catch(function () {
-        return caches.match('/IDE/vscode.php');
+        return caches.match('/IDE/offline.html');
       })
     );
     return;

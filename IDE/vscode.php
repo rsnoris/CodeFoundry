@@ -38,6 +38,12 @@ $page_styles = <<<'PAGECSS'
   border-radius: 999px;
 }
 .vscode-actions { margin-left: auto; display: flex; gap: 8px; }
+.vscode-notice {
+  margin-left: 10px;
+  font-size: 12px;
+  color: #fca5a5;
+  display: none;
+}
 .vscode-btn {
   display: inline-flex; align-items: center; gap: 6px;
   border: 1px solid rgba(255,255,255,.2); color: #dbe6ff;
@@ -77,6 +83,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
   <div class="vscode-topbar">
     <div class="vscode-title">Hosted VS Code</div>
     <span class="vscode-pill" id="workspaceBadge">Workspace</span>
+    <span class="vscode-notice" id="swNotice">PWA features are unavailable in this session.</span>
     <div class="vscode-actions">
       <a class="vscode-btn" href="/IDE/?mode=classic">Open Classic IDE</a>
       <button class="vscode-btn" id="reloadBtn" type="button">Reload</button>
@@ -99,20 +106,22 @@ require_once dirname(__DIR__) . '/includes/header.php';
 <script>
 'use strict';
 
-(function registerSw() {
-  if (!('serviceWorker' in navigator)) return;
-  navigator.serviceWorker.register('/IDE/sw.js', { scope: '/IDE/' }).catch(function (err) {
-    console.warn('Service worker registration failed:', err);
-  });
-})();
-
 const frame = document.getElementById('vscodeFrame');
 const loadingState = document.getElementById('loadingState');
 const errorState = document.getElementById('errorState');
 const errorText = document.getElementById('errorText');
 const capList = document.getElementById('capList');
 const workspaceBadge = document.getElementById('workspaceBadge');
+const swNotice = document.getElementById('swNotice');
 const reloadBtn = document.getElementById('reloadBtn');
+
+(function registerSw() {
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.register('/IDE/sw.js', { scope: '/IDE/' }).catch(function (err) {
+    console.warn('Service worker registration failed:', err);
+    if (swNotice) swNotice.style.display = 'inline';
+  });
+})();
 
 reloadBtn.addEventListener('click', function () {
   window.location.reload();
@@ -149,7 +158,8 @@ fetch('/IDE/vscode-bootstrap.php', { credentials: 'same-origin' })
       showError(msg, (res.body && res.body.capabilities) || []);
       return;
     }
-    workspaceBadge.textContent = 'Workspace: ' + ((res.body.workspace && res.body.workspace.name) || 'default');
+    const workspaceName = (res.body.workspace && res.body.workspace.name) || 'default';
+    workspaceBadge.textContent = 'Workspace: ' + workspaceName;
     frame.src = res.body.launch_url;
     frame.style.display = 'block';
     loadingState.style.display = 'none';
